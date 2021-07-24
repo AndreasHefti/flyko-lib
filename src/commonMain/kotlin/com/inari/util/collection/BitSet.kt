@@ -76,17 +76,17 @@ class BitSet(nBits: Int = 64) {
         for (i in lo_offset + 1 until hi_offset) bits[i] = 0
     }
 
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is BitSet) return false
-        val max: Int = min(bits.size, obj.bits.size)
+    override fun equals(other: Any?): Boolean {
+        if (other !is BitSet) return false
+        val max: Int = min(bits.size, other.bits.size)
         var i: Int = 0
         while (i < max) {
-            if (bits[i] != obj.bits[i]) return false
+            if (bits[i] != other.bits[i]) return false
             ++i
         }
         // If one is larger, check to make sure all extra bits are 0.
         for (j in i until bits.size) if (bits[j] != 0L) return false
-        for (j in i until obj.bits.size) if (obj.bits[j] != 0L) return false
+        for (j in i until other.bits.size) if (other.bits[j] != 0L) return false
         return true
     }
 
@@ -188,32 +188,32 @@ class BitSet(nBits: Int = 64) {
     }
 
     fun nextClearBit(from: Int): Int {
-        var from = from
-        var offset = from shr 6
-        var mask = 1L shl from
+        var _from = from
+        var offset = _from shr 6
+        var mask = 1L shl _from
         while (offset < bits.size) {
             val h = bits[offset]
             do {
-                if (h and mask == 0L) return from
+                if (h and mask == 0L) return _from
                 mask = mask shl 1
-                from++
+                _from++
             } while (mask != 0L)
             mask = 1
             offset++
         }
-        return from
+        return _from
     }
 
     fun nextSetBit(from: Int): Int {
-        var from = from
-        var offset = from shr 6
-        var mask = 1L shl from
+        var _from = from
+        var offset = _from shr 6
+        var mask = 1L shl _from
         while (offset < bits.size) {
             val h = bits[offset]
             do {
-                if (h and mask != 0L) return from
+                if (h and mask != 0L) return _from
                 mask = mask shl 1
-                from++
+                _from++
             } while (mask != 0L)
             mask = 1
             offset++
@@ -266,10 +266,6 @@ class BitSet(nBits: Int = 64) {
     private fun ensure(lastElt: Int) {
         if (lastElt >= bits.size) {
             bits = bits.copyOf(lastElt + 1)
-
-//            val nd = LongArray(lastElt + 1)
-//            System.arraycopy(bits, 0, nd, 0, bits.size)
-//            bits = nd
         }
     }
 

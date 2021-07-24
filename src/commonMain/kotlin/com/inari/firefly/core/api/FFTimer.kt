@@ -6,32 +6,17 @@ import com.inari.util.timeMillis
 import kotlin.native.concurrent.ThreadLocal
 
 @ThreadLocal
-object FFTimer : FFApp.SystemTimer() {
+object FFTimer : TimerAPI() {
 
     private var lastUpdateTime: Long = 0
 
-    var time: Long = 0
+    override var time: Long = 0
         private set
-    var timeElapsed: Long = 0
+    override var timeElapsed: Long = 0
         private set
 
 
     private val schedulers: DynArray<UpdateScheduler> = DynArray.of( 20)
-
-    internal fun updateSchedulers() {
-        var i = 0
-        val to = schedulers.capacity
-        while ( i < to) {
-            val updateScheduler = schedulers[i++] ?: continue
-            updateScheduler.update()
-        }
-    }
-
-    fun createUpdateScheduler(resolution: Float): UpdateScheduler {
-        val updateScheduler = UpdateScheduler(resolution)
-        schedulers.add(updateScheduler)
-        return updateScheduler
-    }
 
     override val tickAction: () -> Unit
         get() = {

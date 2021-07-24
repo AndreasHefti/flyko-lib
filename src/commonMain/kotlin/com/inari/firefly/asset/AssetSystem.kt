@@ -2,20 +2,20 @@ package com.inari.firefly.asset
 
 import com.inari.firefly.FFContext
 import com.inari.firefly.core.component.ComponentMap.MapAction.*
+import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.util.aspect.Aspects
 import com.inari.util.collection.DynIntArray
-
-import kotlin.jvm.JvmField
 
 object AssetSystem : ComponentSystem {
 
     override val supportedComponents: Aspects =
         SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(Asset)
 
-    @JvmField
-    val assets = ComponentSystem.createComponentMapping(
+    val assets: ComponentMapRO<Asset>
+        get() = systemAssets
+    private val systemAssets = ComponentSystem.createComponentMapping(
         Asset,
         activationMapping = true,
         nameMapping = true,
@@ -42,8 +42,8 @@ object AssetSystem : ComponentSystem {
 
     private fun load(asset: Asset) {
         val dependingIndex = asset.dependingIndex()
-        if (dependingIndex >= 0 && !assets.isActive(dependingIndex)) {
-            assets.activate(dependingIndex)
+        if (dependingIndex >= 0 && !systemAssets.isActive(dependingIndex)) {
+            systemAssets.activate(dependingIndex)
         }
 
         asset.activate()
@@ -60,8 +60,8 @@ object AssetSystem : ComponentSystem {
             (0 until dependingAssetIds.length)
                 .filterNot { dependingAssetIds.isEmpty(it) }
                 .map { dependingAssetIds[it] }
-                .filter { assets.isActive(it) }
-                .forEach { assets.deactivate(it) }
+                .filter { systemAssets.isActive(it) }
+                .forEach { systemAssets.deactivate(it) }
         }
 
         asset.deactivate()
@@ -75,7 +75,7 @@ object AssetSystem : ComponentSystem {
         if (dependingAssetIds.isEmpty) {
             (0 until dependingAssetIds.length)
                 .filterNot { dependingAssetIds.isEmpty(it) }
-                .forEach { assets.delete(dependingAssetIds[it]) }
+                .forEach { systemAssets.delete(dependingAssetIds[it]) }
         }
 
         AssetEvent.send(
@@ -85,12 +85,12 @@ object AssetSystem : ComponentSystem {
     }
 
     override fun clearSystem() {
-        assets.clear()
+        systemAssets.clear()
     }
 
     private fun findDependingAssets(assetId: Int) {
         dependingAssetIds.clear()
-        assets.map
+        systemAssets.map
             .filter { it.dependsOn(assetId) }
             .forEach { dependingAssetIds.add(it.index) }
     }

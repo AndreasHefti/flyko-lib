@@ -3,6 +3,8 @@ package com.inari.firefly.graphics.view.camera
 import com.inari.util.geom.PositionF
 import com.inari.firefly.NO_CAMERA_PIVOT
 import com.inari.firefly.control.Controller
+import com.inari.firefly.control.SingleComponentController
+import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewChangeEvent
@@ -11,7 +13,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 
-class SimpleCameraController private constructor() : Controller() {
+class SimpleCameraController private constructor() : SingleComponentController() {
 
     private val pos = PositionF()
     private var view: View? = null
@@ -31,7 +33,7 @@ class SimpleCameraController private constructor() : Controller() {
         }
     }
 
-    override fun update(componentId: Int) {
+    override fun update(componentId: CompId) {
         val view = this.view ?: return
 
         if (getPos(view.data.zoom, view.data.bounds, view.data.worldPosition)) {

@@ -1,10 +1,11 @@
 package com.inari.firefly.physics.movement
 
+import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.ETransform
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-object EulerIntegrator : Integrator {
+class EulerIntegrator private constructor() : Integrator() {
 
     var gravity = 9.8f
     var shift = 10.0.pow(0.0).toFloat()
@@ -45,5 +46,9 @@ object EulerIntegrator : Integrator {
             }
             movement.acceleration.dy = gravity * (movement.mass * movement.massFactor)
         }
+    }
+
+    companion object : SystemComponentSubType<Integrator, EulerIntegrator>(Integrator, EulerIntegrator::class) {
+        override fun createEmpty() = EulerIntegrator()
     }
 }

@@ -39,7 +39,7 @@ object InariIntro {
         }
 
         entityId = Entity.buildAndActivate {
-            component(ETransform) {
+            withComponent(ETransform) {
                 view(BASE_VIEW)
                 position(PositionF(
                     FFContext.screenWidth / 2 - texture.width / 2,
@@ -47,13 +47,13 @@ object InariIntro {
                 ))
             }
 
-            component(ESprite) {
+            withComponent(ESprite) {
                 sprite(spriteAssetId)
                 tint(1f, 1f, 1f, 0f)
             }
 
-            component(EAnimation) {
-                animationId = activeAnimation(EasedProperty) {
+            withComponent(EAnimation) {
+                animationId = withActiveAnimation(EasedProperty) {
                     easing = Easing.Type.LINEAR
                     startValue = 0f
                     endValue = 1f

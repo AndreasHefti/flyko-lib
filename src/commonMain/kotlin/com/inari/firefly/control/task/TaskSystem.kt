@@ -1,7 +1,11 @@
 package com.inari.firefly.control.task
 
 import com.inari.firefly.FFContext
+import com.inari.firefly.NO_COMP_ID
+import com.inari.firefly.control.state.StateSystem
+import com.inari.firefly.control.state.Workflow
 import com.inari.firefly.core.component.CompId
+import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.Entity
@@ -13,52 +17,61 @@ import kotlin.jvm.JvmField
 object TaskSystem : ComponentSystem {
 
     override val supportedComponents: Aspects =
-        SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(SystemTask, EntityTask)
+        SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(GenericTask, ComponentTask)
 
-    @JvmField val systemTasks = ComponentSystem.createComponentMapping(
-        SystemTask, nameMapping = true
+    val genericTasks: ComponentMapRO<GenericTask>
+        get() = _genericTasks
+    private val _genericTasks = ComponentSystem.createComponentMapping(
+        GenericTask, nameMapping = true
     )
 
-    @JvmField val entityTasks = ComponentSystem.createComponentMapping(
-            EntityTask, nameMapping = true
+    val componentTasks: ComponentMapRO<ComponentTask>
+        get() = _componentTasks
+    private val _componentTasks = ComponentSystem.createComponentMapping(
+        ComponentTask, nameMapping = true
     )
 
     init {
         FFContext.loadSystem(this)
     }
 
-    fun runSystemTask(name: String) =
-        runSystemTask(systemTasks.indexForName(name))
+    fun runTask(name: String) =
+        runTask(genericTasks.indexForName(name))
 
-    fun runSystemTask(taskId: CompId) =
-        runSystemTask(taskId.checkType(SystemTask).instanceId)
+    fun runTask(taskId: CompId) =
+        runTask(taskId.instanceId)
 
-    fun runSystemTask(taskIndex: Int) {
-        if (taskIndex in systemTasks) {
-            systemTasks[taskIndex].task()
-            if (systemTasks[taskIndex].removeAfterRun)
-                systemTasks.delete(taskIndex)
-        }
+    fun runTask(taskIndex: Int) {
+        if (taskIndex in _genericTasks)
+            _genericTasks[taskIndex].invoke()
     }
 
-    fun runEntityTask(name: String, entityId: Int): OpResult =
-            runEntityTask(systemTasks.indexForName(name), entityId)
+    fun runTask(
+        name: String,
+        compId1: CompId,
+        compId2: CompId = NO_COMP_ID,
+        compId3: CompId = NO_COMP_ID,
+        compId4: CompId = NO_COMP_ID,
+        compId5: CompId = NO_COMP_ID) = componentTasks[name].invoke(compId1, compId2, compId3, compId4, compId5)
 
-    fun runEntityTask(name: String, entityName: String): OpResult =
-            runEntityTask(
-                    systemTasks.indexForName(name),
-                    EntitySystem[entityName].index)
+    fun runTask(
+        taskId: CompId,
+        compId1: CompId,
+        compId2: CompId = NO_COMP_ID,
+        compId3: CompId = NO_COMP_ID,
+        compId4: CompId = NO_COMP_ID,
+        compId5: CompId = NO_COMP_ID) = componentTasks[taskId].invoke(compId1, compId2, compId3, compId4, compId5)
 
-    fun runEntityTask(taskId: CompId, entityId: CompId): OpResult =
-            runEntityTask(
-                    taskId.checkType(SystemTask).instanceId,
-                    entityId.checkType(Entity).instanceId)
-
-    fun runEntityTask(taskIndex: Int, entityId: Int): OpResult =
-            entityTasks[taskIndex].task(entityId)
+    fun runTask(
+        taskIndex: Int,
+        compId1: CompId,
+        compId2: CompId = NO_COMP_ID,
+        compId3: CompId = NO_COMP_ID,
+        compId4: CompId = NO_COMP_ID,
+        compId5: CompId = NO_COMP_ID) = componentTasks[taskIndex].invoke(compId1, compId2, compId3, compId4, compId5)
 
     override fun clearSystem() {
-        systemTasks.clear()
-        entityTasks.clear()
+        _genericTasks.clear()
+        _componentTasks.clear()
     }
 }

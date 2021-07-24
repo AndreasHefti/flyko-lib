@@ -18,28 +18,28 @@ import kotlin.collections.HashMap
 import kotlin.experimental.and
 
 
-actual object FFInput {
+actual object FFInput : InputAPI {
 
-    actual val xpos: Int
+    actual override val xpos: Int
         get() = Gdx.input.x
-    actual val ypos: Int
+    actual override val ypos: Int
         get() = Gdx.input.y
-    actual val dx: Int
+    actual override val dx: Int
         get() = Gdx.input.deltaX
-    actual val dy: Int
+    actual override val dy: Int
         get() = Gdx.input.deltaY
 
-    actual val implementations: List<InputImpl> = listOf(
+    actual override val implementations: List<InputImpl> = listOf(
             GLFWDesktopKeyboardInput,
             GLFWControllerInput)
 
-    actual val devices: MutableMap<String, InputDevice> = HashMap()
+    actual override val devices: MutableMap<String, InputDevice> = HashMap()
 
     init {
         devices[VOID_INPUT_DEVICE] = VOIDAdapter()
     }
 
-    actual fun <T : InputDevice> createDevice(
+    actual override fun <T : InputDevice> createDevice(
             name: String,
             implementation: InputImpl,
             window: Long): T {
@@ -56,33 +56,33 @@ actual object FFInput {
         }
     }
 
-    actual fun createOrAdapter(name: String, a: String, b: String): ORAdapter {
+    actual override fun createOrAdapter(name: String, a: String, b: String): ORAdapter {
         val adapter = ORAdapter(getDevice(a), getDevice(b), name)
         devices[name] = adapter
         return adapter
     }
 
-    actual fun getDevice(name: String): InputDevice =
+    actual override fun getDevice(name: String): InputDevice =
             devices[name] ?: devices[VOID_INPUT_DEVICE]!!
 
-    actual fun <T : InputDevice> getDeviceOf(name: String): T = getDevice(name) as T
+    actual override fun <T : InputDevice> getDeviceOf(name: String): T = getDevice(name) as T
 
-    actual fun clearDevice(name: String) {
+    actual override fun clearDevice(name: String) {
         devices.remove(name)
     }
 
-    actual fun setKeyCallback(callback: KeyCallback) {
+    actual override fun setKeyCallback(callback: KeyCallback) {
         val w = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         GLFW.glfwSetKeyCallback(w) { _, key, scancode, action, _ -> callback.invoke(key, scancode, action) }
     }
 
-    actual fun setMouseButtonCallback(callback: MouseCallback) {
+    actual override fun setMouseButtonCallback(callback: MouseCallback) {
         val w = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         GLFW.glfwSetMouseButtonCallback(w) { _, key, action, _ -> callback.invoke(key, action) }
     }
 
     private var buttonCallbackUpdate: Call = {}
-    actual fun setButtonCallback(deviceName: String, callback: ButtonCallback) {
+    actual override fun setButtonCallback(deviceName: String, callback: ButtonCallback) {
         if (deviceName in devices) {
             val device = devices[deviceName]!!
             val buttonTypes = ButtonType.values()
@@ -98,7 +98,7 @@ actual object FFInput {
         } else throw IllegalArgumentException("No device with name: $deviceName found")
     }
 
-    actual fun resetInputCallbacks() {
+    actual override fun resetInputCallbacks() {
         val w = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         GLFW.glfwSetKeyCallback(w, null)
         GLFW.glfwSetMouseButtonCallback(w, null)

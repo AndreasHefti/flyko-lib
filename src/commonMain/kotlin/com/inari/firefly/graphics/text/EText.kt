@@ -18,7 +18,7 @@ class EText private constructor() : EntityComponent(EText::class.simpleName!!) {
     @JvmField internal var fontAssetRef = -1
     @JvmField internal var shaderRef = -1
 
-    var renderer = ComponentRefResolver(Renderer) { index-> rendererRef = index }
+    val renderer = ComponentRefResolver(Renderer) { index-> rendererRef = index }
     var fontAsset = ComponentRefResolver(Asset) { index -> fontAssetRef = index }
     val shader = AssetInstanceRefResolver(
         { index -> shaderRef = index },

@@ -2,6 +2,7 @@ package com.inari.util.aspect
 
 import com.inari.util.collection.DynArray
 import kotlin.reflect.KClass
+import kotlin.reflect.cast
 
 class AspectSet<T : Any> constructor(
     val aspectType: AspectType,
@@ -38,8 +39,8 @@ class AspectSet<T : Any> constructor(
         return null
     }
 
-    fun <TT : T> get(aspect: Aspect, subType: KClass<TT>): TT?  =
-         get(aspect) as TT
+    fun <TT : T> get(aspect: Aspect, subType: KClass<TT>): TT  =
+        subType.cast(get(aspect))
 
     operator fun plus(other: AspectSet<T>) {
         if (other.aspectType == this.aspectType) {

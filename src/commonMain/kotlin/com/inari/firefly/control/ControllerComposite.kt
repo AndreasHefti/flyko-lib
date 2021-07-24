@@ -7,7 +7,7 @@ import com.inari.firefly.core.system.SystemComponentBuilder
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.util.collection.DynIntArray
 
-class ControllerComposite private constructor() : Controller()  {
+class ControllerComposite private constructor() : SingleComponentController()  {
 
     private val controller = DynIntArray(3, -1, 5)
 
@@ -46,25 +46,20 @@ class ControllerComposite private constructor() : Controller()  {
 
     fun <C : Controller> withController(cBuilder: SystemComponentBuilder<C>, configure: (C.() -> Unit)): CompId {
         val comp = cBuilder.buildAndGet(configure)
-        comp.controlled.set(this.index)
         controller.add(comp.index)
         return comp.componentId
     }
 
     fun <C : Controller> withActiveController(cBuilder: SystemComponentBuilder<C>, configure: (C.() -> Unit)): CompId {
         val comp = cBuilder.buildActivateAndGet(configure)
-        comp.controlled.set(this.index)
         controller.add(comp.index)
         return comp.componentId
     }
 
-    override fun update(componentId: Int) {
+    override fun update(componentId: CompId) {
         val it = controller.iterator()
         while(it.hasNext())
             FFContext[Controller, it.nextInt()].update(componentId)
     }
 
-    companion object : SystemComponentSubType<Controller, ControllerComposite>(Controller, ControllerComposite::class) {
-        override fun createEmpty() = ControllerComposite()
-    }
 }

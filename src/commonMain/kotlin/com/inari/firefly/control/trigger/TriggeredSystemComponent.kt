@@ -1,28 +1,19 @@
 package com.inari.firefly.control.trigger
 
-import com.inari.firefly.core.system.SystemComponent
-import com.inari.util.Call
-import com.inari.util.collection.BitSet
+import com.inari.firefly.core.component.CompId
+import com.inari.firefly.core.system.SystemComponentBuilder
 
-abstract class TriggeredSystemComponent protected constructor(
-    objectIndexerName: String
-) : SystemComponent(objectIndexerName) {
+interface TriggeredSystemComponent {
 
-    private val trigger = BitSet()
+    val componentId: CompId
 
-    protected fun <A : Trigger> trigger(cBuilder: Trigger.Subtype<A>, call: Call, configure: (A.() -> Unit)): A {
-        val trigger = cBuilder.doBuild(configure)
-        TriggerSystem.trigger.receiver()(trigger)
-        trigger.register(call)
-        return trigger
+    fun <A : Trigger> withTrigger(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): A {
+        val result = cBuilder.buildAndGet(configure)
+        result.triggeredComponentId = componentId
+        return result
     }
 
-    override fun dispose() {
-        var i = trigger.nextSetBit(0)
-        while (i >= 0) {
-            TriggerSystem.trigger.delete(i)
-            i = trigger.nextSetBit(i + 1)
-        }
-        super.dispose()
+    fun disposeTrigger() {
+        TriggerSystem.disposeForComponent(componentId)
     }
 }

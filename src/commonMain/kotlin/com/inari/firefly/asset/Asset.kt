@@ -1,6 +1,7 @@
 package com.inari.firefly.asset
 
 import com.inari.firefly.FFContext
+import com.inari.firefly.core.component.IndexedInstantiableList
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentType
 import kotlin.jvm.JvmField

@@ -1,6 +1,8 @@
 package com.inari.firefly.asset
 
 import com.inari.firefly.core.component.CompId
+import com.inari.firefly.core.component.IndexedInstantiable
+import com.inari.firefly.core.component.IndexedInstantiableList
 import com.inari.util.Consumer
 import com.inari.util.Named
 import com.inari.util.Supplier

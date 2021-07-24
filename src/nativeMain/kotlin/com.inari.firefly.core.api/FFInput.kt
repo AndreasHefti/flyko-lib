@@ -9,26 +9,26 @@ import com.inari.util.Call
 import kotlin.collections.HashMap
 
 
-actual object FFInput {
+actual object FFInput : InputAPI {
 
-    actual val xpos: Int
+    actual override val xpos: Int
         get() = throw UnsupportedOperationException()
-    actual val ypos: Int
+    actual override val ypos: Int
         get() = throw UnsupportedOperationException()
-    actual val dx: Int
+    actual override val dx: Int
         get() = throw UnsupportedOperationException()
-    actual val dy: Int
+    actual override val dy: Int
         get() = throw UnsupportedOperationException()
 
-    actual val implementations: List<InputImpl> = throw UnsupportedOperationException()
+    actual override val implementations: List<InputImpl> = throw UnsupportedOperationException()
 
-    actual val devices: MutableMap<String, InputDevice> = HashMap()
+    actual override val devices: MutableMap<String, InputDevice> = HashMap()
 
     init {
         devices[VOID_INPUT_DEVICE] = VOIDAdapter()
     }
 
-    actual fun <T : InputDevice> createDevice(
+    actual override fun <T : InputDevice> createDevice(
             name: String,
             implementation: InputImpl,
             window: Long): T {
@@ -36,31 +36,31 @@ actual object FFInput {
         throw UnsupportedOperationException()
     }
 
-    actual fun createOrAdapter(name: String, a: String, b: String): ORAdapter {
+    actual override fun createOrAdapter(name: String, a: String, b: String): ORAdapter {
         val adapter = ORAdapter(getDevice(a), getDevice(b), name)
         devices[name] = adapter
         return adapter
     }
 
-    actual fun getDevice(name: String): InputDevice =
+    actual override fun getDevice(name: String): InputDevice =
             devices[name] ?: devices[VOID_INPUT_DEVICE]!!
 
-    actual fun <T : InputDevice> getDeviceOf(name: String): T = getDevice(name) as T
+    actual override fun <T : InputDevice> getDeviceOf(name: String): T = getDevice(name) as T
 
-    actual fun clearDevice(name: String) {
+    actual override fun clearDevice(name: String) {
         devices.remove(name)
     }
 
-    actual fun setKeyCallback(callback: KeyCallback) {
+    actual override fun setKeyCallback(callback: KeyCallback) {
         throw UnsupportedOperationException()
     }
 
-    actual fun setMouseButtonCallback(callback: MouseCallback) {
+    actual override fun setMouseButtonCallback(callback: MouseCallback) {
         throw UnsupportedOperationException()
     }
 
     private var buttonCallbackUpdate: Call = {}
-    actual fun setButtonCallback(deviceName: String, callback: ButtonCallback) {
+    actual override fun setButtonCallback(deviceName: String, callback: ButtonCallback) {
         if (deviceName in devices) {
             val device = devices[deviceName]!!
             val buttonTypes = ButtonType.values()
@@ -76,7 +76,7 @@ actual object FFInput {
         } else throw IllegalArgumentException("No device with name: $deviceName found")
     }
 
-    actual fun resetInputCallbacks() {
+    actual override fun resetInputCallbacks() {
         throw UnsupportedOperationException()
     }
 

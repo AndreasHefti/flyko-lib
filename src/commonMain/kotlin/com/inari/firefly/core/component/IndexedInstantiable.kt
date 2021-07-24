@@ -1,4 +1,4 @@
-package com.inari.firefly.asset
+package com.inari.firefly.core.component
 
 interface IndexedInstantiable {
     val instanceId: Int

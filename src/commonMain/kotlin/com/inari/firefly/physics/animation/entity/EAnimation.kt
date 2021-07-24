@@ -20,7 +20,7 @@ class EAnimation : EntityComponent(EAnimation::class.simpleName!!) {
         animations.set(index)
     }
 
-    fun <A : Animation> animation(builder: SystemComponentSubType<Animation, A>, configure: (A.() -> Unit)): CompId {
+    fun <A : Animation> withAnimation(builder: SystemComponentSubType<Animation, A>, configure: (A.() -> Unit)): CompId {
         if (initialized)
             throw IllegalStateException("EAnimation instance is already created")
         val id = builder.build(configure)
@@ -28,7 +28,7 @@ class EAnimation : EntityComponent(EAnimation::class.simpleName!!) {
         return id
     }
 
-    fun <A : Animation> activeAnimation(builder: SystemComponentSubType<Animation, A>, configure: (A.() -> Unit)): CompId {
+    fun <A : Animation> withActiveAnimation(builder: SystemComponentSubType<Animation, A>, configure: (A.() -> Unit)): CompId {
         if (initialized)
             throw IllegalStateException("EAnimation instance is already created")
         val id = builder.buildAndActivate(configure)

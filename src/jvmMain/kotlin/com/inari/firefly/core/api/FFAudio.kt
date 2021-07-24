@@ -7,39 +7,39 @@ import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynIntArray
 
 
-actual object FFAudio {
+actual object FFAudio : AudioAPI {
 
     private val sounds: DynArray<Sound> = DynArray.of()
     private val lastPlayingSoundOnChannel = DynIntArray(5, -1)
     private val music: DynArray<Music> = DynArray.of()
 
-    actual fun createSound(resourceName: String, streaming: Boolean): Int =
+    actual override fun createSound(resourceName: String, streaming: Boolean): Int =
         if (streaming)
             music.add(Gdx.audio.newMusic(Gdx.files.classpath(resourceName)))
         else
             sounds.add(Gdx.audio.newSound(Gdx.files.classpath(resourceName)))
 
-    actual fun disposeSound(soundId: Int, streaming: Boolean) {
+    actual override fun disposeSound(soundId: Int, streaming: Boolean) {
         if (streaming)
             music.remove(soundId)?.dispose()
         else
             sounds.remove(soundId)?.dispose()
     }
 
-    actual fun changeMusic(soundId: Int, volume: Float, pan: Float) {
+    actual override fun changeMusic(soundId: Int, volume: Float, pan: Float) {
         val music = music[soundId] ?: return
         if (music.isPlaying) return
         music.setPan(pan, volume)
     }
 
-    actual fun changeSound(soundId: Int, instanceId: Long, volume: Float, pitch: Float, pan: Float) {
+    actual override fun changeSound(soundId: Int, instanceId: Long, volume: Float, pitch: Float, pan: Float) {
         val sound = sounds[soundId] ?: return
         sound.setPan( instanceId, pan, volume )
         sound.setPitch( instanceId, pitch )
         sound.setVolume( instanceId, volume )
     }
 
-    actual fun playMusic(soundId: Int, looping: Boolean, volume: Float, pan: Float) {
+    actual override fun playMusic(soundId: Int, looping: Boolean, volume: Float, pan: Float) {
         val music = music[soundId] ?: return
         if (music.isPlaying) return
         music.setPan(pan, volume)
@@ -47,7 +47,7 @@ actual object FFAudio {
         music.play()
     }
 
-    actual fun playSound(soundId: Int, channel: Int, looping: Boolean, volume: Float, pitch: Float, pan: Float): Long {
+    actual override fun playSound(soundId: Int, channel: Int, looping: Boolean, volume: Float, pitch: Float, pan: Float): Long {
         val sound = sounds[soundId] ?: return -1
         if (channel >= 0 && channel < lastPlayingSoundOnChannel.length && lastPlayingSoundOnChannel[channel] >= 0)
             sounds[lastPlayingSoundOnChannel[channel]]?.stop()
@@ -61,12 +61,12 @@ actual object FFAudio {
         return play
     }
 
-    actual fun stopMusic(soundId: Int) {
+    actual override fun stopMusic(soundId: Int) {
         val music = music[soundId] ?: return
         if (music.isPlaying) music.stop()
     }
 
-    actual fun stopSound(soundId: Int, instanceId: Long) {
+    actual override fun stopSound(soundId: Int, instanceId: Long) {
         sounds[soundId]?.stop(instanceId)
     }
 }

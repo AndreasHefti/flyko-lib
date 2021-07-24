@@ -3,6 +3,7 @@ package com.inari.firefly.graphics.view
 import com.inari.firefly.BlendMode
 import com.inari.firefly.asset.AssetInstanceRefResolver
 import com.inari.firefly.control.ControlledSystemComponent
+import com.inari.firefly.control.ControllerSystem
 import com.inari.firefly.core.api.ViewData
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentSingleType
@@ -46,6 +47,11 @@ class View private constructor (
     var fboScale: Float
         get() = data.fboScale
         set(value) { data.fboScale = value }
+
+    override fun dispose() {
+        ControllerSystem.unregister(componentId, true)
+        super.dispose()
+    }
 
     override fun toString(): String {
         return "View(baseView=$baseView, " +

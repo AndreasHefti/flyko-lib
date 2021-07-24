@@ -18,10 +18,10 @@ import kotlin.math.floor
 
 abstract class FFApp protected constructor(
     eventDispatcher: () -> IEventDispatcher,
-    graphics: () -> FFGraphics,
-    audio: () -> FFAudio,
-    input: () -> FFInput,
-    timer: () -> FFTimer
+    graphics: () -> GraphicsAPI,
+    audio: () -> AudioAPI,
+    input: () -> InputAPI,
+    timer: () -> TimerAPI
 ) {
 
     private var initialized: Boolean = false
@@ -99,25 +99,16 @@ abstract class FFApp protected constructor(
 
         lateinit var eventDispatcher: IEventDispatcher
             private set
-        lateinit var graphics: FFGraphics
+        lateinit var graphics: GraphicsAPI
             private set
-        lateinit var audio: FFAudio
+        lateinit var audio: AudioAPI
             private set
-        lateinit var input: FFInput
+        lateinit var input: InputAPI
             private set
-        lateinit var timer: FFTimer
+        lateinit var timer: TimerAPI
             private set
 
         @JvmField internal val NO_VIRTUAL_VIEW_PORTS: DynArrayRO<ViewData> = DynArray.of()
-    }
-
-    abstract class SystemTimer {
-
-        abstract val tickAction: () -> Unit
-
-        internal fun tick() {
-            tickAction()
-        }
     }
 
     class UpdateEvent(override val eventType: EventType) : Event<Call>() {

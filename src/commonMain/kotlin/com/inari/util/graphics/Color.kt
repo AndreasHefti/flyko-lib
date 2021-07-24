@@ -120,8 +120,6 @@ data class MutableColor(
         if (other == null) return false
         if (other !is IColor) return false
 
-        other as IColor
-
         if (r != other.r) return false
         if (g != other.g) return false
         if (b != other.b) return false
@@ -161,8 +159,6 @@ data class ImmutableColor(
         if (this === other) return true
         if (other == null) return false
         if (other !is IColor) return false
-
-        other as IColor
 
         if (r != other.r) return false
         if (g != other.g) return false

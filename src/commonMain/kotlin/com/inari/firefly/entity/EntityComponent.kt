@@ -1,5 +1,6 @@
 package com.inari.firefly.entity
 
+import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.Component
 import com.inari.firefly.core.component.ComponentType
@@ -26,15 +27,22 @@ abstract class EntityComponent protected constructor(
 
     var initialized: Boolean = false
         protected set
-    internal fun internalInit() {
+
+    protected var entityId: CompId = NO_COMP_ID
+
+    internal fun internalInit(entityId: CompId) {
+        this.entityId = entityId
         init()
         initialized = true
     }
+
     protected fun init() {
         initialized = true
     }
+
     internal fun internalReset() {
         reset()
+        this.entityId = NO_COMP_ID
         initialized = false
     }
 
@@ -67,14 +75,14 @@ abstract class EntityComponent protected constructor(
 }
 
 abstract class EntityComponentBuilder<C : EntityComponent> : ComponentType<C> {
-    private fun doBuild(comp: C, configure: C.() -> Unit, receiver: (C) -> C): CompId {
+    private fun doBuild(comp: C, configure: C.() -> Unit, entityId: CompId, receiver: (C) -> C): CompId {
         comp.also(configure)
-        comp.internalInit()
+        comp.internalInit(entityId)
         receiver(comp)
         return comp.componentId
     }
-    internal fun builder(receiver: Receiver<C>): (C.() -> Unit) -> CompId = {
-        configure -> doBuild(EntityProvider.getComponent(this), configure, receiver)
+    internal fun builder(entityId: CompId, receiver: Receiver<C>): (C.() -> Unit) -> CompId = {
+        configure -> doBuild(EntityProvider.getComponent(this), configure, entityId, receiver)
     }
     internal fun create(): C = createEmpty()
     protected abstract fun createEmpty(): C

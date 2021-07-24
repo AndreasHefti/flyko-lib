@@ -2,6 +2,9 @@ package com.inari.firefly.control.behavior
 
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
+import com.inari.firefly.control.action.Action
+import com.inari.firefly.control.action.ActionSystem
+import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.Entity
@@ -44,29 +47,26 @@ object BehaviorSystem : ComponentSystem {
     override val supportedComponents: Aspects =
             SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(BxNode)
 
-    @JvmField val nodes = ComponentSystem.createComponentMapping(
+    val actions: ComponentMapRO<BxNode>
+        get() = systemNodes
+    @JvmField internal val systemNodes = ComponentSystem.createComponentMapping(
             BxNode
     )
+
+    private val entityActivationListener = object : EntityActivationEvent.Listener {
+        override fun entityActivated(entity: Entity) =
+            entityIds.set(entity.index)
+        override fun entityDeactivated(entity: Entity) =
+            entityIds.clear(entity.index)
+        override fun match(aspects: Aspects): Boolean =
+            aspects.contains(EBehavior)
+    }
 
     private val entityIds = BitSet()
 
     init {
-        FFContext.registerListener(FFApp.UpdateEvent) {
-            update()
-        }
-
-        FFContext.registerListener(
-                EntityActivationEvent,
-                object : EntityActivationEvent.Listener {
-                    override fun entityActivated(entity: Entity) =
-                            entityIds.set(entity.index)
-                    override fun entityDeactivated(entity: Entity) =
-                            entityIds.clear(entity.index)
-                    override fun match(aspects: Aspects): Boolean =
-                            aspects.contains(EBehavior)
-                }
-        )
-
+        FFContext.registerListener(FFApp.UpdateEvent, this::update)
+        FFContext.registerListener(EntityActivationEvent, entityActivationListener)
         FFContext.loadSystem(this)
     }
 
@@ -94,11 +94,11 @@ object BehaviorSystem : ComponentSystem {
                 else
                     reset(entityId)
 
-            behavior.treeState = nodes[behavior.treeRef].tick(entity, behavior)
+            behavior.treeState = systemNodes[behavior.treeRef].tick(entity, behavior)
 
     }
 
     override fun clearSystem() {
-        nodes.clear()
+        systemNodes.clear()
     }
 }

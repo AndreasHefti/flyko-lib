@@ -2,6 +2,7 @@ package com.inari.firefly.audio
 
 import com.inari.firefly.FFContext
 import com.inari.firefly.core.component.ComponentMap.MapAction.*
+import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.util.aspect.Aspects
@@ -12,7 +13,9 @@ object AudioSystem : ComponentSystem {
     override val supportedComponents: Aspects =
         SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(Sound)
 
-    @JvmField val sounds = ComponentSystem.createComponentMapping(
+    val sounds: ComponentMapRO<Sound>
+        get() = systemSounds
+    private val systemSounds = ComponentSystem.createComponentMapping(
         Sound,
         activationMapping = true,
         nameMapping = true,
@@ -60,6 +63,6 @@ object AudioSystem : ComponentSystem {
     private fun deleted(sound: Sound) =
         FFContext[SoundAsset, sound.soundAssetId].deactivate()
 
-    override fun clearSystem() = sounds.clear()
+    override fun clearSystem() = systemSounds.clear()
 
 }

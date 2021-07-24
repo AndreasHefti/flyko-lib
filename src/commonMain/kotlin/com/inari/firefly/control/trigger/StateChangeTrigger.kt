@@ -6,6 +6,7 @@ import com.inari.firefly.NULL_CALL
 import com.inari.firefly.control.state.Workflow
 import com.inari.firefly.control.state.WorkflowEvent
 import com.inari.firefly.core.ComponentRefResolver
+import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.util.Call
 import com.inari.util.Consumer
 
@@ -18,7 +19,6 @@ class StateChangeTrigger private constructor(): Trigger() {
     }
 
     private var workflowRef = -1
-    private var call: Call = NULL_CALL
     private val listener : Consumer<WorkflowEvent> =  listener@ { event ->
 
             if (event.workflowId.instanceId != workflowRef)
@@ -27,17 +27,17 @@ class StateChangeTrigger private constructor(): Trigger() {
             when (this.type) {
                 Type.STATE_CHANGE ->
                     if (event.type === WorkflowEvent.Type.STATE_CHANGED && typeName == event.stateChangeName)
-                        doTrigger(call)
+                        doTrigger()
                 Type.ENTER_STATE ->
                     if ((event.type === WorkflowEvent.Type.STATE_CHANGED ||
                                 event.type === WorkflowEvent.Type.WORKFLOW_STARTED) &&
                         typeName == event.toName)
-                        doTrigger(call)
+                        doTrigger()
                 Type.EXIT_STATE ->
                     if ((event.type === WorkflowEvent.Type.STATE_CHANGED ||
                         event.type === WorkflowEvent.Type.WORKFLOW_FINISHED) &&
                         typeName == event.fromName)
-                        doTrigger(call)
+                        doTrigger()
             }
 
     }
@@ -47,18 +47,17 @@ class StateChangeTrigger private constructor(): Trigger() {
     var typeName : String  = NO_NAME
 
 
-    override fun register(call: Call) {
-        this.call = call
+    override fun init() {
+        super.init()
         FFContext.registerListener(WorkflowEvent, listener)
     }
 
     override fun dispose() {
         FFContext.disposeListener(WorkflowEvent, listener)
-        call = NULL_CALL
         super.dispose()
     }
 
-    companion object : Trigger.Subtype<StateChangeTrigger>() {
+    companion object : SystemComponentSubType<Trigger, StateChangeTrigger>(Trigger, StateChangeTrigger::class) {
         override fun createEmpty() = StateChangeTrigger()
     }
 }

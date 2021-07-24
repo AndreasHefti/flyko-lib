@@ -2,17 +2,19 @@ package com.inari.firefly.composite
 
 import com.inari.firefly.FFContext
 import com.inari.firefly.core.component.ComponentMap.MapAction.*
+import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.util.aspect.Aspects
-import kotlin.jvm.JvmField
 
 object CompositeSystem : ComponentSystem {
 
     override val supportedComponents: Aspects =
             SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(Composite)
 
-    @JvmField val composites = ComponentSystem.createComponentMapping(
+    val composites: ComponentMapRO<Composite>
+        get() = systemComposites
+    private val systemComposites = ComponentSystem.createComponentMapping(
             Composite,
             activationMapping = true,
             nameMapping = true,
@@ -28,6 +30,6 @@ object CompositeSystem : ComponentSystem {
         FFContext.loadSystem(this)
     }
 
-    override fun clearSystem() = composites.clear()
+    override fun clearSystem() = systemComposites.clear()
 
 }

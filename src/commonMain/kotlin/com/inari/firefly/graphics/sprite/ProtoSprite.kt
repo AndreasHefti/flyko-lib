@@ -1,7 +1,7 @@
 package com.inari.firefly.graphics.sprite
 
 import com.inari.firefly.NO_NAME
-import com.inari.firefly.asset.IndexedInstantiable
+import com.inari.firefly.core.component.IndexedInstantiable
 import com.inari.firefly.core.component.ComponentDSL
 import com.inari.util.geom.Rectangle
 import kotlin.jvm.JvmField

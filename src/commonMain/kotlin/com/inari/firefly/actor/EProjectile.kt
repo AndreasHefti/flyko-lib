@@ -22,7 +22,6 @@ class EProjectile private constructor () : EntityComponent(EProjectile::class.si
     }
 
     override fun componentType() = Companion
-
     companion object : EntityComponentType<EProjectile>(EProjectile::class) {
         @JvmField val PROJECTILE_CONTACT_TYPE = CONTACT_TYPE_ASPECT_GROUP.createAspect("PROJECTILE_CONTACT_TYPE")
         override fun createEmpty() = EProjectile()

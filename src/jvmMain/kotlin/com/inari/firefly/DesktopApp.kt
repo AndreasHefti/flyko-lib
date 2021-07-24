@@ -98,11 +98,14 @@ abstract class DesktopApp : ApplicationAdapter() {
 
     protected fun addExitKeyTrigger(key: Int) {
         TriggerSystem
-        UpdateEventTrigger.build({
-            dispose()
-            DesktopAppAdapter.exit()
-        }) {
-            condition = { Gdx.input.isKeyPressed( key ) }
+        UpdateEventTrigger.build {
+            call = {
+                dispose()
+                DesktopAppAdapter.exit()
+            }
+            condition = {
+                Gdx.input.isKeyPressed( key )
+            }
         }
     }
 }

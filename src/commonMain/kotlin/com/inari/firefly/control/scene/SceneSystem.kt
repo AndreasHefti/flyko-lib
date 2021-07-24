@@ -8,12 +8,15 @@ import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.util.Call
 import com.inari.util.aspect.Aspects
+import kotlin.jvm.JvmField
 
 object SceneSystem : ComponentSystem {
 
     override val supportedComponents: Aspects =
         SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(Scene)
 
+    val scenes: ComponentMapRO<Scene>
+        get() = systemScenes
     private val systemScenes = ComponentSystem.createComponentMapping(
         Scene,
         nameMapping = true,
@@ -25,21 +28,23 @@ object SceneSystem : ComponentSystem {
             else -> {}
         } }
     )
-    val scenes: ComponentMapRO<Scene> = systemScenes
+
+
+    private val updateListener = {
+        var i = systemScenes.nextActive(0)
+        while(i >= 0) {
+            val scene = systemScenes[i]
+            if (scene.paused)
+                continue
+
+            scene()
+            i = systemScenes.nextActive(i + 1)
+        }
+    }
 
 
     init {
-        FFContext.registerListener(FFApp.UpdateEvent) {
-            var i = systemScenes.nextActive(0)
-            while(i >= 0) {
-                val scene = systemScenes[i]
-                if (scene.paused)
-                    continue
-
-                scene()
-                i = systemScenes.nextActive(i + 1)
-            }
-        }
+        FFContext.registerListener(FFApp.UpdateEvent, updateListener)
         FFContext.loadSystem(this)
     }
 

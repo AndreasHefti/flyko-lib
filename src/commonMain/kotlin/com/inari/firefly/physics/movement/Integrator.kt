@@ -1,18 +1,23 @@
 package com.inari.firefly.physics.movement
 
+import com.inari.firefly.core.system.SystemComponent
+import com.inari.firefly.core.system.SystemComponentType
 import com.inari.firefly.graphics.ETransform
 
-interface Integrator {
+abstract class Integrator protected constructor() : SystemComponent(Integrator::class.simpleName!!) {
 
-    fun integrate(
+    abstract fun integrate(
         movement: EMovement,
         transform: ETransform,
         deltaTimeInSeconds: Long
     )
 
-    fun step(
+    abstract fun step(
         movement: EMovement,
         transform: ETransform,
         deltaTimeInSeconds: Long
     )
+
+    override fun componentType() = Companion
+    companion object : SystemComponentType<Integrator>(Integrator::class)
 }

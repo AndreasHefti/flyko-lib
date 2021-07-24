@@ -1,10 +1,7 @@
 package com.inari.firefly
 
 import com.inari.firefly.asset.AssetSystem
-import com.inari.firefly.core.api.FFAudio
-import com.inari.firefly.core.api.FFGraphics
-import com.inari.firefly.core.api.FFInput
-import com.inari.firefly.core.api.FFTimer
+import com.inari.firefly.core.api.*
 import com.inari.firefly.core.component.*
 import com.inari.firefly.core.system.*
 import com.inari.firefly.entity.EntityComponent
@@ -30,16 +27,16 @@ object FFContext {
     val eventDispatcher: IEventDispatcher
         get() = FFApp.eventDispatcher
 
-    val graphics: FFGraphics
+    val graphics: GraphicsAPI
         get() = FFApp.graphics
 
-    val audio: FFAudio
+    val audio: AudioAPI
         get() = FFApp.audio
 
-    val input: FFInput
+    val input: InputAPI
         get() = FFApp.input
 
-    val timer: FFTimer
+    val timer: TimerAPI
         get() = FFApp.timer
 
     val screenWidth: Int

@@ -39,7 +39,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 
-actual object FFGraphics {
+actual object FFGraphics : GraphicsAPI {
 
     private const val DEFAULT_VERTEX_SHADER =
             "attribute vec4 a_position;" +
@@ -94,9 +94,9 @@ actual object FFGraphics {
     private val vector2 = Vector3()
     private val vector3 = Vector3()
 
-    actual val screenHeight: Int
+    actual override val screenHeight: Int
         get() = Gdx.graphics.height
-    actual val screenWidth: Int
+    actual override val screenWidth: Int
         get() = Gdx.graphics.width
 
     private val viewEventListener: Consumer<ViewEvent> = { viewEvent ->
@@ -124,7 +124,7 @@ actual object FFGraphics {
         FFContext.registerListener(ViewEvent, viewEventListener)
     }
 
-    actual fun createTexture(data: TextureData): Triple<Int, Int, Int> {
+    actual override fun createTexture(data: TextureData): Triple<Int, Int, Int> {
         val colorConverter = data.colorConverter
 
         val texture = if (colorConverter != NULL_INT_FUNCTION)
@@ -146,11 +146,11 @@ actual object FFGraphics {
         return Triple(textureId, texture.width, texture.height)
     }
 
-    actual fun disposeTexture(textureId: Int) {
+    actual override fun disposeTexture(textureId: Int) {
         textures.remove(textureId)?.dispose()
     }
 
-    actual fun createSprite(data: SpriteData): Int {
+    actual override fun createSprite(data: SpriteData): Int {
         if (data.textureId !in textures)
             throw IllegalStateException("Texture with id: ${data.textureId} not loaded" )
 
@@ -167,11 +167,11 @@ actual object FFGraphics {
         return sprites.add(sprite)
     }
 
-    actual fun disposeSprite(spriteId: Int) {
+    actual override fun disposeSprite(spriteId: Int) {
         sprites.remove(spriteId)
     }
 
-    actual fun createShader(data: ShaderData): Int {
+    actual override fun createShader(data: ShaderData): Int {
         var vertexShader = data.vertexShaderProgram
         var fragmentShader = data.fragmentShaderProgram
 
@@ -207,17 +207,17 @@ actual object FFGraphics {
         return shaderPrograms.add(ShaderInitData(data.shaderInit, shaderProgram))
     }
 
-    actual fun disposeShader(shaderId: Int) {
+    actual override fun disposeShader(shaderId: Int) {
         shaderPrograms.remove( shaderId )?.program?.dispose()
     }
 
-    actual fun startRendering(view: ViewData, clear: Boolean) {
+    actual override fun startRendering(view: ViewData, clear: Boolean) {
         activeViewport = viewports[view.index]
         activeViewport?.activate(spriteBatch, shapeRenderer, view, clear)
         spriteBatch.begin()
     }
 
-    actual fun renderSprite(renderableSprite: SpriteRenderable, xpos: Float, ypos: Float) {
+    actual override fun renderSprite(renderableSprite: SpriteRenderable, xpos: Float, ypos: Float) {
         setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
         val sprite = sprites[renderableSprite.spriteId]
         setShaderForSpriteBatch(renderableSprite.shaderId)
@@ -225,7 +225,7 @@ actual object FFGraphics {
         spriteBatch.draw(sprite, xpos, ypos)
     }
 
-    actual fun renderSprite(renderableSprite: SpriteRenderable, xpos: Float, ypos: Float, scale: Float) {
+    actual override fun renderSprite(renderableSprite: SpriteRenderable, xpos: Float, ypos: Float, scale: Float) {
         val sprite = sprites[renderableSprite.spriteId] ?: return
         setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
         setShaderForSpriteBatch(renderableSprite.shaderId)
@@ -237,7 +237,7 @@ actual object FFGraphics {
         )
     }
 
-    actual fun renderSprite(renderableSprite: SpriteRenderable, transform: TransformData) {
+    actual override fun renderSprite(renderableSprite: SpriteRenderable, transform: TransformData) {
         val sprite = sprites[renderableSprite.spriteId] ?: return
         setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
         setShaderForSpriteBatch(renderableSprite.shaderId)
@@ -256,7 +256,7 @@ actual object FFGraphics {
     }
 
 
-    actual fun renderShape(data: ShapeData, xOffset: Float, yOffset: Float) {
+    actual override fun renderShape(data: ShapeData, xOffset: Float, yOffset: Float) {
         if (doRenderWithShapeRenderer(data)) {
             renderWithShapeRenderer(data, xOffset, yOffset)
             return
@@ -311,7 +311,7 @@ actual object FFGraphics {
         Gdx.gl.glDisable(GL20.GL_BLEND)
     }
 
-    actual fun renderShape(data: ShapeData, transform: TransformData) {
+    actual override fun renderShape(data: ShapeData, transform: TransformData) {
 
         if (doRenderWithShapeRenderer(data)) {
             renderWithShapeRenderer(data, transform)
@@ -495,7 +495,7 @@ actual object FFGraphics {
         shapeRenderer.identity()
     }
 
-    actual fun endRendering(view: ViewData) {
+    actual override fun endRendering(view: ViewData) {
         spriteBatch.flush()
         if (!view.isBase )
             activeViewport?.fbo?.end()
@@ -503,7 +503,7 @@ actual object FFGraphics {
         activeViewport = null
     }
 
-    actual fun flush(virtualViews: DynArrayRO<ViewData>) {
+    actual override fun flush(virtualViews: DynArrayRO<ViewData>) {
         if (!virtualViews.isEmpty) {
             baseViewport?.activate(spriteBatch, shapeRenderer, baseView!!, true)
             spriteBatch.begin()
@@ -530,7 +530,7 @@ actual object FFGraphics {
     }
 
 
-    actual fun getScreenshotPixels(area: Rectangle): ByteArray {
+    actual override fun getScreenshotPixels(area: Rectangle): ByteArray {
         val flippedY = screenHeight - area.height + area.pos.y
         val size = area.width * area.height * 3
         val screenContents = ByteBuffer.allocateDirect(size).order(ByteOrder.LITTLE_ENDIAN)

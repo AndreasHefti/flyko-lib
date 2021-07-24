@@ -7,22 +7,23 @@ import com.inari.util.Named
 
 interface ControlledSystemComponent {
 
-    val index: Int
+    val componentId: CompId
 
-    fun withController(id: CompId) =  FFContext[Controller, id].controlled.set(index)
-    fun withController(name: String) = FFContext[Controller, name].controlled.set(index)
-    fun withController(named: Named) = FFContext[Controller, named].controlled.set(index)
-    fun withController(component: Controller) = component.controlled.set(index)
+    fun withController(id: CompId) { FFContext[Controller, id].register(componentId) }
+    fun withController(name: String) = { FFContext[Controller, name].register(componentId) }
+    fun withController(named: Named) = { FFContext[Controller, named].register(componentId) }
+    fun withController(component: Controller) = { component.register(componentId) }
 
     fun <C : Controller> withController(cBuilder: SystemComponentBuilder<C>, configure: (C.() -> Unit)): CompId {
         val comp = cBuilder.buildAndGet(configure)
-        comp.controlled.set(this.index)
+        comp.register(componentId)
         return comp.componentId
     }
 
     fun <C : Controller> withActiveController(cBuilder: SystemComponentBuilder<C>, configure: (C.() -> Unit)): CompId {
         val comp = cBuilder.buildActivateAndGet(configure)
-        comp.controlled.set(this.index)
+        comp.register(componentId)
         return comp.componentId
     }
+
 }

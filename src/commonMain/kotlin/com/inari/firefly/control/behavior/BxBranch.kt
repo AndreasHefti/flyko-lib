@@ -11,7 +11,7 @@ abstract class BxBranch internal constructor() : BxNode() {
 
     fun <C : BxNode> node(cBuilder: SystemComponentBuilder<C>, configure: (C.() -> Unit)): CompId {
         val id = cBuilder.build(configure)
-        children.add(BehaviorSystem.nodes[id.instanceId])
+        children.add(BehaviorSystem.systemNodes[id.instanceId])
         return id
     }
 }
