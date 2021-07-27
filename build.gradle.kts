@@ -12,10 +12,6 @@ repositories {
     maven ( url = "https://jitpack.io" )
 }
 
-
-group = "me.anhef"
-version = "1.0-SNAPSHOT"
-
 repositories {
     mavenCentral()
 }

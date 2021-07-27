@@ -97,6 +97,7 @@ class TileSet : Composite() {
                 return false
 
             val entityId = Entity.buildAndActivate {
+                name = tile.name
                 withComponent(ETransform) {
                     view(this@TileSet.viewRef)
                     layer(this@TileSet.layerRef)

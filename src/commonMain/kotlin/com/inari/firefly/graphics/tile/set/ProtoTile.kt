@@ -1,6 +1,7 @@
 package com.inari.firefly.graphics.tile.set
 
 import com.inari.firefly.BlendMode
+import com.inari.firefly.NO_NAME
 import com.inari.firefly.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.UNDEFINED_MATERIAL
 import com.inari.firefly.core.component.ComponentDSL
@@ -19,23 +20,24 @@ class ProtoTile internal constructor() {
     @JvmField internal var animationData: TileAnimation? = null
     @JvmField internal var entityRef = -1
 
+    @JvmField var name: String = NO_NAME
     @Suppress("SetterBackingFieldAssignment")
     var aspects: Aspects = TILE_ASPECTS.createAspects()
         set(value) {
             field.clear()
             field + value
         }
-    var material: Aspect = UNDEFINED_MATERIAL
-    var contactType: Aspect = UNDEFINED_CONTACT_TYPE
-    var contactMask: BitMask? = null
-    var tintColor: MutableColor? = null
-    var blendMode: BlendMode? = null
-    val animation: (TileAnimation.() -> Unit) -> Unit = { configure ->
+    @JvmField var material: Aspect = UNDEFINED_MATERIAL
+    @JvmField var contactType: Aspect = UNDEFINED_CONTACT_TYPE
+    @JvmField var contactMask: BitMask? = null
+    @JvmField var tintColor: MutableColor? = null
+    @JvmField var blendMode: BlendMode? = null
+    @JvmField val animation: (TileAnimation.() -> Unit) -> Unit = { configure ->
         val animationData = TileAnimation.of {}
         animationData.also(configure)
         this.animationData = animationData
     }
-    val sprite: (ProtoSprite.() -> Unit) -> Unit = { configure ->
+    @JvmField val sprite: (ProtoSprite.() -> Unit) -> Unit = { configure ->
         val sprite = ProtoSprite.of {}
         sprite.also(configure)
         this.spriteData = sprite
