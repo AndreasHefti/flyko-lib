@@ -1,6 +1,7 @@
-package com.inari.firefly.control.behavior
+package com.inari.firefly.behavior
 
 import com.inari.firefly.TestApp
+import com.inari.firefly.control.behavior.*
 import com.inari.firefly.control.behavior.BehaviorSystem.FALSE_CONDITION
 import com.inari.firefly.control.task.ComponentTask
 import com.inari.firefly.control.task.TaskSystem

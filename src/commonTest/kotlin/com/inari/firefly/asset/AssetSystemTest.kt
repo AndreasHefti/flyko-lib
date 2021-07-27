@@ -125,7 +125,7 @@ class AssetSystemTest {
         )
 
         val asset2 = TestAsset.build {
-            DependsOn("parentAsset")
+            dependsOn("parentAsset")
             name = "childAsset"
             Param1 = "child"
             Param2 = 1.45f

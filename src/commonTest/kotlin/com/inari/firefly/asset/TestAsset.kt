@@ -9,7 +9,7 @@ class TestAsset private constructor(
         var Param2: Float = 0.0f
 ) : Asset() {
 
-    var DependsOn =
+    var dependsOn =
         ComponentRefResolver(Asset) { index-> dependingRef = setIfNotInitialized(index, "DependsOn") }
 
     override var instanceId: Int = -1

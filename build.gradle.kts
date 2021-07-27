@@ -15,16 +15,14 @@ repositories {
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "11"
+            kotlinOptions.jvmTarget = "1.8"
         }
         testRuns["test"].executionTask.configure {
             useJUnit()
         }
     }
     js(LEGACY) {
-        useCommonJs()
         browser {
-            testRuns["test"].executionTask.configure {  }
         }
     }
     val hostOs = System.getProperty("os.name")
