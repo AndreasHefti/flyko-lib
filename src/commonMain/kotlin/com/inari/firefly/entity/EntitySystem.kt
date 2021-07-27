@@ -1,8 +1,11 @@
 package com.inari.firefly.entity
 
 import com.inari.firefly.FFContext
+import com.inari.firefly.control.scene.Scene
+import com.inari.firefly.control.scene.SceneSystem
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.ComponentMap
+import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.EntityActivationEvent.Type.ACTIVATED
@@ -15,7 +18,9 @@ object EntitySystem : ComponentSystem {
     override val supportedComponents: Aspects =
         SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(Entity)
 
-    @JvmField val entities: ComponentMap<Entity> = ComponentSystem.createComponentMapping(
+    val entities: ComponentMapRO<Entity>
+        get() = systemEntities
+    private val systemEntities: ComponentMap<Entity> = ComponentSystem.createComponentMapping(
         Entity,
         activationMapping = true,
         nameMapping = true,
@@ -30,12 +35,12 @@ object EntitySystem : ComponentSystem {
         FFContext.loadSystem(this)
     }
 
-    operator fun get(entityId: CompId) = entities[entityId.instanceId]
-    operator fun get(name: String) = entities[name]
-    operator fun get(index: Int) = entities[index]
-    operator fun contains(entityId: CompId) = entityId in entities
-    operator fun contains(name: String) = name in entities
-    operator fun contains(index: Int) = index in entities
+    operator fun get(entityId: CompId) = systemEntities[entityId.instanceId]
+    operator fun get(name: String) = systemEntities[name]
+    operator fun get(index: Int) = systemEntities[index]
+    operator fun contains(entityId: CompId) = entityId in systemEntities
+    operator fun contains(name: String) = name in systemEntities
+    operator fun contains(index: Int) = index in systemEntities
 
     private fun activated(entity: Entity) {
         EntityActivationEvent.send(
@@ -51,6 +56,6 @@ object EntitySystem : ComponentSystem {
         )
     }
 
-    override fun clearSystem() = entities.clear()
+    override fun clearSystem() = systemEntities.clear()
 
 }

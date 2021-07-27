@@ -26,39 +26,16 @@ object RenderingSystem : FFSystem {
             properties.renderingChain[i++].render(e.viewIndex, e.layerIndex, e.clip)
     }
 
+    private val entityActivationListener = object : EntityActivationEvent.Listener {
+        override fun entityActivated(entity: Entity) = _entityActicated(entity)
+        override fun entityDeactivated(entity: Entity) = _entitiyDeactivated(entity)
+        override fun match(aspects: Aspects) = true
+    }
+
 
     init {
         FFContext.registerListener(RenderEvent, renderingListener)
-
-
-        FFContext.registerListener(
-            entityActivationEvent,
-            object : EntityActivationEvent.Listener {
-                override fun entityActivated(entity: Entity) {
-                    var i = 0
-                    while (i < properties.renderingChain.size) {
-                        val renderer = properties.renderingChain[i++]
-                        if (renderer.match(entity)) {
-                            if (renderer.accept(entity) && !properties.allowMultipleAcceptance)
-                                return
-                        }
-                    }
-                }
-
-                override fun entityDeactivated(entity: Entity) {
-                    var i = 0
-                    while (i < properties.renderingChain.size) {
-                        val renderer = properties.renderingChain[i++]
-                        if (renderer.match(entity))
-                            renderer.dispose(entity)
-
-                    }
-                }
-
-                override fun match(aspects: Aspects) = true
-            }
-        )
-
+        FFContext.registerListener(EntityActivationEvent, entityActivationListener)
         setDefaultRenderingChain()
     }
 
@@ -85,11 +62,31 @@ object RenderingSystem : FFSystem {
         }
     }
 
+    private fun _entityActicated(entity: Entity) {
+        var i = 0
+        while (i < properties.renderingChain.size) {
+            val renderer = properties.renderingChain[i++]
+            if (renderer.match(entity)) {
+                if (renderer.accept(entity) && !properties.allowMultipleAcceptance)
+                    return
+            }
+        }
+    }
+
+    private fun _entitiyDeactivated(entity: Entity) {
+        var i = 0
+        while (i < properties.renderingChain.size) {
+            val renderer = properties.renderingChain[i++]
+            if (renderer.match(entity))
+                renderer.dispose(entity)
+
+        }
+    }
+
     override fun clearSystem() {}
 
     class Properties internal constructor() {
         @JvmField var allowMultipleAcceptance: Boolean = false
         internal var renderingChain: Array<Renderer> = emptyArray()
     }
-
 }

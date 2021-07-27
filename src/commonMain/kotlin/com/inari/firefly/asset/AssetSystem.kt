@@ -15,7 +15,7 @@ object AssetSystem : ComponentSystem {
 
     val assets: ComponentMapRO<Asset>
         get() = systemAssets
-    private val systemAssets = ComponentSystem.createComponentMapping(
+    internal val systemAssets = ComponentSystem.createComponentMapping(
         Asset,
         activationMapping = true,
         nameMapping = true,

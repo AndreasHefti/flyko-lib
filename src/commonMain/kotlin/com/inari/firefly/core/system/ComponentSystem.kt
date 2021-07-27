@@ -55,6 +55,9 @@ interface ComponentSystem : FFSystem {
         override val size: Int
             get() = map.size
 
+        override val isEmpty: Boolean
+            get() = map.isEmpty
+
         override operator fun contains(index: Int): Boolean = map.contains(index)
         override operator fun contains(name: String): Boolean = internalIndexForName(name) >= 0
 
@@ -213,5 +216,6 @@ interface ComponentSystem : FFSystem {
                 activate(c.index)
             return c
         }
+
     }
 }

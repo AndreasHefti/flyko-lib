@@ -22,9 +22,7 @@ object SceneSystem : ComponentSystem {
         nameMapping = true,
         activationMapping = true,
         listener = { scene, action -> when (action) {
-            //ACTIVATED       -> internalRun(scene.index())
             DEACTIVATED     -> internalStop(scene.index)
-            //DELETED         -> internalDelete(scene.index())
             else -> {}
         } }
     )

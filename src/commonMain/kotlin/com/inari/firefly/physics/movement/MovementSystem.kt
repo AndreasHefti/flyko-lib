@@ -18,12 +18,14 @@ object MovementSystem : ComponentSystem {
         Integrator
     )
 
-    @JvmField
-    val integrator = ComponentSystem.createComponentMapping(
+
+    @JvmField val integrator = ComponentSystem.createComponentMapping(
         Integrator,
         activationMapping = true,
         nameMapping = true
     )
+
+    @JvmField val defaultIntegrator = SimpleStepIntegrator.buildAndGet {}
 
     private val entities: BitSet = BitSet()
 
@@ -41,6 +43,7 @@ object MovementSystem : ComponentSystem {
     init {
         FFContext.registerListener(UpdateEvent, this::processMove)
         FFContext.registerListener(EntityActivationEvent, entityActivationListener)
+        FFContext.loadSystem(this)
     }
 
     private fun processMove() {
@@ -53,10 +56,13 @@ object MovementSystem : ComponentSystem {
             i = entities.nextSetBit(i + 1)
 
             val movement = entity[EMovement]
-            if (!movement.active || movement.integratorRef < 0 || !movement.scheduler.needsUpdate())
+            if (!movement.active || !movement.scheduler.needsUpdate())
                 continue
 
-            val movementIntegrator = integrator[movement.integratorRef]
+            val movementIntegrator = if (movement.integratorRef < 0)
+                defaultIntegrator
+            else
+                integrator[movement.integratorRef]
             val transform = entity[ETransform]
             if (movement.velocity.dx != 0f || movement.velocity.dy != 0f) {
                 movementIntegrator.step(movement, transform, deltaTimeInSeconds)

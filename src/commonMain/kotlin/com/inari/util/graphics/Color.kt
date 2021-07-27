@@ -22,6 +22,9 @@ interface IColor {
                 ((b * 255).toInt() shl 8) or
                 255
 
+    val mutable: MutableColor
+        get() = MutableColor(this.r, this.g, this.b, this.a)
+
     companion object {
 
         @JvmField val BLACK: IColor = ImmutableColor(0f, 0f, 0f, 1f)

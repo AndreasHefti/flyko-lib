@@ -2,6 +2,7 @@ package com.inari.firefly.core.component
 
 interface ComponentMapRO<C : Component> {
 
+    val isEmpty: Boolean
     operator fun contains(index: Int): Boolean
     operator fun contains(name: String): Boolean
     operator fun contains(id: CompId): Boolean

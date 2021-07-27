@@ -25,7 +25,7 @@ class ViewEvent(override val eventType: EventType) : Event<Consumer<ViewEvent>>(
     override fun notify(listener: Consumer<ViewEvent>) = listener(this)
 
     companion object : EventType("ViewEvent") {
-        internal val viewEvent = ViewEvent(this)
+        private val viewEvent = ViewEvent(this)
         internal fun send(id: CompId, data: ViewData, type: Type) {
             viewEvent.id = id
             viewEvent.data = data

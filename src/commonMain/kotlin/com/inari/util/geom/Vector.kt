@@ -34,6 +34,17 @@ data class Vector1f constructor(
         this.d /= dd
         return this
     }
+    override fun toString(): String = "[d=$d]"
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null) return false
+        if (this::class != other::class) return false
+        other as Vector1f
+        if (d != other.d) return false
+        return true
+    }
+    override fun hashCode(): Int = d.hashCode()
 }
 
 /** A simple one dimensional vector within integer precision
@@ -68,6 +79,17 @@ data class Vector1i constructor(
         this.d /= dd
         return this
     }
+    override fun toString(): String = "[d=$d]"
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null) return false
+        if (this::class != other::class) return false
+        other as Vector1i
+        if (d != other.d) return false
+        return true
+    }
+    override fun hashCode(): Int = d.hashCode()
 }
 
 /** A simple two-dimensional (x/y) vector within float precision
@@ -116,6 +138,20 @@ data class Vector2f constructor(
         this.dy /= v.dy
         return this
     }
+    override fun toString(): String = "[dx=$dx,dy=$dy]"
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null) return false
+        if (this::class != other::class) return false
+        other as Vector2f
+        if (dx != other.dx && dy != other.dy) return false
+        return true
+    }
+    override fun hashCode(): Int {
+        var result = dx.hashCode()
+        result = 31 * result + dy.hashCode()
+        return result
+    }
 }
 
 /** A simple two-dimensional (x/y) vector within integer precision
@@ -163,5 +199,19 @@ data class Vector2i constructor(
         this.dx /= v.dx
         this.dy /= v.dy
         return this
+    }
+    override fun toString(): String = "[dx=$dx,dy=$dy]"
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null) return false
+        if (this::class != other::class) return false
+        other as Vector2i
+        if (dx != other.dx && dy != other.dy) return false
+        return true
+    }
+    override fun hashCode(): Int {
+        var result = dx
+        result = 31 * result + dy
+        return result
     }
 }

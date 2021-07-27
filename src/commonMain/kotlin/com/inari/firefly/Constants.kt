@@ -87,6 +87,8 @@ val EMPTY_FLOAT_ARRAY: FloatArray = FloatArray(0)
 @JvmField val EMPTY_INT_OPERATION: IntOperation = { OpResult.SUCCESS  }
 @JvmField val TRUE_INT_PREDICATE: IntPredicate =  { true }
 @JvmField val FALSE_INT_PREDICATE: IntPredicate = { false }
+@JvmField val EMPTY_TASK_OPERATION: TaskOperation =  { OpResult.SUCCESS }
+@JvmField val EMPTY_COMPONENT_TASK_OPERATION: ComponentTaskOperation = { _, _, _, _, _  -> OpResult.SUCCESS }
 
 enum class BlendMode constructor(val source: Int, val dest: Int) {
     /** No blending. Disables blending  */

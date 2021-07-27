@@ -85,7 +85,7 @@ object BehaviorSystem : ComponentSystem {
     internal fun tick(entityId: Int) {
             val entity = EntitySystem[entityId]
             val behavior = entity[EBehavior]
-            if (!behavior.active || behavior.treeRef < 0)
+            if (!behavior.active || behavior.treeRef < 0 || !behavior.scheduler.needsUpdate())
                 return
 
             if (behavior.treeState === OpResult.SUCCESS)

@@ -8,10 +8,12 @@ import com.inari.firefly.entity.EMultiplier
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityActivationEvent
 import com.inari.firefly.graphics.ETransform
+import com.inari.firefly.graphics.rendering.RenderingSystem
 import com.inari.firefly.graphics.view.ViewEvent
 import com.inari.firefly.graphics.view.ViewEvent.Type.VIEW_DELETED
 import com.inari.firefly.graphics.view.ViewLayerAware
 import com.inari.firefly.graphics.view.ViewLayerMapping
+import com.inari.util.Consumer
 import com.inari.util.aspect.Aspects
 import kotlin.jvm.JvmField
 
@@ -31,28 +33,23 @@ object TileGridSystem : ComponentSystem {
         } }
     )
 
+    private val viewListener: Consumer<ViewEvent> = { e ->
+        when(e.type) {
+            VIEW_DELETED -> viewLayerMapping[e.id.instanceId]
+                .forEach { grid -> grids.delete(grid.index) }
+            else -> {}
+        }
+    }
+
+    private val entityActivationListener = object : EntityActivationEvent.Listener {
+        override fun entityActivated(entity: Entity) = addEntity(entity)
+        override fun entityDeactivated(entity: Entity) = removeEntity(entity)
+        override fun match(aspects: Aspects) = aspects.contains(ETile)
+    }
+
     init {
-        FFContext.registerListener(ViewEvent.viewEvent) { e ->
-                    when(e.type) {
-                        VIEW_DELETED -> viewLayerMapping[e.id.instanceId]
-                            .forEach { grid -> grids.delete(grid.index) }
-                        else -> {}
-                    }
-            }
-
-
-        FFContext.registerListener(
-            EntityActivationEvent,
-            object : EntityActivationEvent.Listener {
-                override fun entityActivated(entity: Entity) =
-                    addEntity(entity)
-                override fun entityDeactivated(entity: Entity) =
-                    removeEntity(entity)
-                override fun match(aspects: Aspects): Boolean =
-                    aspects.contains(ETile)
-            }
-        )
-
+        FFContext.registerListener(ViewEvent, viewListener)
+        FFContext.registerListener(EntityActivationEvent, entityActivationListener)
         FFContext.loadSystem(this)
     }
 

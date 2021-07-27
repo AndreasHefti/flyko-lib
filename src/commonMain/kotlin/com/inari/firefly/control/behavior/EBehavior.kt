@@ -1,7 +1,10 @@
 package com.inari.firefly.control.behavior
 
+import com.inari.firefly.FFContext
+import com.inari.firefly.INFINITE_SCHEDULER
 import com.inari.firefly.control.behavior.BehaviorSystem.BEHAVIOR_STATE_ASPECT_GROUP
 import com.inari.firefly.core.ComponentRefResolver
+import com.inari.firefly.core.api.FFTimer
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
 import com.inari.util.OpResult
@@ -12,10 +15,14 @@ class EBehavior private constructor() : EntityComponent(EBehavior::class.simpleN
 
     @JvmField internal var treeRef = -1
     @JvmField internal var actionsDone: Aspects = BEHAVIOR_STATE_ASPECT_GROUP.createAspects()
+    @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
 
     val behaviorTree = ComponentRefResolver(BxNode) { index-> treeRef = index }
     var repeat: Boolean = true
     var active: Boolean = true
+    var updateResolution: Float
+        get() = throw UnsupportedOperationException()
+        set(value) { scheduler = FFContext.timer.createUpdateScheduler(value) }
     var treeState: OpResult = OpResult.SUCCESS
         internal set
 

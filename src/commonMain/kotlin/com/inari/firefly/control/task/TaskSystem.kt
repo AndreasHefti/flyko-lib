@@ -35,15 +35,17 @@ object TaskSystem : ComponentSystem {
         FFContext.loadSystem(this)
     }
 
-    fun runTask(name: String) =
+    fun runTask(name: String): OpResult =
         runTask(genericTasks.indexForName(name))
 
-    fun runTask(taskId: CompId) =
+    fun runTask(taskId: CompId): OpResult =
         runTask(taskId.instanceId)
 
-    fun runTask(taskIndex: Int) {
-        if (taskIndex in _genericTasks)
+    fun runTask(taskIndex: Int): OpResult {
+        return if (taskIndex in _genericTasks)
             _genericTasks[taskIndex].invoke()
+        else
+            OpResult.FAILED
     }
 
     fun runTask(
@@ -52,7 +54,7 @@ object TaskSystem : ComponentSystem {
         compId2: CompId = NO_COMP_ID,
         compId3: CompId = NO_COMP_ID,
         compId4: CompId = NO_COMP_ID,
-        compId5: CompId = NO_COMP_ID) = componentTasks[name].invoke(compId1, compId2, compId3, compId4, compId5)
+        compId5: CompId = NO_COMP_ID): OpResult = componentTasks[name].invoke(compId1, compId2, compId3, compId4, compId5)
 
     fun runTask(
         taskId: CompId,
@@ -60,7 +62,7 @@ object TaskSystem : ComponentSystem {
         compId2: CompId = NO_COMP_ID,
         compId3: CompId = NO_COMP_ID,
         compId4: CompId = NO_COMP_ID,
-        compId5: CompId = NO_COMP_ID) = componentTasks[taskId].invoke(compId1, compId2, compId3, compId4, compId5)
+        compId5: CompId = NO_COMP_ID): OpResult = componentTasks[taskId].invoke(compId1, compId2, compId3, compId4, compId5)
 
     fun runTask(
         taskIndex: Int,
@@ -68,7 +70,7 @@ object TaskSystem : ComponentSystem {
         compId2: CompId = NO_COMP_ID,
         compId3: CompId = NO_COMP_ID,
         compId4: CompId = NO_COMP_ID,
-        compId5: CompId = NO_COMP_ID) = componentTasks[taskIndex].invoke(compId1, compId2, compId3, compId4, compId5)
+        compId5: CompId = NO_COMP_ID): OpResult = componentTasks[taskIndex].invoke(compId1, compId2, compId3, compId4, compId5)
 
     override fun clearSystem() {
         _genericTasks.clear()
