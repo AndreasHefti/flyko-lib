@@ -9,6 +9,7 @@ import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityActivationEvent
+import com.inari.firefly.entity.EntityActivationEventListener
 import com.inari.firefly.entity.EntitySystem
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.tile.ETile
@@ -62,24 +63,22 @@ object ContactSystem : ComponentSystem {
         updateContactMaps(moveEvent.entities)
     }
 
+    private val entityActivationListener: EntityActivationEventListener = object: EntityActivationEventListener {
+        override fun entityActivated(entity: Entity) {
+            contactMapViewLayer[entity[ETransform]]?.add(entity)
+        }
+        override fun entityDeactivated(entity: Entity) {
+            contactMapViewLayer[entity[ETransform]]?.remove(entity)
+        }
+        override fun match(aspects: Aspects): Boolean =
+            EContact in aspects &&
+                    ETransform in aspects &&
+                    ETile !in aspects
+    }
+
     init {
         FFContext.registerListener(ViewEvent, viewListener)
-
-        FFContext.registerListener(EntityActivationEvent, object : EntityActivationEvent.Listener{
-            override fun entityActivated(entity: Entity) {
-                contactMapViewLayer[entity[ETransform]]?.add(entity)
-            }
-
-            override fun entityDeactivated(entity: Entity) {
-                contactMapViewLayer[entity[ETransform]]?.remove(entity)
-            }
-
-            override fun match(aspects: Aspects): Boolean =
-                EContact in aspects &&
-                ETransform in aspects &&
-                ETile !in aspects
-        })
-
+        FFContext.registerListener(EntityActivationEvent, entityActivationListener)
         FFContext.registerListener(MoveEvent, moveListener)
     }
 

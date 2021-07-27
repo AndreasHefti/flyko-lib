@@ -9,6 +9,7 @@ import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityActivationEvent
+import com.inari.firefly.entity.EntityActivationEventListener
 import com.inari.firefly.entity.EntitySystem
 import com.inari.util.OpResult
 import com.inari.util.aspect.Aspect
@@ -53,7 +54,7 @@ object BehaviorSystem : ComponentSystem {
             BxNode
     )
 
-    private val entityActivationListener = object : EntityActivationEvent.Listener {
+    private val entityActivationListener: EntityActivationEventListener = object : EntityActivationEventListener {
         override fun entityActivated(entity: Entity) =
             entityIds.set(entity.index)
         override fun entityDeactivated(entity: Entity) =

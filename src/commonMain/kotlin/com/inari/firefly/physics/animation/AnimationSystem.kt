@@ -7,6 +7,9 @@ import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityActivationEvent
+import com.inari.firefly.entity.EntityActivationEventListener
+import com.inari.firefly.graphics.tile.ETile
+import com.inari.firefly.graphics.tile.TileGridSystem
 import com.inari.firefly.physics.animation.entity.EAnimation
 import com.inari.firefly.physics.animation.entity.EntityPropertyAnimation
 import com.inari.util.aspect.Aspects
@@ -22,20 +25,17 @@ object AnimationSystem : ComponentSystem {
         activationMapping = true
     )
 
+    private val entityActivationListener: EntityActivationEventListener = object: EntityActivationEventListener {
+        override fun entityActivated(entity: Entity) = registerEntityAnimations(entity)
+        override fun entityDeactivated(entity: Entity) = detachEntityAnimations(entity)
+        override fun match(aspects: Aspects): Boolean = EAnimation in aspects
+    }
+
     init {
         FFContext.registerListener(FFApp.UpdateEvent) {
                 animations.forEachActive { it.update() }
         }
-
-        FFContext.registerListener(EntityActivationEvent, object: EntityActivationEvent.Listener {
-            override fun entityActivated(entity: Entity) =
-                registerEntityAnimations(entity)
-            override fun entityDeactivated(entity: Entity) =
-                detachEntityAnimations(entity)
-            override fun match(aspects: Aspects): Boolean =
-                EAnimation in aspects
-        })
-
+        FFContext.registerListener(EntityActivationEvent, entityActivationListener)
         FFContext.loadSystem(this)
     }
 

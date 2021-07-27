@@ -7,7 +7,11 @@ import com.inari.util.event.AspectedEvent
 import com.inari.util.event.AspectedEventListener
 import com.inari.util.event.Event
 
-class EntityActivationEvent(override val eventType: EventType) : AspectedEvent<EntityActivationEvent.Listener>() {
+interface EntityActivationEventListener : AspectedEventListener {
+    fun entityActivated(entity: Entity)
+    fun entityDeactivated(entity: Entity)
+}
+class EntityActivationEvent(override val eventType: EventType) : AspectedEvent<EntityActivationEventListener>() {
 
     enum class Type {
         ACTIVATED,
@@ -22,18 +26,11 @@ class EntityActivationEvent(override val eventType: EventType) : AspectedEvent<E
     override val aspects: Aspects get() =
         entity.aspects
 
-    override fun notify(listener: Listener) =
+    override fun notify(listener: EntityActivationEventListener) =
         when(type) {
             Type.ACTIVATED -> listener.entityActivated(entity)
             Type.DEACTIVATED -> listener.entityDeactivated(entity)
         }
-
-
-
-    interface Listener : AspectedEventListener {
-        fun entityActivated(entity: Entity)
-        fun entityDeactivated(entity: Entity)
-    }
 
     companion object : EventType("EntityActivationEvent") {
         internal val entityActivationEvent = EntityActivationEvent(this)
@@ -42,5 +39,6 @@ class EntityActivationEvent(override val eventType: EventType) : AspectedEvent<E
             entityActivationEvent.type = type
             FFContext.notify(entityActivationEvent)
         }
+
     }
 }

@@ -12,10 +12,6 @@ repositories {
     maven ( url = "https://jitpack.io" )
 }
 
-repositories {
-    mavenCentral()
-}
-
 kotlin {
     jvm {
         compilations.all {
@@ -26,10 +22,9 @@ kotlin {
         }
     }
     js(LEGACY) {
+        useCommonJs()
         browser {
-            commonWebpackConfig {
-                cssSupport.enabled = true
-            }
+            testRuns["test"].executionTask.configure {  }
         }
     }
     val hostOs = System.getProperty("os.name")
@@ -70,12 +65,15 @@ kotlin {
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
+                implementation("org.jetbrains.kotlin:kotlin-test-js")
                 implementation(npm("bitset", "5.1.0"))
             }
         }
         val nativeMain by getting
         val nativeTest by getting
     }
+
+
 }
 
 

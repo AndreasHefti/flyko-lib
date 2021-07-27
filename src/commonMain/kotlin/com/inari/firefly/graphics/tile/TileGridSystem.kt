@@ -7,6 +7,7 @@ import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.EMultiplier
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityActivationEvent
+import com.inari.firefly.entity.EntityActivationEventListener
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.rendering.RenderingSystem
 import com.inari.firefly.graphics.view.ViewEvent
@@ -41,7 +42,7 @@ object TileGridSystem : ComponentSystem {
         }
     }
 
-    private val entityActivationListener = object : EntityActivationEvent.Listener {
+    private val entityActivationListener: EntityActivationEventListener = object : EntityActivationEventListener {
         override fun entityActivated(entity: Entity) = addEntity(entity)
         override fun entityDeactivated(entity: Entity) = removeEntity(entity)
         override fun match(aspects: Aspects) = aspects.contains(ETile)
