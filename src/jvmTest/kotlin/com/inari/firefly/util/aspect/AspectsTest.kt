@@ -1,5 +1,6 @@
-package com.inari.util.aspect
+package com.inari.firefly.util.aspect
 
+import com.inari.util.aspect.IndexedAspectType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

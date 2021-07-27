@@ -1,6 +1,8 @@
-package com.inari.util.geom
+package com.inari.firefly.util.geom
 
 
+import com.inari.util.geom.BitMask
+import com.inari.util.geom.Rectangle
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

@@ -1,5 +1,6 @@
-package com.inari.util.geom
+package com.inari.firefly.util.geom
 
+import com.inari.util.geom.Vector2f
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

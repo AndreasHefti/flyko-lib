@@ -23,8 +23,12 @@ kotlin {
     }
     js(LEGACY) {
         browser {
+            testTask {
+                enabled = false
+            }
         }
     }
+
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
     val nativeTarget = when {
@@ -33,6 +37,7 @@ kotlin {
         isMingwX64 -> mingwX64("native")
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
+
 
     
     sourceSets {

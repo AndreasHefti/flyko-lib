@@ -1,6 +1,8 @@
-package com.inari.util.graphics
+package com.inari.firefly.util.graphics
 
+import com.inari.util.graphics.IColor
 import com.inari.util.graphics.IColor.Companion.of
+import com.inari.util.graphics.ImmutableColor
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

@@ -4,7 +4,6 @@ import com.inari.util.geom.Position
 import com.inari.firefly.FFContext
 import com.inari.firefly.TestApp
 import com.inari.firefly.measureTime
-import com.inari.firefly.physics.contact.ContactEvent
 import com.inari.util.IntFunction
 import com.inari.util.event.Event
 import kotlin.test.BeforeTest

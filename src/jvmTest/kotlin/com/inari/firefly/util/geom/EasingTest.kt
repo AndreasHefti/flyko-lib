@@ -1,6 +1,7 @@
-package com.inari.util.geom
+package com.inari.firefly.util.geom
 
 import com.inari.util.StringUtils
+import com.inari.util.geom.Easing
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
