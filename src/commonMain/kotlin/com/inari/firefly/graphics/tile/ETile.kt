@@ -1,6 +1,7 @@
 package com.inari.firefly.graphics.tile
 
 import com.inari.firefly.BlendMode
+import com.inari.firefly.TILE_ASPECT_GROUP
 import com.inari.firefly.asset.AssetInstanceRefResolver
 import com.inari.firefly.core.api.SpriteRenderable
 import com.inari.firefly.entity.Entity
@@ -21,7 +22,7 @@ class ETile private constructor () : EntityComponent(ETile::class.simpleName!!) 
     @JvmField internal val spriteRenderable = SpriteRenderable()
 
     @Suppress("SetterBackingFieldAssignment")
-    var aspects: Aspects = TILE_ASPECTS.createAspects()
+    var aspects: Aspects = TILE_ASPECT_GROUP.createAspects()
         set(value) {
             field.clear()
             field + value
@@ -100,7 +101,6 @@ class ETile private constructor () : EntityComponent(ETile::class.simpleName!!) 
 
     override fun componentType() = Companion
     companion object : EntityComponentType<ETile>(ETile::class) {
-        @JvmField val TILE_ASPECTS = IndexedAspectType("TILE_ASPECTS")
         override fun createEmpty() = ETile()
     }
 }

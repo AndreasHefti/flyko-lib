@@ -126,6 +126,9 @@ enum class BlendMode constructor(val source: Int, val dest: Int) {
 @JvmField val MATERIAL_ASPECT_GROUP = IndexedAspectType("MATERIAL_ASPECT_GROUP")
 @JvmField val UNDEFINED_MATERIAL: Aspect = MATERIAL_ASPECT_GROUP.createAspect("UNDEFINED_MATERIAL")
 
+@JvmField val TILE_ASPECT_GROUP = IndexedAspectType("TILE_ASPECT_GROUP")
+@JvmField val UNDEFINED_TILE_ASPECT = TILE_ASPECT_GROUP.createAspect("UNDEFINED_TILE_ASPECT")
+
 @JvmField val CONTACT_TYPE_ASPECT_GROUP = IndexedAspectType("CONTACT_TYPE_ASPECT_GROUP")
 @JvmField val UNDEFINED_CONTACT_TYPE: Aspect = CONTACT_TYPE_ASPECT_GROUP.createAspect("UNDEFINED_CONTACT_TYPE")
 

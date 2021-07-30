@@ -2,6 +2,7 @@ package com.inari.firefly.util.geom
 
 
 import com.inari.util.geom.BitMask
+import com.inari.util.geom.Direction
 import com.inari.util.geom.Rectangle
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -1470,6 +1471,774 @@ class BitMaskTest {
                 "01010101]",
             intersection.toString()
         )
+    }
+
+    @Test
+    fun testCreateSlopeMask() {
+        var mask = BitMask(0,0, 8, 8)
+            .setHalfSlopeRegion(Direction.NORTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "11111111\n" +
+                    "11111110\n" +
+                    "11111100\n" +
+                    "11111000\n" +
+                    "11110000\n" +
+                    "11100000\n" +
+                    "11000000\n" +
+                    "10000000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .setHalfSlopeRegion(Direction.NORTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "11111111\n" +
+                    "01111111\n" +
+                    "00111111\n" +
+                    "00011111\n" +
+                    "00001111\n" +
+                    "00000111\n" +
+                    "00000011\n" +
+                    "00000001]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .setHalfSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "00000001\n" +
+                    "00000011\n" +
+                    "00000111\n" +
+                    "00001111\n" +
+                    "00011111\n" +
+                    "00111111\n" +
+                    "01111111\n" +
+                    "11111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .setHalfSlopeRegion(Direction.SOUTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "10000000\n" +
+                    "11000000\n" +
+                    "11100000\n" +
+                    "11110000\n" +
+                    "11111000\n" +
+                    "11111100\n" +
+                    "11111110\n" +
+                    "11111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .setHorizontalQuarterSlopeRegion(Direction.NORTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "11111111\n" +
+                    "11111100\n" +
+                    "11110000\n" +
+                    "11000000\n" +
+                    "00000000\n" +
+                    "00000000\n" +
+                    "00000000\n" +
+                    "00000000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .setHorizontalQuarterSlopeRegion(Direction.NORTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "11111111\n" +
+                    "00111111\n" +
+                    "00001111\n" +
+                    "00000011\n" +
+                    "00000000\n" +
+                    "00000000\n" +
+                    "00000000\n" +
+                    "00000000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .setHorizontalQuarterSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "00000000\n" +
+                    "00000000\n" +
+                    "00000000\n" +
+                    "00000000\n" +
+                    "00000011\n" +
+                    "00001111\n" +
+                    "00111111\n" +
+                    "11111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .setHorizontalQuarterSlopeRegion(Direction.SOUTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "00000000\n" +
+                    "00000000\n" +
+                    "00000000\n" +
+                    "00000000\n" +
+                    "11000000\n" +
+                    "11110000\n" +
+                    "11111100\n" +
+                    "11111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .setHorizontalQuarterToSlopeRegion(Direction.NORTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "00111111\n" +
+                    "00001111\n" +
+                    "00000011]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .setHorizontalQuarterToSlopeRegion(Direction.NORTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111100\n" +
+                    "11110000\n" +
+                    "11000000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .setHorizontalQuarterToSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "00000011\n" +
+                    "00001111\n" +
+                    "00111111\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .setHorizontalQuarterToSlopeRegion(Direction.SOUTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "11000000\n" +
+                    "11110000\n" +
+                    "11111100\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .seVerticalQuarterSlopeRegion(Direction.NORTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "11110000\n" +
+                    "11110000\n" +
+                    "11100000\n" +
+                    "11100000\n" +
+                    "11000000\n" +
+                    "11000000\n" +
+                    "10000000\n" +
+                    "10000000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .seVerticalQuarterSlopeRegion(Direction.NORTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "00001111\n" +
+                    "00001111\n" +
+                    "00000111\n" +
+                    "00000111\n" +
+                    "00000011\n" +
+                    "00000011\n" +
+                    "00000001\n" +
+                    "00000001]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .seVerticalQuarterSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "00000001\n" +
+                    "00000001\n" +
+                    "00000011\n" +
+                    "00000011\n" +
+                    "00000111\n" +
+                    "00000111\n" +
+                    "00001111\n" +
+                    "00001111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .seVerticalQuarterSlopeRegion(Direction.SOUTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "10000000\n" +
+                    "10000000\n" +
+                    "11000000\n" +
+                    "11000000\n" +
+                    "11100000\n" +
+                    "11100000\n" +
+                    "11110000\n" +
+                    "11110000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .seVerticalQuarterToSlopeRegion(Direction.NORTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "01111111\n" +
+                    "01111111\n" +
+                    "00111111\n" +
+                    "00111111\n" +
+                    "00011111\n" +
+                    "00011111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .seVerticalQuarterToSlopeRegion(Direction.NORTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "11111111\n" +
+                    "11111111\n" +
+                    "11111110\n" +
+                    "11111110\n" +
+                    "11111100\n" +
+                    "11111100\n" +
+                    "11111000\n" +
+                    "11111000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .seVerticalQuarterToSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "00001111\n" +
+                    "00011111\n" +
+                    "00011111\n" +
+                    "00111111\n" +
+                    "00111111\n" +
+                    "01111111\n" +
+                    "01111111\n" +
+                    "11111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 8, 8)
+            .seVerticalQuarterToSlopeRegion(Direction.SOUTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "11111000\n" +
+                    "11111000\n" +
+                    "11111100\n" +
+                    "11111100\n" +
+                    "11111110\n" +
+                    "11111110\n" +
+                    "11111111\n" +
+                    "11111111]",
+            mask.toString()
+        )
+
+    }
+
+    @Test
+    fun testCreateSlopeMask16() {
+        var mask = BitMask(0,0, 16, 16)
+            .setHalfSlopeRegion(Direction.NORTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1111111111111111\n" +
+                    "1111111111111110\n" +
+                    "1111111111111100\n" +
+                    "1111111111111000\n" +
+                    "1111111111110000\n" +
+                    "1111111111100000\n" +
+                    "1111111111000000\n" +
+                    "1111111110000000\n" +
+                    "1111111100000000\n" +
+                    "1111111000000000\n" +
+                    "1111110000000000\n" +
+                    "1111100000000000\n" +
+                    "1111000000000000\n" +
+                    "1110000000000000\n" +
+                    "1100000000000000\n" +
+                    "1000000000000000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .setHalfSlopeRegion(Direction.NORTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1111111111111111\n" +
+                    "0111111111111111\n" +
+                    "0011111111111111\n" +
+                    "0001111111111111\n" +
+                    "0000111111111111\n" +
+                    "0000011111111111\n" +
+                    "0000001111111111\n" +
+                    "0000000111111111\n" +
+                    "0000000011111111\n" +
+                    "0000000001111111\n" +
+                    "0000000000111111\n" +
+                    "0000000000011111\n" +
+                    "0000000000001111\n" +
+                    "0000000000000111\n" +
+                    "0000000000000011\n" +
+                    "0000000000000001]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .setHalfSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "0000000000000001\n" +
+                    "0000000000000011\n" +
+                    "0000000000000111\n" +
+                    "0000000000001111\n" +
+                    "0000000000011111\n" +
+                    "0000000000111111\n" +
+                    "0000000001111111\n" +
+                    "0000000011111111\n" +
+                    "0000000111111111\n" +
+                    "0000001111111111\n" +
+                    "0000011111111111\n" +
+                    "0000111111111111\n" +
+                    "0001111111111111\n" +
+                    "0011111111111111\n" +
+                    "0111111111111111\n" +
+                    "1111111111111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .setHalfSlopeRegion(Direction.SOUTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1000000000000000\n" +
+                    "1100000000000000\n" +
+                    "1110000000000000\n" +
+                    "1111000000000000\n" +
+                    "1111100000000000\n" +
+                    "1111110000000000\n" +
+                    "1111111000000000\n" +
+                    "1111111100000000\n" +
+                    "1111111110000000\n" +
+                    "1111111111000000\n" +
+                    "1111111111100000\n" +
+                    "1111111111110000\n" +
+                    "1111111111111000\n" +
+                    "1111111111111100\n" +
+                    "1111111111111110\n" +
+                    "1111111111111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .setHorizontalQuarterSlopeRegion(Direction.NORTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1111111111111111\n" +
+                    "1111111111111100\n" +
+                    "1111111111110000\n" +
+                    "1111111111000000\n" +
+                    "1111111100000000\n" +
+                    "1111110000000000\n" +
+                    "1111000000000000\n" +
+                    "1100000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .setHorizontalQuarterSlopeRegion(Direction.NORTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1111111111111111\n" +
+                    "0011111111111111\n" +
+                    "0000111111111111\n" +
+                    "0000001111111111\n" +
+                    "0000000011111111\n" +
+                    "0000000000111111\n" +
+                    "0000000000001111\n" +
+                    "0000000000000011\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .setHorizontalQuarterSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000011\n" +
+                    "0000000000001111\n" +
+                    "0000000000111111\n" +
+                    "0000000011111111\n" +
+                    "0000001111111111\n" +
+                    "0000111111111111\n" +
+                    "0011111111111111\n" +
+                    "1111111111111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .setHorizontalQuarterSlopeRegion(Direction.SOUTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "0000000000000000\n" +
+                    "1100000000000000\n" +
+                    "1111000000000000\n" +
+                    "1111110000000000\n" +
+                    "1111111100000000\n" +
+                    "1111111111000000\n" +
+                    "1111111111110000\n" +
+                    "1111111111111100\n" +
+                    "1111111111111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .setHorizontalQuarterToSlopeRegion(Direction.NORTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "0011111111111111\n" +
+                    "0000111111111111\n" +
+                    "0000001111111111\n" +
+                    "0000000011111111\n" +
+                    "0000000000111111\n" +
+                    "0000000000001111\n" +
+                    "0000000000000011]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .setHorizontalQuarterToSlopeRegion(Direction.NORTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111100\n" +
+                    "1111111111110000\n" +
+                    "1111111111000000\n" +
+                    "1111111100000000\n" +
+                    "1111110000000000\n" +
+                    "1111000000000000\n" +
+                    "1100000000000000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .setHorizontalQuarterToSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "0000000000000011\n" +
+                    "0000000000001111\n" +
+                    "0000000000111111\n" +
+                    "0000000011111111\n" +
+                    "0000001111111111\n" +
+                    "0000111111111111\n" +
+                    "0011111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .setHorizontalQuarterToSlopeRegion(Direction.SOUTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1100000000000000\n" +
+                    "1111000000000000\n" +
+                    "1111110000000000\n" +
+                    "1111111100000000\n" +
+                    "1111111111000000\n" +
+                    "1111111111110000\n" +
+                    "1111111111111100\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .seVerticalQuarterSlopeRegion(Direction.NORTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1111111100000000\n" +
+                    "1111111100000000\n" +
+                    "1111111000000000\n" +
+                    "1111111000000000\n" +
+                    "1111110000000000\n" +
+                    "1111110000000000\n" +
+                    "1111100000000000\n" +
+                    "1111100000000000\n" +
+                    "1111000000000000\n" +
+                    "1111000000000000\n" +
+                    "1110000000000000\n" +
+                    "1110000000000000\n" +
+                    "1100000000000000\n" +
+                    "1100000000000000\n" +
+                    "1000000000000000\n" +
+                    "1000000000000000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .seVerticalQuarterSlopeRegion(Direction.NORTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "0000000011111111\n" +
+                    "0000000011111111\n" +
+                    "0000000001111111\n" +
+                    "0000000001111111\n" +
+                    "0000000000111111\n" +
+                    "0000000000111111\n" +
+                    "0000000000011111\n" +
+                    "0000000000011111\n" +
+                    "0000000000001111\n" +
+                    "0000000000001111\n" +
+                    "0000000000000111\n" +
+                    "0000000000000111\n" +
+                    "0000000000000011\n" +
+                    "0000000000000011\n" +
+                    "0000000000000001\n" +
+                    "0000000000000001]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .seVerticalQuarterSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "0000000000000111\n" +
+                    "0000000000000111\n" +
+                    "0000000000001111\n" +
+                    "0000000000001111\n" +
+                    "0000000000011111\n" +
+                    "0000000000011111\n" +
+                    "0000000000111111\n" +
+                    "0000000000111111\n" +
+                    "0000000001111111\n" +
+                    "0000000001111111\n" +
+                    "0000000011111111\n" +
+                    "0000000011111111\n" +
+                    "0000000111111111\n" +
+                    "0000000111111111\n" +
+                    "0000001111111111\n" +
+                    "0000001111111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .seVerticalQuarterSlopeRegion(Direction.SOUTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1000000000000000\n" +
+                    "1000000000000000\n" +
+                    "1100000000000000\n" +
+                    "1100000000000000\n" +
+                    "1110000000000000\n" +
+                    "1110000000000000\n" +
+                    "1111000000000000\n" +
+                    "1111000000000000\n" +
+                    "1111100000000000\n" +
+                    "1111100000000000\n" +
+                    "1111110000000000\n" +
+                    "1111110000000000\n" +
+                    "1111111000000000\n" +
+                    "1111111000000000\n" +
+                    "1111111100000000\n" +
+                    "1111111100000000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .seVerticalQuarterToSlopeRegion(Direction.NORTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "0111111111111111\n" +
+                    "0111111111111111\n" +
+                    "0011111111111111\n" +
+                    "0011111111111111\n" +
+                    "0001111111111111\n" +
+                    "0001111111111111\n" +
+                    "0000111111111111\n" +
+                    "0000111111111111\n" +
+                    "0000011111111111\n" +
+                    "0000011111111111\n" +
+                    "0000001111111111\n" +
+                    "0000001111111111\n" +
+                    "0000000111111111\n" +
+                    "0000000111111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .seVerticalQuarterToSlopeRegion(Direction.NORTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111\n" +
+                    "1111111111111110\n" +
+                    "1111111111111110\n" +
+                    "1111111111111100\n" +
+                    "1111111111111100\n" +
+                    "1111111111111000\n" +
+                    "1111111111111000\n" +
+                    "1111111111110000\n" +
+                    "1111111111110000\n" +
+                    "1111111111100000\n" +
+                    "1111111111100000\n" +
+                    "1111111111000000\n" +
+                    "1111111111000000\n" +
+                    "1111111110000000\n" +
+                    "1111111110000000]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .seVerticalQuarterToSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "0000000011111111\n" +
+                    "0000000111111111\n" +
+                    "0000000111111111\n" +
+                    "0000001111111111\n" +
+                    "0000001111111111\n" +
+                    "0000011111111111\n" +
+                    "0000011111111111\n" +
+                    "0000111111111111\n" +
+                    "0000111111111111\n" +
+                    "0001111111111111\n" +
+                    "0001111111111111\n" +
+                    "0011111111111111\n" +
+                    "0011111111111111\n" +
+                    "0111111111111111\n" +
+                    "0111111111111111\n" +
+                    "1111111111111111]",
+            mask.toString()
+        )
+
+        mask = BitMask(0,0, 16, 16)
+            .seVerticalQuarterToSlopeRegion(Direction.SOUTH_WEST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
+                    "1111111110000000\n" +
+                    "1111111110000000\n" +
+                    "1111111111000000\n" +
+                    "1111111111000000\n" +
+                    "1111111111100000\n" +
+                    "1111111111100000\n" +
+                    "1111111111110000\n" +
+                    "1111111111110000\n" +
+                    "1111111111111000\n" +
+                    "1111111111111000\n" +
+                    "1111111111111100\n" +
+                    "1111111111111100\n" +
+                    "1111111111111110\n" +
+                    "1111111111111110\n" +
+                    "1111111111111111\n" +
+                    "1111111111111111]",
+            mask.toString()
+        )
+
     }
 
 
