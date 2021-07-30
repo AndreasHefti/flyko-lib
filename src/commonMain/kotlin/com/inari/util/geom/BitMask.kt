@@ -186,7 +186,7 @@ class BitMask constructor(
         return this
     }
 
-    fun seVerticalQuarterSlopeRegion(direction: Direction): BitMask {
+    fun setVerticalQuarterSlopeRegion(direction: Direction): BitMask {
         clearMask()
         for (y in 0 until region.height) {
             for (x in 0 until region.width) {
@@ -202,7 +202,7 @@ class BitMask constructor(
         return this
     }
 
-    fun seVerticalQuarterToSlopeRegion(direction: Direction): BitMask {
+    fun setVerticalQuarterToSlopeRegion(direction: Direction): BitMask {
         clearMask()
         for (y in 0 until region.height) {
             for (x in 0 until region.width) {

@@ -1656,7 +1656,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 8, 8)
-            .seVerticalQuarterSlopeRegion(Direction.NORTH_WEST)
+            .setVerticalQuarterSlopeRegion(Direction.NORTH_WEST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
                     "11110000\n" +
@@ -1671,7 +1671,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 8, 8)
-            .seVerticalQuarterSlopeRegion(Direction.NORTH_EAST)
+            .setVerticalQuarterSlopeRegion(Direction.NORTH_EAST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
                     "00001111\n" +
@@ -1686,7 +1686,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 8, 8)
-            .seVerticalQuarterSlopeRegion(Direction.SOUTH_EAST)
+            .setVerticalQuarterSlopeRegion(Direction.SOUTH_EAST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
                     "00000001\n" +
@@ -1701,7 +1701,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 8, 8)
-            .seVerticalQuarterSlopeRegion(Direction.SOUTH_WEST)
+            .setVerticalQuarterSlopeRegion(Direction.SOUTH_WEST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
                     "10000000\n" +
@@ -1716,7 +1716,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 8, 8)
-            .seVerticalQuarterToSlopeRegion(Direction.NORTH_EAST)
+            .setVerticalQuarterToSlopeRegion(Direction.NORTH_EAST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
                     "11111111\n" +
@@ -1731,7 +1731,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 8, 8)
-            .seVerticalQuarterToSlopeRegion(Direction.NORTH_WEST)
+            .setVerticalQuarterToSlopeRegion(Direction.NORTH_WEST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
                     "11111111\n" +
@@ -1746,7 +1746,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 8, 8)
-            .seVerticalQuarterToSlopeRegion(Direction.SOUTH_EAST)
+            .setVerticalQuarterToSlopeRegion(Direction.SOUTH_EAST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
                     "00001111\n" +
@@ -1761,7 +1761,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 8, 8)
-            .seVerticalQuarterToSlopeRegion(Direction.SOUTH_WEST)
+            .setVerticalQuarterToSlopeRegion(Direction.SOUTH_WEST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
                     "11111000\n" +
@@ -2056,7 +2056,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 16, 16)
-            .seVerticalQuarterSlopeRegion(Direction.NORTH_WEST)
+            .setVerticalQuarterSlopeRegion(Direction.NORTH_WEST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
                     "1111111100000000\n" +
@@ -2079,7 +2079,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 16, 16)
-            .seVerticalQuarterSlopeRegion(Direction.NORTH_EAST)
+            .setVerticalQuarterSlopeRegion(Direction.NORTH_EAST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
                     "0000000011111111\n" +
@@ -2102,7 +2102,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 16, 16)
-            .seVerticalQuarterSlopeRegion(Direction.SOUTH_EAST)
+            .setVerticalQuarterSlopeRegion(Direction.SOUTH_EAST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
                     "0000000000000111\n" +
@@ -2125,7 +2125,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 16, 16)
-            .seVerticalQuarterSlopeRegion(Direction.SOUTH_WEST)
+            .setVerticalQuarterSlopeRegion(Direction.SOUTH_WEST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
                     "1000000000000000\n" +
@@ -2148,7 +2148,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 16, 16)
-            .seVerticalQuarterToSlopeRegion(Direction.NORTH_EAST)
+            .setVerticalQuarterToSlopeRegion(Direction.NORTH_EAST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
                     "1111111111111111\n" +
@@ -2171,7 +2171,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 16, 16)
-            .seVerticalQuarterToSlopeRegion(Direction.NORTH_WEST)
+            .setVerticalQuarterToSlopeRegion(Direction.NORTH_WEST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
                     "1111111111111111\n" +
@@ -2194,7 +2194,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 16, 16)
-            .seVerticalQuarterToSlopeRegion(Direction.SOUTH_EAST)
+            .setVerticalQuarterToSlopeRegion(Direction.SOUTH_EAST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
                     "0000000011111111\n" +
@@ -2217,7 +2217,7 @@ class BitMaskTest {
         )
 
         mask = BitMask(0,0, 16, 16)
-            .seVerticalQuarterToSlopeRegion(Direction.SOUTH_WEST)
+            .setVerticalQuarterToSlopeRegion(Direction.SOUTH_WEST)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
                     "1111111110000000\n" +
