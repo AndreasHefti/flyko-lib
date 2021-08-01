@@ -1,5 +1,6 @@
 package com.inari.firefly
 
+import com.inari.firefly.core.api.FFResourceService
 import com.inari.util.event.EventDispatcher
 
 object TestApp : FFApp(
@@ -7,5 +8,6 @@ object TestApp : FFApp(
     { GraphicsMock },
     { AudioMock },
     { InputMock },
-    { TestTimer }
+    { TestTimer },
+    { FFResourceService }
 )

@@ -39,6 +39,9 @@ object FFContext {
     val timer: TimerAPI
         get() = FFApp.timer
 
+    val resourceService: ResourceServiceAPI
+        get() = FFApp.resourceService
+
     val screenWidth: Int
         get() = graphics.screenWidth
     val screenHeight: Int

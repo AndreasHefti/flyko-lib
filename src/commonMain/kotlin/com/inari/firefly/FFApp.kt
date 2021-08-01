@@ -21,7 +21,8 @@ abstract class FFApp protected constructor(
     graphics: () -> GraphicsAPI,
     audio: () -> AudioAPI,
     input: () -> InputAPI,
-    timer: () -> TimerAPI
+    timer: () -> TimerAPI,
+    resourceService: () -> ResourceServiceAPI
 ) {
 
     private var initialized: Boolean = false
@@ -36,6 +37,7 @@ abstract class FFApp protected constructor(
         Companion.audio = audio()
         Companion.input = input()
         Companion.timer = timer()
+        Companion.resourceService = resourceService()
     }
 
     fun update() {
@@ -106,6 +108,8 @@ abstract class FFApp protected constructor(
         lateinit var input: InputAPI
             private set
         lateinit var timer: TimerAPI
+            private set
+        lateinit var resourceService: ResourceServiceAPI
             private set
 
         @JvmField internal val NO_VIRTUAL_VIEW_PORTS: DynArrayRO<ViewData> = DynArray.of()

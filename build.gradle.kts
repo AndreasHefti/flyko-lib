@@ -53,6 +53,7 @@ kotlin {
                 implementation("com.badlogicgames.gdx:gdx:1.9.12")
                 implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:1.9.12")
                 implementation("com.badlogicgames.gdx:gdx-platform:1.9.12:natives-desktop")
+                implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.0")
             }
         }
         val jvmTest by getting {

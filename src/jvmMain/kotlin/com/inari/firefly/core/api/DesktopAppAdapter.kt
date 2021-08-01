@@ -9,7 +9,8 @@ object DesktopAppAdapter : FFApp(
     { FFGraphics },
     { FFAudio },
     { FFInput },
-    { FFTimer }
+    { FFTimer },
+    { FFResourceService }
 ) {
 
     fun exit() {

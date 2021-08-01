@@ -154,7 +154,6 @@ class TileGrid private constructor() : SystemComponent(TileGrid::class.simpleNam
         TileGridIterator.getInstance(worldClip, this)
 
     override fun componentType() = Companion
-
     companion object : SystemComponentSingleType<TileGrid>(TileGrid::class) {
         override fun createEmpty() = TileGrid()
     }
