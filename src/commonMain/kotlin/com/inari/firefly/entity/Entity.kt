@@ -15,12 +15,6 @@ class Entity internal constructor(): SystemComponent(Entity::class.simpleName!!)
     override val aspects: Aspects
         get() = components.aspects
 
-    override var name: String  = NO_NAME
-        set(value) {
-            check(!(name !== NO_NAME)) { "An illegal reassignment of name: $value to: $name" }
-            field = name
-        }
-
     fun has(aspect: Aspect): Boolean =
         aspects.contains(aspect)
 
