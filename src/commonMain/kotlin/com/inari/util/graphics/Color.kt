@@ -70,6 +70,21 @@ interface IColor {
         fun ofMutable(r: Int, g: Int, b: Int, a: Int): MutableColor {
             return MutableColor(r / 255f, g / 255f, b / 255f, a / 255f)
         }
+
+        // #rrggbbaa
+        fun ofMutable(rgba: String): MutableColor {
+            val hexString = if (rgba.startsWith("#"))
+                rgba.subSequence(1, rgba.length)
+            else rgba
+
+            val ints = hexString
+                .chunked(2)
+                .map { it.toInt(16) }
+
+            return if (ints.size == 3)
+                ofMutable(ints[0], ints[1], ints[2])
+            else ofMutable(ints[0], ints[1], ints[2], ints[3])
+        }
     }
 }
 

@@ -53,4 +53,14 @@ class ColorTest {
         assertEquals("[r=1.0,g=1.0,b=1.0,a=1.0]", IColor.WHITE.toString())
     }
 
+    @Test
+    fun testFromHexString() {
+        val color1 = IColor.ofMutable("#AABBCC12")
+        assertEquals("[r=0.6666667,g=0.73333335,b=0.8,a=0.07058824]", color1.toString())
+        val color2 = IColor.ofMutable("FFFFFF")
+        assertEquals("[r=1.0,g=1.0,b=1.0,a=1.0]", color2.toString())
+        val color3 = IColor.ofMutable("#101010")
+        assertEquals("[r=0.0627451,g=0.0627451,b=0.0627451,a=1.0]", color3.toString())
+    }
+
 }
