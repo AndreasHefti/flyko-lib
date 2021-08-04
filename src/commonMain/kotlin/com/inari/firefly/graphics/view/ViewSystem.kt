@@ -3,13 +3,16 @@ package com.inari.firefly.graphics.view
 import com.inari.firefly.BASE_VIEW
 import com.inari.firefly.FFContext
 import com.inari.firefly.core.api.ViewData
+import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.ComponentMap
 import com.inari.firefly.core.component.ComponentMap.MapAction.*
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.util.aspect.Aspects
 import com.inari.util.collection.DynArray
+import com.inari.util.collection.DynArrayRO
 import com.inari.util.collection.DynIntArray
+import com.inari.util.collection.DynIntArrayRO
 import kotlin.jvm.JvmField
 
 object ViewSystem : ComponentSystem {
@@ -39,9 +42,9 @@ object ViewSystem : ComponentSystem {
     )
 
     @JvmField val baseView: View
-    @JvmField internal val activeViewPorts: DynArray<ViewData> = DynArray.of()
-    @JvmField internal val layersOfView: DynArray<DynIntArray> = DynArray.of()
-
+    @JvmField internal val privateActiveViewPorts: DynArray<ViewData> = DynArray.of(5, 5)
+    @JvmField internal val privateLayersOfView: DynArray<DynIntArray> = DynArray.of(5, 5)
+    @JvmField val activeViewPorts: DynArrayRO<ViewData> = privateActiveViewPorts
     private val orderedView: DynIntArray = DynIntArray(10, -1, 5)
 
     init {
@@ -54,10 +57,14 @@ object ViewSystem : ComponentSystem {
         FFContext.loadSystem(this)
     }
 
+    fun layersOfView(viewId: CompId): DynIntArrayRO = privateLayersOfView[viewId.index]!!
+    fun layersOfView(viewId: Int): DynIntArrayRO = privateLayersOfView[viewId]!!
+    fun layersOfView(viewName: String): DynIntArrayRO = privateLayersOfView[views[viewName].index]!!
+
     private fun created(view: View) {
         val index = view.index
-        if (index !in layersOfView)
-            layersOfView[index] = DynIntArray(10, -1, 5)
+        if (index !in privateLayersOfView)
+            privateLayersOfView[index] = DynIntArray(10, -1, 5)
 
         if (!view.baseView)
             orderedView.add(index)
@@ -78,6 +85,8 @@ object ViewSystem : ComponentSystem {
             throw IllegalStateException("Base View cannot be deactivated")
 
         updateViewMapping()
+        privateLayersOfView[view.index]?.iterator()?.forEach(layers::deactivate)
+
         ViewEvent.send(view.componentId, view.data, ViewEvent.Type.VIEW_DISPOSED)
     }
 
@@ -87,7 +96,7 @@ object ViewSystem : ComponentSystem {
 
         // delete also all layers of this view
         val index = view.index
-        layersOfView[index]?.also { bag ->
+        privateLayersOfView[index]?.also { bag ->
             val i = bag.iterator()
             while (i.hasNext())
                 layers.delete(i.next())
@@ -102,20 +111,20 @@ object ViewSystem : ComponentSystem {
     private fun created(layer: Layer) {
         if (layer.viewRef !in views)
             throw IllegalStateException("No View exists for Layer: $layer")
-        layersOfView[layer.viewRef]?.add(layer.index)
+        privateLayersOfView[layer.viewRef]?.add(layer.index)
     }
 
     private fun deleted(layer: Layer) =
-        layersOfView[layer.viewRef]?.remove(layer.index)
+        privateLayersOfView[layer.viewRef]?.remove(layer.index)
 
 
     private fun updateViewMapping() {
-        activeViewPorts.clear()
+        privateActiveViewPorts.clear()
         val i = orderedView.iterator()
         while (i.hasNext()) {
             val nextId = i.next()
             if (views.isActive(nextId)) {
-                activeViewPorts.add(views[nextId].data)
+                privateActiveViewPorts.add(views[nextId].data)
             }
         }
     }

@@ -59,6 +59,8 @@ class ViewLayerMapping<C : ViewLayerAware> constructor(
         internalGet(c.viewIndex)?.remove(c.layerIndex)
     }
 
+    fun clear() = mapping.clear()
+
     private fun internalGet(view: Int): DynArray<C>? {
         if (view !in mapping)
             mapping[view] = createFunction()

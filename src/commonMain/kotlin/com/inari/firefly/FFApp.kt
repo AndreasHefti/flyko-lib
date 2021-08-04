@@ -47,16 +47,16 @@ abstract class FFApp protected constructor(
     }
 
     fun render() {
-            val size = ViewSystem.activeViewPorts.size
+            val size = ViewSystem.privateActiveViewPorts.size
             if (size > 0) {
                 var i = 0
                 while (i < size) {
-                    ViewSystem.activeViewPorts[i++]?.apply {
+                    ViewSystem.privateActiveViewPorts[i++]?.apply {
                         render(this)
                     }
                 }
 
-                graphics.flush(ViewSystem.activeViewPorts)
+                graphics.flush(ViewSystem.privateActiveViewPorts)
             } else {
                 render(ViewSystem.baseView.data)
                 graphics.flush(NO_VIRTUAL_VIEW_PORTS)
@@ -77,7 +77,7 @@ abstract class FFApp protected constructor(
 
         graphics.startRendering(view, true)
 
-        ViewSystem.layersOfView[view.index]?.apply {
+        ViewSystem.privateLayersOfView[view.index]?.apply {
             if (isEmpty) {
                 FFContext.notify(renderEvent)
             } else {
