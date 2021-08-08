@@ -7,11 +7,11 @@ import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.property.VirtualPropertyRef
 import com.inari.firefly.graphics.view.camera.CameraPivot
-import com.inari.util.geom.PositionF
 import com.inari.util.*
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.AspectType
 import com.inari.util.aspect.IndexedAspectType
+import com.inari.util.geom.*
 import com.inari.util.indexed.Indexed
 import kotlin.jvm.JvmField
 import kotlin.reflect.KClass
@@ -118,7 +118,20 @@ enum class BlendMode constructor(val source: Int, val dest: Int) {
     SRC_XOR_DEST(GLBlendMode.GL_ONE_MINUS_DST_ALPHA, GLBlendMode.GL_ONE_MINUS_SRC_ALPHA),
 }
 
-// Following some pre defined aspects
+// normalized vecrtors
+
+@JvmField val VEC_NF_NORTH = ImmutableVector2f(0f, 1f)
+@JvmField val VEC_NF_SOUTH = ImmutableVector2f(0f, -1f)
+@JvmField val VEC_NF_WEST = ImmutableVector2f(-1f, 0f)
+@JvmField val VEC_NF_EAST = ImmutableVector2f(1f, 0f)
+
+@JvmField val VEC_NI_NORTH = ImmutableVector2i(0, 1)
+@JvmField val VEC_NI_SOUTH = ImmutableVector2i(0, -1)
+@JvmField val VEC_NI_WEST = ImmutableVector2i(-1, 0)
+@JvmField val VEC_NI_EAST = ImmutableVector2i(1, 0)
+
+
+// Following some pre defined aspect groups
 
 @JvmField val ENTITY_CONTROL_ASPECT_GROUP = IndexedAspectType("ENTITY_CONTROL_ASPECTS")
 @JvmField val UNDEFINED_CONTROL: Aspect = ENTITY_CONTROL_ASPECT_GROUP.createAspect("UNDEFINED_CONTROL")
@@ -132,14 +145,27 @@ enum class BlendMode constructor(val source: Int, val dest: Int) {
 @JvmField val CONTACT_TYPE_ASPECT_GROUP = IndexedAspectType("CONTACT_TYPE_ASPECT_GROUP")
 @JvmField val UNDEFINED_CONTACT_TYPE: Aspect = CONTACT_TYPE_ASPECT_GROUP.createAspect("UNDEFINED_CONTACT_TYPE")
 
-@JvmField val PROJECTILE_TYPE_ASPECT = IndexedAspectType("PROJECTILE_TYPE_ASPECT")
-@JvmField val UNDEFINED_PROJECTILE_TYPE = PROJECTILE_TYPE_ASPECT.createAspect("UNDEFINED_PROJECTILE_TYPE")
+@JvmField val PROJECTILE_TYPE_ASPECT_GROUP = IndexedAspectType("PROJECTILE_TYPE_ASPECT_GROUP")
+@JvmField val UNDEFINED_PROJECTILE_TYPE = PROJECTILE_TYPE_ASPECT_GROUP.createAspect("UNDEFINED_PROJECTILE_TYPE")
 
-@JvmField val ACTOR_CATEGORY_ASPECT = IndexedAspectType("ACTOR_CATEGORY_ASPECT")
-@JvmField val UNDEFINED_ACTOR_CATEGORY = ACTOR_CATEGORY_ASPECT.createAspect("UNDEFINED_ACTOR_CATEGORY")
+@JvmField val ACTOR_CATEGORY_ASPECT_GROUP = IndexedAspectType("ACTOR_CATEGORY_ASPECT_GROUP")
+@JvmField val UNDEFINED_ACTOR_CATEGORY = ACTOR_CATEGORY_ASPECT_GROUP.createAspect("UNDEFINED_ACTOR_CATEGORY")
 
-@JvmField val ACTOR_TYPE_ASPECT = IndexedAspectType("ACTOR_TYPE_ASPECT")
-@JvmField val UNDEFINED_ACTOR_TYPE = ACTOR_TYPE_ASPECT.createAspect("UNDEFINED_ACTOR_TYPE")
+@JvmField val ACTOR_TYPE_ASPECT_GROUP = IndexedAspectType("ACTOR_TYPE_ASPECT_GROUP")
+@JvmField val UNDEFINED_ACTOR_TYPE = ACTOR_TYPE_ASPECT_GROUP.createAspect("UNDEFINED_ACTOR_TYPE")
+
+@JvmField val MOVEMENT_ASPECT_GROUP = IndexedAspectType("MOVEMENT_ASPECT_GROUP")
+@JvmField val UNDEFINED_MOVEMENT = MOVEMENT_ASPECT_GROUP.createAspect("UNDEFINED_MOVEMEN")
+enum class MovementAspect(private val aspect: Aspect) : Aspect {
+    ON_GROUND(MOVEMENT_ASPECT_GROUP.createAspect("ON_GROUND")),
+    BLOCK_WEST(MOVEMENT_ASPECT_GROUP.createAspect("BLOCK_WEST")),
+    BLOCK_EAST(MOVEMENT_ASPECT_GROUP.createAspect("BLOCK_EAST")),
+    BLOCK_NORTH(MOVEMENT_ASPECT_GROUP.createAspect("BLOCK_NORTH")),
+    ;
+    override val aspectIndex: Int get() = aspect.aspectIndex
+    override val aspectName: String get() = aspect.aspectName
+    override val aspectType: AspectType get() = aspect.aspectType
+}
 
 
 

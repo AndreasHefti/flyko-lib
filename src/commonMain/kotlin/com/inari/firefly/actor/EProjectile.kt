@@ -1,7 +1,7 @@
 package com.inari.firefly.actor
 
 import com.inari.firefly.CONTACT_TYPE_ASPECT_GROUP
-import com.inari.firefly.PROJECTILE_TYPE_ASPECT
+import com.inari.firefly.PROJECTILE_TYPE_ASPECT_GROUP
 import com.inari.firefly.UNDEFINED_PROJECTILE_TYPE
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
@@ -12,7 +12,7 @@ class EProjectile private constructor () : EntityComponent(EProjectile::class.si
 
     var type: Aspect = UNDEFINED_PROJECTILE_TYPE
         set(value) =
-            if (PROJECTILE_TYPE_ASPECT.typeCheck(value)) field = value
+            if (PROJECTILE_TYPE_ASPECT_GROUP.typeCheck(value)) field = value
             else throw IllegalArgumentException()
     var hitPower: Int = 0
 

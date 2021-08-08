@@ -2,11 +2,7 @@ package com.inari.firefly.control.trigger
 
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
-import com.inari.firefly.NULL_CALL
 import com.inari.firefly.core.system.SystemComponentSubType
-import com.inari.firefly.physics.movement.Integrator
-import com.inari.firefly.physics.movement.SimpleStepIntegrator
-import com.inari.util.Call
 
 class UpdateEventTrigger private constructor() : Trigger() {
 

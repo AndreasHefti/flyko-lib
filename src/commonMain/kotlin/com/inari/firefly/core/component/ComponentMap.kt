@@ -33,13 +33,6 @@ interface ComponentMap<C : Component> : ComponentMapRO<C> {
     fun indexIterator(predicate: Predicate<C?>): IntFunction
     fun nextActive(from: Int): Int
     fun receiver(): Receiver<C>
-    fun forEach(expr: Consumer<C>)
-    fun forEachActive(expr: Consumer<C>)
-    fun forEachIn(bag: DynIntArrayRO, expr: Consumer<C>)
-    fun <CC : C> forEachSubtypeIn(bag: DynIntArrayRO, expr: Consumer<CC>)
-//    TODO
-//    fun forEachIn(set: BitSet, expr: Consumer<C>)
-//    fun <CC : C> forEachSubtypeIn(set: BitSet, expr: Consumer<CC>)
 
     fun clear()
 }

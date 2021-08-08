@@ -1,5 +1,6 @@
 package com.inari.firefly.physics.movement
 
+import com.inari.firefly.MovementAspect
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.ETransform
 import kotlin.math.abs
@@ -11,12 +12,12 @@ class SimpleStepIntegrator  private constructor() : Integrator() {
         if (movement.mass == 0f)
             return
 
-        if (movement.onGround) {
+        if (MovementAspect.ON_GROUND in movement.aspects) {
             if (velocity.dy != 0f )
                 velocity.dy = 0f
             return
         }
-       velocity.dy = velocity.dy + abs( (velocity.dy / movement.mass - 1f ) * 0.2f )
+        velocity.dy = velocity.dy + abs( (velocity.dy / movement.mass - 1f ) * 0.2f )
     }
 
     override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Long) =

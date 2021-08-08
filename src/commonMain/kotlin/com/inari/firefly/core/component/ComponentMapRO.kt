@@ -1,5 +1,8 @@
 package com.inari.firefly.core.component
 
+import com.inari.util.Consumer
+import com.inari.util.collection.DynIntArrayRO
+
 interface ComponentMapRO<C : Component> {
 
     val isEmpty: Boolean
@@ -20,6 +23,10 @@ interface ComponentMapRO<C : Component> {
     fun <CC : C> getAs(index: Int): CC
     fun <CC : C> getAs(name: String): CC
     fun <CC : C> getAs(id: CompId): CC
+    fun forEach(expr: Consumer<C>)
+    fun forEachActive(expr: Consumer<C>)
+    fun forEachIn(bag: DynIntArrayRO, expr: Consumer<C>)
+    fun <CC : C> forEachSubtypeIn(bag: DynIntArrayRO, expr: Consumer<CC>)
 
 
 }

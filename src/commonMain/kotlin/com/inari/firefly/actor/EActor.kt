@@ -17,9 +17,9 @@ class EActor private constructor () : EntityComponent(EActor::class.simpleName!!
     @JvmField internal var hitContactConstraintRef = -1
 
     var category: Aspect = UNDEFINED_ACTOR_CATEGORY
-        set(value) { if (ACTOR_CATEGORY_ASPECT.typeCheck(value)) field = value else throw IllegalArgumentException() }
+        set(value) { if (ACTOR_CATEGORY_ASPECT_GROUP.typeCheck(value)) field = value else throw IllegalArgumentException() }
     var type: Aspect = UNDEFINED_ACTOR_TYPE
-        set(value) { if (ACTOR_TYPE_ASPECT.typeCheck(value)) field = value else throw IllegalArgumentException() }
+        set(value) { if (ACTOR_TYPE_ASPECT_GROUP.typeCheck(value)) field = value else throw IllegalArgumentException() }
     var health: Int = -1
     var maxHealth: Int = -1
     var hitPower: Int = 0

@@ -163,7 +163,7 @@ actual object FFGraphics : GraphicsAPI {
             data.region.height
         )
 
-        sprite.flip(data.isVerticalFlip, !data.isHorizontalFlip)
+        sprite.flip(data.isHorizontalFlip, !data.isVerticalFlip)
         return sprites.add(sprite)
     }
 
@@ -180,7 +180,7 @@ actual object FFGraphics : GraphicsAPI {
             vertexShader = try {
                 Gdx.files.internal(data.vertexShaderResourceName).readString()
             } catch (e: Exception) {
-                System.err.println("Failed to load vertex shader from resource: ${data.vertexShaderResourceName}")
+                System.err.println("Failed to load vertex shader from resource: ${data.vertexShaderResourceName}")
                 println("Use default vertex shader")
                 DEFAULT_VERTEX_SHADER
             }
@@ -190,7 +190,7 @@ actual object FFGraphics : GraphicsAPI {
             fragmentShader = try {
                 Gdx.files.internal(data.fragmentShaderResourceName).readString()
             } catch (e: Exception) {
-                System.err.println("Failed to load fragment shader from resource: ${data.fragmentShaderResourceName}")
+                System.err.println("Failed to load fragment shader from resource: ${data.fragmentShaderResourceName}")
                 println("Use default fragment shader")
                 DEFAULT_FRAGMENT_SHADER
             }
