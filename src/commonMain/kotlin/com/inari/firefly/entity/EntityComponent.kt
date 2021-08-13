@@ -36,7 +36,7 @@ abstract class EntityComponent protected constructor(
         initialized = true
     }
 
-    protected fun init() {
+    protected open fun init() {
         initialized = true
     }
 
@@ -77,8 +77,8 @@ abstract class EntityComponent protected constructor(
 abstract class EntityComponentBuilder<C : EntityComponent> : ComponentType<C> {
     private fun doBuild(comp: C, configure: C.() -> Unit, entityId: CompId, receiver: (C) -> C): CompId {
         comp.also(configure)
-        comp.internalInit(entityId)
         receiver(comp)
+        comp.internalInit(entityId)
         return comp.componentId
     }
     internal fun builder(entityId: CompId, receiver: Receiver<C>): (C.() -> Unit) -> CompId = {

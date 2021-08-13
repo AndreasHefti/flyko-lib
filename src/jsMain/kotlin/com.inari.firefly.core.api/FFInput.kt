@@ -2,6 +2,7 @@ package com.inari.firefly.core.api
 
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
+import com.inari.firefly.NO_NAME
 import com.inari.firefly.core.api.InputDevice.Companion.ACTION_PRESS
 import com.inari.firefly.core.api.InputDevice.Companion.ACTION_TYPED
 import com.inari.firefly.core.api.InputDevice.Companion.VOID_INPUT_DEVICE
@@ -23,6 +24,7 @@ actual object FFInput : InputAPI{
     actual override val implementations: List<InputImpl> = throw UnsupportedOperationException()
 
     actual override val devices: MutableMap<String, InputDevice> = HashMap()
+    override var defaultDevice: String = NO_NAME
 
     init {
         devices[VOID_INPUT_DEVICE] = VOIDAdapter()

@@ -48,6 +48,10 @@ class View private constructor (
         get() = data.fboScale
         set(value) { data.fboScale = value }
 
+    override fun init() {
+        super.init()
+    }
+
     override fun dispose() {
         ControllerSystem.unregister(componentId, true)
         super.dispose()

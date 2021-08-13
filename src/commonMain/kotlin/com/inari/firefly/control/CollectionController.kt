@@ -4,9 +4,9 @@ import com.inari.firefly.FFContext
 import com.inari.firefly.core.component.CompId
 import com.inari.util.collection.DynArray
 
-abstract class ComponentCollectionController protected constructor() : Controller() {
+abstract class CollectionController protected constructor() : Controller() {
 
-    val controlledComponentIds: DynArray<CompId> = DynArray.of(5, 5)
+    protected val controlledComponentIds: DynArray<CompId> = DynArray.of(5, 5)
 
     override fun update() =
         controlledComponentIds.forEach { id -> this.update(id) }
@@ -19,6 +19,4 @@ abstract class ComponentCollectionController protected constructor() : Controlle
         if (disposeWhenEmpty && controlledComponentIds.isEmpty)
             FFContext.delete(componentId)
     }
-
-
 }

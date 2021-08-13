@@ -161,6 +161,7 @@ enum class MovementAspect(private val aspect: Aspect) : Aspect {
     BLOCK_WEST(MOVEMENT_ASPECT_GROUP.createAspect("BLOCK_WEST")),
     BLOCK_EAST(MOVEMENT_ASPECT_GROUP.createAspect("BLOCK_EAST")),
     BLOCK_NORTH(MOVEMENT_ASPECT_GROUP.createAspect("BLOCK_NORTH")),
+    BLOCK_SOUTH(MOVEMENT_ASPECT_GROUP.createAspect("ON_GROUND")),
     ;
     override val aspectIndex: Int get() = aspect.aspectIndex
     override val aspectName: String get() = aspect.aspectName

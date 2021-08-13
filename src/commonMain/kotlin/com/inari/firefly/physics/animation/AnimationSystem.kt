@@ -30,11 +30,12 @@ object AnimationSystem : ComponentSystem {
         override fun entityDeactivated(entity: Entity) = detachEntityAnimations(entity)
         override fun match(aspects: Aspects): Boolean = EAnimation in aspects
     }
+    private val updateListener = {
+        animations.forEachActive { it.update() }
+    }
 
     init {
-        FFContext.registerListener(FFApp.UpdateEvent) {
-                animations.forEachActive { it.update() }
-        }
+        FFContext.registerListener(FFApp.UpdateEvent, updateListener)
         FFContext.registerListener(EntityActivationEvent, entityActivationListener)
         FFContext.loadSystem(this)
     }

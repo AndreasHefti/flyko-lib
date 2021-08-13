@@ -19,8 +19,8 @@ class ContactConstraint private constructor() : SystemComponent(ContactConstrain
             layerRef = setIfNotInitialized(index, "Layer")
         }
     var bounds: Rectangle  = Rectangle()
-    val materialFilter: Aspects = MATERIAL_ASPECT_GROUP.createAspects()
-    val typeFilter: Aspects = CONTACT_TYPE_ASPECT_GROUP.createAspects()
+    @JvmField val materialFilter: Aspects = MATERIAL_ASPECT_GROUP.createAspects()
+    @JvmField val typeFilter: Aspects = CONTACT_TYPE_ASPECT_GROUP.createAspects()
 
     val width: Int
         get() = bounds.width

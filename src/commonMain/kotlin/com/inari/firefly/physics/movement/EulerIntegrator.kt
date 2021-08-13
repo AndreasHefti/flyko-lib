@@ -22,7 +22,7 @@ class EulerIntegrator private constructor() : Integrator() {
                 10.0.pow(value.toDouble()).toFloat()
         }
 
-    override fun integrate(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Long) {
+    override fun integrate(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) {
         gravityIntegration( movement )
         val velocity = movement.velocity
         val acceleration = movement.acceleration
@@ -31,7 +31,7 @@ class EulerIntegrator private constructor() : Integrator() {
         velocity.dy = velocity.dy + acceleration.dy * deltaTimeInSeconds
     }
 
-    override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Long) {
+    override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) {
         transform.move(
             (movement.velocity.dx * deltaTimeInSeconds * shift).roundToInt() / shift,
             (movement.velocity.dy * deltaTimeInSeconds * shift).roundToInt() / shift

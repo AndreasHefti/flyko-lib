@@ -4,8 +4,11 @@ import com.inari.firefly.CONTACT_TYPE_ASPECT_GROUP
 import com.inari.firefly.MATERIAL_ASPECT_GROUP
 import com.inari.firefly.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.UNDEFINED_MATERIAL
+import com.inari.firefly.control.Controller
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
+import com.inari.firefly.core.system.SystemComponentSingleType
+import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
 import com.inari.util.Named
@@ -20,7 +23,7 @@ class EContact private constructor() : EntityComponent(EContact::class.simpleNam
     @JvmField internal var resolverRef = -1
     @JvmField internal val contactScan = ContactScan()
 
-    val collisionResolver = ComponentRefResolver(CollisionResolver) { index -> resolverRef = index }
+    val withResolver = ComponentRefResolver(CollisionResolver) { index -> resolverRef = index }
     var bounds: Rectangle = Rectangle()
     var mask: BitMask = BitMask(width = 0, height = 0)
         set(value) {
@@ -37,19 +40,24 @@ class EContact private constructor() : EntityComponent(EContact::class.simpleNam
             if (CONTACT_TYPE_ASPECT_GROUP.typeCheck(value)) field = value
             else throw IllegalArgumentException()
 
-    val addConstraint =
-        ComponentRefResolver(ContactConstraint) { id ->
+    val withConstraint = ComponentRefResolver(ContactConstraint) { id ->
             if (id !in contactScan.contacts) contactScan.contacts[id] = Contacts(id)
         }
 
-    val removeConstraint =
-        ComponentRefResolver(ContactConstraint) { id: Int ->
+    val removeConstraint = ComponentRefResolver(ContactConstraint) { id: Int ->
             contactScan.contacts.remove(id)
         }
 
-    val constraint: (ContactConstraint.() -> Unit) -> Unit = { configure ->
-        val id = ContactConstraint.build(configure)
+    fun <A : ContactConstraint> withConstraint(builder: SystemComponentSingleType<A>, configure: (A.() -> Unit)): CompId {
+        val id = builder.build(configure)
         contactScan.contacts[id.instanceId] = Contacts(id.instanceId)
+        return id
+    }
+
+    fun <A : CollisionResolver> withResolver(builder: SystemComponentSubType<CollisionResolver, A>, configure: (A.() -> Unit)): CompId {
+        val id = builder.build(configure)
+        resolverRef = id.instanceId
+        return id
     }
 
     fun clearConstraints() =

@@ -109,6 +109,18 @@ object FFContext {
     operator fun <C : SystemComponent, CC : C> get(cType: SystemComponentSubType<C, CC>, named: Named): CC =
         mapper<CC>(cType)[named.name]
 
+    operator fun <E : EntityComponent> get(ecType: EntityComponentType<E>, entityId: Int): E =
+        EntitySystem.entities[entityId][ecType]
+
+    operator fun <E : EntityComponent> get(ecType: EntityComponentType<E>, entityId: CompId): E =
+        EntitySystem.entities[entityId][ecType]
+
+    operator fun <E : EntityComponent> get(ecType: EntityComponentType<E>, entityName: String): E =
+        EntitySystem.entities[entityName][ecType]
+
+    operator fun <E : EntityComponent> get(ecType: EntityComponentType<E>, entityName: Named): E =
+        EntitySystem.entities[entityName.name][ecType]
+
     fun assetInstanceId(assetId: Int): Int =
         AssetSystem.assets[assetId].instanceId
 
@@ -118,17 +130,7 @@ object FFContext {
     fun assetInstanceId(assetName: Named): Int =
         AssetSystem.assets[assetName.name].instanceId
 
-    operator fun <E : EntityComponent> get(entityId: Int, ecType: EntityComponentType<E>): E =
-        EntitySystem.entities[entityId][ecType]
 
-    operator fun <E : EntityComponent> get(entityId: CompId, ecType: EntityComponentType<E>): E =
-        EntitySystem.entities[entityId][ecType]
-
-    operator fun <E : EntityComponent> get(entityName: String, ecType: EntityComponentType<E>): E =
-        EntitySystem.entities[entityName][ecType]
-
-    operator fun <E : EntityComponent> get(entityName: Named, ecType: EntityComponentType<E>): E =
-        EntitySystem.entities[entityName.name][ecType]
 
     fun isActive(component: Component): Boolean =
         isActive(component.componentId)

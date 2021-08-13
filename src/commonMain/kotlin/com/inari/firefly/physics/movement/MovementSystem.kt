@@ -2,6 +2,7 @@ package com.inari.firefly.physics.movement
 
 import com.inari.firefly.FFApp.UpdateEvent
 import com.inari.firefly.FFContext
+import com.inari.firefly.MovementAspect
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.Entity
@@ -12,6 +13,7 @@ import com.inari.firefly.graphics.ETransform
 import com.inari.util.aspect.Aspects
 import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
+import kotlin.math.min
 
 object MovementSystem : ComponentSystem {
 
@@ -49,7 +51,7 @@ object MovementSystem : ComponentSystem {
 
     private fun processMove() {
         MoveEvent.moveEvent.entities.clear()
-        val deltaTimeInSeconds: Long = FFContext.timer.timeElapsed / 1000
+        val deltaTimeInSeconds: Float = min(FFContext.timer.timeElapsed / 1000f, .5f)
 
         var i: Int = entities.nextSetBit(0)
         while (i >= 0) {

@@ -1,5 +1,6 @@
 package com.inari.firefly.core.api
 
+import com.inari.firefly.NO_NAME
 import com.inari.util.collection.BitSet
 
 typealias KeyCallback = (Int, Int, Int) -> Unit // key, scancode, action
@@ -57,10 +58,14 @@ interface InputAPI {
     val dy: Int
 
     val implementations: List<InputImpl>
-    val devices: MutableMap<String, InputDevice>
+    val devices: Map<String, InputDevice>
+    var defaultDevice: String
 
     fun <T : InputDevice> createDevice(name: String, implementation: InputImpl, window: Long = -1): T
     fun getDevice(name: String): InputDevice
+    fun getDefaultDevice(): InputDevice =
+        devices[defaultDevice] ?: devices[InputDevice.VOID_INPUT_DEVICE]!!
+
     fun <T : InputDevice> getDeviceOf(name: String): T
     fun createOrAdapter(name: String, a: String, b: String): ORAdapter
     fun clearDevice(name: String)

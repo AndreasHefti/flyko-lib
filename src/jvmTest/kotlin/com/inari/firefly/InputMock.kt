@@ -19,6 +19,7 @@ object InputMock : InputAPI {
     override val implementations: List<InputImpl> = listOf()
     override val devices: MutableMap<String, InputDevice>
         get() = TODO("Not yet implemented")
+    override var defaultDevice: String = NO_NAME
 
     override fun <T : InputDevice> createDevice(name: String, implementation: InputImpl, window: Long): T {
         TODO("Not yet implemented")

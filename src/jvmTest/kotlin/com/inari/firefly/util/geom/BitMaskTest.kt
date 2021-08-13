@@ -2241,5 +2241,52 @@ class BitMaskTest {
 
     }
 
+    @Test
+    fun testAndWIthOffsetInSecondMask() {
+        val mask1 = BitMask(0, 0, 8, 8)
+            .setHalfSlopeRegion(Direction.SOUTH_EAST)
+
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "00000001\n" +
+                    "00000011\n" +
+                    "00000111\n" +
+                    "00001111\n" +
+                    "00011111\n" +
+                    "00111111\n" +
+                    "01111111\n" +
+                    "11111111]",
+            mask1.toString()
+        )
+
+        val mask2 = BitMask(1, 0, 1, 8).fill()
+        assertEquals(
+            "BitMask [region=[x=1,y=0,width=1,height=8], bits=\n" +
+                    "1\n" +
+                    "1\n" +
+                    "1\n" +
+                    "1\n" +
+                    "1\n" +
+                    "1\n" +
+                    "1\n" +
+                    "1]",
+            mask2.toString()
+        )
+
+        mask2.and(mask1)
+        assertEquals(
+            "BitMask [region=[x=1,y=0,width=1,height=8], bits=\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "1\n" +
+                    "1]",
+            mask2.toString()
+        )
+
+    }
 
 }

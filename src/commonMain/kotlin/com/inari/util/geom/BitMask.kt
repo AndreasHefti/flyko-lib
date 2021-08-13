@@ -29,6 +29,9 @@ class BitMask constructor(
         tmpBits = BitSet(region.width + region.height)
     }
 
+    val cardinality: Int
+        get() = bits.cardinality
+
     fun region(): Rectangle =
         region
     val isEmpty: Boolean get() =
@@ -264,27 +267,27 @@ class BitMask constructor(
         return this
     }
 
-    fun and(other: BitMask, xoffset: Int, yoffset: Int): BitMask {
-        setTmpBits(other, xoffset, yoffset)
+    fun and(other: BitMask, xOffset: Int, yOffset: Int): BitMask {
+        setTmpBits(other, xOffset, yOffset)
         bits.and(tmpBits)
         return this
     }
 
     fun or(other: BitMask): BitMask {
-        setTmpBits(other, 0, 0)
+        setTmpBits(other, 0,0)
         bits.or(tmpBits)
         return this
     }
 
-    fun or(other: BitMask, xoffset: Int, yoffset: Int): BitMask {
-        setTmpBits(other, xoffset, yoffset)
+    fun or(other: BitMask, xOffset: Int, yOffset: Int): BitMask {
+        setTmpBits(other, xOffset, yOffset)
         bits.or(tmpBits)
         return this
     }
 
-    private fun setTmpBits(other: BitMask, xoffset: Int, yoffset: Int): BitMask {
-        tmpRegion.x = other.region.x + xoffset
-        tmpRegion.y = other.region.y + yoffset
+    private fun setTmpBits(other: BitMask, xOffset: Int, yOffset: Int): BitMask {
+        tmpRegion.x = other.region.x + xOffset
+        tmpRegion.y = other.region.y + yOffset
         tmpRegion.width = other.region.width
         tmpRegion.height = other.region.height
         GeomUtils.intersection(region, tmpRegion, intersection)

@@ -165,7 +165,7 @@ object ContactSystem : ComponentSystem {
 
     private val tmpEntityKeyMap = BitSet()
     private fun updateContactMaps(entities: BitSet) {
-        // first we have to update all moved entities within the registered ContactMap's
+        // first we have to update all moved entities within the registered ContactMap's
         tmpEntityKeyMap.clear()
         var i = entities.nextSetBit(0)
         while (i >= 0) {
@@ -174,11 +174,11 @@ object ContactSystem : ComponentSystem {
             if (EContact !in entity.aspects)
                 continue
 
-            tmpEntityKeyMap.set(i)
+            tmpEntityKeyMap.set(entity.index)
             contactMapViewLayer[entity[ETransform]]?.update(entity)
         }
 
-        // then we can update the contacts on the new positions
+        // then we can update the contacts on the new positions
         updateContacts()
     }
 
@@ -194,7 +194,7 @@ object ContactSystem : ComponentSystem {
             scanContacts(entity, contacts)
 
             if (contacts.resolverRef >= 0)
-                collisionResolver[contacts.resolverRef].resolve(entity)
+                collisionResolver[contacts.resolverRef].resolve(entity, contacts, contacts.contactScan)
 
             if (contacts.contactScan.hasAnyContact()) {
                 ContactEvent.contactEvent.entity = entity.index

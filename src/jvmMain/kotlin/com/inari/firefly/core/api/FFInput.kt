@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
+import com.inari.firefly.NO_NAME
 import com.inari.firefly.core.api.InputDevice.Companion.ACTION_PRESS
 import com.inari.firefly.core.api.InputDevice.Companion.ACTION_TYPED
 import com.inari.firefly.core.api.InputDevice.Companion.VOID_INPUT_DEVICE
@@ -35,6 +36,8 @@ actual object FFInput : InputAPI {
 
     actual override val devices: MutableMap<String, InputDevice> = HashMap()
 
+    override var defaultDevice: String = NO_NAME
+
     init {
         devices[VOID_INPUT_DEVICE] = VOIDAdapter()
     }
@@ -64,6 +67,8 @@ actual object FFInput : InputAPI {
 
     actual override fun getDevice(name: String): InputDevice =
             devices[name] ?: devices[VOID_INPUT_DEVICE]!!
+
+
 
     actual override fun <T : InputDevice> getDeviceOf(name: String): T = getDevice(name) as T
 
