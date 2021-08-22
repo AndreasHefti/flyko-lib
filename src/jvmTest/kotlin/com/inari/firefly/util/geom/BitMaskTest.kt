@@ -2286,7 +2286,114 @@ class BitMaskTest {
                     "1]",
             mask2.toString()
         )
+    }
 
+    @Test
+    fun testOrWithOffset() {
+        var bitmask1 = BitMask(0, 0, 8, 8).setHalfSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "00000001\n" +
+                    "00000011\n" +
+                    "00000111\n" +
+                    "00001111\n" +
+                    "00011111\n" +
+                    "00111111\n" +
+                    "01111111\n" +
+                    "11111111]",
+            bitmask1.toString())
+
+        var bitmask2 = BitMask(0, 0, 1, 8)
+        bitmask2.or(bitmask1)
+
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=1,height=8], bits=\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "1]",
+            bitmask2.toString())
+
+        bitmask2 = BitMask(1, 1, 1, 8)
+        bitmask2.or(bitmask1)
+
+        assertEquals(
+            "BitMask [region=[x=1,y=1,width=1,height=8], bits=\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "1\n" +
+                    "1\n" +
+                    "0]",
+            bitmask2.toString())
+
+
+    }
+
+    @Test
+    fun testAndWithOffset() {
+        var bitmask1 = BitMask(0, 0, 8, 8).setHalfSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
+                    "00000001\n" +
+                    "00000011\n" +
+                    "00000111\n" +
+                    "00001111\n" +
+                    "00011111\n" +
+                    "00111111\n" +
+                    "01111111\n" +
+                    "11111111]",
+            bitmask1.toString())
+
+        var bitmask2 = BitMask(1, 0, 1, 8).fill()
+        bitmask2.and(bitmask1)
+
+        assertEquals(
+            "BitMask [region=[x=1,y=0,width=1,height=8], bits=\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "1\n" +
+                    "1]",
+            bitmask2.toString())
+
+
+        bitmask1 = BitMask(-1, -1, 8, 8).setHalfSlopeRegion(Direction.SOUTH_EAST)
+        assertEquals(
+            "BitMask [region=[x=-1,y=-1,width=8,height=8], bits=\n" +
+                    "00000001\n" +
+                    "00000011\n" +
+                    "00000111\n" +
+                    "00001111\n" +
+                    "00011111\n" +
+                    "00111111\n" +
+                    "01111111\n" +
+                    "11111111]",
+            bitmask1.toString())
+
+        bitmask2 = BitMask(0, -1, 1, 8).fill()
+        bitmask2.and(bitmask1)
+
+        assertEquals(
+            "BitMask [region=[x=0,y=-1,width=1,height=8], bits=\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "0\n" +
+                    "1\n" +
+                    "1]",
+            bitmask2.toString())
     }
 
 }

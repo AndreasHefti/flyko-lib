@@ -2,6 +2,7 @@ package com.inari.util.geom
 
 import com.inari.util.StringUtils
 import com.inari.util.collection.BitSet
+import kotlin.jvm.JvmField
 
 class BitMask constructor(
     x: Int = 0,
@@ -29,8 +30,18 @@ class BitMask constructor(
         tmpBits = BitSet(region.width + region.height)
     }
 
+    val x get() = region.x
+    val y get() = region.y
+    val width get() = region.width
+    val height get() = region.height
+
     val cardinality: Int
         get() = bits.cardinality
+
+    val firstSetBit: Int
+        get() = bits.nextSetBit(0)
+
+    fun nextSetBit(from: Int) = bits.nextSetBit(from)
 
     fun region(): Rectangle =
         region
@@ -300,8 +311,8 @@ class BitMask constructor(
         // adjust intersection to origin
         val x1 = intersection.x - region.x
         val y1 = intersection.y - region.y
-        val x2 = if (intersection.x == 0) other.region.width - intersection.width else intersection.x - tmpRegion.x
-        val y2 = if (intersection.y == 0) other.region.height - intersection.height else intersection.y - tmpRegion.y
+        val x2 = intersection.x - tmpRegion.x
+        val y2 = intersection.y - tmpRegion.y
 
         for (y in 0 until intersection.height) {
             for (x in 0 until intersection.width) {
@@ -406,10 +417,7 @@ class BitMask constructor(
 
             for (y in 0 until result.region.height) {
                 for (x in 0 until result.region.width) {
-                    result.bits.set(
-                        y * result.region.width + x,
-                        bitmask.bits.get((y + y1) * bitmask.region.width + (x + x1))
-                    )
+                    result.bits[y * result.region.width + x] = bitmask.bits[(y + y1) * bitmask.region.width + (x + x1)]
                 }
             }
 
