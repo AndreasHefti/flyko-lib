@@ -1,5 +1,6 @@
 package com.inari.firefly.core.api
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import java.io.File
@@ -13,7 +14,9 @@ import kotlin.reflect.KClass
 
 actual object FFResourceService : ResourceServiceAPI {
 
-    private val JSONMapper = ObjectMapper().registerModule(KotlinModule())
+    private val JSONMapper = ObjectMapper()
+        .registerModule(KotlinModule())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     actual override fun loadTextResource(resourceName: String, encryption: String?): String {
         if (encryption != null) {

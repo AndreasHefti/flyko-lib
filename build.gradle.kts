@@ -41,7 +41,10 @@ kotlin {
 
     
     sourceSets {
-        val commonMain by getting
+        val commonMain by getting {
+            dependencies {
+            }
+        }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test-common"))
@@ -59,6 +62,7 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
+                implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.0")
             }
         }
         val jsMain by getting {

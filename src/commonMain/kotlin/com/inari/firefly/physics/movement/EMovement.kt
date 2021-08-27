@@ -18,19 +18,20 @@ class EMovement private constructor() : EntityComponent(EMovement::class.simpleN
     @JvmField internal var integratorRef = -1
     @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
 
-    @JvmField var active: Boolean = true
+    @JvmField var active = true
     @JvmField val integrator = ComponentRefResolver(Integrator) { index-> integratorRef = index }
-    @JvmField var mass: Float = 0f
-    @JvmField val force: Vector2f  = Vector2f(0f, 0f)
-    @JvmField val acceleration: Vector2f = Vector2f(0f, 0f)
-    @JvmField val velocity: Vector2f  = Vector2f(0f, 0f)
+    @JvmField var mass = 0.0f
+    @JvmField val force = Vector2f(0f, 0f)
+    @JvmField val acceleration = Vector2f(0f, 0f)
+    @JvmField val velocity = Vector2f(0f, 0f)
 
     @JvmField var maxVelocityNorth = Float.MAX_VALUE
     @JvmField var maxVelocityEast = Float.MAX_VALUE
     @JvmField var maxVelocitySouth = Float.MAX_VALUE
     @JvmField var maxVelocityWest = Float.MAX_VALUE
 
-    @JvmField var onGround: Boolean = false
+    @JvmField var onGround = false
+
     @JvmField val aspects: Aspects = MOVEMENT_ASPECT_GROUP.createAspects()
 
     var velocityX: Float

@@ -67,12 +67,11 @@ object MovementSystem : ComponentSystem {
             else
                 integrator[movement.integratorRef]
             val transform = entity[ETransform]
-            if (movement.velocity.dx != 0f || movement.velocity.dy != 0f) {
+            movementIntegrator.integrate(movement, transform, deltaTimeInSeconds)
+            if (movement.velocity.dx != 0.0f || movement.velocity.dy != 0.0f) {
                 movementIntegrator.step(movement, transform, deltaTimeInSeconds)
                 MoveEvent.moveEvent.entities.set(entity.index)
             }
-
-            movementIntegrator.integrate(movement, transform, deltaTimeInSeconds)
         }
 
         if (!MoveEvent.moveEvent.entities.isEmpty)

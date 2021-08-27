@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.5" tiledversion="1.7.1" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="1">
+ <editorsettings>
+  <export target="map1.json" format="json"/>
+ </editorsettings>
+ <properties>
+  <property name="tilesets" value="redTerrain:tiles/outline_full.json,bluTerrain:tiles/outline_blu_full.json"/>
+ </properties>
+ <tileset firstgid="1" source="outline_full.tsx"/>
+ <tileset firstgid="41" source="outline_blu_full.tsx"/>
+ <layer id="1" name="Layer1" width="20" height="20" tintcolor="#ffffff" offsetx="0.5" offsety="0.5">
+  <properties>
+   <property name="blend" value="NORMAL_ALPHA"/>
+   <property name="tilesets" value="bluTerrain,redTerrain"/>
+  </properties>
+  <data encoding="csv">
+41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,
+1,0,0,0,0,0,0,0,80,70,0,0,0,41,41,41,0,0,0,41,
+1,0,0,0,0,0,0,0,60,50,0,0,0,0,0,0,0,0,0,41,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,
+1,0,0,0,0,0,0,0,0,0,0,0,0,50,60,0,0,0,0,41,
+1,0,0,0,0,0,0,0,0,11,11,0,0,70,80,0,0,0,0,41,
+1,0,0,0,0,0,0,0,0,61,61,0,0,0,0,0,0,0,0,41,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,
+1,0,0,0,0,0,0,0,42,52,0,0,43,53,55,75,0,0,0,41,
+1,0,0,0,0,0,0,0,62,72,0,0,63,73,65,65,0,0,0,41,
+1,0,0,0,0,0,71,0,0,0,0,0,0,0,0,0,0,0,0,41,
+1,0,0,0,0,0,0,0,0,0,43,49,53,0,0,0,78,0,0,41,
+1,0,0,0,0,0,0,0,0,0,63,59,73,0,0,0,0,0,0,41,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,72,0,0,41,
+1,0,0,0,0,0,0,0,0,0,43,0,0,0,42,72,0,0,0,41,
+1,0,41,46,0,0,0,0,43,44,73,0,48,42,72,0,0,0,0,41,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,41
+</data>
+ </layer>
+</map>
