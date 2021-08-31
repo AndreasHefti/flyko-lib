@@ -18,16 +18,8 @@ class PlatformerJumpController : SingleComponentController() {
     @JvmField var doubleJump = true
 
     private var doubleJumpOn = true
-    private lateinit var playerMovement: EMovement
-
-    override fun register(componentId: CompId) {
-        super.register(componentId)
-        playerMovement = FFContext[EMovement, componentId]
-    }
-
-    override fun unregister(componentId: CompId, disposeWhenEmpty: Boolean) {
-        playerMovement = null!!
-        super.unregister(componentId, disposeWhenEmpty)
+    private val playerMovement: EMovement by lazy {
+        FFContext[EMovement, controlledComponentId]
     }
 
     override fun update(componentId: CompId) {

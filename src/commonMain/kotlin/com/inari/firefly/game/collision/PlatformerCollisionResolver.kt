@@ -1,6 +1,8 @@
 package com.inari.firefly.game.collision
 
-import com.inari.firefly.*
+import com.inari.firefly.EMPTY_INT_CONSUMER
+import com.inari.firefly.UNDEFINED_CONTACT_TYPE
+import com.inari.firefly.UNDEFINED_MATERIAL
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSingleType
@@ -13,20 +15,18 @@ import com.inari.util.IntConsumer
 import com.inari.util.Predicate
 import com.inari.util.aspect.Aspect
 import com.inari.util.collection.DynArray
+import com.inari.util.geom.BitMask
 import kotlin.jvm.JvmField
-import kotlin.math.*
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.max
 
-
-class PlatformerCollisionResolver : CollisionResolver() {
+class PlatformerCollisionResolver : CollisionResolver()  {
 
     private var fullContactConstraintRef = -1
     private val fullContactCallbacks = DynArray.of<CollisionCallback>()
-    private var solidContactAreaRef = -1
-    private  lateinit var sensorMatrix: CollisionSensorMatrix
+    private var terrainContactConstraintRef = -1
 
-    @JvmField var slopeAdaptionThreshold = 15
-    @JvmField var horizontalContactSensorThreshold = 10
-    @JvmField var verticalContactSensorThreshold = 10
     @JvmField var touchGroundCallback: IntConsumer = EMPTY_INT_CONSUMER
     @JvmField var looseGroundContactCallback: IntConsumer = EMPTY_INT_CONSUMER
     @JvmField var onSlopeCallback: (Int, Int, Contacts) -> Unit = { _, _, _ -> }
@@ -35,43 +35,39 @@ class PlatformerCollisionResolver : CollisionResolver() {
         fullContactConstraintRef = it
     }
 
-    fun <A : ContactConstraint> withSolidContactConstraint(
-        gapNorth: Int = 1,
-        gapEast: Int = 1,
-        gapSouth: Int = 5,
-        gapWest: Int = 1,
-        builder: SystemComponentSingleType<A>, configure: (A.() -> Unit)): CompId {
+    private var gapSouth = 5
+    private var scanLength = 5
+    private var bScanLength = gapSouth + scanLength
 
-        val result = builder.buildAndGet(configure)
-        sensorMatrix = CollisionSensorMatrix(
-            result.width - gapWest - gapEast,
-            result.height - gapNorth - gapSouth,
-            gapNorth,
-            gapEast,
-            gapSouth,
-            gapWest)
-        solidContactAreaRef = result.index
-        return result.componentId
-    }
+    private var x1 = 2
+    private var x2 = -1
+    private var x3 = -1
+    private var y1 = 2
+    private var y2 = -1
+    private var y3 = -1
 
-    fun withSolidContactConstraint(
-        constraintName: String,
-        gapNorth: Int = 1,
-        gapEast: Int = 1,
-        gapSouth: Int = 5,
-        gapWest: Int = 1): CompId {
+    private var tmax = -1
+    private var bmax = -1
+    private var lmax = -1
+    private var rmax = -1
 
-        val result = ContactSystem.constraints[constraintName]
-        sensorMatrix = CollisionSensorMatrix(
-            result.width - gapWest - gapEast,
-            result.height - gapNorth - gapSouth,
-            gapNorth,
-            gapEast,
-            gapSouth,
-            gapWest)
-        solidContactAreaRef = result.index
-        return result.componentId
-    }
+    private val contactSensorT1 = BitMask()
+    private val contactSensorT2 = BitMask()
+    private val contactSensorT3 = BitMask()
+
+    private val contactSensorB1 = BitMask()
+    private val contactSensorB2 = BitMask()
+    private val contactSensorB3 = BitMask()
+
+    private val contactSensorL1 = BitMask()
+    private val contactSensorL2 = BitMask()
+    private val contactSensorL3 = BitMask()
+
+    private val contactSensorR1 = BitMask()
+    private val contactSensorR2 = BitMask()
+    private val contactSensorR3 = BitMask()
+
+    private val contactSensorGround = BitMask()
 
     fun withFullContactCallback(
         material: Aspect = UNDEFINED_MATERIAL,
@@ -80,8 +76,33 @@ class PlatformerCollisionResolver : CollisionResolver() {
         fullContactCallbacks.add(CollisionCallback(material, contact, callback))
     }
 
+    fun <A : ContactConstraint> withTerrainContactConstraint(gapSouth: Int = 5, builder: SystemComponentSingleType<A>, configure: (A.() -> Unit)): CompId {
+        this.gapSouth = gapSouth
+        val result = builder.build(configure)
+        terrainContactConstraintRef = result.index
+        initTerrainContact()
+        return result
+    }
+
+    fun withTerrainContactConstraint(constraintName: String, gapSouth: Int = 5): CompId {
+        this.gapSouth = gapSouth
+        val result = ContactSystem.constraints[constraintName]
+        terrainContactConstraintRef = result.componentId.index
+        initTerrainContact()
+        return result.componentId
+    }
+
+    fun withTerrainContactConstraint(constraintRefId: CompId, gapSouth: Int = 5): CompId {
+        this.gapSouth = gapSouth
+        val result = ContactSystem.constraints[constraintRefId]
+        terrainContactConstraintRef = result.componentId.index
+        initTerrainContact()
+        return result.componentId
+    }
+
     override fun resolve(entity: Entity, contact: EContact, contactScan: ContactScan) {
-        val terrainContact = contactScan[solidContactAreaRef]
+
+        val terrainContact = contactScan[terrainContactConstraintRef]
         if (terrainContact.hasAnyContact()) {
             val transform = entity[ETransform]
             val movement = entity[EMovement]
@@ -103,167 +124,150 @@ class PlatformerCollisionResolver : CollisionResolver() {
         }
     }
 
-    private fun minDist(d1: Int, d2: Int, d3: Int) : Int {
-        var result = if (d1 != sensorMatrix.noDistanceValue) d1 else 0
-        result = if (d2 != sensorMatrix.noDistanceValue) min(result, d2) else result
-        return if (d3 != sensorMatrix.noDistanceValue) min(result, d3) else result
-    }
-    private fun minDist(d1: Int, d2: Int) : Int {
-        val result = if (d1 != sensorMatrix.noDistanceValue) d1 else 0
-        return if (d2 != sensorMatrix.noDistanceValue) min(result, d2) else result
-    }
-
     private fun resolveTerrainContact(contacts: Contacts, entity: Entity, transform: ETransform, movement: EMovement) {
-        //println("movement: ${movement.velocity}")
-        //println("$sensorMatrix")
 
         val prefGround = movement.onGround
-        sensorMatrix.calc(contacts.contactMask)
 
-        resolveHorizontally(entity, contacts, movement, transform)
-        resolveVertically(contacts, movement, transform, entity)
+        takeFullLedgeScans(contacts)
+        resolveVertically(contacts, entity, transform, movement)
+        resolveHorizontally(contacts, entity, transform, movement)
 
-        if (movement.onGround)
-            transform.position.y = ceil(transform.position.y)
         if (!prefGround && movement.onGround)
             touchGroundCallback(entity.index)
         if (prefGround && !movement.onGround)
             looseGroundContactCallback(entity.index)
     }
 
-    private fun resolveVertically(
-        contacts: Contacts,
-        movement: EMovement,
-        transform: ETransform,
-        entity: Entity
-    ) {
+    private fun resolveVertically(contacts: Contacts, entity: Entity, transform: ETransform, movement: EMovement) {
         var refresh = false
         var setOnGround = false
-        if (contacts.hasAnyContact()) {
-            if (movement.velocity.dy < 0.0f) {
+        val onSlope = contactSensorB1.cardinality != 0 &&
+                contactSensorB3.cardinality != 0 &&
+                contactSensorB1.cardinality != contactSensorB3.cardinality &&
+                contactSensorGround.cardinality < contactSensorGround.width
 
-                val d1 = getAdjustDistance(sensorMatrix.distances[0].dy, verticalContactSensorThreshold)
-                val d2 = getAdjustDistance(sensorMatrix.distances[1].dy, verticalContactSensorThreshold)
-                val d3 = getAdjustDistance(sensorMatrix.distances[2].dy, verticalContactSensorThreshold)
-                val minDistTop = minDist(d1, d2, d3)
-
-                // special case jump under slope
-                if ((sensorMatrix.distances[0].dy != sensorMatrix.noDistanceValue &&
-                    sensorMatrix.contactSensorLineLeft.cardinality < verticalContactSensorThreshold &&
-                    sensorMatrix.contactSensorLineLeft.getBit(0, sensorMatrix.gapNorth)) ||
-                    (sensorMatrix.distances[2].dy != sensorMatrix.noDistanceValue &&
-                    sensorMatrix.contactSensorLineRight.cardinality < verticalContactSensorThreshold &&
-                    sensorMatrix.contactSensorLineRight.getBit(0, sensorMatrix.gapNorth))) {
-
-                    movement.velocity.dy = 0.0f
-                    refresh = true
-                } else if (minDistTop != sensorMatrix.noDistanceValue && minDistTop < 0) {
-                    movement.velocity.dy = 0.0f
-                    refresh = true
-                }
+        if (onSlope && movement.velocity.dy >= 0.0f) {
+            //println("adjust slope ${contactSensorB2.cardinality}")
+            if (contactSensorB1.cardinality > contactSensorB3.cardinality) {
+                //println("slope south-east")
+                transform.move(dy = -(contactSensorB1.cardinality - gapSouth))
+                transform.position.y = ceil(transform.position.y)
+                movement.velocity.dy = 0.0f
+                refresh = true
+                setOnGround = true
+                onSlopeCallback(entity.index, contactSensorB1.cardinality - contactSensorB3.cardinality, contacts)
             } else {
-
-                val d1 = getAdjustDistance(sensorMatrix.distances[5].dy, verticalContactSensorThreshold)
-                val d2 = getAdjustDistance(sensorMatrix.distances[6].dy, verticalContactSensorThreshold)
-                val d3 = getAdjustDistance(sensorMatrix.distances[7].dy, verticalContactSensorThreshold)
-                //println("slope d1 $d1 d2 $d2 d3 $d3")
-                if (movement.onGround) {
-                    // adjust slope
-                    if ((d1 < 0 && d3 >= 0) || (d2 > 0 && d1 == 0)) {
-                        // slope south-west
-                        val d4 = abs(d3 - d1)
-                        if (d4 < slopeAdaptionThreshold) {
-                            //println("adjust slope south-west d4 $d4 d2 $d2")
-                            transform.move(dy = d2)
-                            onSlopeCallback(entity.index, d2, contacts)
-                            refresh = true
-                            setOnGround = true
-                        }
-                    } else if ((d1 >= 0 && d3 < 0) || (d2 > 0 && d3 == 0)) {
-                        // slope south-east
-                        val d4 = abs(d1 - d3)
-                        if (d4 < slopeAdaptionThreshold) {
-                            //println("adjust slope south-east d4 $d4 d2 $d2")
-                            transform.move(dy = d2)
-                            onSlopeCallback(entity.index, d2, contacts)
-                            refresh = true
-                            setOnGround = true
-
-                        }
-                    }
-                } else {
-                    val minDistBottom = if (d1 != 0 && d2 != 0) min(d1, d2) else if (d2 != 0 && d3 != 0) min(d2, d3) else d2
-                    if (minDistBottom != sensorMatrix.noDistanceValue && minDistBottom < 0) {
-                        //println("adjust ground: $minDistBottom")
-                        transform.move(dy = minDistBottom)
-                        refresh = true
-                    }
-                }
+                //println("slope south-west")
+                transform.move(dy = -(contactSensorB3.cardinality - gapSouth))
+                transform.position.y = ceil(transform.position.y)
+                movement.velocity.dy = 0.0f
+                refresh = true
+                setOnGround = true
+                onSlopeCallback(entity.index, contactSensorB1.cardinality - contactSensorB3.cardinality, contacts)
             }
+        } else if (bmax > gapSouth) {
+            //println("adjust ground: ${bmax - gapSouth}")
+            transform.move(dy = -(bmax - gapSouth))
+            transform.position.y = ceil(transform.position.y)
+            movement.velocity.dy = 0.0f
+            refresh = true
+            setOnGround = true
+        }
+
+        if (tmax > 0) {
+            //println("adjust top: $tmax")
+            transform.move(dy = tmax)
+            transform.position.y = floor(transform.position.y)
+            if (movement.velocity.dy < 0.0f)
+                movement.velocity.dy = 0.0f
+            refresh = true
         }
 
         if (refresh) {
             ContactSystem.updateContacts(entity.componentId)
-            sensorMatrix.calc(contacts.contactMask)
+            takeFullLedgeScans(contacts)
         }
 
-        // set on ground
         movement.onGround =
-            setOnGround ||
-            (movement.velocity.dy >= 0.0f &&
-            (sensorMatrix.distances[5].dy == 0 ||
-            sensorMatrix.distances[6].dy == 0 ||
-            sensorMatrix.distances[7].dy == 0))
+            setOnGround || contactSensorGround.cardinality > 0
+        if (movement.onGround)
+            transform.position.y = ceil(transform.position.y)
 
+        //println("onGround ${movement.onGround}")
     }
 
-    private fun getAdjustDistance(d: Int, max: Int): Int =
-        if (d == sensorMatrix.noDistanceValue || abs(d) > max) 0 else d
-
-    private fun resolveHorizontally(
-        entity: Entity,
-        contacts: Contacts,
-        movement: EMovement,
-        transform: ETransform,
-    ) {
+    private fun resolveHorizontally(contacts: Contacts, entity: Entity, transform: ETransform, movement: EMovement) {
         var refresh = false
-        if (movement.velocity.dx > 0.0f) {
-            if (sensorMatrix.contactSensorLineRight.cardinality > horizontalContactSensorThreshold || sensorMatrix.distances[2].dx != 0) {
-                val minDistRight = minDist(sensorMatrix.distances[2].dx, sensorMatrix.distances[4].dx)
-                //println("minDistRight $minDistRight")
-                if (minDistRight != sensorMatrix.noDistanceValue && minDistRight < 0) {
-                    //println("adjust right $minDistRight")
-                    transform.move(dx = minDistRight)
-                    transform.position.x = ceil(transform.position.x)
-                    refresh = true
-                }
-            }
-        } else if (movement.velocity.dx < 0.0f) {
-            if (sensorMatrix.contactSensorLineLeft.cardinality > horizontalContactSensorThreshold || sensorMatrix.distances[0].dx != 0) {
-                val minDistLeft = minDist(sensorMatrix.distances[0].dx, sensorMatrix.distances[3].dx)
-                if (minDistLeft != sensorMatrix.noDistanceValue && minDistLeft < 0) {
-                    //println("adjust left $minDistLeft")
-                    transform.move(dx = -minDistLeft)
-                    transform.position.x = floor(transform.position.x)
-                    refresh = true
-                }
-            }
+
+        if (lmax > 0) {
+            //println("adjust left: $lmax")
+            transform.move(dx = lmax)
+            transform.position.x = floor(transform.position.x)
+            refresh = true
+        }
+
+        if (rmax > 0) {
+            //println("adjust right: $rmax")
+            transform.move(dx = -rmax)
+            transform.position.x = ceil(transform.position.x)
+            refresh = true
         }
 
         if (refresh) {
             ContactSystem.updateContacts(entity.componentId)
-            sensorMatrix.calc(contacts.contactMask)
+            takeFullLedgeScans(contacts)
         }
+    }
+
+    private fun takeFullLedgeScans(contacts: Contacts) {
+        contactSensorT1.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+        contactSensorT2.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+        contactSensorT3.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+        contactSensorB1.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+        contactSensorB2.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+        contactSensorB3.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+        contactSensorL1.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+        contactSensorL2.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+        contactSensorL3.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+        contactSensorR1.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+        contactSensorR2.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+        contactSensorR3.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+        contactSensorGround.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
+
+        tmax = max(contactSensorT1.cardinality, max(contactSensorT2.cardinality, contactSensorT3.cardinality))
+        bmax = max(contactSensorB1.cardinality, max(contactSensorB2.cardinality, contactSensorB3.cardinality))
+        lmax = max(contactSensorL1.cardinality, max(contactSensorL2.cardinality, contactSensorL3.cardinality))
+        rmax = max(contactSensorR1.cardinality, max(contactSensorR2.cardinality, contactSensorR3.cardinality))
+    }
+
+    private fun initTerrainContact() {
+        val constraint = ContactSystem.constraints[terrainContactConstraintRef]
+        x2 = constraint.width / 2
+        x3 = constraint.width - 3
+        y2 = (constraint.height - gapSouth) / 2
+        y3 = constraint.height - gapSouth - 3
+
+
+        contactSensorT1.reset(x1, 0, 1, scanLength)
+        contactSensorT2.reset(x2, 0, 1, scanLength)
+        contactSensorT3.reset(x3, 0, 1, scanLength)
+
+        contactSensorB1.reset(x1, constraint.height - bScanLength, 1, bScanLength)
+        contactSensorB2.reset(x2, constraint.height - bScanLength, 1, bScanLength)
+        contactSensorB3.reset(x3, constraint.height - bScanLength, 1, bScanLength)
+
+        contactSensorL1.reset(0, y1, scanLength, 1)
+        contactSensorL2.reset(0, y2, scanLength, 1)
+        contactSensorL3.reset(0, y3, scanLength, 1)
+
+        contactSensorR1.reset(constraint.width - scanLength, y1, scanLength, 1)
+        contactSensorR2.reset(constraint.width - scanLength, y2, scanLength, 1)
+        contactSensorR3.reset(constraint.width - scanLength, y3, scanLength, 1)
+
+        contactSensorGround.reset(x1, constraint.height - gapSouth, constraint.width - 4, 1)
     }
 
     companion object : SystemComponentSubType<CollisionResolver, PlatformerCollisionResolver>(CollisionResolver, PlatformerCollisionResolver::class) {
         override fun createEmpty() = PlatformerCollisionResolver()
     }
-
-    private data class CollisionCallback(
-        @JvmField val material: Aspect = UNDEFINED_MATERIAL,
-        @JvmField val contact: Aspect = UNDEFINED_CONTACT_TYPE,
-        @JvmField val callback: Predicate<Contacts>
-    )
-
 }

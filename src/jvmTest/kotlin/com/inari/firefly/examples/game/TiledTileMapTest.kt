@@ -14,6 +14,7 @@ import com.inari.firefly.core.api.FFInput
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntitySystem
 import com.inari.firefly.game.collision.PlatformerCollisionResolver
+import com.inari.firefly.game.collision.PlatformerMatrixCollisionResolver
 import com.inari.firefly.game.movement.*
 import com.inari.firefly.game.tile.TileMapSystem
 import com.inari.firefly.game.tile.TileMaterialType
@@ -145,15 +146,23 @@ class TiledTileMapTest : DesktopApp() {
                 val fullContactId = withConstraint(ContactConstraint) {
                     bounds(3,1,9,14)
                 }
-                withConstraint(ContactConstraint) {
-                    name = "player1SolidContact"
-                    bounds(1,0,14,21)
+                val terrainContactsId = withConstraint(ContactConstraint) {
+                    bounds(4,1,8,19)
                     materialFilter + TileMaterialType.TERRAIN_SOLID
                 }
                 withResolver(PlatformerCollisionResolver) {
                     withFullContactConstraint(fullContactId)
-                    withSolidContactConstraint("player1SolidContact")
+                    withTerrainContactConstraint(terrainContactsId)
                 }
+//                val terrainContactsId = withConstraint(ContactConstraint) {
+//                    name = "player1SolidContact"
+//                    bounds(1,0,14,21)
+//                    materialFilter + TileMaterialType.TERRAIN_SOLID
+//                }
+//                withResolver(PlatformerMatrixCollisionResolver) {
+//                    withFullContactConstraint(fullContactId)
+//                    withSolidContactConstraint(terrainContactsId)
+//                }
             }
         }
     }

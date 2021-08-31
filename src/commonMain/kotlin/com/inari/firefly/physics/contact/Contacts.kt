@@ -147,6 +147,8 @@ class Contacts internal constructor(
         return false
     }
 
+    fun get(pos: Position): Contact = this[pos.x, pos.y]
+
     operator fun get(x: Int, y: Int): Contact {
         var i = 0
         while (i < contacts.capacity) {

@@ -236,7 +236,7 @@ class BitSet(nBits: Int = 64) {
         if (value) set(index) else clear(index)
     }
 
-    operator fun set(from: Int, to: Int) {
+    fun set(from: Int, to: Int) {
         if (from < 0 || from > to) throw IndexOutOfBoundsException()
         if (from == to) return
         val lo_offset = from ushr 6
@@ -251,7 +251,7 @@ class BitSet(nBits: Int = 64) {
         for (i in lo_offset + 1 until hi_offset) bits[i] = -1
     }
 
-    operator fun set(from: Int, to: Int, value: Boolean) {
+    fun set(from: Int, to: Int, value: Boolean) {
         if (value) set(from, to) else clear(from, to)
     }
 

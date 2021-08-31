@@ -21,17 +21,10 @@ class PlatformerHMoveController : SingleComponentController() {
     @JvmField var buttonLeft = ButtonType.LEFT
     @JvmField var buttonRight = ButtonType.RIGHT
 
-    private lateinit var playerMovement: EMovement
-
-    override fun register(componentId: CompId) {
-        super.register(componentId)
-        playerMovement = FFContext[EMovement, componentId]
+    private val playerMovement: EMovement by lazy {
+        FFContext[EMovement, controlledComponentId]
     }
 
-    override fun unregister(componentId: CompId, disposeWhenEmpty: Boolean) {
-        playerMovement = null!!
-        super.unregister(componentId, disposeWhenEmpty)
-    }
 
     override fun update(componentId: CompId) {
         if (inputDevice.buttonPressed(buttonLeft)) {

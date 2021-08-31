@@ -77,8 +77,6 @@ class BitMask constructor(
         return this
     }
 
-
-
     fun setBit(index: Int): BitMask {
         bits.set(index)
         return this
@@ -272,25 +270,13 @@ class BitMask constructor(
         return this
     }
 
-    fun and(other: BitMask): BitMask {
-        setTmpBits(other, 0, 0)
-        bits.and(tmpBits)
-        return this
-    }
-
-    fun and(other: BitMask, xOffset: Int, yOffset: Int): BitMask {
+    fun and(other: BitMask, xOffset: Int = 0, yOffset: Int = 0): BitMask {
         setTmpBits(other, xOffset, yOffset)
         bits.and(tmpBits)
         return this
     }
 
-    fun or(other: BitMask): BitMask {
-        setTmpBits(other, 0,0)
-        bits.or(tmpBits)
-        return this
-    }
-
-    fun or(other: BitMask, xOffset: Int, yOffset: Int): BitMask {
+    fun or(other: BitMask, xOffset: Int = 0, yOffset: Int = 0): BitMask {
         setTmpBits(other, xOffset, yOffset)
         bits.or(tmpBits)
         return this
