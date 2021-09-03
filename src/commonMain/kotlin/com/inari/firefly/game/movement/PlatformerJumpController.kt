@@ -15,8 +15,10 @@ class PlatformerJumpController : SingleComponentController() {
     @JvmField var inputDevice: InputDevice = FFContext.input.getDefaultDevice()
     @JvmField var jumpButton = ButtonType.FIRE_1
     @JvmField var jumpImpulse = 100f
-    @JvmField var doubleJump = true
+    @JvmField var doubleJump = false
+    @JvmField var jumpActionTolerance = 5
 
+    private var jumpAction = 0
     private var doubleJumpOn = true
     private val playerMovement: EMovement by lazy {
         FFContext[EMovement, controlledComponentId]
@@ -28,11 +30,21 @@ class PlatformerJumpController : SingleComponentController() {
                 playerMovement.onGround = false
                 playerMovement.velocity.dy = -jumpImpulse
                 doubleJumpOn = false
+                jumpAction = 0
             } else if (doubleJump && !doubleJumpOn) {
                 playerMovement.velocity.dy = -jumpImpulse
                 doubleJumpOn = true
-            }
-        }
+                jumpAction = 0
+            } else
+                jumpAction = 1
+
+        } else if (playerMovement.onGround && jumpAction > 0 && jumpAction < jumpActionTolerance) {
+            playerMovement.onGround = false
+            playerMovement.velocity.dy = -jumpImpulse
+            doubleJumpOn = false
+            jumpAction = 0
+        } else if (jumpAction > 0)
+            jumpAction++
     }
 
     companion object : SystemComponentSubType<Controller, PlatformerJumpController>(Controller, PlatformerJumpController::class) {
