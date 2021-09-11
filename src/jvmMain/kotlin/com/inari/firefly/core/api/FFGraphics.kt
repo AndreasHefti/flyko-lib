@@ -217,24 +217,12 @@ actual object FFGraphics : GraphicsAPI {
         spriteBatch.begin()
     }
 
-    actual override fun renderSprite(renderableSprite: SpriteRenderable, xpos: Float, ypos: Float) {
+    actual override fun renderSprite(renderableSprite: SpriteRenderable, xOffset: Float, yOffset: Float) {
         setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
         val sprite = sprites[renderableSprite.spriteId]
         setShaderForSpriteBatch(renderableSprite.shaderId)
 
-        spriteBatch.draw(sprite, xpos, ypos)
-    }
-
-    actual override fun renderSprite(renderableSprite: SpriteRenderable, xpos: Float, ypos: Float, scale: Float) {
-        val sprite = sprites[renderableSprite.spriteId] ?: return
-        setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
-        setShaderForSpriteBatch(renderableSprite.shaderId)
-        spriteBatch.draw(
-            sprite, xpos, ypos, 0F, 0F,
-            sprite.regionWidth.toFloat(),
-            sprite.regionHeight.toFloat(),
-            scale, scale, 0F
-        )
+        spriteBatch.draw(sprite, xOffset, yOffset)
     }
 
     actual override fun renderSprite(renderableSprite: SpriteRenderable, transform: TransformData) {
@@ -255,6 +243,23 @@ actual object FFGraphics : GraphicsAPI {
         )
     }
 
+    actual override fun renderSprite(renderableSprite: SpriteRenderable, transform: TransformData, xOffset: Float, yOffset: Float) {
+        val sprite = sprites[renderableSprite.spriteId] ?: return
+        setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
+        setShaderForSpriteBatch(renderableSprite.shaderId)
+        spriteBatch.draw(
+            sprite,
+            transform.position.x + xOffset,
+            transform.position.y + yOffset,
+            transform.pivot.x,
+            transform.pivot.y,
+            sprite.regionWidth.toFloat(),
+            sprite.regionHeight.toFloat(),
+            transform.scale.dx,
+            transform.scale.dy,
+            transform.rotation
+        )
+    }
 
     actual override fun renderShape(data: ShapeData, xOffset: Float, yOffset: Float) {
         if (doRenderWithShapeRenderer(data)) {
@@ -311,7 +316,11 @@ actual object FFGraphics : GraphicsAPI {
         Gdx.gl.glDisable(GL20.GL_BLEND)
     }
 
-    actual override fun renderShape(data: ShapeData, transform: TransformData) {
+    actual override fun renderShape(data: ShapeData, transform: TransformData) =
+        renderShape(data, transform, 0.0f, 0.0f)
+
+
+    actual override fun renderShape(data: ShapeData, transform: TransformData, xOffset: Float, yOffset: Float) {
 
         if (doRenderWithShapeRenderer(data)) {
             renderWithShapeRenderer(data, transform)
@@ -334,7 +343,7 @@ actual object FFGraphics : GraphicsAPI {
             spriteBatch.transformMatrix = transformMatrix
         }
 
-        renderShape(data, transform.position.x, transform.position.y)
+        renderShape(data, transform.position.x + xOffset, transform.position.y + yOffset)
 
         if (transform.hasScale || transform.hasRotation) {
             transformMatrix.idt()

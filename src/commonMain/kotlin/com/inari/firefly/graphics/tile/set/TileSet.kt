@@ -5,6 +5,7 @@ import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.composite.Composite
+import com.inari.firefly.composite.CompositeSystem
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.ArrayAccessor
 import com.inari.firefly.core.component.ComponentDSL
@@ -172,6 +173,7 @@ class TileSet : Composite() {
     }
 
     companion object : SystemComponentSubType<Composite, TileSet>(Composite, TileSet::class) {
+        init { CompositeSystem.compositeTypeMapping[TileSet::class.simpleName!!] = this }
         override fun createEmpty() = TileSet()
     }
 }

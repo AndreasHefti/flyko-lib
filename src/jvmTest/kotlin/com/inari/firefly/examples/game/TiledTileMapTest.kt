@@ -13,12 +13,13 @@ import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.api.FFInput
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntitySystem
+import com.inari.firefly.game.camera.CameraPivot
+import com.inari.firefly.game.camera.SimpleCameraController
 import com.inari.firefly.game.collision.PlatformerCollisionResolver
-import com.inari.firefly.game.collision.PlatformerMatrixCollisionResolver
 import com.inari.firefly.game.movement.*
 import com.inari.firefly.game.tile.TileMapSystem
 import com.inari.firefly.game.tile.TileMaterialType
-import com.inari.firefly.game.tile.TiledMapAsset
+import com.inari.firefly.game.tiled.TiledMapAsset
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.TextureAsset
 import com.inari.firefly.graphics.rendering.RenderingSystem
@@ -35,6 +36,7 @@ import com.inari.firefly.physics.contact.ContactSystem
 import com.inari.firefly.physics.contact.EContact
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.MovementSystem
+import com.inari.util.geom.PositionF
 import org.lwjgl.glfw.GLFW
 
 
@@ -56,6 +58,7 @@ class TiledTileMapTest : DesktopApp() {
         AnimationSystem
         MovementSystem
         ContactSystem
+        TestGameObject
 
         val playerTextureAsset = TextureAsset.buildAndActivate {
             name = "playerTex"
@@ -154,17 +157,21 @@ class TiledTileMapTest : DesktopApp() {
                     withFullContactConstraint(fullContactId)
                     withTerrainContactConstraint(terrainContactsId)
                 }
-//                val terrainContactsId = withConstraint(ContactConstraint) {
-//                    name = "player1SolidContact"
-//                    bounds(1,0,14,21)
-//                    materialFilter + TileMaterialType.TERRAIN_SOLID
-//                }
-//                withResolver(PlatformerMatrixCollisionResolver) {
-//                    withFullContactConstraint(fullContactId)
-//                    withSolidContactConstraint(terrainContactsId)
-//                }
             }
         }
+
+        // camera
+        val _pivot: CameraPivot =object : CameraPivot {
+            override fun init() {}
+            override operator fun invoke(): PositionF = FFContext[ETransform, playerEntityId].position
+
+        }
+        val camId = SimpleCameraController.buildAndActivate {
+            name="Player_Camera"
+            pivot=_pivot
+            snapToBounds(-100, -100, 840, 840)
+        }
+        FFContext.get<View>(viewId).withController(camId)
     }
 }
 

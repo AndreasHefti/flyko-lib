@@ -7,10 +7,7 @@ import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.ComponentMap.MapAction.*
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
-import com.inari.firefly.entity.Entity
-import com.inari.firefly.entity.EntityActivationEvent
-import com.inari.firefly.entity.EntityActivationEventListener
-import com.inari.firefly.entity.EntitySystem
+import com.inari.firefly.entity.*
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGridSystem
@@ -25,6 +22,7 @@ import com.inari.util.aspect.Aspects
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.BitMask
 import com.inari.util.geom.GeomUtils
+import com.inari.util.geom.PositionF
 import com.inari.util.geom.Rectangle
 import com.inari.util.indexed.Indexed
 import kotlin.jvm.JvmField
@@ -75,6 +73,8 @@ object ContactSystem : ComponentSystem {
                     ETransform in aspects &&
                     ETile !in aspects
     }
+
+
 
     init {
         FFContext.registerListener(ViewEvent, viewListener)
@@ -224,7 +224,7 @@ object ContactSystem : ComponentSystem {
 
         c.update(
             constraint.bounds,
-            transform.data.position,
+            getWorldPos(entity, transform),
             movement.velocity
         )
 
@@ -248,7 +248,10 @@ object ContactSystem : ComponentSystem {
             if (EContact !in otherEntity.aspects)
                 continue
 
-            scanContact(c, otherEntity, iterator.worldPosition.x, iterator.worldPosition.y )
+            val otherTransform = otherEntity[ETransform]
+            scanContact(c, otherEntity,
+                iterator.worldPosition.x + otherTransform.position.x,
+                iterator.worldPosition.y + otherTransform.position.y)
         }
     }
 
@@ -257,8 +260,12 @@ object ContactSystem : ComponentSystem {
             return
 
         val iterator = contactMapViewLayer[transform.viewRef, layerRef]!![c.worldBounds, entity]
-        while (iterator.hasNext())
-            scanContact(c, EntitySystem[iterator.next()], transform.data.position.x, transform.data.position.y)
+        while (iterator.hasNext()) {
+            val otherEntity = EntitySystem[iterator.next()]
+            val otherWorldPos = getWorldPos(otherEntity, otherEntity[ETransform])
+            scanContact(c, otherEntity, otherWorldPos.x, otherWorldPos.y)
+        }
+
     }
 
     private val checkPivot = Rectangle()
@@ -370,6 +377,22 @@ object ContactSystem : ComponentSystem {
                 Contact()
             else
                 CONTACTS_POOL.removeFirst()
+    }
+
+    private val worldTempPos = PositionF()
+    private fun getWorldPos(entity: Entity, transform: ETransform): PositionF {
+        return if (EChild in entity.aspects) {
+            addTransformPos(entity[EChild].int_parent)
+            worldTempPos
+        } else
+            transform.position
+    }
+
+    private fun addTransformPos(parent: Int) {
+        val parentEntity = FFContext[Entity, parent]
+        worldTempPos + parentEntity[ETransform].position
+        if (EChild in parentEntity.aspects)
+            addTransformPos(parentEntity[EChild].int_parent)
     }
 
 }

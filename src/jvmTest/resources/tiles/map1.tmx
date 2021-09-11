@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.1" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="1">
+<map version="1.5" tiledversion="1.7.1" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="8">
  <editorsettings>
   <export target="map1.json" format="json"/>
  </editorsettings>
  <properties>
+  <property name="area-name" value="test-area"/>
+  <property name="area-pos-x" type="int" value="0"/>
+  <property name="area-pos-y" type="int" value="0"/>
   <property name="tilesets" value="redTerrain:tiles/outline_full.json,bluTerrain:tiles/outline_blu_full.json"/>
  </properties>
  <tileset firstgid="1" source="outline_full.tsx"/>
@@ -36,4 +39,17 @@
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,41
 </data>
  </layer>
+ <objectgroup id="4" name="Layer1">
+  <properties>
+   <property name="addContactMap" type="bool" value="true"/>
+  </properties>
+  <object id="3" type="Composite:TestGameObject" x="19.4545" y="252.909">
+   <properties>
+    <property name="power" type="int" value="10"/>
+    <property name="spawn" value="enemy1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="6" gid="52" x="144" y="256" width="16" height="16"/>
+ </objectgroup>
 </map>

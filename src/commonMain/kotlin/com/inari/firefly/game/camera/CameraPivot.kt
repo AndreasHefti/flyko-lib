@@ -1,4 +1,4 @@
-package com.inari.firefly.graphics.view.camera
+package com.inari.firefly.game.camera
 
 import com.inari.util.geom.PositionF
 

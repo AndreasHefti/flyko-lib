@@ -23,6 +23,7 @@ class View private constructor (
             get() = baseView
     }
 
+    @JvmField var zPosition: Int = 0
     var bounds: Rectangle
         get() = data.bounds
         set(value) { data.bounds(value) }

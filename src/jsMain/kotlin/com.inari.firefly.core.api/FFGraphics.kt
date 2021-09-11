@@ -80,29 +80,10 @@ actual object FFGraphics : GraphicsAPI {
     /** This is called form the firefly API to render a created sprite on specified position to the actual [ViewData]
      *
      * @param renderableSprite the sprite DAO
-     * @param xpos the x-axis position in the 2D world of the actual [ViewData]
-     * @param ypos the y-axis position in the 2D world of the actual [ViewData]
+     * @param xOffset the x-axis offset, default is 0f
+     * @param yOffset the y-axis offset, default is 0f
      */
-    actual override fun renderSprite(
-        renderableSprite: SpriteRenderable,
-        xpos: Float,
-        ypos: Float
-    ) {
-    }
-
-    /** This is called form the firefly API to render a created sprite on specified position and scale to the actual [ViewData]
-     *
-     * @param renderableSprite the sprite DAO
-     * @param xpos the x-axis position in the 2D world of the actual [ViewData]
-     * @param ypos the y-axis position in the 2D world of the actual [ViewData]
-     * @param scale the x-axis and y-axis scale for the sprite to render
-     */
-    actual override fun renderSprite(
-        renderableSprite: SpriteRenderable,
-        xpos: Float,
-        ypos: Float,
-        scale: Float
-    ) {
+    actual override fun renderSprite(renderableSprite: SpriteRenderable, xOffset: Float, yOffset: Float) {
     }
 
     /** This is called form the firefly API to render a created sprite with specified [TransformData] to the actual [ViewData]
@@ -116,6 +97,9 @@ actual object FFGraphics : GraphicsAPI {
     ) {
     }
 
+    actual override fun renderSprite(renderableSprite: SpriteRenderable, transform: TransformData, xOffset: Float, yOffset: Float) {
+    }
+
     /** This is called form the firefly API to render a shape. See [ShapeData] for more information about the data structure of shapes.
      *
      * @param data [ShapeData] DAO
@@ -123,6 +107,10 @@ actual object FFGraphics : GraphicsAPI {
      * @param yOffset the y-axis offset, default is 0f
      */
     actual override fun renderShape(data: ShapeData, xOffset: Float, yOffset: Float) {
+    }
+
+    actual override fun renderShape(data: ShapeData, transform: TransformData, xOffset: Float, yOffset: Float) {
+
     }
 
     /** This is called form the firefly API to render a shape with given [TransformData].

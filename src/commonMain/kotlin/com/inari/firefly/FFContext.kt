@@ -176,10 +176,16 @@ object FFContext {
         return this
     }
 
+    fun activateAll(ids: DynArray<CompId>) =
+        ids.forEach { activate(it) }
+
     fun activate(id: CompNameId): FFContext {
         mapper<Component>(id).activate(id.name)
         return this
     }
+
+    fun activateAllByNameId(ids: DynArray<CompNameId>) =
+        ids.forEach { activate(it) }
 
     fun activate(cType: ComponentType<*>, name: String): FFContext {
         mapper<Component>(cType).activate(name)

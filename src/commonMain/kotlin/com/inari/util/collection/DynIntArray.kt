@@ -157,6 +157,14 @@ class DynIntArray(
         return -1
     }
 
+    /** Sorts the list within the given comparator.
+     * @param comparator
+     */
+    fun sort(comparator: Comparator<Int>) {
+        trim_all()
+        array.sortedWith(comparator)
+    }
+
     fun trim_head_tail() {
         var startIndex = 0
         var endIndex = array.size -1

@@ -7,6 +7,7 @@ import com.inari.firefly.TestApp
 import com.inari.firefly.asset.AssetSystem
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntitySystem
+import com.inari.firefly.game.tiled.TiledTileSetAsset
 import com.inari.firefly.graphics.TextureAsset
 import com.inari.firefly.graphics.rendering.RenderingSystem
 import com.inari.firefly.graphics.tile.TileGridSystem

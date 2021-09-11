@@ -1,5 +1,6 @@
-package com.inari.firefly.graphics.view.camera
+package com.inari.firefly.game.camera
 
+import com.inari.firefly.FFContext
 import com.inari.util.geom.PositionF
 import com.inari.firefly.NO_CAMERA_PIVOT
 import com.inari.firefly.control.Controller
@@ -24,7 +25,7 @@ class SimpleCameraController private constructor() : SingleComponentController()
     var velocity: Float = 0.25f
 
     fun adjust() {
-        val view = this.view ?: return
+        val view = this.view ?: FFContext[componentId] ?: return
 
         if (getPos(view.data.zoom, view.data.bounds, view.data.worldPosition)) {
             view.data.worldPosition.x = floor(view.data.worldPosition.x.toDouble() + pos.x).toFloat()
@@ -34,7 +35,7 @@ class SimpleCameraController private constructor() : SingleComponentController()
     }
 
     override fun update(componentId: CompId) {
-        val view = this.view ?: return
+        val view = this.view ?: FFContext[componentId] ?: return
 
         if (getPos(view.data.zoom, view.data.bounds, view.data.worldPosition)) {
             view.data.worldPosition.x += pos.x * velocity

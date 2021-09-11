@@ -3,6 +3,7 @@ package com.inari.firefly.game.tile
 import com.inari.firefly.BlendMode
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
+import com.inari.firefly.NO_NAME
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.ComponentDSL
@@ -29,9 +30,10 @@ import kotlin.jvm.JvmField
 
 class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!!) {
 
-    @JvmField
-    internal var viewRef = -1
+    @JvmField internal var viewRef = -1
     private val tileSetInstances = DynArray.of<MapLayer>(5, 5)
+    private val tileDecorations = DynArray.of<MapLayer>(10, 50)
+    @JvmField internal val entityIds = DynArray.of<CompId>(10, 10)
 
     private var loaded = false
     private var active = false
@@ -44,6 +46,12 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         tileSetInstances[instance.layerRef] = instance
     }
 
+    val withDecoration: (TileDecoration.() -> Unit) -> Unit = { configure ->
+        val instance = TileDecoration()
+        instance.also(configure)
+        tileDecorations + instance
+    }
+
     internal fun load() {
         if (loaded)
             return
@@ -54,6 +62,8 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
                 FFContext.activate(Asset, tileMap.tileSetAssetRef)
             }
         }
+
+        // TODO create inactive entities for decoration
 
         loaded = true
     }
@@ -72,6 +82,9 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
                 parallax = true
         }
 
+        if (!entityIds.isEmpty)
+            FFContext.activateAll(entityIds)
+
         active = true
     }
 
@@ -80,6 +93,9 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
             return
 
         parallax = false
+        if (!entityIds.isEmpty)
+            FFContext.deactivateAll(entityIds)
+
         tileSetInstances.forEach { layer ->
             deleteTileGrid(layer)
             deactivateTileSetsForLayer(layer)
@@ -101,6 +117,10 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
                 FFContext.deactivate(Asset, tileMap.tileSetAssetRef)
             }
         }
+
+        if (!entityIds.isEmpty)
+            FFContext.deleteAll(entityIds)
+        entityIds.clear()
 
         loaded = false
     }
@@ -228,6 +248,16 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
     override fun componentType() = Companion
     companion object : SystemComponentSingleType<TileMap>(TileMap::class) {
         override fun createEmpty() = TileMap()
+    }
+
+    @ComponentDSL
+    class TileDecoration {
+        @JvmField internal var layerRef = 0
+        @JvmField internal var rendererRef = -1
+
+        @JvmField var tileName = NO_NAME
+        @JvmField var renderer = ComponentRefResolver(Renderer) { index-> rendererRef = index }
+        @JvmField var layer = ComponentRefResolver(Layer) { index -> layerRef = index }
     }
 
     @ComponentDSL

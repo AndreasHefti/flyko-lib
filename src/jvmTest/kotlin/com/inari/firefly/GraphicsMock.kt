@@ -74,16 +74,21 @@ object GraphicsMock : GraphicsAPI {
         _log.add("startRendering::$view")
     }
 
-    override fun renderSprite(renderableSprite: SpriteRenderable, xpos: Float, ypos: Float) {
-        _log.add("renderSprite::Sprite($renderableSprite)")
-    }
-
-    override fun renderSprite(renderableSprite: SpriteRenderable, xpos: Float, ypos: Float, scale: Float) {
+    override fun renderSprite(renderableSprite: SpriteRenderable, xOffset: Float, yOffset: Float) {
         _log.add("renderSprite::Sprite($renderableSprite)")
     }
 
     override fun renderSprite(renderableSprite: SpriteRenderable, transform: TransformData) {
         _log.add("renderSprite::Sprite($renderableSprite)")
+    }
+
+    override fun renderSprite(
+        renderableSprite: SpriteRenderable,
+        transform: TransformData,
+        xOffset: Float,
+        yOffset: Float
+    ) {
+        _log.add("renderSprite::Sprite($renderableSprite) offset: $xOffset $yOffset")
     }
 
     override fun renderShape(data: ShapeData, xOffset: Float, yOffset: Float) {
@@ -92,6 +97,10 @@ object GraphicsMock : GraphicsAPI {
 
     override fun renderShape(data: ShapeData, transform: TransformData) {
         _log.add("renderShape:: $data : $transform")
+    }
+
+    override fun renderShape(data: ShapeData, transform: TransformData, xOffset: Float, yOffset: Float) {
+        _log.add("renderShape:: $data : $transform  offset: $xOffset $yOffset")
     }
 
     override fun endRendering(view: ViewData) {

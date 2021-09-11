@@ -27,11 +27,78 @@
          "width":20,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":4,
+         "name":"Layer1",
+         "objects":[
+                {
+                 "height":0,
+                 "id":3,
+                 "name":"",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"power",
+                         "type":"int",
+                         "value":10
+                        }, 
+                        {
+                         "name":"spawn",
+                         "type":"string",
+                         "value":"enemy1"
+                        }],
+                 "rotation":0,
+                 "type":"Composite:TestGameObject",
+                 "visible":true,
+                 "width":0,
+                 "x":19.4545454545455,
+                 "y":252.909090909091
+                }, 
+                {
+                 "gid":52,
+                 "height":16,
+                 "id":6,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":144,
+                 "y":256
+                }],
+         "opacity":1,
+         "properties":[
+                {
+                 "name":"addContactMap",
+                 "type":"bool",
+                 "value":true
+                }],
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":4,
- "nextobjectid":1,
+ "nextlayerid":5,
+ "nextobjectid":8,
  "orientation":"orthogonal",
  "properties":[
+        {
+         "name":"area-name",
+         "type":"string",
+         "value":"test-area"
+        }, 
+        {
+         "name":"area-pos-x",
+         "type":"int",
+         "value":0
+        }, 
+        {
+         "name":"area-pos-y",
+         "type":"int",
+         "value":0
+        }, 
         {
          "name":"tilesets",
          "type":"string",

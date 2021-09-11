@@ -36,20 +36,7 @@ class SpriteGroupRenderer private constructor() : Renderer(
 
     companion object : SingletonComponent<Renderer, SpriteGroupRenderer>(Renderer, SpriteGroupRenderer::class) {
         private val COMPARATOR = Comparator<Entity?> { e1, e2 ->
-            if (e1 == null && e2 == null)
-                return@Comparator 0
-            if (e1 == null)
-                return@Comparator 1
-            if (e2 == null)
-                return@Comparator -1
-
-            val p1 = e1[EChild].zPos
-            val p2 = e2[EChild].zPos
-            when {
-                p1 == p2 -> 0
-                p1 < p2 -> -1
-                else -> 1
-            }
+            e1?.get(EChild)?.zPos ?: 0.compareTo(e2?.get(EChild)?.zPos ?: 0)
         }
 
         override fun create() = SpriteGroupRenderer()

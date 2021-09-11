@@ -6,7 +6,7 @@ import com.inari.firefly.core.component.Component
 import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.property.VirtualPropertyRef
-import com.inari.firefly.graphics.view.camera.CameraPivot
+import com.inari.firefly.game.camera.CameraPivot
 import com.inari.util.*
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.AspectType

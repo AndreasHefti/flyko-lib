@@ -1,4 +1,4 @@
-package com.inari.firefly.game.tile
+package com.inari.firefly.game.tiled
 
 import com.inari.firefly.BlendMode
 import com.inari.firefly.FFContext
@@ -7,6 +7,7 @@ import com.inari.firefly.NO_NAME
 import com.inari.firefly.asset.Asset
 import com.inari.firefly.asset.AssetSystem
 import com.inari.firefly.core.system.SystemComponentSubType
+import com.inari.firefly.game.tile.*
 import com.inari.firefly.graphics.TextureAsset
 import com.inari.util.Supplier
 
@@ -81,12 +82,12 @@ class TiledTileSetAsset private constructor() : Asset() {
                 val tileDirection = if (tile_type.size > 2 )
                     TileUtils.getTileDirection(tile_type[2])
                     else
-                        TileDirection.NONE
+                    TileDirection.NONE
 
                 val tileOrientation = if (tile_type.size > 3)
                     TileUtils.getTileOrientation(tile_type[3])
                     else
-                        TileOrientation.NONE
+                    TileOrientation.NONE
 
                 val contactBitMask = TileMapSystem.createTileContactBitMask(
                     contactFormType,

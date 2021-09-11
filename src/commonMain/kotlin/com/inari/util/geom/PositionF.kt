@@ -8,8 +8,13 @@ data class PositionF constructor(
     @JvmField var x: Float = 0.0f,
     @JvmField var y: Float = 0.0f
 ){
+
+
     constructor(xi: Int, yi: Int) : this(xi.toFloat(), yi.toFloat())
     constructor(other: PositionF) : this(other.x, other.y)
+
+    val isOrigin: Boolean
+        get() = x == 0.0f && y == 0.0f
 
     operator fun invoke(x: Float, y: Float) {
         this.x = x

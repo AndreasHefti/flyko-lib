@@ -12,6 +12,7 @@ import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
 import com.inari.util.event.Event
 import com.inari.util.event.IEventDispatcher
+import com.inari.util.geom.PositionF
 import com.inari.util.geom.Rectangle
 import kotlin.jvm.JvmField
 import kotlin.math.floor
@@ -78,12 +79,12 @@ abstract class FFApp protected constructor(
         graphics.startRendering(view, true)
 
         ViewSystem.privateLayersOfView[view.index]?.apply {
-            if (isEmpty) {
+            if (isEmpty)
                 FFContext.notify(renderEvent)
-            } else {
+            else {
                 val layerIterator = iterator()
                 while (layerIterator.hasNext()) {
-                    val layerId = layerIterator.next()
+                    val layerId = layerIterator.next().index
                     if (!ViewSystem.layers.isActive(layerId))
                         continue
                     renderEvent.layerIndex = layerId
