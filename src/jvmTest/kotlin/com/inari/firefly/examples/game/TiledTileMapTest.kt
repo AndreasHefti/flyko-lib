@@ -72,10 +72,19 @@ class TiledTileMapTest : DesktopApp() {
             zoom = .5f
         }
 
-        val layerId = Layer.buildAndActivate {
+        val layerId3 = Layer.buildAndActivate {
+            name = "Layer3"
+            view(viewId)
+        }
+        val layerId2 = Layer.buildAndActivate {
+            name = "Layer2"
+            view(viewId)
+        }
+        val layerId1 = Layer.buildAndActivate {
             name = "Layer1"
             view(viewId)
         }
+
 
         val mapAssetId = TiledMapAsset.build {
             name = "TiledMapExampleAsset"
@@ -129,7 +138,7 @@ class TiledTileMapTest : DesktopApp() {
             }
             withComponent(ETransform) {
                 view(viewId)
-                layer(layerId)
+                layer(layerId1)
                 position(4 * 16, 4 * 16)
             }
             withComponent(ESprite) {

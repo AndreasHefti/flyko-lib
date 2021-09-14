@@ -21,9 +21,11 @@ import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.rendering.Renderer
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGrid
+import com.inari.firefly.graphics.view.ViewChangeEvent
 import com.inari.firefly.physics.animation.entity.EAnimation
 import com.inari.firefly.physics.animation.timeline.IntTimelineProperty
 import com.inari.firefly.physics.contact.EContact
+import com.inari.util.Consumer
 import com.inari.util.geom.PositionF
 import com.inari.util.graphics.MutableColor
 import kotlin.jvm.JvmField
@@ -31,7 +33,7 @@ import kotlin.jvm.JvmField
 class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!!) {
 
     @JvmField internal var viewRef = -1
-    private val tileSetInstances = DynArray.of<MapLayer>(5, 5)
+    private val tileMapLayer = DynArray.of<MapLayer>(5, 5)
     private val tileDecorations = DynArray.of<MapLayer>(10, 50)
     @JvmField internal val entityIds = DynArray.of<CompId>(10, 10)
 
@@ -39,11 +41,16 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
     private var active = false
     private var parallax = false
 
+    private val parallaxListener: Consumer<ViewChangeEvent> = { event ->
+        if (event.type == ViewChangeEvent.Type.ORIENTATION && event.id.instanceId == viewRef)
+            updateParallaxLayer()
+    }
+
     var view = ComponentRefResolver(View) { index -> viewRef = index }
     val withLayer: (MapLayer.() -> Unit) -> Unit = { configure ->
         val instance = MapLayer()
         instance.also(configure)
-        tileSetInstances[instance.layerRef] = instance
+        tileMapLayer[instance.layerRef] = instance
     }
 
     val withDecoration: (TileDecoration.() -> Unit) -> Unit = { configure ->
@@ -57,7 +64,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
             return
 
         // load all involved assets (texture assets, tile set assets)
-        tileSetInstances.forEach { layer ->
+        tileMapLayer.forEach { layer ->
             layer.tileSetMapping.forEach { tileMap ->
                 FFContext.activate(Asset, tileMap.tileSetAssetRef)
             }
@@ -75,7 +82,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         if (!loaded)
             load()
 
-        tileSetInstances.forEach { layer ->
+        tileMapLayer.forEach { layer ->
             activateTileSetForLayer(layer)
             buildTileGrid(layer)
             if (layer.parallaxFactorX >= 0f || layer.parallaxFactorY >= 0f)
@@ -85,6 +92,9 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         if (!entityIds.isEmpty)
             FFContext.activateAll(entityIds)
 
+        if (parallax)
+            FFContext.registerListener(ViewChangeEvent, parallaxListener)
+
         active = true
     }
 
@@ -92,11 +102,14 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         if (!active)
             return
 
+        if (parallax)
+            FFContext.disposeListener(ViewChangeEvent, parallaxListener)
+
         parallax = false
         if (!entityIds.isEmpty)
             FFContext.deactivateAll(entityIds)
 
-        tileSetInstances.forEach { layer ->
+        tileMapLayer.forEach { layer ->
             deleteTileGrid(layer)
             deactivateTileSetsForLayer(layer)
         }
@@ -112,7 +125,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
             deactivate()
 
         // disposes all involved assets
-        tileSetInstances.forEach { layer ->
+        tileMapLayer.forEach { layer ->
             layer.tileSetMapping.forEach { tileMap ->
                 FFContext.deactivate(Asset, tileMap.tileSetAssetRef)
             }
@@ -132,7 +145,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         getTileEntityRef(code, viewLayer.layerIndex)
 
     fun getTileEntityRef(code: Int, layerRef: Int = 0): Int =
-        tileSetInstances[layerRef]?.activeEntityRefs?.get(code) ?: -1
+        tileMapLayer[layerRef]?.activeEntityRefs?.get(code) ?: -1
 
     private fun activateTileSetForLayer(layer: MapLayer) {
 
@@ -242,7 +255,15 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
     }
 
     private fun updateParallaxLayer() {
-        // TODO
+        val viewPos = FFContext[View, viewRef].worldPosition
+
+        tileMapLayer.forEach { mapLayer ->
+            if (mapLayer.parallaxFactorX != 0.0f || mapLayer.parallaxFactorY != 0.0f) {
+                FFContext[TileGrid, mapLayer.tileGridId].position(
+                    -viewPos.x * mapLayer.parallaxFactorX,
+                    -viewPos.y * mapLayer.parallaxFactorY)
+            }
+        }
     }
 
     override fun componentType() = Companion
@@ -274,12 +295,12 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         @JvmField var mapHeight = 0
         @JvmField var tileWidth = 0
         @JvmField var tileHeight = 0
-        @JvmField var parallaxFactorX = 1f
-        @JvmField var parallaxFactorY = 1f
+        @JvmField var parallaxFactorX = 0.0f
+        @JvmField var parallaxFactorY = 0.0f
         @JvmField var position: PositionF = PositionF(0.0f, 0.0f)
         @JvmField var spherical: Boolean = false
-        @JvmField var blend: BlendMode? = null
-        @JvmField var tint: MutableColor? = null
+        @JvmField var blend = BlendMode.NORMAL_ALPHA
+        @JvmField var tint = MutableColor(1f, 1f, 1f, 1f)
         @JvmField var layer = ComponentRefResolver(Layer) { index -> layerRef = index }
         @JvmField var mapCodes: IntArray = intArrayOf()
 

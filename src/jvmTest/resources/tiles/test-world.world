@@ -1,5 +1,12 @@
 {
     "maps": [
+        {
+            "fileName": "map1.tmx",
+            "height": 320,
+            "width": 320,
+            "x": -224,
+            "y": -272
+        }
     ],
     "onlyShowAdjacentMaps": false,
     "type": "world"

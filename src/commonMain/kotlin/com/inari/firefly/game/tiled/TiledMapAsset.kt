@@ -116,20 +116,21 @@ class TiledMapAsset private constructor() : Asset() {
         val layerTileSets = layerJson.mappedProperties["tilesets"]?.value
             ?: throw RuntimeException("Missing tilesets for layer")
 
-//        val layer = FFContext[Layer, layerJson.name]
-//        layer.parallaxFactor(layerJson.parallaxx, layerJson.parallaxy)
-
         tileMap.withLayer {
             position(layerJson.x + layerJson.offsetx, layerJson.y + layerJson.offsety)
             tileWidth = tileMapJson.tilewidth
             tileHeight = tileMapJson.tileheight
             mapWidth = layerJson.mappedProperties["width"]?.value?.toInt() ?: tileMapJson.width
             mapHeight = layerJson.mappedProperties["height"]?.value?.toInt() ?: tileMapJson.height
+            parallaxFactorX = layerJson.parallaxx - 1
+            parallaxFactorY = layerJson.parallaxy - 1
             layer(layerJson.name)
             mapCodes = layerJson.data!!
             spherical = tileMapJson.infinite
             if (layerJson.tintcolor.isNotEmpty())
-                tint = IColor.Companion.ofMutable(layerJson.tintcolor)
+                tint = IColor.ofMutable(layerJson.tintcolor)
+            if (layerJson.opacity < 1.0f)
+                tint(tint.r, tint.g, tint.b, layerJson.opacity)
             if ("blend" in layerJson.mappedProperties)
                 blend = BlendMode.valueOf(layerJson.mappedProperties["blend"]?.value!!)
             if ("renderer" in layerJson.mappedProperties)
