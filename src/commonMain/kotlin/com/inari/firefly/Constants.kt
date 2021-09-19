@@ -50,7 +50,9 @@ val EMPTY_FLOAT_ARRAY: FloatArray = FloatArray(0)
     override val aspectIndex: Int get() = throw UnsupportedOperationException()
     override val aspectName: String get() = throw UnsupportedOperationException()
     override val aspectType: AspectType get() = throw UnsupportedOperationException()
-    override val typeClass: KClass<out Component> get() = throw UnsupportedOperationException()
+    override val typeClass: KClass<Component> get() = throw UnsupportedOperationException()
+    override val subTypeClass: KClass<out Component>
+        get() = typeClass
 })
 @JvmField val NO_INDEXED = object : Indexed {
     override val index: Int = -1
