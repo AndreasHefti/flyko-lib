@@ -12,21 +12,22 @@ import com.inari.util.indexed.AbstractIndexed
 import kotlin.reflect.KClass
 
 abstract class SystemComponent protected constructor(
-    objectIndexerName: String
-) : AbstractIndexed(objectIndexerName), NamedComponent {
+    objectIndexerName: String,
+    subTypeName: String = objectIndexerName // TODO set this in subtrypes
+) : AbstractIndexed(objectIndexerName, subTypeName), NamedComponent {
 
     override var name: String = NO_NAME
         set(value) {
             if (name !== NO_NAME) {
-                throw IllegalStateException("An illegal reassignment of name: $value to: $name" )
+                throw IllegalStateException("An illegal reassignment of name: $value to: $name")
             }
             field = value
         }
 
     final override val componentId: CompId
-        by lazy { CompId(index, componentType()) }
+            by lazy { CompId(index, componentType()) }
 
-    var initialized:Boolean = false
+    var initialized: Boolean = false
         internal set
 
     internal fun internalInit() {
@@ -34,9 +35,11 @@ abstract class SystemComponent protected constructor(
         init()
         initialized = true
     }
+
     protected open fun init() {
         initialized = true
     }
+
     override fun dispose() {
         initialized = false
         super.disposeIndex()
@@ -54,7 +57,7 @@ abstract class SystemComponent protected constructor(
         if (initialized) alreadyInit(name)
         else value
 
-    protected fun <T> setIfNotInitialized(value:T, name: String): T =
+    protected fun <T> setIfNotInitialized(value: T, name: String): T =
         if (initialized) alreadyInit(name)
         else value
 
@@ -76,12 +79,15 @@ abstract class SystemComponentType<C : SystemComponent>(
     final override val aspectIndex: Int = compAspect.aspectIndex
     final override val aspectName: String = compAspect.aspectName
     final override val aspectType: AspectType = compAspect.aspectType
+    override val subTypeClass: KClass<out C> = typeClass
     override fun toString() = "SystemComponentType:$aspectName"
 }
 
 abstract class SystemComponentSingleType<C : SystemComponent>(
     final override val typeClass: KClass<C>
 ) : SystemComponentBuilder<C>(), ComponentType<C> {
+    final override val subTypeClass: KClass<out C>
+        get() = typeClass
     final override val compAspect: Aspect = SYSTEM_COMPONENT_ASPECTS.createAspect(typeClass.simpleName!!)
     final override val aspectIndex: Int = compAspect.aspectIndex
     final override val aspectName: String = compAspect.aspectName
@@ -90,9 +96,9 @@ abstract class SystemComponentSingleType<C : SystemComponent>(
 
 abstract class SystemComponentSubType<C : SystemComponent, CC : C>(
     baseType: SystemComponentType<C>,
-    val subTypeClass: KClass<CC>
+    override val subTypeClass: KClass<CC>
 ) : SystemComponentBuilder<CC>(), ComponentType<C> {
-    override val typeClass: KClass<C> = baseType.typeClass
+    final override val typeClass: KClass<C> = baseType.typeClass
     final override val compAspect: Aspect = baseType.compAspect
     final override val aspectIndex: Int = baseType.aspectIndex
     final override val aspectName: String = baseType.aspectName

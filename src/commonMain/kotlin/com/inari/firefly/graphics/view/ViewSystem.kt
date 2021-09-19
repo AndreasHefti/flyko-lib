@@ -91,6 +91,10 @@ object ViewSystem : ComponentSystem {
         if (view.baseView)
             return
 
+        layers.forEach {
+            if (it.viewRef == view.index)
+                FFContext.activate(it)
+        }
         updateViewMapping()
         ViewEvent.send(view.componentId, view.data, ViewEvent.Type.VIEW_ACTIVATED)
     }

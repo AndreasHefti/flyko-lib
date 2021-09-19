@@ -1,5 +1,6 @@
 package com.inari.util.geom
 
+import com.inari.util.StringUtils
 import kotlin.jvm.JvmField
 
 
@@ -59,6 +60,14 @@ data class Rectangle constructor(
         height = other.height
     }
 
+    operator fun invoke(fromString: String) {
+        val split = fromString.split(",")
+        x = try { split[0].toInt() } catch (e: Exception) { x }
+        y = try { split[1].toInt() } catch (e: Exception) { y }
+        width = try { split[2].toInt() } catch (e: Exception) { width }
+        height = try { split[3].toInt() } catch (e: Exception) { height }
+    }
+
     operator fun set(x: Int, y: Int, other: Rectangle) {
         pos(x, y)
         width = other.width
@@ -72,6 +81,9 @@ data class Rectangle constructor(
         height = 0
     }
 
+    fun toJsonString(): String = "$x${StringUtils.VALUE_SEPARATOR}$y" +
+            "${StringUtils.VALUE_SEPARATOR}$width${StringUtils.VALUE_SEPARATOR}$height"
     override fun toString(): String =
-        "[x=${pos.x},y=${pos.y},width=$width,height=$height]"
+        "[x=${pos.x}${StringUtils.VALUE_SEPARATOR}y=${pos.y}" +
+                "${StringUtils.VALUE_SEPARATOR}width=$width${StringUtils.VALUE_SEPARATOR}height=$height]"
 }

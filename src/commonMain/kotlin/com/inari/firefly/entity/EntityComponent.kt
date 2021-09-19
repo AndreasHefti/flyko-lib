@@ -89,8 +89,10 @@ abstract class EntityComponentBuilder<C : EntityComponent> : ComponentType<C> {
 }
 
 abstract class EntityComponentType<C : EntityComponent>(
-    final override val typeClass: KClass<out C>
+    final override val typeClass: KClass<C>
 ) : EntityComponentBuilder<C>(), ComponentType<C> {
+    override val subTypeClass: KClass<out C>
+        get() = typeClass
     val compAspect: Aspect = ENTITY_COMPONENT_ASPECTS.createAspect(typeClass.simpleName!!)
     final override val aspectIndex: Int = compAspect.aspectIndex
     final override val aspectName: String = compAspect.aspectName

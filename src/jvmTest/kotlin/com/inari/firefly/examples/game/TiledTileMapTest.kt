@@ -19,13 +19,12 @@ import com.inari.firefly.game.collision.PlatformerCollisionResolver
 import com.inari.firefly.game.movement.*
 import com.inari.firefly.game.tile.TileMapSystem
 import com.inari.firefly.game.tile.TileMaterialType
-import com.inari.firefly.game.tiled.TiledMapAsset
+import com.inari.firefly.game.json.TiledJsonRoomAsset
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.TextureAsset
 import com.inari.firefly.graphics.rendering.RenderingSystem
 import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.sprite.SpriteAsset
-import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewSystem
 import com.inari.firefly.info.FFInfoSystem
@@ -37,6 +36,7 @@ import com.inari.firefly.physics.contact.EContact
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.MovementSystem
 import com.inari.util.geom.PositionF
+import com.inari.util.indexed.Indexer
 import org.lwjgl.glfw.GLFW
 
 
@@ -70,23 +70,13 @@ class TiledTileMapTest : DesktopApp() {
             fboScale = 2f
             bounds(0, 0, 640, 640)
             zoom = .5f
-        }
-
-        val layerId3 = Layer.buildAndActivate {
-            name = "Layer3"
-            view(viewId)
-        }
-        val layerId2 = Layer.buildAndActivate {
-            name = "Layer2"
-            view(viewId)
-        }
-        val layerId1 = Layer.buildAndActivate {
-            name = "Layer1"
-            view(viewId)
+            withLayer { name = "Layer3" }
+            withLayer { name = "Layer2" }
+            withLayer { name = "Layer1" }
         }
 
 
-        val mapAssetId = TiledMapAsset.build {
+        val mapAssetId = TiledJsonRoomAsset.build {
             name = "TiledMapExampleAsset"
             resourceName = "tiles/map1.json"
             view(viewId)
@@ -117,12 +107,6 @@ class TiledTileMapTest : DesktopApp() {
         }
 
         // player
-        val playerSpriteId = SpriteAsset.buildAndActivate {
-            name = "playerSprite"
-            texture(playerTextureAsset)
-            textureRegion(7 * 16, 1 * 16, 16, 16)
-        }
-
         val playerEntityId = Entity.buildAndActivate {
             name = "player"
             withComponent(EControl) {
@@ -138,11 +122,15 @@ class TiledTileMapTest : DesktopApp() {
             }
             withComponent(ETransform) {
                 view(viewId)
-                layer(layerId1)
+                layer("Layer1")
                 position(4 * 16, 4 * 16)
             }
             withComponent(ESprite) {
-                sprite(playerSpriteId)
+                sprite(SpriteAsset.buildAndActivate {
+                    name = "playerSprite"
+                    texture(playerTextureAsset)
+                    textureRegion(7 * 16, 1 * 16, 16, 16)
+                })
                 blend = BlendMode.NORMAL_ALPHA
             }
             withComponent(EMovement) {
@@ -170,17 +158,17 @@ class TiledTileMapTest : DesktopApp() {
         }
 
         // camera
-        val _pivot: CameraPivot =object : CameraPivot {
-            override fun init() {}
-            override operator fun invoke(): PositionF = FFContext[ETransform, playerEntityId].position
-
-        }
         val camId = SimpleCameraController.buildAndActivate {
             name="Player_Camera"
-            pivot=_pivot
+            pivot = object : CameraPivot {
+                override fun init() {}
+                override operator fun invoke(): PositionF = FFContext[ETransform, playerEntityId].position
+            }
             snapToBounds(-100, -100, 840, 840)
         }
         FFContext.get<View>(viewId).withController(camId)
+
+        println(Indexer.dump())
     }
 }
 

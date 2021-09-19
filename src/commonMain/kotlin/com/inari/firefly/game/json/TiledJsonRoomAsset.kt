@@ -1,16 +1,15 @@
-package com.inari.firefly.game.tiled
+package com.inari.firefly.game.json
 
 import com.inari.firefly.BlendMode
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.NO_NAME
 import com.inari.firefly.asset.Asset
-import com.inari.firefly.composite.Composite
 import com.inari.firefly.composite.CompositeSystem
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.game.tile.TileMap
-import com.inari.firefly.graphics.view.Layer
+import com.inari.firefly.game.world.GameObjectComposite
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewSystem
 import com.inari.firefly.physics.contact.SimpleContactMap
@@ -19,7 +18,7 @@ import com.inari.util.graphics.IColor
 import com.inari.util.graphics.MutableColor
 import kotlin.jvm.JvmField
 
-class TiledMapAsset private constructor() : Asset() {
+class TiledJsonRoomAsset private constructor() : Asset() {
 
     private var tileMapId = NO_COMP_ID
     private val tileSetAssetToCodeOffsetMapping = mutableMapOf<String, Int>()
@@ -27,10 +26,11 @@ class TiledMapAsset private constructor() : Asset() {
     private var resource: Supplier<TiledTileMap> = { throw RuntimeException() }
 
     @JvmField var view = ComponentRefResolver(View) { index -> viewRef = index }
+    @JvmField var encryptionKey: String? = null
     var resourceName: String = NO_NAME
         set(value) {
             field = value
-            resource = { FFContext.resourceService.loadJSONResource(value, TiledTileMap::class) }
+            resource = { FFContext.resourceService.loadJSONResource(value, TiledTileMap::class, encryptionKey) }
         }
     fun withTiledTileMap(tileMapJson: TiledTileMap) {
         resource = { tileMapJson }
@@ -60,7 +60,7 @@ class TiledMapAsset private constructor() : Asset() {
             val tileSetAssetName = "${tileSetName}_tileSetAsset"
             val tilesetResource = tileSetProps[1]
 
-            val tileSetAssetId = TiledTileSetAsset.build {
+            val tileSetAssetId = TiledJsonTileSetAsset.build {
                 name = tileSetAssetName
                 resourceName = tilesetResource
             }
@@ -71,13 +71,13 @@ class TiledMapAsset private constructor() : Asset() {
         // create TileMap
         tileMapId = TileMap.build {
             name = tileMapJson.mappedProperties["name"]?.value ?: super.name
-            view(this@TiledMapAsset.viewRef)
+            view(this@TiledJsonRoomAsset.viewRef)
 
             tileMapJson.layers.forEach { layerJson ->
                 if (layerJson.type == "tilelayer")
-                    this@TiledMapAsset.loadTileLayer(this, tileMapJson, layerJson)
+                    this@TiledJsonRoomAsset.loadTileLayer(this, tileMapJson, layerJson)
                 else if (layerJson.type == "objectgroup")
-                    this@TiledMapAsset.loadObjectLayer(this, tileMapJson, layerJson)
+                    this@TiledJsonRoomAsset.loadObjectLayer(this, tileMapJson, layerJson)
             }
         }
     }
@@ -86,7 +86,7 @@ class TiledMapAsset private constructor() : Asset() {
 
         if (layerJson.mappedProperties.containsKey("addContactMap")) {
             val contactMap = SimpleContactMap.build {
-                view(this@TiledMapAsset.viewRef)
+                view(this@TiledJsonRoomAsset.viewRef)
                 layer(layerJson.name)
             }
             tileMap.entityIds + contactMap
@@ -97,9 +97,9 @@ class TiledMapAsset private constructor() : Asset() {
             if (tiledObject.type.startsWith("Composite")) {
                 val typeName = tiledObject.type.split(":")
 
-                val obj =  CompositeSystem.getCompositeBuilder<TiledObjectComposite>(typeName[1]).buildAndGet {
+                val obj =  CompositeSystem.getCompositeBuilder<GameObjectComposite>(typeName[1]).buildAndGet {
                     name = tiledObject.name
-                    view(this@TiledMapAsset.viewRef)
+                    view(this@TiledJsonRoomAsset.viewRef)
                     layer(layerJson.name)
                     tilesObjectProperties = tiledObject
                 }
@@ -141,7 +141,7 @@ class TiledMapAsset private constructor() : Asset() {
             tileSetNames.forEach { tileSetName ->
                 withTileSet {
                     tileSetAsset("${tileSetName}_tileSetAsset")
-                    codeOffset = this@TiledMapAsset.tileSetAssetToCodeOffsetMapping[tileSetName] ?: 0
+                    codeOffset = this@TiledJsonRoomAsset.tileSetAssetToCodeOffsetMapping[tileSetName] ?: 0
                 }
             }
         }
@@ -161,67 +161,9 @@ class TiledMapAsset private constructor() : Asset() {
         tileMapId = NO_COMP_ID
     }
 
-    companion object : SystemComponentSubType<Asset, TiledMapAsset>(Asset, TiledMapAsset::class) {
-        override fun createEmpty() = TiledMapAsset()
+    companion object : SystemComponentSubType<Asset, TiledJsonRoomAsset>(Asset, TiledJsonRoomAsset::class) {
+        override fun createEmpty() = TiledJsonRoomAsset()
     }
 
-    data class TiledTileMap(
-        val width: Int,
-        val height: Int,
-        val tilewidth: Int,
-        val tileheight: Int,
-        val infinite: Boolean = false,
-        val orientation: String,
-        val layers: Array<TiledLayer> = emptyArray(),
-        val tilesets: Array<TilesetCodeOffsets> = emptyArray(),
-        val properties: Array<PropertyJson> = emptyArray()
-    ) {
-        val mappedProperties: Map<String, PropertyJson> = properties.associateBy(PropertyJson::name)
-    }
 
-    data class TiledLayer(
-        val name: String,
-        val type: String,               // "tilelayer" or "objectgroup"
-        val x: Int,                     // position in pixel
-        val y: Int,                     // position in pixel
-        val width: Int,                 // width in tiles
-        val height: Int,                // height in tiles
-        val offsetx: Float = 0f,        // offset x-axis in pixel
-        val offsety: Float = 0f,        // offset y-axis in pixel
-        val parallaxx: Float = 1f,      // parallax scroll factor
-        val parallaxy: Float = 1f,      // parallax scroll factor
-        val opacity: Float = 1f,
-        val tintcolor: String = "",          // #rrggbbaa
-        val visible: Boolean,
-        val data: IntArray?,
-        val objects: Array<TiledObject>?,
-        val properties: Array<PropertyJson> = emptyArray()
-    ) {
-        val mappedProperties: Map<String, PropertyJson> = properties.associateBy(PropertyJson::name)
-    }
-
-    data class TiledObject(
-        val id: Int = -1,
-        val name: String = NO_NAME,
-        val type: String = NO_NAME,
-        val x: Float = 0.0f,
-        val y: Float = 0.0f,
-        val width: Float = 0.0f,
-        val height: Float = 0.0f,
-        val rotation: Float = 0.0f,
-        val visible: Boolean = false,
-        val gid: Int = -1,
-        val point: Boolean = false,
-        val properties: Array<PropertyJson> = emptyArray()
-    )
-
-    data class PropertyJson(
-        val name: String,
-        val type: String,
-        val value: String
-    )
-
-    data class TilesetCodeOffsets(
-        val firstgid: Int,
-    )
 }

@@ -6,7 +6,7 @@ import com.inari.firefly.core.component.ArrayAccessor
 import com.inari.firefly.core.component.ComponentDSL
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentSingleType
-import com.inari.firefly.graphics.text.FontAsset
+import com.inari.firefly.graphics.TextureAsset
 import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 
@@ -17,7 +17,7 @@ class TileSet private constructor() : SystemComponent(TileSet::class.simpleName!
     @JvmField internal val tileTemplates = DynArray.of<TileTemplate>()
     @JvmField internal var spriteSetAssetId = NO_COMP_ID
 
-    val texture = ComponentRefResolver(FontAsset) { index -> textureAssetRef = index }
+    val texture = ComponentRefResolver(TextureAsset) { index -> textureAssetRef = index }
 
     val withTile: (TileTemplate.() -> Unit) -> TileTemplate = { configure ->
         val tile = TileTemplate()

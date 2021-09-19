@@ -7,7 +7,7 @@ import com.inari.firefly.TestApp
 import com.inari.firefly.asset.AssetSystem
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntitySystem
-import com.inari.firefly.game.tiled.TiledTileSetAsset
+import com.inari.firefly.game.json.TiledJsonTileSetAsset
 import com.inari.firefly.graphics.TextureAsset
 import com.inari.firefly.graphics.rendering.RenderingSystem
 import com.inari.firefly.graphics.tile.TileGridSystem
@@ -31,7 +31,7 @@ class TestTiledTileSetAsset {
         AnimationSystem
 
 
-        val tileSetAssetId = TiledTileSetAsset.build {
+        val tileSetAssetId = TiledJsonTileSetAsset.build {
             name = "testTileSet"
             resourceName = "tiles/outline_full.json"
         }
@@ -52,7 +52,7 @@ class TestTiledTileSetAsset {
         TileMapSystem.loadTileMap(tileMapId)
 
         // check all expected assets and components are created correctly
-        val tiledTileSetAsset = FFContext[TiledTileSetAsset, tileSetAssetId]
+        val tiledTileSetAsset = FFContext[TiledJsonTileSetAsset, tileSetAssetId]
         assertNotNull(tiledTileSetAsset)
         val textureAssetName = "texture_${tiledTileSetAsset.name}"
         assertTrue { AssetSystem.assets.contains( textureAssetName ) }

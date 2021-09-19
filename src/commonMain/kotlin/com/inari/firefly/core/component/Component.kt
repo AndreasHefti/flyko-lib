@@ -17,7 +17,8 @@ interface Component : Indexed {
 interface NamedComponent : Component, Named
 
 interface ComponentType<C : Component> : Aspect {
-    val typeClass: KClass<out Component>
+    val typeClass: KClass<C>
+    val subTypeClass: KClass<out C>
 }
 
 class CompId (

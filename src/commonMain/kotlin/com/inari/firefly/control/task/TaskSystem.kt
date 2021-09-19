@@ -4,20 +4,30 @@ import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.control.state.StateSystem
 import com.inari.firefly.control.state.Workflow
+import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntitySystem
+import com.inari.firefly.game.world.World
 import com.inari.util.OpResult
 import com.inari.util.aspect.Aspects
 import kotlin.jvm.JvmField
 
 object TaskSystem : ComponentSystem {
 
-    override val supportedComponents: Aspects =
-        SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(GenericTask, ComponentTask)
+    override val supportedComponents: Aspects = SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(
+            SimpleTask,
+            GenericTask,
+            ComponentTask)
+
+    val simpleTasks: ComponentMapRO<SimpleTask>
+        get() = _simpleTasks
+    private val _simpleTasks = ComponentSystem.createComponentMapping(
+        SimpleTask, nameMapping = true
+    )
 
     val genericTasks: ComponentMapRO<GenericTask>
         get() = _genericTasks
@@ -35,17 +45,8 @@ object TaskSystem : ComponentSystem {
         FFContext.loadSystem(this)
     }
 
-    fun runTask(name: String): OpResult =
-        runTask(genericTasks.indexForName(name))
-
-    fun runTask(taskId: CompId): OpResult =
-        runTask(taskId.instanceId)
-
-    fun runTask(taskIndex: Int): OpResult {
-        return if (taskIndex in _genericTasks)
-            _genericTasks[taskIndex].invoke()
-        else
-            OpResult.FAILED
+    val runTask = ComponentRefResolver(SimpleTask) { index ->
+        _simpleTasks[index].invoke()
     }
 
     fun runTask(
@@ -54,7 +55,7 @@ object TaskSystem : ComponentSystem {
         compId2: CompId = NO_COMP_ID,
         compId3: CompId = NO_COMP_ID,
         compId4: CompId = NO_COMP_ID,
-        compId5: CompId = NO_COMP_ID): OpResult = componentTasks[name].invoke(compId1, compId2, compId3, compId4, compId5)
+        compId5: CompId = NO_COMP_ID): OpResult = componentTasks[name](compId1, compId2, compId3, compId4, compId5)
 
     fun runTask(
         taskId: CompId,
@@ -62,7 +63,7 @@ object TaskSystem : ComponentSystem {
         compId2: CompId = NO_COMP_ID,
         compId3: CompId = NO_COMP_ID,
         compId4: CompId = NO_COMP_ID,
-        compId5: CompId = NO_COMP_ID): OpResult = componentTasks[taskId].invoke(compId1, compId2, compId3, compId4, compId5)
+        compId5: CompId = NO_COMP_ID): OpResult = componentTasks[taskId](compId1, compId2, compId3, compId4, compId5)
 
     fun runTask(
         taskIndex: Int,
@@ -70,7 +71,7 @@ object TaskSystem : ComponentSystem {
         compId2: CompId = NO_COMP_ID,
         compId3: CompId = NO_COMP_ID,
         compId4: CompId = NO_COMP_ID,
-        compId5: CompId = NO_COMP_ID): OpResult = componentTasks[taskIndex].invoke(compId1, compId2, compId3, compId4, compId5)
+        compId5: CompId = NO_COMP_ID): OpResult = componentTasks[taskIndex](compId1, compId2, compId3, compId4, compId5)
 
     override fun clearSystem() {
         _genericTasks.clear()

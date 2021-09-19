@@ -179,6 +179,15 @@ object FFContext {
     fun activateAll(ids: DynArray<CompId>) =
         ids.forEach { activate(it) }
 
+    fun activateAll(cType: ComponentType<*>, set: BitSet): FFContext {
+        var i = set.nextSetBit(0)
+        while (i >= 0) {
+            activate(cType, i)
+            i = set.nextSetBit(i + 1)
+        }
+        return this
+    }
+
     fun activate(id: CompNameId): FFContext {
         mapper<Component>(id).activate(id.name)
         return this

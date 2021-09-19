@@ -1,12 +1,16 @@
 package com.inari.firefly.graphics.view
 
 import com.inari.firefly.BlendMode
+import com.inari.firefly.FFContext
+import com.inari.firefly.NO_NAME
 import com.inari.firefly.asset.AssetInstanceRefResolver
 import com.inari.firefly.control.ControlledSystemComponent
 import com.inari.firefly.control.ControllerSystem
 import com.inari.firefly.core.api.ViewData
+import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentSingleType
+import com.inari.util.collection.DynIntArray
 import com.inari.util.geom.PositionF
 import com.inari.util.geom.Rectangle
 import com.inari.util.graphics.MutableColor
@@ -49,11 +53,23 @@ class View private constructor (
         get() = data.fboScale
         set(value) { data.fboScale = value }
 
+    private val layers = mutableListOf<Layer.() -> Unit>()
+    fun withLayer(configure: Layer.() -> Unit) =
+        layers.add(configure)
+
     override fun init() {
         super.init()
+        val it = layers.iterator()
+        while (it.hasNext())
+            Layer.build {
+                view(this@View.index)
+                also(it.next())
+            }
+        layers.clear()
     }
 
     override fun dispose() {
+        layers.clear()
         ControllerSystem.unregister(componentId, true)
         super.dispose()
     }

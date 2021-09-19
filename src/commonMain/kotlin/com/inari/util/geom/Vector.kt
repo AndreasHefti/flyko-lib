@@ -1,8 +1,11 @@
 package com.inari.util.geom
 
+import com.inari.util.StringUtils
+
 interface Vec2f {
     val dx: Float
     val dy: Float
+    fun toJsonString(): String
 }
 
 class ImmutableVector2f constructor(
@@ -28,7 +31,8 @@ class ImmutableVector2f constructor(
     operator fun div(v: Vec2f): ImmutableVector2f =
         ImmutableVector2f(this.dx / v.dx, this.dy / v.dy)
 
-    override fun toString(): String = "[dx=$dx,dy=$dy]"
+    override fun toJsonString(): String = "$dx${StringUtils.VALUE_SEPARATOR}$dy"
+    override fun toString(): String = "[dx=$dx${StringUtils.VALUE_SEPARATOR}dy=$dy]"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false
@@ -65,6 +69,12 @@ data class Vector2f constructor(
         return this
     }
 
+    operator fun invoke(jsonString: String) {
+        val split = jsonString.split(",")
+        dx = try { split[0].toFloat() } catch (e: Exception) { dx }
+        dy = try { split[1].toFloat() } catch (e: Exception) { dy }
+    }
+
     operator fun plus(v: Vec2f) {
         this.dx += v.dx
         this.dy += v.dy
@@ -95,7 +105,8 @@ data class Vector2f constructor(
         this.dy /= dd
     }
 
-    override fun toString(): String = "[dx=$dx,dy=$dy]"
+    override fun toJsonString(): String = "$dx${StringUtils.VALUE_SEPARATOR}$dy"
+    override fun toString(): String = "[dx=$dx${StringUtils.VALUE_SEPARATOR}dy=$dy]"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false
@@ -114,6 +125,7 @@ data class Vector2f constructor(
 interface Vec2i {
     val dx: Int
     val dy: Int
+    fun toJsonString(): String
 }
 
 data class ImmutableVector2i constructor(
@@ -139,7 +151,8 @@ data class ImmutableVector2i constructor(
     operator fun div(v: Vec2i): ImmutableVector2i =
         ImmutableVector2i(this.dx / v.dx, this.dy / v.dy)
 
-    override fun toString(): String = "[dx=$dx,dy=$dy]"
+    override fun toJsonString(): String = "$dx${StringUtils.VALUE_SEPARATOR}$dy"
+    override fun toString(): String = "[dx=$dx${StringUtils.VALUE_SEPARATOR}dy=$dy]"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false
@@ -176,6 +189,12 @@ data class Vector2i constructor(
         return this
     }
 
+    operator fun invoke(jsonString: String) {
+        val split = jsonString.split(",")
+        dx = try { split[0].toInt() } catch (e: Exception) { dx }
+        dy = try { split[1].toInt() } catch (e: Exception) { dy }
+    }
+
     operator fun plus(v: Vec2i) {
         this.dx += v.dx
         this.dy += v.dy
@@ -206,7 +225,8 @@ data class Vector2i constructor(
         this.dy /= dd
     }
 
-    override fun toString(): String = "[dx=$dx,dy=$dy]"
+    override fun toJsonString(): String = "$dx${StringUtils.VALUE_SEPARATOR}$dy"
+    override fun toString(): String = "[dx=$dx${StringUtils.VALUE_SEPARATOR}dy=$dy]"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false

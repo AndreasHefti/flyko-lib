@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.1" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="8">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="8">
  <editorsettings>
   <export target="map1.json" format="json"/>
  </editorsettings>
  <properties>
-  <property name="area-name" value="test-area"/>
-  <property name="area-pos-x" type="int" value="0"/>
-  <property name="area-pos-y" type="int" value="0"/>
   <property name="tilesets" value="redTerrain:tiles/outline_full.json,bluTerrain:tiles/outline_blu_full.json"/>
  </properties>
  <tileset firstgid="1" source="outline_full.tsx"/>
@@ -67,7 +64,7 @@
 41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41
 </data>
  </layer>
- <layer id="1" name="Layer1" width="20" height="20" tintcolor="#ffffff">
+ <layer id="1" name="Layer1" width="20" height="20" tintcolor="#ffffff" offsetx="1.33333" offsety="0">
   <properties>
    <property name="blend" value="NORMAL_ALPHA"/>
    <property name="tilesets" value="bluTerrain,redTerrain"/>
@@ -78,8 +75,8 @@
 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
 1,0,0,0,0,0,0,0,40,30,0,0,0,1,1,1,0,0,0,1,
 1,0,0,0,0,0,0,0,20,10,0,0,0,0,0,0,0,0,0,1,
-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 1,0,0,0,0,0,0,0,0,0,0,0,0,10,20,0,0,0,0,1,
 1,0,0,0,0,0,0,0,0,11,11,0,0,30,40,0,0,0,15,1,
 1,0,0,0,0,0,0,0,0,21,21,0,0,0,0,0,0,0,16,1,

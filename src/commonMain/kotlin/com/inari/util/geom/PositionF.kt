@@ -1,5 +1,6 @@
 package com.inari.util.geom
 
+import com.inari.util.StringUtils
 import kotlin.jvm.JvmField
 
 
@@ -42,6 +43,12 @@ data class PositionF constructor(
         y = p.y
     }
 
+    operator fun invoke(fromString: String) {
+        val split = fromString.split(",")
+        x = try { split[0].toFloat() } catch (e: Exception) { x }
+        y = try { split[1].toFloat() } catch (e: Exception) { y }
+    }
+
     operator fun plus(pos: PositionF): PositionF {
         this.x += pos.x
         this.y += pos.y
@@ -78,7 +85,8 @@ data class PositionF constructor(
         return this
     }
 
-    override fun toString(): String = "[x=$x,y=$y]"
+    fun toJsonString(): String = "$x${StringUtils.VALUE_SEPARATOR}$y"
+    override fun toString(): String = "[x=$x${StringUtils.VALUE_SEPARATOR}y=$y]"
 
     override fun hashCode(): Int {
         var result = x.hashCode()

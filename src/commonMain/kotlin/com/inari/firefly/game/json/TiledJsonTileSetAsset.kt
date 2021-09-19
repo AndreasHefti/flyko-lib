@@ -1,4 +1,4 @@
-package com.inari.firefly.game.tiled
+package com.inari.firefly.game.json
 
 import com.inari.firefly.BlendMode
 import com.inari.firefly.FFContext
@@ -10,17 +10,19 @@ import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.game.tile.*
 import com.inari.firefly.graphics.TextureAsset
 import com.inari.util.Supplier
+import kotlin.jvm.JvmField
 
-class TiledTileSetAsset private constructor() : Asset() {
+class TiledJsonTileSetAsset private constructor() : Asset() {
 
     private var tileSetId = NO_COMP_ID
     private var textureAssetId = NO_COMP_ID
     private var resource: Supplier<TileSetJson> = { throw RuntimeException() }
 
+    @JvmField var encryptionKey: String? = null
     var resourceName: String = NO_NAME
         set(value) {
             field = value
-            resource = { FFContext.resourceService.loadJSONResource(value, TileSetJson::class) }
+            resource = { FFContext.resourceService.loadJSONResource(value, TileSetJson::class, encryptionKey) }
         }
     fun withTileSetJson(tileSetJson: TileSetJson) {
         resource = { tileSetJson }
@@ -44,7 +46,7 @@ class TiledTileSetAsset private constructor() : Asset() {
         }
         if (textureAssetId == NO_COMP_ID) {
             textureAssetId = TextureAsset.build {
-                name = "texture_${this@TiledTileSetAsset.name}"
+                name = "texture_${this@TiledJsonTileSetAsset.name}"
                 resourceName = atlasResource
             }
         }
@@ -54,7 +56,7 @@ class TiledTileSetAsset private constructor() : Asset() {
         // create tile set
         tileSetId = TileSet.build {
             name = tileSetJson.name
-            texture(this@TiledTileSetAsset.textureAssetId)
+            texture(this@TiledJsonTileSetAsset.textureAssetId)
 
             tileSetJson.tiles.forEach { tileJson ->
 //                TileType -> [name]_[material-type]_[tile-type]_[atlas-orientation]
@@ -162,33 +164,8 @@ class TiledTileSetAsset private constructor() : Asset() {
         textureAssetId = NO_COMP_ID
     }
 
-    companion object : SystemComponentSubType<Asset, TiledTileSetAsset>(Asset, TiledTileSetAsset::class) {
-        override fun createEmpty() = TiledTileSetAsset()
+    companion object : SystemComponentSubType<Asset, TiledJsonTileSetAsset>(Asset, TiledJsonTileSetAsset::class) {
+        override fun createEmpty() = TiledJsonTileSetAsset()
     }
 
-    data class TileSetJson(
-        val name: String,
-        val tilewidth: Int,
-        val tileheight: Int,
-        val columns: Int,
-        val tilecount: Int,
-        val properties: Array<PropertyJson> = emptyArray(),
-        val tiles: Array<TileJson> = emptyArray()
-    ) {
-        val mappedProperties: Map<String, PropertyJson> = properties.associateBy(PropertyJson::name)
-    }
-
-    data class TileJson(
-        val id: Int,
-        val type: String,
-        val properties: Array<PropertyJson> = emptyArray()
-    ) {
-        val mappedProperties: Map<String, PropertyJson> = properties.associateBy(PropertyJson::name)
-    }
-
-    data class PropertyJson(
-        val name: String,
-        val type: String,
-        val value: String
-    )
 }

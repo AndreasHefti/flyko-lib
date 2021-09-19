@@ -43,8 +43,6 @@ class EActor private constructor () : EntityComponent(EActor::class.simpleName!!
 
     companion object : EntityComponentType<EActor>(EActor::class) {
 
-
-
         @JvmField val ENCOUNTER_CONTACT_TYPE = CONTACT_TYPE_ASPECT_GROUP.createAspect("ENCOUNTER_CONTACT_TYPE")
 
         @JvmField val ANY_ENCOUNTER_CONDITION: IntPredicate = { entityId ->

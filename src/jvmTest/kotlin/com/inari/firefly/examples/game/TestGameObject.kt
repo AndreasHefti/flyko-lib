@@ -2,20 +2,19 @@ package com.inari.firefly.examples.game
 
 import com.inari.firefly.BlendMode
 import com.inari.firefly.NO_COMP_ID
-import com.inari.firefly.composite.AttributedComposite
 import com.inari.firefly.composite.Composite
 import com.inari.firefly.composite.CompositeSystem
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.game.tile.TileContactFormType
 import com.inari.firefly.game.tile.TileMaterialType
-import com.inari.firefly.game.tiled.TiledObjectComposite
+import com.inari.firefly.game.world.GameObjectComposite
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.sprite.SpriteAsset
 import com.inari.firefly.physics.contact.EContact
 
-class TestGameObject : TiledObjectComposite() {
+class TestGameObject : GameObjectComposite() {
 
     private var spriteId = NO_COMP_ID
     private var entityId = NO_COMP_ID
@@ -56,7 +55,7 @@ class TestGameObject : TiledObjectComposite() {
     }
 
     companion object : SystemComponentSubType<Composite, TestGameObject>(Composite, TestGameObject::class) {
-        init { CompositeSystem.compositeTypeMapping[TestGameObject::class.simpleName!!] = this }
+        init { CompositeSystem.compositeBuilderMapping[TestGameObject::class.simpleName!!] = this }
         override fun createEmpty() = TestGameObject()
     }
 }

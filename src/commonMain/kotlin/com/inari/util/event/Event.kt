@@ -63,7 +63,7 @@ abstract class Event<L> protected constructor() {
     }
 
      abstract class EventType(name: String) : Aspect {
-        private val aspect = EVENT_ASPECTS.createAspect(name)
+         private val aspect = EVENT_ASPECTS.createAspect(name)
          override val aspectName = aspect.aspectName
          override val aspectType = aspect.aspectType
          override val aspectIndex = aspect.aspectIndex

@@ -4,6 +4,7 @@ import com.inari.firefly.TestApp
 import com.inari.firefly.control.behavior.*
 import com.inari.firefly.control.behavior.BehaviorSystem.FALSE_CONDITION
 import com.inari.firefly.control.task.ComponentTask
+import com.inari.firefly.control.task.GenericTask
 import com.inari.firefly.control.task.TaskSystem
 import com.inari.util.OpResult
 import kotlin.test.BeforeTest
@@ -21,9 +22,9 @@ class BehaviorTreeTest {
     @Test
     fun testCreation() {
 
-        ComponentTask.build {
+        GenericTask.build {
             name = "Task_Name"
-            operation = { _, _, _, _ , _ -> OpResult.SUCCESS }
+            withTaskOperation { _, _, _, _ , _ -> OpResult.SUCCESS }
         }
 
         BxSelection.build {
