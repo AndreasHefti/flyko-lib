@@ -15,6 +15,7 @@ class BxCondition private constructor() : BxNode() {
                 false -> OpResult.FAILED
             }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<BxNode, BxCondition>(BxNode, BxCondition::class) {
         override fun createEmpty() = BxCondition()
     }

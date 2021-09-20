@@ -24,7 +24,7 @@ class AssetSystemTest {
         val emptyAssetId = TestAsset.build {}
 
         assertEquals(
-            "CompId(instanceId=0, componentType=SystemComponentType:Asset)",
+            "CompId(instanceId=0, componentType=SystemComponentType:Asset:TestAsset)",
             emptyAssetId.toString()
         )
 
@@ -75,7 +75,7 @@ class AssetSystemTest {
         }
 
         assertEquals(
-            "CompId(instanceId=0, componentType=SystemComponentType:Asset)",
+            "CompId(instanceId=0, componentType=SystemComponentType:Asset:TestAsset)",
             assetId.toString()
         )
         assertEquals(

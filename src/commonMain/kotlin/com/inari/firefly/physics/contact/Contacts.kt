@@ -15,7 +15,7 @@ import kotlin.math.floor
 
 class Contacts internal constructor(
     @JvmField internal var constraintRef: Int
-){
+) {
 
     @JvmField internal val normalizedContactBounds = Rectangle()
     @JvmField internal val worldBounds = Rectangle()

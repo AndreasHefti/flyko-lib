@@ -287,12 +287,12 @@ class TestTiledTileSetAsset {
         var entityRefId = TileMapSystem.getTileEntityRef(1)
         assertTrue( entityRefId >= 0)
         var entity = FFContext[Entity, entityRefId]
-        assertEquals("outline_full_terrain_quad:full_0:0_v0l0", entity.name)
+        assertEquals("tile_outline_full_terrain_quad:full_0:0_view:0_layer:0", entity.name)
 
         entityRefId = TileMapSystem.getTileEntityRef(11)
         assertTrue( entityRefId >= 0)
         entity = FFContext[Entity, entityRefId]
-        assertEquals("outline_full_terrain_circle:full_0:1_v0l0", entity.name)
+        assertEquals("tile_outline_full_terrain_circle:full_0:1_view:0_layer:0", entity.name)
     }
 
     @Test

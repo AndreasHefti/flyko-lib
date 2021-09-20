@@ -87,6 +87,7 @@ class SimpleTextRenderer private constructor() : Renderer() {
 
     private val textRenderable = SpriteRenderable()
 
+    override fun componentType() = Companion
     companion object : SingletonComponent<Renderer, SimpleTextRenderer>(Renderer, SimpleTextRenderer::class) {
         override fun create() = SimpleTextRenderer()
         private val MATCHING_ASPECTS = EntityComponent.ENTITY_COMPONENT_ASPECTS.createAspects(

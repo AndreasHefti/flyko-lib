@@ -29,6 +29,7 @@ class SemiImplicitEulerIntegrator private constructor() : Integrator() {
             movement.velocity.dx * deltaTimeInSeconds,
             movement.velocity.dy * deltaTimeInSeconds)
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Integrator, SemiImplicitEulerIntegrator>(Integrator, SemiImplicitEulerIntegrator::class) {
         override fun createEmpty() = SemiImplicitEulerIntegrator()
     }

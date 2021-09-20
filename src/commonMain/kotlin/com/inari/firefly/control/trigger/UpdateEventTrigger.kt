@@ -3,6 +3,7 @@ package com.inari.firefly.control.trigger
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
 import com.inari.firefly.core.system.SystemComponentSubType
+import com.inari.firefly.graphics.rendering.Renderer
 
 class UpdateEventTrigger private constructor() : Trigger() {
 
@@ -18,6 +19,7 @@ class UpdateEventTrigger private constructor() : Trigger() {
         super.dispose()
     }
 
+    override fun componentType() = Renderer
     companion object : SystemComponentSubType<Trigger, UpdateEventTrigger>(Trigger, UpdateEventTrigger::class) {
         override fun createEmpty() = UpdateEventTrigger()
     }

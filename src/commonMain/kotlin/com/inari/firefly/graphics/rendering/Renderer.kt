@@ -86,8 +86,6 @@ abstract class Renderer protected constructor(
 
     abstract fun render(viewIndex: Int, layerIndex: Int, clip: Rectangle)
 
-    override fun componentType(): ComponentType<Renderer> = Companion
-
     companion object : SystemComponentType<Renderer>(Renderer::class)
 
     protected interface TransformDataCollector {

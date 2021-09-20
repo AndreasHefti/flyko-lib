@@ -29,28 +29,5 @@ abstract class Trigger protected constructor() : SystemComponent(Trigger::class.
         }
     }
 
-    override fun componentType(): ComponentType<Trigger> = Companion
     companion object : SystemComponentType<Trigger>(Trigger::class)
-
-//    abstract class Subtype<A : Trigger> : ComponentType<A> {
-//        internal fun doBuild(configure: A.() -> Unit): A {
-//            val result = createEmpty()
-//            result.also(configure)
-//            TriggerSystem.systemTrigger.receiver()(result)
-//            return result
-//        }
-//        fun build(call: Call, configure: A.() -> Unit): Int {
-//            val result = doBuild(configure)
-//            return result.index
-//        }
-//        fun buildAndGet(call: Call, configure: A.() -> Unit): A {
-//            val result = doBuild(configure)
-//            return result
-//        }
-//        override val typeClass: KClass<out Component> = Trigger.typeClass
-//        final override val aspectIndex: Int = Trigger.aspectIndex
-//        final override val aspectName: String = Trigger.aspectName
-//        final override val aspectType: AspectType = Trigger.aspectType
-//        protected abstract fun createEmpty(): A
-//    }
 }

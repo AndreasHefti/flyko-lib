@@ -58,6 +58,5 @@ abstract class Scene protected constructor() : SystemComponent(Scene::class.simp
         disposeTrigger()
     }
 
-    override fun componentType(): ComponentType<Scene> = Companion
     companion object : SystemComponentType<Scene>(Scene::class)
 }

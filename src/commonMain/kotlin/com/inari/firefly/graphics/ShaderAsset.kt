@@ -49,6 +49,7 @@ class ShaderAsset private constructor() : Asset() {
        }
     }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Asset, ShaderAsset>(Asset, ShaderAsset::class) {
         override fun createEmpty() = ShaderAsset()
     }

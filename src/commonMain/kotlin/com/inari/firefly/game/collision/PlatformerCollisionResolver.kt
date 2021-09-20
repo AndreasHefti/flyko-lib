@@ -267,6 +267,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
         contactSensorGround.reset(x1, constraint.height - gapSouth, constraint.width - 4, 1)
     }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<CollisionResolver, PlatformerCollisionResolver>(CollisionResolver, PlatformerCollisionResolver::class) {
         override fun createEmpty() = PlatformerCollisionResolver()
     }

@@ -26,6 +26,7 @@ class SimpleShapeRenderer private constructor() : Renderer() {
         }
     }
 
+    override fun componentType() = Companion
     companion object : SingletonComponent<Renderer, SimpleShapeRenderer>(Renderer, SimpleShapeRenderer::class) {
         override fun create() = SimpleShapeRenderer()
     }

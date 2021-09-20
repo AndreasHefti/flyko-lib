@@ -18,6 +18,7 @@ class BxSelection private constructor() : BxBranch() {
         return OpResult.FAILED
     }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<BxNode, BxSelection>(BxNode, BxSelection::class) {
         override fun createEmpty() = BxSelection()
     }

@@ -168,7 +168,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
                     throw IllegalStateException("Missing sprite id for tile: ${tile.name} in TileSet: ${tileSet.name}")
 
                 val entityId = Entity.buildAndActivate {
-                    name = "${tile.name}_v${this@TileMap.viewRef}l${layer.layerRef}"
+                    name = "tile_${tile.name}_view:${this@TileMap.viewRef}_layer:${layer.layerRef}"
 
                     withComponent(ETransform) {
                         view(this@TileMap.viewRef)
@@ -200,6 +200,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
                     if (tile.animationData != null) {
                         withComponent(EAnimation) {
                             withActiveAnimation(IntTimelineProperty) {
+                                name = "tileAnim_${tile.name}_view:${this@TileMap.viewRef}_layer:${layer.layerRef}"
                                 looping = true
                                 timeline = tile.animationData!!.frames.toArray()
                                 propertyRef = ETile.Property.SPRITE_REFERENCE
@@ -215,7 +216,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
 
     private fun buildTileGrid(layer: MapLayer) {
         layer.tileGridId = TileGrid.buildAndActivate {
-            name = "tilegrid_${name}_${layer.layerRef}"
+            name = "tilegrid_${this@TileMap.name}_${layer.layerRef}"
             view(this@TileMap.viewRef)
             layer(layer.layerRef)
             if (layer.rendererRef >= 0)

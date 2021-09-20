@@ -44,7 +44,7 @@ class SimpleContactMap : ContactMap() {
         entities.clear()
 
 
-
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<ContactMap, SimpleContactMap>(ContactMap, SimpleContactMap::class) {
         override fun createEmpty() = SimpleContactMap()
     }

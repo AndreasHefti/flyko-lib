@@ -35,6 +35,7 @@ class EasedValue : Animation(), FloatAnimation {
     override fun reset() = control.reset()
     override fun update() = control.update()
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Animation, EasedValue>(Animation, EasedValue::class) {
         override fun createEmpty() = EasedValue()
     }

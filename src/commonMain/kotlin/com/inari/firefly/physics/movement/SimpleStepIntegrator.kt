@@ -23,6 +23,7 @@ class SimpleStepIntegrator  private constructor() : Integrator() {
     override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) =
         transform.move(movement.velocity.dx, movement.velocity.dy)
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Integrator, SimpleStepIntegrator>(Integrator, SimpleStepIntegrator::class) {
         override fun createEmpty() = SimpleStepIntegrator()
     }

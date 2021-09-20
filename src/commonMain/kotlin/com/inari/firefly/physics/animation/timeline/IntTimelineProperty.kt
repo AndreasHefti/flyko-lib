@@ -59,6 +59,7 @@ class IntTimelineProperty private constructor() : EntityPropertyAnimation(), Int
         propertyAccessor?.set(data.timeline[data.currentIndex].value)
     }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Animation, IntTimelineProperty>(Animation, IntTimelineProperty::class) {
         override fun createEmpty() = IntTimelineProperty()
     }

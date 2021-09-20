@@ -13,8 +13,7 @@ class IndexerTest {
     @Test
     fun testSimpleIndexedObject() {
         assertEquals(
-            "SimpleIndexedObject : {\n" +
-                "}",
+            "SimpleIndexedObject : 0",
             Indexer.dump("SimpleIndexedObject")
         )
 
@@ -22,11 +21,7 @@ class IndexerTest {
         val o2 = SimpleIndexedObject()
         val o3 = SimpleIndexedObject()
 
-        assertEquals("SimpleIndexedObject : {\n" +
-            "    0\n" +
-            "    1\n" +
-            "    2\n" +
-            "}", Indexer.dump("SimpleIndexedObject")
+        assertEquals("SimpleIndexedObject : 3", Indexer.dump("SimpleIndexedObject")
         )
         assertTrue(o1.index == 0)
         assertTrue(o2.index == 1)
@@ -34,10 +29,7 @@ class IndexerTest {
         assertTrue(o1.indexedTypeName == "SimpleIndexedObject")
 
         o1.dispose()
-        assertEquals("SimpleIndexedObject : {\n" +
-            "    1\n" +
-            "    2\n" +
-            "}", Indexer.dump("SimpleIndexedObject")
+        assertEquals("SimpleIndexedObject : 2", Indexer.dump("SimpleIndexedObject")
         )
         assertEquals(o1.index, -1)
 
@@ -48,51 +40,34 @@ class IndexerTest {
         assertTrue(o1.index == 3)
         o1.applyNew()
         assertTrue(o1.index == 3)
-        assertEquals("SimpleIndexedObject : {\n" +
-            "    0\n" +
-            "    1\n" +
-            "    2\n" +
-            "    3\n" +
-            "}", Indexer.dump("SimpleIndexedObject")
+        assertEquals("SimpleIndexedObject : 4", Indexer.dump("SimpleIndexedObject")
         )
     }
 
     @Test
     fun testSimpleIndexedType() {
-        assertEquals("SimpleIndexedType : {\n" +
-            "}", Indexer.dump("SimpleIndexedType")
+        assertEquals("SimpleIndexedType : 0", Indexer.dump("SimpleIndexedType")
         )
 
         val a1 = SITA()
-        assertEquals("SimpleIndexedType : {\n" +
-            "    0:SITA\n" +
-            "}", Indexer.dump("SimpleIndexedType")
+        assertEquals("SimpleIndexedType : 1", Indexer.dump("SimpleIndexedType")
         )
         assertTrue(SITA.index ==  0)
         assertTrue(SITA.indexedTypeName == "SimpleIndexedType")
 
         val a2 = SITA()
-        assertEquals("SimpleIndexedType : {\n" +
-            "    0:SITA\n" +
-            "}", Indexer.dump("SimpleIndexedType")
+        assertEquals("SimpleIndexedType : 1", Indexer.dump("SimpleIndexedType")
         )
         assertTrue(SITA.index == 0)
 
         val b1 = SITB()
-        assertEquals("SimpleIndexedType : {\n" +
-            "    0:SITA\n" +
-            "    1:SITB\n" +
-            "}", Indexer.dump("SimpleIndexedType")
+        assertEquals("SimpleIndexedType : 2", Indexer.dump("SimpleIndexedType")
         )
         assertTrue(SITB.index == 1)
         assertEquals("SimpleIndexedType", SITB.indexedTypeName)
 
         val c1 = SITC()
-        assertEquals("SimpleIndexedType : {\n" +
-            "    0:SITA\n" +
-            "    1:SITB\n" +
-            "    2:SITC\n" +
-            "}", Indexer.dump("SimpleIndexedType")
+        assertEquals("SimpleIndexedType : 3", Indexer.dump("SimpleIndexedType")
         )
         assertTrue(SITC.index == 2)
         assertEquals("SimpleIndexedType", SITC.indexedTypeName)
@@ -100,10 +75,7 @@ class IndexerTest {
 
 
         SITC.dispose()
-        assertEquals("SimpleIndexedType : {\n" +
-            "    0:SITA\n" +
-            "    1:SITB\n" +
-            "}", Indexer.dump("SimpleIndexedType")
+        assertEquals("SimpleIndexedType : 2", Indexer.dump("SimpleIndexedType")
         )
         assertTrue(SITC.index == -1)
         assertEquals("SimpleIndexedType", SITC.indexedTypeName)
@@ -112,49 +84,31 @@ class IndexerTest {
 
     @Test
     fun testIndexedTypeAndObject() {
-        assertEquals("IndexedType : {\n" +
-            "}", Indexer.dump("IndexedType")
+        assertEquals("IndexedType : 0", Indexer.dump("IndexedType")
         )
 
         val a1 = IOATA()
-        assertEquals("IndexedType : {\n" +
-            "    0:IOATA\n" +
-            "}", Indexer.dump("IndexedType")
+        assertEquals("IndexedType : 1", Indexer.dump("IndexedType")
         )
-        assertEquals("Object:IOATA : {\n" +
-            "    0\n" +
-            "}", Indexer.dump("Object:IOATA")
+        assertEquals("Object:IOATA : 1", Indexer.dump("Object:IOATA")
         )
         assertTrue(a1.index == 0)
         assertTrue(IOATA.index == 0)
 
         val a2 = IOATA()
-        assertEquals("IndexedType : {\n" +
-            "    0:IOATA\n" +
-            "}", Indexer.dump("IndexedType")
+        assertEquals("IndexedType : 1", Indexer.dump("IndexedType")
         )
-        assertEquals("Object:IOATA : {\n" +
-            "    0\n" +
-            "    1\n" +
-            "}", Indexer.dump("Object:IOATA")
+        assertEquals("Object:IOATA : 2", Indexer.dump("Object:IOATA")
         )
         assertTrue(a2.index == 1)
         assertTrue(IOATA.index == 0)
 
         val b1 = IOATB()
-        assertEquals("IndexedType : {\n" +
-            "    0:IOATA\n" +
-            "    1:IOATB\n" +
-            "}", Indexer.dump("IndexedType")
+        assertEquals("IndexedType : 2", Indexer.dump("IndexedType")
         )
-        assertEquals("Object:IOATA : {\n" +
-            "    0\n" +
-            "    1\n" +
-            "}", Indexer.dump("Object:IOATA")
+        assertEquals("Object:IOATA : 2", Indexer.dump("Object:IOATA")
         )
-        assertEquals("Object:IOATB : {\n" +
-            "    0\n" +
-            "}", Indexer.dump("Object:IOATB")
+        assertEquals("Object:IOATB : 1", Indexer.dump("Object:IOATB")
         )
         assertTrue(b1.index == 0)
         assertTrue(IOATB.index == 1)
@@ -163,30 +117,16 @@ class IndexerTest {
         val b3 = IOATB()
         val c1 = IOATC()
         val c2 = IOATC()
-        assertEquals("IndexedType : {\n" +
-            "    0:IOATA\n" +
-            "    1:IOATB\n" +
-            "    2:IOATC\n" +
-            "}", Indexer.dump("IndexedType")
+        assertEquals("IndexedType : 3", Indexer.dump("IndexedType")
         )
 
-        assertEquals("Object:IOATA : {\n" +
-            "    0\n" +
-            "    1\n" +
-            "}", Indexer.dump("Object:IOATA")
+        assertEquals("Object:IOATA : 2", Indexer.dump("Object:IOATA")
         )
 
-        assertEquals("Object:IOATB : {\n" +
-            "    0\n" +
-            "    1\n" +
-            "    2\n" +
-            "}", Indexer.dump("Object:IOATB")
+        assertEquals("Object:IOATB : 3", Indexer.dump("Object:IOATB")
         )
 
-        assertEquals("Object:IOATC : {\n" +
-            "    0\n" +
-            "    1\n" +
-            "}", Indexer.dump("Object:IOATC")
+        assertEquals("Object:IOATC : 2", Indexer.dump("Object:IOATC")
         )
     }
 
@@ -199,7 +139,7 @@ class SimpleIndexedObject : AbstractIndexed("SimpleIndexedObject") {
 
 
 abstract class SimpleIndexedType {
-    abstract class TypeIndex(subTypeName: String) : AbstractIndexed("SimpleIndexedType", subTypeName) {
+    abstract class TypeIndex(subTypeName: String) : AbstractIndexed("SimpleIndexedType") {
         fun dispose() = disposeIndex()
         fun applyNew() = applyNewIndex()
     }
@@ -220,7 +160,7 @@ abstract class IndexedObjectAndType(
     fun dispose() = disposeIndex()
     fun applyNew() = applyNewIndex()
 
-    abstract class TypeIndex(subTypeName: String) : AbstractIndexed("IndexedType", subTypeName) {
+    abstract class TypeIndex(subTypeName: String) : AbstractIndexed("IndexedType") {
         fun dispose() = disposeIndex()
         fun applyNew() = applyNewIndex()
     }

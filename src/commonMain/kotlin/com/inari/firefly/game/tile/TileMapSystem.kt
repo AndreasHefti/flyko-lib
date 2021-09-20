@@ -238,19 +238,6 @@ object TileMapSystem : ComponentSystem {
         }
     }
 
-//    private fun init(tileSetContext: TileSetContext) =
-//        tileSetContextMapping.add(tileSetContext)
-
-//
-//    private fun activateTileSetContext(tileSetContext: TileSetContext) =
-//        tileSetContext.activate()
-//
-//    private fun deactivateTileSetContext(tileSetContext: TileSetContext) =
-//        tileSetContext.deactivate()
-
-//    private fun dispose(tileSetContext: TileSetContext) =
-//        tileSetContextMapping.delete(tileSetContext)
-
     private fun disposeTileSet(tileSet: TileSet) {
         FFContext.delete(SpriteSetAsset, tileSet.spriteSetAssetId)
         tileSet.spriteSetAssetId = NO_COMP_ID
@@ -258,7 +245,6 @@ object TileMapSystem : ComponentSystem {
     
     override fun clearSystem() {
         systemTileSet.clear()
- //       systemTileSetContext.clear()
         bitMaskCache.clear()
     }
 }

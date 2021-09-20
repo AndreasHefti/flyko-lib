@@ -12,9 +12,8 @@ import com.inari.util.indexed.AbstractIndexed
 import kotlin.reflect.KClass
 
 abstract class SystemComponent protected constructor(
-    objectIndexerName: String,
-    subTypeName: String = objectIndexerName // TODO set this in subtrypes
-) : AbstractIndexed(objectIndexerName, subTypeName), NamedComponent {
+    objectIndexerName: String
+) : AbstractIndexed(objectIndexerName), NamedComponent {
 
     override var name: String = NO_NAME
         set(value) {
@@ -92,6 +91,7 @@ abstract class SystemComponentSingleType<C : SystemComponent>(
     final override val aspectIndex: Int = compAspect.aspectIndex
     final override val aspectName: String = compAspect.aspectName
     final override val aspectType: AspectType = compAspect.aspectType
+    override fun toString() = "SystemComponentType:$aspectName"
 }
 
 abstract class SystemComponentSubType<C : SystemComponent, CC : C>(
@@ -103,4 +103,5 @@ abstract class SystemComponentSubType<C : SystemComponent, CC : C>(
     final override val aspectIndex: Int = baseType.aspectIndex
     final override val aspectName: String = baseType.aspectName
     final override val aspectType: AspectType = baseType.aspectType
+    override fun toString() = "SystemComponentType:${aspectName}:${subTypeClass.simpleName}"
 }

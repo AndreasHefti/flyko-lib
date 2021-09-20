@@ -77,7 +77,7 @@ class TiledTileMapTest : DesktopApp() {
 
 
         val mapAssetId = TiledJsonRoomAsset.build {
-            name = "TiledMapExampleAsset"
+            name = "TiledMapExample"
             resourceName = "tiles/map1.json"
             view(viewId)
         }
@@ -167,6 +167,8 @@ class TiledTileMapTest : DesktopApp() {
             snapToBounds(-100, -100, 840, 840)
         }
         FFContext.get<View>(viewId).withController(camId)
+
+        println(FFContext.dump(true))
 
         println(Indexer.dump())
     }

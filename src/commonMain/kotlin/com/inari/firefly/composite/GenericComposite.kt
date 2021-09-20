@@ -13,7 +13,7 @@ import com.inari.util.collection.BitSet
 import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 
-open class GenericComposite : Composite(GenericComposite::class.simpleName!!) {
+open class GenericComposite : Composite() {
 
     @JvmField internal var loadTaskRef = -1
     @JvmField internal var activationTaskRef = -1
@@ -105,6 +105,7 @@ open class GenericComposite : Composite(GenericComposite::class.simpleName!!) {
         activatableComponents.clear()
     }
 
+    override fun componentType(): SystemComponentSubType<Composite, out GenericComposite> = Companion
     companion object : SystemComponentSubType<Composite, GenericComposite>(Composite, GenericComposite::class) {
         init { CompositeSystem.compositeBuilderMapping[GenericComposite::class.simpleName!!] = this }
         override fun createEmpty() = GenericComposite()

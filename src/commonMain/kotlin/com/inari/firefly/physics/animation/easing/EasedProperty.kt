@@ -51,9 +51,8 @@ class EasedProperty : EntityPropertyAnimation(), FloatAnimation {
 
     override fun update() = control.update()
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Animation, EasedProperty>(Animation, EasedProperty::class) {
         override fun createEmpty() = EasedProperty()
     }
-
-
 }

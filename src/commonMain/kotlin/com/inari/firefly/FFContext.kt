@@ -22,7 +22,8 @@ import kotlin.jvm.JvmField
 object FFContext {
 
     @PublishedApi @JvmField internal val componentMaps: DynArray<ComponentMap<*>> = DynArray.of()
-    @JvmField  internal val systemTypeMapping: DynArray<ComponentSystem> = DynArray.of()
+    @JvmField internal val systemTypeMapping: DynArray<ComponentSystem> = DynArray.of()
+    private val systemMapping = DynArray.of<ComponentSystem>()
 
     val eventDispatcher: IEventDispatcher
         get() = FFApp.eventDispatcher
@@ -48,6 +49,7 @@ object FFContext {
         get() = graphics.screenHeight
 
     fun <S : ComponentSystem> loadSystem(system: S) {
+        systemMapping.add(system)
         for (aspect in system.supportedComponents)
             systemTypeMapping[aspect.aspectIndex] = system
     }
@@ -391,6 +393,43 @@ object FFContext {
     fun <L : AspectedEventListener> notify(event: AspectedEvent<L>): FFContext {
         eventDispatcher.notify(event)
         return this
+    }
+
+    fun dump(full: Boolean = false): String {
+        val builder = StringBuilder()
+        builder.append("FFContext: {")
+
+        builder.append("\n  Systems: ")
+        systemMapping.forEachIndexed() { i, system ->
+
+            system.supportedComponents.forEach { aspect ->
+                builder.append("\n    ").append(system::class.simpleName!!)
+                    .append(":").append(aspect.aspectName)
+                    .append(":").append(aspect.aspectIndex)
+                    .append(":").append(i)
+            }
+        }
+
+        builder.append("\n  Components : ")
+        componentMaps.forEach { cMap ->
+            builder.append("\n    ").append(cMap.componentType.aspectName)
+                .append(":").append(cMap.map.size)
+            if (full) {
+                cMap.map.forEach { comp ->
+                    builder.append("\n      ").append(comp.index)
+
+                    if (comp is NamedComponent)
+                        builder.append(" -- name: ").append(comp.name)
+
+                    if (comp is SystemComponent)
+                        builder.append(" -- subtype: ").append(comp.componentType().subTypeClass.simpleName)
+                }
+            }
+        }
+
+
+        builder.append("\n}")
+        return builder.toString()
     }
 
 }

@@ -9,6 +9,5 @@ abstract class BxNode protected constructor() : SystemComponent(BxNode::class.si
 
     abstract fun tick(entity: Entity, behavior: EBehavior): OpResult
 
-    override fun componentType() = Companion
     companion object : SystemComponentType<BxNode>(BxNode::class)
 }

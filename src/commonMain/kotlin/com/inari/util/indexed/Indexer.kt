@@ -13,7 +13,6 @@ interface Indexed {
 
 abstract class AbstractIndexed(
     final override val indexedTypeName: String,
-    val subTypeName: String = EMPTY_STRING,
     applyIndex: Boolean = true
 ) : Indexed {
 
@@ -40,7 +39,6 @@ class Indexer private constructor(
 ) {
 
     private val indices: BitSet = BitSet()
-    private val subTypeNames: DynArray<String> = DynArray.of()
 
     fun applyNewIndex(indexedSupplier: () -> AbstractIndexed) =
         applyNewIndex(indexedSupplier())
@@ -53,8 +51,6 @@ class Indexer private constructor(
 
         indexed.iindex = indices.nextClearBit(0)
         indices.set(indexed.iindex)
-        if (EMPTY_STRING !== indexed.subTypeName)
-            subTypeNames[indexed.iindex] = indexed.subTypeName
     }
 
     fun disposeIndex(indexedSupplier: () -> AbstractIndexed) =
@@ -63,10 +59,8 @@ class Indexer private constructor(
     fun disposeIndex(indexed: AbstractIndexed) {
         typeCheck(indexed)
 
-        if (indexed.index >= 0) {
+        if (indexed.index >= 0)
             indices.clear(indexed.index)
-            subTypeNames.remove(indexed.index)
-        }
 
         indexed.iindex = -1
     }
@@ -83,17 +77,7 @@ class Indexer private constructor(
         "Indexer(name='$name', indices=$indices)"
 
     fun toDumpString(): String {
-        val builder = StringBuilder()
-        var i = indices.nextSetBit(0)
-        while (i >= 0) {
-            builder.append("\n    $i")
-            if (i in subTypeNames) {
-                builder.append(":${subTypeNames[i]}")
-            }
-
-            i = indices.nextSetBit(i+1)
-        }
-        return builder.toString()
+        return indices.cardinality.toString()
     }
 
 
@@ -112,11 +96,11 @@ class Indexer private constructor(
         }
         fun dump(indexerName: String): String {
             val builder = StringBuilder()
-            builder.append("$indexerName : {")
-            if (indexerName in indexer) {
+            builder.append("$indexerName : ")
+            if (indexerName in indexer)
                 builder.append(indexer[indexerName]!!.toDumpString())
-            }
-            builder.append("\n}")
+            else
+                builder.append("0")
             return builder.toString()
         }
 

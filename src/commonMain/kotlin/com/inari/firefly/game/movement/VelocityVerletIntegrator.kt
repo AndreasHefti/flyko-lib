@@ -33,6 +33,7 @@ class VelocityVerletIntegrator private constructor() : Integrator() {
             deltaTimeInSeconds * (movement.velocity.dx + deltaTimeInSeconds * movement.acceleration.dx / 2),
             deltaTimeInSeconds * (movement.velocity.dy + deltaTimeInSeconds * movement.acceleration.dy / 2))
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Integrator, VelocityVerletIntegrator>(Integrator, VelocityVerletIntegrator::class) {
         override fun createEmpty() = VelocityVerletIntegrator()
     }

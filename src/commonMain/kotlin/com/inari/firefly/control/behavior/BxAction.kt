@@ -22,6 +22,7 @@ class BxAction private constructor() : BxNode() {
         return result
     }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<BxNode, BxAction>(BxNode, BxAction::class) {
         override fun createEmpty() = BxAction()
     }

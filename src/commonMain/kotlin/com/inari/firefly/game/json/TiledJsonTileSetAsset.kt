@@ -164,6 +164,7 @@ class TiledJsonTileSetAsset private constructor() : Asset() {
         textureAssetId = NO_COMP_ID
     }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Asset, TiledJsonTileSetAsset>(Asset, TiledJsonTileSetAsset::class) {
         override fun createEmpty() = TiledJsonTileSetAsset()
     }

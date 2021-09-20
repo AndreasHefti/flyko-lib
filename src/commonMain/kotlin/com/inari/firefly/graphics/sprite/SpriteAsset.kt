@@ -48,6 +48,7 @@ class SpriteAsset private constructor() : Asset() {
         }
     }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Asset, SpriteAsset>(Asset, SpriteAsset::class) {
         override fun createEmpty() = SpriteAsset()
     }

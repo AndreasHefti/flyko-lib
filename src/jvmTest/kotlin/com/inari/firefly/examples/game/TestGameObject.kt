@@ -54,6 +54,7 @@ class TestGameObject : GameObjectComposite() {
         TODO("Not yet implemented")
     }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Composite, TestGameObject>(Composite, TestGameObject::class) {
         init { CompositeSystem.compositeBuilderMapping[TestGameObject::class.simpleName!!] = this }
         override fun createEmpty() = TestGameObject()

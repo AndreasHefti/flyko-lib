@@ -29,9 +29,8 @@ class SimpleVelocityStepIntegrator  private constructor() : Integrator() {
             movement.velocity.dx * deltaTimeInSeconds,
             movement.velocity.dy * deltaTimeInSeconds)
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Integrator, SimpleVelocityStepIntegrator>(Integrator, SimpleVelocityStepIntegrator::class) {
         override fun createEmpty() = SimpleVelocityStepIntegrator()
     }
-
-
 }

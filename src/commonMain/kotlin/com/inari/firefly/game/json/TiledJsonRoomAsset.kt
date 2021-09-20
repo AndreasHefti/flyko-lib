@@ -161,9 +161,9 @@ class TiledJsonRoomAsset private constructor() : Asset() {
         tileMapId = NO_COMP_ID
     }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Asset, TiledJsonRoomAsset>(Asset, TiledJsonRoomAsset::class) {
         override fun createEmpty() = TiledJsonRoomAsset()
     }
-
 
 }

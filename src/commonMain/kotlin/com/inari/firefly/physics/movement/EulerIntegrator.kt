@@ -52,6 +52,7 @@ class EulerIntegrator private constructor() : Integrator() {
         }
     }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Integrator, EulerIntegrator>(Integrator, EulerIntegrator::class) {
         override fun createEmpty() = EulerIntegrator()
     }

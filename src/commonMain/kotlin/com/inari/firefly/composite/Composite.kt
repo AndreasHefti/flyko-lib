@@ -2,13 +2,9 @@ package com.inari.firefly.composite
 
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentType
-import kotlin.reflect.KClass
-import kotlin.reflect.KClassifier
 
 
-abstract class Composite protected constructor(
-    subTypeName: String
-) : SystemComponent(Composite::class.simpleName!!, subTypeName) {
+abstract class Composite protected constructor() : SystemComponent(Composite::class.simpleName!!) {
 
     var loaded: Boolean = false
         private set
@@ -51,7 +47,5 @@ abstract class Composite protected constructor(
     protected abstract fun deactivate()
     protected abstract fun unload()
 
-    override fun componentType() = Companion
     companion object : SystemComponentType<Composite>(Composite::class)
-
 }

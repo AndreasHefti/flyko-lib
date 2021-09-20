@@ -31,6 +31,7 @@ class TestAsset private constructor(
             " dependsOn=$dependingRef"
     }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Asset, TestAsset>(Asset, TestAsset::class) {
         override fun createEmpty(): TestAsset = TestAsset()
     }

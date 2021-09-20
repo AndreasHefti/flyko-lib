@@ -7,6 +7,7 @@ import com.inari.firefly.control.state.Workflow
 import com.inari.firefly.control.state.WorkflowEvent
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.system.SystemComponentSubType
+import com.inari.firefly.graphics.rendering.Renderer
 import com.inari.util.Call
 import com.inari.util.Consumer
 
@@ -57,6 +58,7 @@ class StateChangeTrigger private constructor(): Trigger() {
         super.dispose()
     }
 
+    override fun componentType() = Renderer
     companion object : SystemComponentSubType<Trigger, StateChangeTrigger>(Trigger, StateChangeTrigger::class) {
         override fun createEmpty() = StateChangeTrigger()
     }

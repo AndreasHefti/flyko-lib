@@ -76,6 +76,7 @@ class FireflyJsonAreaAsset private constructor() : Asset() {
 
     override fun instanceId(index: Int): Int = areaId.instanceId
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Asset, FireflyJsonAreaAsset>(Asset, FireflyJsonAreaAsset::class) {
         override fun createEmpty() = FireflyJsonAreaAsset()
     }

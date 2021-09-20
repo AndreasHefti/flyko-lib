@@ -104,7 +104,6 @@ abstract class ContactMap protected constructor() : SystemComponent(ContactMap::
     /** Use this to clear all entity id's form a specified pool instance  */
     abstract fun clear()
 
-    override fun componentType() = Companion
     companion object : SystemComponentType<ContactMap>(ContactMap::class) {
 
         @JvmField internal val MATCHER =

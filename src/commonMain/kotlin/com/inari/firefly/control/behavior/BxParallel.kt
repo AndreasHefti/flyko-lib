@@ -31,6 +31,7 @@ class BxParallel private constructor() : BxBranch() {
         }
     }
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<BxNode, BxParallel>(BxNode, BxParallel::class) {
         override fun createEmpty() = BxParallel()
     }

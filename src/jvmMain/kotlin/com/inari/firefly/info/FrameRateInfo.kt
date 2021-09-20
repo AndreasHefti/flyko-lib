@@ -7,7 +7,7 @@ object FrameRateInfo : FFInfoSystem.SysInfo{
     private var lastSecondTime = -1L
     private var frames = 0
 
-    private val info = "FPS:........00".toCharArray()
+    private val info = "FPS:000".toCharArray()
 
     override val name: String = "FrameRateInfo"
     override val length: Int = info.size

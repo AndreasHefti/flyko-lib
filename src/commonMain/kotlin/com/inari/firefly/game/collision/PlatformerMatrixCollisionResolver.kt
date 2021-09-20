@@ -315,6 +315,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
     private fun getAdjustDistance(d: Int, max: Int, nan: Int = 0): Int =
         if (d == sensorMatrix.noDistanceValue || abs(d) > max) nan else d
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<CollisionResolver, PlatformerMatrixCollisionResolver>(CollisionResolver, PlatformerMatrixCollisionResolver::class) {
         override fun createEmpty() = PlatformerMatrixCollisionResolver()
     }

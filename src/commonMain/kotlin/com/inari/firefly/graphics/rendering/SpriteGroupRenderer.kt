@@ -34,6 +34,7 @@ class SpriteGroupRenderer private constructor() : Renderer(
         }
     }
 
+    override fun componentType() = Companion
     companion object : SingletonComponent<Renderer, SpriteGroupRenderer>(Renderer, SpriteGroupRenderer::class) {
         private val COMPARATOR = Comparator<Entity?> { e1, e2 ->
             e1?.get(EChild)?.zPos ?: 0.compareTo(e2?.get(EChild)?.zPos ?: 0)

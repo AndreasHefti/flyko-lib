@@ -17,6 +17,7 @@ class Room : GenericComposite() {
     @JvmField var orientationType: WorldOrientationType = WorldOrientationType.COUNT
     @JvmField val orientation: Rectangle = Rectangle()
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Composite, Room>(Composite, Room::class) {
         init { CompositeSystem.compositeBuilderMapping[Room::class.simpleName!!] = this }
         override fun createEmpty() = Room()

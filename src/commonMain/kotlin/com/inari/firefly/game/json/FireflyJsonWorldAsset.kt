@@ -67,6 +67,7 @@ class FireflyJsonWorldAsset private constructor() : Asset() {
 
     override fun instanceId(index: Int): Int = worldId.instanceId
 
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Asset, FireflyJsonWorldAsset>(Asset, FireflyJsonWorldAsset::class) {
         override fun createEmpty() = FireflyJsonWorldAsset()
     }

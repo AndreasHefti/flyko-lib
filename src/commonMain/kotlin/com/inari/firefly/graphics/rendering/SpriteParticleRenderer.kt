@@ -38,6 +38,7 @@ class SpriteParticleRenderer private constructor() : Renderer() {
         }
     }
 
+    override fun componentType() = Companion
     companion object : SingletonComponent<Renderer, SpriteParticleRenderer>(Renderer, SpriteParticleRenderer::class) {
         override fun create() = SpriteParticleRenderer()
         private val MATCHING_ASPECTS = EntityComponent.ENTITY_COMPONENT_ASPECTS.createAspects(

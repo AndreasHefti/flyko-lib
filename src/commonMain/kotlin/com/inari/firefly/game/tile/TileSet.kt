@@ -10,7 +10,6 @@ import com.inari.firefly.graphics.TextureAsset
 import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 
-@ComponentDSL
 class TileSet private constructor() : SystemComponent(TileSet::class.simpleName!!) {
 
     @JvmField internal var textureAssetRef: Int = -1

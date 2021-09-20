@@ -9,7 +9,7 @@ import com.inari.firefly.graphics.view.View
 import kotlin.jvm.JvmField
 
 
-abstract class GameObjectComposite : Composite(GameObjectComposite::class.simpleName!!) {
+abstract class GameObjectComposite : Composite() {
 
     protected var viewRef = -1
     protected var layerRef = -1

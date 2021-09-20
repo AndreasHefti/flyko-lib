@@ -9,7 +9,5 @@ abstract class CollisionResolver protected constructor() : SystemComponent(Colli
 
     abstract fun resolve(entity: Entity, contact: EContact, contactScan: ContactScan)
 
-    override fun componentType() = Companion
     companion object : SystemComponentType<CollisionResolver>(CollisionResolver::class)
-
 }

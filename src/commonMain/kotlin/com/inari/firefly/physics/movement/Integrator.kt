@@ -53,6 +53,5 @@ abstract class Integrator protected constructor() : SystemComponent(Integrator::
         }
     }
 
-    override fun componentType() = Companion
     companion object : SystemComponentType<Integrator>(Integrator::class)
 }

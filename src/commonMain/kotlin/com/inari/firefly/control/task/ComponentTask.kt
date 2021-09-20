@@ -40,7 +40,5 @@ abstract class ComponentTask protected constructor() : SystemComponent(Component
         disposeTrigger()
     }
 
-    override fun componentType() = Companion
     companion object : SystemComponentType<ComponentTask>(ComponentTask::class)
-
 }
