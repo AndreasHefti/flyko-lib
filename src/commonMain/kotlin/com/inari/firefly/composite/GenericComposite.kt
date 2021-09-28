@@ -2,18 +2,30 @@ package com.inari.firefly.composite
 
 import com.inari.firefly.FFContext
 import com.inari.firefly.asset.Asset
-import com.inari.firefly.control.task.ComponentTask
+import com.inari.firefly.control.scene.SceneSystem
+import com.inari.firefly.control.task.Task
 import com.inari.firefly.control.task.TaskSystem
+import com.inari.firefly.control.trigger.Trigger
+import com.inari.firefly.control.trigger.TriggeredSystemComponent
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentBuilder
 import com.inari.firefly.core.system.SystemComponentSubType
-import com.inari.firefly.game.player.PlayerSystem
+import com.inari.util.Call
 import com.inari.util.collection.BitSet
 import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 
-open class GenericComposite : Composite() {
+open class GenericComposite : Composite(), TriggeredSystemComponent {
+
+    var parentRef = -1
+        internal set
+    val withParent = ComponentRefResolver(Composite) { index -> parentRef = index }
+
+    @JvmField internal var loadDependsOnParent = true
+    @JvmField internal var activationDependsOnParent = false
+    @JvmField internal var deactivateAlsoParent = false
+    @JvmField internal var disposeAlsoParent = false
 
     @JvmField internal var loadTaskRef = -1
     @JvmField internal var activationTaskRef = -1
@@ -25,6 +37,11 @@ open class GenericComposite : Composite() {
     @JvmField internal val loadedComponents = DynArray.of<CompId>(5, 10)
     @JvmField internal val activatableComponents = DynArray.of<CompId>(5, 10)
 
+    private val loadCall: Call = { FFContext.load(componentId) }
+    private val activateCall: Call = { FFContext.activate(componentId) }
+    private val deactivateCall: Call = { FFContext.deactivate(componentId) }
+    private val disposeCall: Call = { FFContext.dispose(componentId) }
+
     fun getAttribute(name: String): String? = attributes[name]
     fun setAttribute(name: String, value: String) { attributes[name] = value }
 
@@ -35,35 +52,63 @@ open class GenericComposite : Composite() {
             activatableComponents + id
     }
 
-    val withLoadTask = ComponentRefResolver(ComponentTask) { index -> PlayerSystem.loadTaskRef + index }
-    fun <A : ComponentTask> withLoadTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
+    val withLoadTask = ComponentRefResolver(Task) { index -> loadTaskRef = index }
+    fun <A : Task> withLoadTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
-        PlayerSystem.loadTaskRef = result.instanceId
+        loadTaskRef = result.instanceId
         return result
     }
 
-    val withActivationTask = ComponentRefResolver(ComponentTask) { index -> PlayerSystem.activationTaskRef + index }
-    fun <A : ComponentTask> withActivationTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
+    val withActivationTask = ComponentRefResolver(Task) { index -> activationTaskRef = index }
+    fun <A : Task> withActivationTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
-        PlayerSystem.activationTaskRef = result.instanceId
+        activationTaskRef = result.instanceId
         return result
     }
 
-    val withDeactivationTask = ComponentRefResolver(ComponentTask) { index -> PlayerSystem.deactivationTaskRef + index }
-    fun <A : ComponentTask> withDeactivationTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
+    val withDeactivationTask = ComponentRefResolver(Task) { index -> deactivationTaskRef = index }
+    fun <A : Task> withDeactivationTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
-        PlayerSystem.deactivationTaskRef = result.instanceId
+        deactivationTaskRef = result.instanceId
         return result
     }
 
-    val withDisposeTaskRefTask = ComponentRefResolver(ComponentTask) { index -> PlayerSystem.unloadTaskRef + index }
-    fun <A : ComponentTask> withDisposeTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
+    val withDisposeTask = ComponentRefResolver(Task) { index -> disposeTaskRef = index }
+    fun <A : Task> withDisposeTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
-        PlayerSystem.unloadTaskRef = result.instanceId
+        disposeTaskRef = result.instanceId
         return result
     }
 
-    override fun load() {
+    fun <A : Trigger> withLoadTrigger(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): A {
+        val result = super.withTrigger(cBuilder, configure)
+        result.call = loadCall
+        return result
+    }
+
+    fun <A : Trigger> withActivationTrigger(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): A {
+        val result = super.withTrigger(cBuilder, configure)
+        result.call = activateCall
+        return result
+    }
+
+    fun <A : Trigger> withDeactivationTrigger(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): A {
+        val result = super.withTrigger(cBuilder, configure)
+        result.call = deactivateCall
+        return result
+    }
+
+    fun <A : Trigger> withDisposeTrigger(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): A {
+        val result = super.withTrigger(cBuilder, configure)
+        result.call = disposeCall
+        return result
+    }
+
+    override fun loadComposite() {
+
+        // if depends on parent and parent is defined load the parent first if not already loaded
+        if (loadDependsOnParent && parentRef >= 0)
+            FFContext.load(Composite, parentRef)
 
         // first load all registered assets
         FFContext.activateAll(Asset, assetRefs)
@@ -73,7 +118,11 @@ open class GenericComposite : Composite() {
             TaskSystem.runTask(loadTaskRef, this.componentId)
     }
 
-    override fun activate() {
+    override fun activateComposite() {
+
+        // if depends on parent and parent is defined activate the parent first if not already active
+        if (activationDependsOnParent && parentRef >= 0)
+            FFContext.activate(Composite, parentRef)
 
         // run additional activation task if defined
         if (activationTaskRef >= 0)
@@ -83,7 +132,7 @@ open class GenericComposite : Composite() {
         FFContext.activateAll(activatableComponents)
     }
 
-    override fun deactivate() {
+    override fun deactivateComposite() {
 
         // deactivate all registered components
         FFContext.deactivateAll(activatableComponents)
@@ -91,9 +140,13 @@ open class GenericComposite : Composite() {
         // run additional deactivation task if defined
         if (deactivationTaskRef >= 0)
             TaskSystem.runTask(deactivationTaskRef, this.componentId)
+
+        // if depends on parent and parent is defined deactivate the parent also
+        if (deactivateAlsoParent && parentRef >= 0)
+            FFContext.deactivate(Composite, parentRef)
     }
 
-    override fun unload() {
+    override fun disposeComposite() {
 
         // run additional dispose task if defined
         if (disposeTaskRef >= 0)
@@ -103,6 +156,15 @@ open class GenericComposite : Composite() {
         attributes.clear()
         loadedComponents.clear()
         activatableComponents.clear()
+
+        // if depends on parent and parent is defined dispose the parent also
+        if (disposeAlsoParent && parentRef >= 0)
+            FFContext.dispose(Composite, parentRef)
+    }
+
+    override fun dispose() {
+        super.dispose()
+        disposeTrigger()
     }
 
     override fun componentType(): SystemComponentSubType<Composite, out GenericComposite> = Companion

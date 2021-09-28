@@ -17,7 +17,7 @@ enum class OpResult {
 typealias Consumer<C> = (C) -> Unit
 typealias Operation<C> = (C) -> OpResult
 typealias TaskOperation = () -> OpResult
-typealias ComponentTaskOperation = (CompId, CompId, CompId, CompId, CompId) -> OpResult
+typealias ComponentTaskOperation = (CompId, CompId, CompId) -> OpResult
 typealias Call = () -> Unit
 typealias Supplier<C> = () -> C
 typealias Receiver<C> = (C) -> C

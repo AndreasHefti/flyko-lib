@@ -80,10 +80,10 @@ object InariIntro {
     private fun dispose() {
         if (!disposing) {
             disposing = true
-            FFContext.deleteQuietly(entityId)
-            FFContext.deleteQuietly(spriteAssetId)
-            FFContext.deleteQuietly(textureAssetId)
-            FFContext.deleteQuietly(animationId)
+            FFContext.delete(entityId)
+            FFContext.delete(spriteAssetId)
+            FFContext.delete(textureAssetId)
+            FFContext.delete(animationId)
             FFContext.input.resetInputCallbacks()
             callback()
         }

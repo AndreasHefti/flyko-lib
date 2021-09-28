@@ -6,13 +6,11 @@ import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.FFSystem
 import com.inari.firefly.core.system.SingletonComponent
 import com.inari.firefly.entity.Entity
-import com.inari.firefly.entity.EntityActivationEvent
-import com.inari.firefly.entity.EntityActivationEvent.Companion.entityActivationEvent
-import com.inari.firefly.entity.EntityActivationEventListener
+import com.inari.firefly.entity.EntityEvent
+import com.inari.firefly.entity.EntityEventListener
 import com.inari.util.Consumer
 import com.inari.util.aspect.Aspects
 import kotlin.jvm.JvmField
-import kotlin.native.concurrent.ThreadLocal
 
 object RenderingSystem : FFSystem {
 
@@ -27,7 +25,7 @@ object RenderingSystem : FFSystem {
             properties.renderingChain[i++].render(e.viewIndex, e.layerIndex, e.clip)
     }
 
-    private val entityActivationListener: EntityActivationEventListener = object : EntityActivationEventListener {
+    private val entityActivationListener: EntityEventListener = object : EntityEventListener {
         override fun entityActivated(entity: Entity) = _entityActicated(entity)
         override fun entityDeactivated(entity: Entity) = _entitiyDeactivated(entity)
         override fun match(aspects: Aspects) = true
@@ -36,7 +34,7 @@ object RenderingSystem : FFSystem {
 
     init {
         FFContext.registerListener(RenderEvent, renderingListener)
-        FFContext.registerListener(EntityActivationEvent, entityActivationListener)
+        FFContext.registerListener(EntityEvent, entityActivationListener)
         setDefaultRenderingChain()
     }
 

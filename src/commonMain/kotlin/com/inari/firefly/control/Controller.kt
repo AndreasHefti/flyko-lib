@@ -19,7 +19,6 @@ abstract class Controller protected constructor() : SystemComponent(Controller::
         get() = throw UnsupportedOperationException()
         set(value) { scheduler = FFContext.timer.createUpdateScheduler(value) }
 
-
     internal abstract fun update()
 
     abstract fun register(componentId: CompId)

@@ -1,5 +1,7 @@
 package com.inari.firefly.core.component
 
+import com.inari.firefly.core.ComponentRefPredicate
+import com.inari.firefly.core.ComponentRefResolver
 import com.inari.util.Named
 import com.inari.util.aspect.Aspect
 import com.inari.util.indexed.Indexed
@@ -47,3 +49,9 @@ interface CompNameId: Named {
 abstract class ComponentBuilder<out C : Component> {
     protected abstract fun createEmpty(): C
 }
+
+data class ComponentLoadDispatcher<C : Component>(
+    val loadDispatch: ComponentRefResolver<C>,
+    val isLoaded: ComponentRefPredicate<C>,
+    val disposeDispatch: ComponentRefResolver<C>
+)

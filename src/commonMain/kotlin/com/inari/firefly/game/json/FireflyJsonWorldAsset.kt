@@ -58,7 +58,7 @@ class FireflyJsonWorldAsset private constructor() : Asset() {
             return
 
         // delete all area assets. This implicates also dispose them first if active
-        FFContext.deleteAllQuietly(Asset,  FFContext[World, worldId].assetRefs)
+        FFContext.deleteAll(Asset,  FFContext[World, worldId].assetRefs)
         // delete the world
         FFContext.delete(worldId)
         // cleanup

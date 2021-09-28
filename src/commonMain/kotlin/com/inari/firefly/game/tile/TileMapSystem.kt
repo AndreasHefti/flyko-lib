@@ -57,7 +57,7 @@ object TileMapSystem : ComponentSystem {
         when(e.type) {
             ViewEvent.Type.VIEW_DELETED ->  systemTileMaps.forEach { tileMap ->
                 if (tileMap.viewRef == e.id.instanceId)
-                    FFContext.deleteQuietly(tileMap.componentId)
+                    FFContext.delete(tileMap.componentId)
             }
             else -> {}
         }

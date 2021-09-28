@@ -55,3 +55,19 @@ class ComponentRefFunction<T : Component, X>(
     operator fun invoke(singleton: SingletonComponent<*, *>): X = receiver(singleton.instance.index)
 
 }
+
+class ComponentRefPredicate<T : Component>(
+    private val type: ComponentType<T>,
+    private val predicate: (Int) -> Boolean
+) {
+
+    operator fun invoke(id: CompId): Boolean = predicate(id.instanceId)
+    operator fun invoke(index: Int): Boolean = predicate(index)
+    operator fun invoke(indexed: Indexed): Boolean = predicate(indexed.index)
+    operator fun invoke(name: String): Boolean = predicate(FFContext[type, name].index)
+    operator fun invoke(named: Named): Boolean = predicate(FFContext[type, named.name].index)
+    operator fun invoke(component: Component): Boolean = predicate(component.index)
+    operator fun invoke(component: SystemComponent): Boolean = predicate(component.index)
+    operator fun invoke(singleton: SingletonComponent<*, *>): Boolean = predicate(singleton.instance.index)
+
+}

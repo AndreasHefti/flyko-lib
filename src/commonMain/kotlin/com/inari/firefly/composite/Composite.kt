@@ -1,5 +1,6 @@
 package com.inari.firefly.composite
 
+import com.inari.firefly.FFContext
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentType
 
@@ -13,39 +14,39 @@ abstract class Composite protected constructor() : SystemComponent(Composite::cl
 
     internal fun systemLoad() {
         if (!loaded) {
-            load()
+            loadComposite()
             loaded = true
         }
     }
     internal fun systemActivate() {
         if (!active) {
             if (!loaded)
-                load()
+                FFContext.load(this)
 
-            activate()
+            activateComposite()
             active = true
         }
     }
     internal fun systemDeactivate()  {
         if (active) {
-            deactivate()
+            deactivateComposite()
             active = false
         }
     }
-    internal fun systemUnload() {
+    internal fun systemDispose() {
         if (loaded) {
             if (active)
-                systemDeactivate()
+                FFContext.deactivate(this)
 
-            unload()
+            dispose()
             loaded = false
         }
     }
 
-    protected abstract fun load()
-    protected abstract fun activate()
-    protected abstract fun deactivate()
-    protected abstract fun unload()
+    protected abstract fun loadComposite()
+    protected abstract fun activateComposite()
+    protected abstract fun deactivateComposite()
+    protected abstract fun disposeComposite()
 
     companion object : SystemComponentType<Composite>(Composite::class)
 }

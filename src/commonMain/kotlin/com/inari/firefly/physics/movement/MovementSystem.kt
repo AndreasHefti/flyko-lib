@@ -2,12 +2,11 @@ package com.inari.firefly.physics.movement
 
 import com.inari.firefly.FFApp.UpdateEvent
 import com.inari.firefly.FFContext
-import com.inari.firefly.MovementAspect
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.Entity
-import com.inari.firefly.entity.EntityActivationEvent
-import com.inari.firefly.entity.EntityActivationEventListener
+import com.inari.firefly.entity.EntityEvent
+import com.inari.firefly.entity.EntityEventListener
 import com.inari.firefly.entity.EntitySystem
 import com.inari.firefly.graphics.ETransform
 import com.inari.util.aspect.Aspects
@@ -32,7 +31,7 @@ object MovementSystem : ComponentSystem {
 
     private val entities: BitSet = BitSet()
 
-    private val entityActivationListener: EntityActivationEventListener = object : EntityActivationEventListener {
+    private val entityActivationListener: EntityEventListener = object : EntityEventListener {
         override fun entityActivated(entity: Entity) {
             entities[entity.index] = true
         }
@@ -45,7 +44,7 @@ object MovementSystem : ComponentSystem {
 
     init {
         FFContext.registerListener(UpdateEvent, this::processMove)
-        FFContext.registerListener(EntityActivationEvent, entityActivationListener)
+        FFContext.registerListener(EntityEvent, entityActivationListener)
         FFContext.loadSystem(this)
     }
 

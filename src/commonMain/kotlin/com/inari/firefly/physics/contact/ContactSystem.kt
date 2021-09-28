@@ -61,7 +61,7 @@ object ContactSystem : ComponentSystem {
         updateContactMaps(moveEvent.entities)
     }
 
-    private val entityActivationListener: EntityActivationEventListener = object: EntityActivationEventListener {
+    private val entityActivationListener: EntityEventListener = object: EntityEventListener {
         override fun entityActivated(entity: Entity) {
             contactMapViewLayer[entity[ETransform]]?.add(entity)
         }
@@ -78,7 +78,7 @@ object ContactSystem : ComponentSystem {
 
     init {
         FFContext.registerListener(ViewEvent, viewListener)
-        FFContext.registerListener(EntityActivationEvent, entityActivationListener)
+        FFContext.registerListener(EntityEvent, entityActivationListener)
         FFContext.registerListener(MoveEvent, moveListener)
     }
 

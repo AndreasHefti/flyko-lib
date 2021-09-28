@@ -7,7 +7,11 @@ import com.inari.firefly.core.system.*
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
 import com.inari.firefly.entity.EntitySystem
+import com.inari.firefly.game.world.World
+import com.inari.firefly.game.world.WorldSystem
+import com.inari.util.Consumer
 import com.inari.util.Named
+import com.inari.util.Predicate
 import com.inari.util.aspect.Aspect
 import com.inari.util.collection.BitSet
 import com.inari.util.collection.DynArray
@@ -22,6 +26,7 @@ import kotlin.jvm.JvmField
 object FFContext {
 
     @PublishedApi @JvmField internal val componentMaps: DynArray<ComponentMap<*>> = DynArray.of()
+    @PublishedApi @JvmField internal val componentLoadDispatcher: DynArray<ComponentLoadDispatcher<*>> = DynArray.of()
     @JvmField internal val systemTypeMapping: DynArray<ComponentSystem> = DynArray.of()
     private val systemMapping = DynArray.of<ComponentSystem>()
 
@@ -54,6 +59,8 @@ object FFContext {
             systemTypeMapping[aspect.aspectIndex] = system
     }
 
+    // **** MAPPERS AND DISPATCHER *****
+
     fun <C : Component> mapper(compAspect: Aspect): ComponentMap<C>  =
         @Suppress("UNCHECKED_CAST")
         if (SystemComponent.SYSTEM_COMPONENT_ASPECTS.typeCheck(compAspect) &&
@@ -62,16 +69,9 @@ object FFContext {
             componentMaps[compAspect.aspectIndex] as ComponentMap<C>
         else throw RuntimeException("No Component Mapper registered for compAspect: $compAspect")
 
-
-    fun <C : Component> mapper(id: CompId): ComponentMap<C> =
-        mapper<C>(id.componentType)
-
-    fun <C : Component> mapper(id: CompNameId): ComponentMap<C> =
-        mapper<C>(id.componentType)
-
-    fun <C : SystemComponent> mapper(coType: SystemComponentType<C>): ComponentMap<C> =
-        mapper(coType.compAspect)
-
+    fun <C : Component> mapper(id: CompId): ComponentMap<C> = mapper<C>(id.componentType)
+    fun <C : Component> mapper(id: CompNameId): ComponentMap<C> = mapper<C>(id.componentType)
+    fun <C : SystemComponent> mapper(coType: SystemComponentType<C>): ComponentMap<C> = mapper(coType.compAspect)
     @Suppress("UNCHECKED_CAST")
     fun <C : Component> mapper(coType: ComponentType<C>): ComponentMap<C> {
         val index = coType.aspectIndex
@@ -80,107 +80,96 @@ object FFContext {
         return componentMaps[index] as ComponentMap<C>
     }
 
-    operator fun <C : Component> get(id: CompId): C =
-        mapper<C>(id)[id.instanceId]
+    @Suppress("UNCHECKED_CAST")
+    fun <C: Component> loadDispatcher(coType: ComponentType<C>): ComponentLoadDispatcher<C> {
+        val index = coType.aspectIndex
+        if (!componentLoadDispatcher.contains(index))
+            throw RuntimeException("No Component Load Dispatcher registered for subType: $coType")
+        return componentLoadDispatcher[index] as ComponentLoadDispatcher<C>
+    }
 
-    operator fun <C : Component> get(id: CompNameId): C =
-        mapper<C>(id)[id.name]
+    // **** GET COMPONENT *****
 
-    operator fun <C : Component> get(cType: ComponentType<C>, index: Int): C =
-        mapper(cType)[index]
+    operator fun <C : Component> get(id: CompId): C = mapper<C>(id)[id.instanceId]
+    operator fun <C : Component> get(id: CompNameId): C = mapper<C>(id)[id.name]
+    operator fun <C : Component> get(cType: ComponentType<C>, index: Int): C = mapper(cType)[index]
+    operator fun <C : Component> get(cType: ComponentType<C>, indexed: Indexed): C = mapper(cType)[indexed.index]
+    operator fun <C : Component> get(cType: ComponentType<C>, name: String): C = mapper(cType)[name]
+    operator fun <C : Component> get(cType: ComponentType<C>, named: Named): C = mapper(cType)[named.name]
 
+    operator fun <C : SystemComponent, CC : C> get(cType: SystemComponentSubType<C, CC>, index: Int): CC = mapper<CC>(cType)[index]
+    operator fun <C : SystemComponent, CC : C> get(cType: SystemComponentSubType<C, CC>, indexed: Indexed): CC = mapper<CC>(cType)[indexed.index]
+    operator fun <C : SystemComponent, CC : C> get(cType: SystemComponentSubType<C, CC>, name: String): CC = mapper<CC>(cType)[name]
+    operator fun <C : SystemComponent, CC : C> get(cType: SystemComponentSubType<C, CC>, named: Named): CC = mapper<CC>(cType)[named.name]
 
-    operator fun <C : Component> get(cType: ComponentType<C>, indexed: Indexed): C =
-        mapper(cType)[indexed.index]
+    operator fun <E : EntityComponent> get(ecType: EntityComponentType<E>, entityId: Int): E = EntitySystem.entities[entityId][ecType]
+    operator fun <E : EntityComponent> get(ecType: EntityComponentType<E>, entityId: CompId): E = EntitySystem.entities[entityId][ecType]
+    operator fun <E : EntityComponent> get(ecType: EntityComponentType<E>, entityName: String): E = EntitySystem.entities[entityName][ecType]
+    operator fun <E : EntityComponent> get(ecType: EntityComponentType<E>, entityName: Named): E = EntitySystem.entities[entityName.name][ecType]
 
-    operator fun <C : Component> get(cType: ComponentType<C>, name: String): C =
-        mapper(cType)[name]
+    // **** LOAD COMPONENT *****
 
-    operator fun <C : Component> get(cType: ComponentType<C>, named: Named): C =
-        mapper(cType)[named.name]
-
-    operator fun <C : SystemComponent, CC : C> get(cType: SystemComponentSubType<C, CC>, index: Int): CC =
-        mapper<CC>(cType)[index]
-
-    operator fun <C : SystemComponent, CC : C> get(cType: SystemComponentSubType<C, CC>, indexed: Indexed): CC =
-        mapper<CC>(cType)[indexed.index]
-
-    operator fun <C : SystemComponent, CC : C> get(cType: SystemComponentSubType<C, CC>, name: String): CC =
-        mapper<CC>(cType)[name]
-
-    operator fun <C : SystemComponent, CC : C> get(cType: SystemComponentSubType<C, CC>, named: Named): CC =
-        mapper<CC>(cType)[named.name]
-
-    operator fun <E : EntityComponent> get(ecType: EntityComponentType<E>, entityId: Int): E =
-        EntitySystem.entities[entityId][ecType]
-
-    operator fun <E : EntityComponent> get(ecType: EntityComponentType<E>, entityId: CompId): E =
-        EntitySystem.entities[entityId][ecType]
-
-    operator fun <E : EntityComponent> get(ecType: EntityComponentType<E>, entityName: String): E =
-        EntitySystem.entities[entityName][ecType]
-
-    operator fun <E : EntityComponent> get(ecType: EntityComponentType<E>, entityName: Named): E =
-        EntitySystem.entities[entityName.name][ecType]
-
-    fun assetInstanceId(assetId: Int): Int =
-        AssetSystem.assets[assetId].instanceId
-
-    fun assetInstanceId(assetName: String): Int =
-        AssetSystem.assets[assetName].instanceId
-
-    fun assetInstanceId(assetName: Named): Int =
-        AssetSystem.assets[assetName.name].instanceId
-
-
-
-    fun isActive(component: Component): Boolean =
-        isActive(component.componentId)
-
-    fun isActive(cType: ComponentType<*>, index: Int): Boolean =
-        mapper<Component>(cType).isActive(index)
-
-    fun isActive(cType: ComponentType<*>, indexed: Indexed): Boolean =
-        mapper<Component>(cType).isActive(indexed.index)
-
-    fun isActive(id: CompId): Boolean =
-            mapper<Component>(id).isActive(id.instanceId)
-
-    fun isActive(id: CompNameId): Boolean =
-        mapper<Component>(id).isActive(id.name)
-
-    fun isActive(cType: ComponentType<*>, name: String): Boolean =
-        mapper<Component>(cType).isActive(name)
-
-    fun isActive(cType: ComponentType<*>, named: Named): Boolean =
-        mapper<Component>(cType).isActive(named.name)
-
-    fun isActive(singleton: SingletonComponent<*, *>): Boolean =
-        mapper<Component>(singleton).isActive(singleton.instance.index)
-
-    fun activate(component: Component): FFContext {
-        activate(component.componentId)
+    fun load(cType: ComponentType<*>, index: Int): FFContext {
+        loadDispatcher(cType).loadDispatch(index)
         return this
     }
+    fun load(cType: ComponentType<*>, name: String): FFContext {
+        loadDispatcher(cType).loadDispatch(name)
+        return this
+    }
+    fun load(component: Component) = load(component.componentId)
+    fun load(cType: ComponentType<*>, indexed: Indexed) = load(cType, indexed.index)
+    fun load(id: CompId) = load(id.componentType, id.index)
+    fun loadAll(ids: DynArray<CompId>) = ids.forEach { load(it) }
+    fun load(id: CompNameId) = load(id.componentType, id.name)
+    fun load(cType: ComponentType<*>, named: Named) = load(cType, named.name)
+    fun loadAllByNameId(ids: DynArray<CompNameId>) = ids.forEach { load(it) }
+    fun load(singleton: SingletonComponent<*,*>) = load(singleton, singleton.instance.index)
+    fun loadAll(cType: ComponentType<*>, set: BitSet): FFContext {
+        var i = set.nextSetBit(0)
+        while (i >= 0) {
+            load(cType, i)
+            i = set.nextSetBit(i + 1)
+        }
+        return this
+    }
+
+    // **** IS LOADED *****
+
+    fun isLoaded(component: Component): Boolean = isLoaded(component.componentId.componentType, component.index)
+    fun isLoaded(cType: ComponentType<*>, index: Int): Boolean = loadDispatcher(cType).isLoaded(index)
+    fun isLoaded(cType: ComponentType<*>, indexed: Indexed): Boolean = isLoaded(cType, indexed.index)
+    fun isLoaded(id: CompId): Boolean = isLoaded(id.componentType, id.index)
+    fun isLoaded(id: CompNameId): Boolean = isLoaded(id.componentType, id.name)
+    fun isLoaded(cType: ComponentType<*>, name: String): Boolean = loadDispatcher(cType).isLoaded(name)
+    fun isLoaded(cType: ComponentType<*>, named: Named): Boolean = isLoaded(cType, named.name)
+    fun isLoaded(singleton: SingletonComponent<*, *>): Boolean = isLoaded(singleton, singleton.aspectIndex)
+
+    // **** ASSET INSTANCE *****
+
+    fun assetInstanceId(assetId: Int): Int = AssetSystem.assets[assetId].instanceId
+    fun assetInstanceId(assetName: String): Int = AssetSystem.assets[assetName].instanceId
+    fun assetInstanceId(assetName: Named): Int = AssetSystem.assets[assetName.name].instanceId
+
+    // **** ACTIVATE COMPONENT *****
 
     fun activate(cType: ComponentType<*>, index: Int): FFContext {
         mapper<Component>(cType).activate(index)
         return this
     }
-
-    fun activate(cType: ComponentType<*>, indexed: Indexed): FFContext {
-        mapper<Component>(cType).activate(indexed.index)
+    fun activate(cType: ComponentType<*>, name: String): FFContext {
+        mapper<Component>(cType).activate(name)
         return this
     }
 
-    fun activate(id: CompId): FFContext {
-        mapper<Component>(id).activate(id.instanceId)
-        return this
-    }
-
-    fun activateAll(ids: DynArray<CompId>) =
-        ids.forEach { activate(it) }
-
+    fun activate(component: Component) = activate(component.componentId.componentType, component.index)
+    fun activate(cType: ComponentType<*>, indexed: Indexed) = activate(cType, indexed.index)
+    fun activate(id: CompId) = activate(id.componentType, id.index)
+    fun activateAll(ids: DynArray<CompId>) = ids.forEach { activate(it) }
+    fun activate(id: CompNameId) = activate(id.componentType, id.name)
+    fun activate(cType: ComponentType<*>, named: Named) = activate(cType, named.name)
+    fun activateAllByNameId(ids: DynArray<CompNameId>) = ids.forEach { activate(it) }
+    fun activate(singleton: SingletonComponent<*,*>) = activate(singleton, singleton.instance.index)
     fun activateAll(cType: ComponentType<*>, set: BitSet): FFContext {
         var i = set.nextSetBit(0)
         while (i >= 0) {
@@ -190,39 +179,34 @@ object FFContext {
         return this
     }
 
-    fun activate(id: CompNameId): FFContext {
-        mapper<Component>(id).activate(id.name)
-        return this
-    }
+    // **** IS COMPONENT ACTIVATE *****
 
-    fun activateAllByNameId(ids: DynArray<CompNameId>) =
-        ids.forEach { activate(it) }
+    fun isActive(component: Component): Boolean = isActive(component.componentId.componentType, component.index)
+    fun isActive(cType: ComponentType<*>, index: Int): Boolean = mapper<Component>(cType).isActive(index)
+    fun isActive(cType: ComponentType<*>, indexed: Indexed): Boolean = mapper<Component>(cType).isActive(indexed.index)
+    fun isActive(id: CompId): Boolean = mapper<Component>(id).isActive(id.instanceId)
+    fun isActive(id: CompNameId): Boolean = mapper<Component>(id).isActive(id.name)
+    fun isActive(cType: ComponentType<*>, name: String): Boolean = mapper<Component>(cType).isActive(name)
+    fun isActive(cType: ComponentType<*>, named: Named): Boolean = mapper<Component>(cType).isActive(named.name)
+    fun isActive(singleton: SingletonComponent<*, *>): Boolean = mapper<Component>(singleton).isActive(singleton.instance.index)
 
-    fun activate(cType: ComponentType<*>, name: String): FFContext {
-        mapper<Component>(cType).activate(name)
-        return this
-    }
 
-    fun activate(cType: ComponentType<*>, named: Named): FFContext {
-        mapper<Component>(cType).activate(named.name)
-        return this
-    }
-
-    fun activate(singleton: SingletonComponent<*,*>): FFContext {
-        mapper<Component>(singleton).activate(singleton.instance.index)
-        return this
-    }
-
-    fun deactivate(component: Component): FFContext {
-        deactivate(component.componentId)
-        return this
-    }
+    // **** DEACTIVATE COMPONENT *****
 
     fun deactivate(cType: ComponentType<*>, index: Int): FFContext {
         mapper<Component>(cType).deactivate(index)
         return this
     }
-
+    fun deactivate(cType: ComponentType<*>, name: String): FFContext {
+        mapper<Component>(cType).deactivate(name)
+        return this
+    }
+    fun deactivate(component: Component) = deactivate(component.componentId)
+    fun deactivate(cType: ComponentType<*>, indexed: Indexed) = deactivate(cType, indexed.index)
+    fun deactivate(id: CompId) = deactivate(id.componentType, id.index)
+    fun deactivate(id: CompNameId) = deactivate(id.componentType, id.name)
+    fun deactivate(cType: ComponentType<*>, named: Named) = deactivate(cType, named.name)
+    fun deactivate(singleton: SingletonComponent<*,*>) = deactivate(singleton, singleton.instance.index)
     fun deactivateAll(cType: ComponentType<*>, set: BitSet): FFContext {
         var i = set.nextSetBit(0)
         while (i >= 0) {
@@ -231,7 +215,6 @@ object FFContext {
         }
         return this
     }
-
     fun deactivateAll(list: DynArray<CompId>): FFContext {
         val it = list.iterator()
         while (it.hasNext())
@@ -239,53 +222,60 @@ object FFContext {
         return this
     }
 
-    fun deactivate(cType: ComponentType<*>, indexed: Indexed): FFContext {
-        mapper<Component>(cType).deactivate(indexed.index)
+    // **** DISPOSE COMPONENT *****
+
+    fun dispose(cType: ComponentType<*>, index: Int): FFContext {
+        loadDispatcher(cType).disposeDispatch(index)
+        return this
+    }
+    fun dispose(cType: ComponentType<*>, name: String): FFContext {
+        loadDispatcher(cType).disposeDispatch(name)
+        return this
+    }
+    fun dispose(component: Component) = dispose(component.componentId)
+    fun dispose(cType: ComponentType<*>, indexed: Indexed) = dispose(cType, indexed.index)
+    fun dispose(id: CompId) = dispose(id.componentType, id.index)
+    fun disposeAll(ids: DynArray<CompId>) = ids.forEach { dispose(it) }
+    fun dispose(id: CompNameId) = dispose(id.componentType, id.name)
+    fun dispose(cType: ComponentType<*>, named: Named) = dispose(cType, named.name)
+    fun disposeAllByNameId(ids: DynArray<CompNameId>) = ids.forEach { dispose(it) }
+    fun dispose(singleton: SingletonComponent<*,*>) = dispose(singleton, singleton.instance.index)
+    fun disposeAll(cType: ComponentType<*>, set: BitSet): FFContext {
+        var i = set.nextSetBit(0)
+        while (i >= 0) {
+            dispose(cType, i)
+            i = set.nextSetBit(i + 1)
+        }
         return this
     }
 
-    fun deactivate(id: CompId): FFContext {
-        mapper<Component>(id).deactivate(id.instanceId)
-        return this
-    }
-
-    fun deactivate(id: CompNameId): FFContext {
-        mapper<Component>(id).deactivate(id.name)
-        return this
-    }
-
-    fun deactivate(cType: ComponentType<*>, name: String): FFContext {
-        mapper<Component>(cType).deactivate(name)
-        return this
-    }
-
-    fun deactivate(cType: ComponentType<*>, named: Named): FFContext {
-        mapper<Component>(cType).deactivate(named.name)
-        return this
-    }
-
-    fun deactivate(singleton: SingletonComponent<*,*>): FFContext {
-        mapper<Component>(singleton).deactivate(singleton.instance.index)
-        return this
-    }
-
-    fun delete(component: Component): FFContext {
-        delete(component.componentId)
-        return this
-    }
+    // **** DELETE COMPONENT *****
 
     fun delete(cType: ComponentType<*>, index: Int): FFContext {
-        mapper<Component>(cType).delete(index)
-        return this
-    }
-
-    fun deleteQuietly(cType: ComponentType<*>, index: Int): FFContext {
         val mapper = mapper<Component>(cType)
         if (mapper.map.contains(index))
             mapper.delete(index)
+        else
+            println("WARN: Component not found, abort delete: $cType - $index")
+        return this
+    }
+    fun delete(cType: ComponentType<*>, name: String): FFContext {
+        if (name == NO_NAME)
+            return this
+        val mapper = mapper<Component>(cType)
+        if (mapper.contains(name))
+            mapper.delete(name)
+        else
+            println("WARN: Component not found, abort delete: $cType - $name")
         return this
     }
 
+    fun delete(component: Component) = delete(component.componentId.componentType, component.index)
+    fun delete(cType: ComponentType<*>, indexed: Indexed) = delete(cType, indexed.index)
+    fun delete(id: CompId) = delete(id.componentType, id.instanceId)
+    fun delete(id: CompNameId) = delete(id.componentType, id.name)
+    fun delete(cType: ComponentType<*>, named: Named) = delete(cType, named.name)
+    fun delete(singleton: SingletonComponent<*, *>) = delete(singleton, singleton.instance.index)
     fun deleteAll(cType: ComponentType<*>, set: BitSet): FFContext {
         var i = set.nextSetBit(0)
         while (i >= 0) {
@@ -294,16 +284,6 @@ object FFContext {
         }
         return this
     }
-
-    fun deleteAllQuietly(cType: ComponentType<*>, set: BitSet): FFContext {
-        var i = set.nextSetBit(0)
-        while (i >= 0) {
-            deleteQuietly(cType, i)
-            i = set.nextSetBit(i + 1)
-        }
-        return this
-    }
-
     fun deleteAll(list: DynArray<CompId>): FFContext {
         val it = list.iterator()
         while (it.hasNext())
@@ -311,59 +291,7 @@ object FFContext {
         return this
     }
 
-    fun deleteAllQuietly(list: DynArray<CompId>): FFContext {
-        val it = list.iterator()
-        while (it.hasNext())
-            deleteQuietly(it.next())
-        return this
-    }
-
-    fun delete(cType: ComponentType<*>, indexed: Indexed): FFContext =
-        delete(cType, indexed.index)
-
-    fun deleteQuietly(cType: ComponentType<*>, indexed: Indexed): FFContext =
-        deleteQuietly(cType, indexed.index)
-
-    fun delete(id: CompId): FFContext =
-        delete(id.componentType, id.instanceId)
-
-    fun deleteQuietly(id: CompId): FFContext {
-        if (id != NO_COMP_ID)
-            deleteQuietly(id.componentType, id.instanceId)
-        return this
-    }
-
-    fun delete(id: CompNameId): FFContext =
-        delete(id.componentType, id.name)
-
-    fun deleteQuietly(id: CompNameId): FFContext =
-        deleteQuietly(id.componentType, id.name)
-
-    fun delete(cType: ComponentType<*>, name: String): FFContext {
-        mapper<Component>(cType).delete(name)
-        return this
-    }
-
-    fun deleteQuietly(cType: ComponentType<*>, name: String): FFContext {
-        if (name == NO_NAME)
-            return this
-        val mapper = mapper<Component>(cType)
-        if (mapper.contains(name))
-            mapper.delete(name)
-        return this
-    }
-
-    fun delete(cType: ComponentType<*>, named: Named): FFContext =
-        delete(cType, named.name)
-
-    fun deleteQuietly(cType: ComponentType<*>, named: Named): FFContext =
-        deleteQuietly(cType, named.name)
-
-    fun delete(singleton: SingletonComponent<*, *>): FFContext {
-        singleton.dispose()
-        return this
-    }
-
+    // **** LISTENERS *****
 
     fun <L> registerListener(event: Event<L>, listener: L): FFContext {
         eventDispatcher.register(event.eventType, listener)
@@ -394,6 +322,51 @@ object FFContext {
         eventDispatcher.notify(event)
         return this
     }
+
+    // **** MISC *****
+
+    fun <C : Component> forEach(cType: ComponentType<*>, consumer: Consumer<C>) {
+        val mapper = mapper<C>(cType)
+        mapper.forEach(consumer)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <C : SystemComponent, CC : C> forEach(cType: SystemComponentSubType<C, CC>, consumer: Consumer<CC>) {
+        val mapper = mapper(cType)
+        mapper.forEach { c ->
+            if (c.componentType() == cType)
+                consumer(c as CC)
+        }
+    }
+
+    fun <C : Component> forEach(cType: ComponentType<C>, components: BitSet, consumer: Consumer<C>) {
+        var index = components.nextSetBit(0)
+        while (index >= 0) {
+            consumer(FFContext[cType, index])
+            index = components.nextSetBit(index + 1)
+        }
+    }
+
+    fun <C : SystemComponent, CC : C> forEach(cType: SystemComponentSubType<C, CC>, components: BitSet, consumer: Consumer<CC>) {
+        var index = components.nextSetBit(0)
+        while (index >= 0) {
+            consumer(FFContext[cType, index])
+            index = components.nextSetBit(index + 1)
+        }
+    }
+
+    fun <C : SystemComponent, CC : C> findFirst(cType: SystemComponentSubType<C, CC>, components: BitSet, predicate: Predicate<CC>) : CC? {
+        var index = components.nextSetBit(0)
+        while (index >= 0) {
+            val c = FFContext[cType, index]
+            if (predicate(c))
+                return c
+            index = components.nextSetBit(index + 1)
+        }
+        return null
+    }
+
+
 
     fun dump(full: Boolean = false): String {
         val builder = StringBuilder()
@@ -426,8 +399,6 @@ object FFContext {
                 }
             }
         }
-
-
         builder.append("\n}")
         return builder.toString()
     }

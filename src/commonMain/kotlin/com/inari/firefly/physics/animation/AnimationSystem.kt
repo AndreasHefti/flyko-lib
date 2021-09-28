@@ -6,10 +6,8 @@ import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.Entity
-import com.inari.firefly.entity.EntityActivationEvent
-import com.inari.firefly.entity.EntityActivationEventListener
-import com.inari.firefly.graphics.tile.ETile
-import com.inari.firefly.graphics.tile.TileGridSystem
+import com.inari.firefly.entity.EntityEvent
+import com.inari.firefly.entity.EntityEventListener
 import com.inari.firefly.physics.animation.entity.EAnimation
 import com.inari.firefly.physics.animation.entity.EntityPropertyAnimation
 import com.inari.util.aspect.Aspects
@@ -25,7 +23,7 @@ object AnimationSystem : ComponentSystem {
         activationMapping = true
     )
 
-    private val entityActivationListener: EntityActivationEventListener = object: EntityActivationEventListener {
+    private val entityActivationListener: EntityEventListener = object: EntityEventListener {
         override fun entityActivated(entity: Entity) = registerEntityAnimations(entity)
         override fun entityDeactivated(entity: Entity) = detachEntityAnimations(entity)
         override fun match(aspects: Aspects): Boolean = EAnimation in aspects
@@ -36,7 +34,7 @@ object AnimationSystem : ComponentSystem {
 
     init {
         FFContext.registerListener(FFApp.UpdateEvent, updateListener)
-        FFContext.registerListener(EntityActivationEvent, entityActivationListener)
+        FFContext.registerListener(EntityEvent, entityActivationListener)
         FFContext.loadSystem(this)
     }
 

@@ -47,8 +47,10 @@ class FireflyJsonAreaAsset private constructor() : Asset() {
         areaData.roomsData.forEach { roomData ->
             val roomId = Room.build {
                 name = roomData.name
-                orientationType = roomData.orientationType
-                orientation(roomData.orientation)
+                roomOrientationType = roomData.orientationType
+                roomOrientation(roomData.orientation)
+                areaOrientationType = roomData.areaOrientationType
+                areaOrientation(roomData.areaOrientation)
                 attributes.putAll(roomData.attributes)
 
                 if (roomData.onActivationTasks != null)
@@ -63,14 +65,8 @@ class FireflyJsonAreaAsset private constructor() : Asset() {
         if (areaId == NO_COMP_ID)
             return
 
-        // delete all rooms of the area
-        WorldSystem.rooms.forEach { room ->
-            if (room.parentRef == areaId.instanceId)
-                FFContext.deleteQuietly(room.componentId)
-        }
-
         // delete the area
-        FFContext.deleteQuietly(areaId)
+        FFContext.delete(areaId)
         areaId = NO_COMP_ID
     }
 

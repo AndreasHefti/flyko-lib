@@ -6,10 +6,13 @@ import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.NO_NAME
 import com.inari.firefly.asset.Asset
 import com.inari.firefly.composite.CompositeSystem
+import com.inari.firefly.composite.EComposite
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.system.SystemComponentSubType
+import com.inari.firefly.entity.Entity
 import com.inari.firefly.game.tile.TileMap
-import com.inari.firefly.game.world.GameObjectComposite
+import com.inari.firefly.game.world.objects.RoomObjectComposite
+import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewSystem
 import com.inari.firefly.physics.contact.SimpleContactMap
@@ -89,7 +92,7 @@ class TiledJsonRoomAsset private constructor() : Asset() {
                 view(this@TiledJsonRoomAsset.viewRef)
                 layer(layerJson.name)
             }
-            tileMap.entityIds + contactMap
+            tileMap.compositeIds + contactMap
         }
 
         layerJson.objects!!.forEach { tiledObject ->
@@ -97,14 +100,43 @@ class TiledJsonRoomAsset private constructor() : Asset() {
             if (tiledObject.type.startsWith("Composite")) {
                 val typeName = tiledObject.type.split(":")
 
-                val obj =  CompositeSystem.getCompositeBuilder<GameObjectComposite>(typeName[1]).buildAndGet {
+                val composite = CompositeSystem.getCompositeBuilder<RoomObjectComposite>(typeName[1]).buildAndGet {
                     name = tiledObject.name
                     view(this@TiledJsonRoomAsset.viewRef)
                     layer(layerJson.name)
-                    tilesObjectProperties = tiledObject
+                    layerJson.properties.forEach { setAttribute(it.name, it.value) }
                 }
-                obj.systemLoad()
-                tileMap.entityIds + obj.componentId
+                composite.systemLoad()
+                tileMap.compositeIds + composite.componentId
+
+            } else if (tiledObject.type.startsWith("EComposite")) {
+
+                Entity.build {
+                    name = tiledObject.name
+                    withComponent(ETransform) {
+                        view(this@TiledJsonRoomAsset.viewRef)
+                        layer(layerJson.name)
+                        position(tiledObject.x, tiledObject.y)
+                        rotation = tiledObject.rotation
+                    }
+                    withComponent(EComposite) {
+                        layerJson.properties.forEach {
+                            setAttribute(it.name, it.value)
+                        }
+                        tiledObject.mappedProperties["loadTask"]?.also {
+                            withLoadTask(it.value)
+                        }
+                        tiledObject.mappedProperties["activationTask"]?.also {
+                            withActivationTask(it.value)
+                        }
+                        tiledObject.mappedProperties["deactivationTask"]?.also {
+                            withDeactivationTask(it.value)
+                        }
+                        tiledObject.mappedProperties["disposeTask"]?.also {
+                            withDisposeTask(it.value)
+                        }
+                    }
+                }
 
             } else {
                 //throw RuntimeException("Unknown Tiles Object Type: ${tiledObject.type}")

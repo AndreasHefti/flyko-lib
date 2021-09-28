@@ -1,5 +1,6 @@
 package com.inari.firefly.core.system
 
+import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.NO_NAME
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.ComponentType
@@ -24,7 +25,7 @@ abstract class SystemComponent protected constructor(
         }
 
     final override val componentId: CompId
-            by lazy { CompId(index, componentType()) }
+        by lazy { CompId(index, componentType()) }
 
     var initialized: Boolean = false
         internal set

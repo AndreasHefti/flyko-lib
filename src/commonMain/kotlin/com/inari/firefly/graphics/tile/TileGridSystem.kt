@@ -6,10 +6,9 @@ import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.EMultiplier
 import com.inari.firefly.entity.Entity
-import com.inari.firefly.entity.EntityActivationEvent
-import com.inari.firefly.entity.EntityActivationEventListener
+import com.inari.firefly.entity.EntityEvent
+import com.inari.firefly.entity.EntityEventListener
 import com.inari.firefly.graphics.ETransform
-import com.inari.firefly.graphics.rendering.RenderingSystem
 import com.inari.firefly.graphics.view.ViewEvent
 import com.inari.firefly.graphics.view.ViewEvent.Type.VIEW_DELETED
 import com.inari.firefly.graphics.view.ViewLayerAware
@@ -42,7 +41,7 @@ object TileGridSystem : ComponentSystem {
         }
     }
 
-    private val entityActivationListener: EntityActivationEventListener = object : EntityActivationEventListener {
+    private val entityActivationListener: EntityEventListener = object : EntityEventListener {
         override fun entityActivated(entity: Entity) = addEntity(entity)
         override fun entityDeactivated(entity: Entity) = removeEntity(entity)
         override fun match(aspects: Aspects) = aspects.contains(ETile)
@@ -50,7 +49,7 @@ object TileGridSystem : ComponentSystem {
 
     init {
         FFContext.registerListener(ViewEvent, viewListener)
-        FFContext.registerListener(EntityActivationEvent, entityActivationListener)
+        FFContext.registerListener(EntityEvent, entityActivationListener)
         FFContext.loadSystem(this)
     }
 

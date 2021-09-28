@@ -11,11 +11,7 @@ import com.inari.util.collection.DynArray
 import com.inari.util.geom.Rectangle
 import kotlin.jvm.JvmField
 
-class Area : GenericComposite() {
-
-    var parentRef = -1
-        internal set
-    val withParent = ComponentRefResolver(World) { index -> parentRef + index }
+class Area private constructor() : GenericComposite() {
 
     @JvmField var orientationType: WorldOrientationType = WorldOrientationType.COUNT
     @JvmField val orientation: Rectangle = Rectangle()

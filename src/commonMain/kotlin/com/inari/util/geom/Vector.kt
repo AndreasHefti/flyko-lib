@@ -1,6 +1,7 @@
 package com.inari.util.geom
 
 import com.inari.util.StringUtils
+import kotlin.math.round
 
 interface Vec2f {
     val dx: Float
@@ -183,9 +184,25 @@ data class Vector2i constructor(
         return this
     }
 
+    operator fun invoke(dx: Float, dy: Float): Vector2i {
+        this.dx = round(dx).toInt()
+        this.dy = round(dy).toInt()
+        return this
+    }
+
     operator fun invoke(v: Vec2i): Vector2i {
         this.dx = v.dx
         this.dy = v.dy
+        return this
+    }
+
+    operator fun invoke(v: Vec2f): Vector2i {
+        this(v.dx, v.dy)
+        return this
+    }
+
+    operator fun invoke(p: PositionF): Vector2i {
+        this(p.x, p.y)
         return this
     }
 

@@ -1,4 +1,4 @@
-package com.inari.firefly.examples.game
+package com.inari.firefly.examples.game.platformer
 
 import com.inari.firefly.BlendMode
 import com.inari.firefly.NO_COMP_ID
@@ -8,18 +8,18 @@ import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.game.tile.TileContactFormType
 import com.inari.firefly.game.tile.TileMaterialType
-import com.inari.firefly.game.world.GameObjectComposite
+import com.inari.firefly.game.world.objects.RoomObjectComposite
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.sprite.SpriteAsset
 import com.inari.firefly.physics.contact.EContact
 
-class TestGameObject : GameObjectComposite() {
+class TestGameObject : RoomObjectComposite() {
 
     private var spriteId = NO_COMP_ID
     private var entityId = NO_COMP_ID
 
-    override fun load() {
+    override fun loadComposite() {
         spriteId = SpriteAsset.buildAndActivate {
             name = "objectSprite"
             texture("playerTex")
@@ -27,7 +27,7 @@ class TestGameObject : GameObjectComposite() {
         }
     }
 
-    override fun activate() {
+    override fun activateComposite() {
         entityId = Entity.buildAndActivate {
             withComponent(ETransform) {
                 view(this@TestGameObject.viewRef)
@@ -46,11 +46,11 @@ class TestGameObject : GameObjectComposite() {
         }
     }
 
-    override fun deactivate() {
+    override fun deactivateComposite() {
         TODO("Not yet implemented")
     }
 
-    override fun unload() {
+    override fun disposeComposite() {
         TODO("Not yet implemented")
     }
 

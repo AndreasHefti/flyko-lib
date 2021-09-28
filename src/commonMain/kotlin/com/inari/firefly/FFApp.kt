@@ -96,8 +96,6 @@ abstract class FFApp protected constructor(
         graphics.endRendering(view)
     }
 
-
-
     companion object {
 
         lateinit var eventDispatcher: IEventDispatcher

@@ -35,7 +35,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
     @JvmField internal var viewRef = -1
     private val tileMapLayer = DynArray.of<MapLayer>(5, 5)
     private val tileDecorations = DynArray.of<MapLayer>(10, 50)
-    @JvmField internal val entityIds = DynArray.of<CompId>(10, 10)
+    @JvmField internal val compositeIds = DynArray.of<CompId>(10, 10)
 
     private var loaded = false
     private var active = false
@@ -89,8 +89,8 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
                 parallax = true
         }
 
-        if (!entityIds.isEmpty)
-            FFContext.activateAll(entityIds)
+        if (!compositeIds.isEmpty)
+            FFContext.activateAll(compositeIds)
 
         if (parallax)
             FFContext.registerListener(ViewChangeEvent, parallaxListener)
@@ -106,8 +106,8 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
             FFContext.disposeListener(ViewChangeEvent, parallaxListener)
 
         parallax = false
-        if (!entityIds.isEmpty)
-            FFContext.deactivateAll(entityIds)
+        if (!compositeIds.isEmpty)
+            FFContext.deactivateAll(compositeIds)
 
         tileMapLayer.forEach { layer ->
             deleteTileGrid(layer)
@@ -131,9 +131,9 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
             }
         }
 
-        if (!entityIds.isEmpty)
-            FFContext.deleteAll(entityIds)
-        entityIds.clear()
+        if (!compositeIds.isEmpty)
+            FFContext.deleteAll(compositeIds)
+        compositeIds.clear()
 
         loaded = false
     }
@@ -246,13 +246,13 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
     private fun deactivateTileSetsForLayer(layer: MapLayer) {
         val iterator = layer.activeEntityRefs.iterator()
         while (iterator.hasNext())
-            FFContext.deleteQuietly(Entity, iterator.nextInt())
+            FFContext.delete(Entity, iterator.nextInt())
 
         layer.activeEntityRefs.clear()
     }
 
     private fun deleteTileGrid(layer: MapLayer) {
-        FFContext.deleteQuietly(TileGrid, layer.tileGridId)
+        FFContext.delete(TileGrid, layer.tileGridId)
     }
 
     private fun updateParallaxLayer() {

@@ -13,4 +13,9 @@ object TestTimer : TimerAPI() {
         Unit
     }
 
+    internal fun reset() {
+        time = 0
+        timeElapsed = 0
+    }
+
 }

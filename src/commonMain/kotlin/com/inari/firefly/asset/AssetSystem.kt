@@ -1,6 +1,8 @@
 package com.inari.firefly.asset
 
 import com.inari.firefly.FFContext
+import com.inari.firefly.core.ComponentRefPredicate
+import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.ComponentMap.MapAction.*
 import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
@@ -25,6 +27,13 @@ object AssetSystem : ComponentSystem {
             DEACTIVATED   -> unload(asset)
             DELETED       -> deleted(asset)
         } }
+    )
+
+    val loaderDispatcher = ComponentSystem.createLoaderDispatcher(
+        Asset,
+        ComponentRefResolver(Asset) { systemAssets.activate(it) },
+        ComponentRefPredicate(Asset) { systemAssets.isActive(it) },
+        ComponentRefResolver(Asset) { systemAssets.deactivate(it) }
     )
 
     private val dependingAssetIds: DynIntArray = DynIntArray(1, -1)

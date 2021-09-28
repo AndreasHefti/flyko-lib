@@ -1,17 +1,13 @@
 package com.inari.firefly.entity
 
 import com.inari.firefly.FFContext
-import com.inari.firefly.control.scene.Scene
-import com.inari.firefly.control.scene.SceneSystem
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.ComponentMap
+import com.inari.firefly.core.component.ComponentMap.MapAction.*
 import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
-import com.inari.firefly.entity.EntityActivationEvent.Type.ACTIVATED
-import com.inari.firefly.entity.EntityActivationEvent.Type.DEACTIVATED
 import com.inari.util.aspect.Aspects
-import kotlin.jvm.JvmField
 
 object EntitySystem : ComponentSystem {
 
@@ -25,9 +21,10 @@ object EntitySystem : ComponentSystem {
         activationMapping = true,
         nameMapping = true,
         listener = { entity, action -> when (action) {
-            ComponentMap.MapAction.ACTIVATED     -> activated(entity)
-            ComponentMap.MapAction.DEACTIVATED   -> deactivated(entity)
-            else -> {}
+            CREATED       -> EntityEvent.send(entity, EntityEventType.ON_CREATE)
+            ACTIVATED     -> EntityEvent.send(entity, EntityEventType.ACTIVATED)
+            DEACTIVATED   ->  EntityEvent.send(entity, EntityEventType.DEACTIVATED)
+            DELETED       ->  EntityEvent.send(entity, EntityEventType.ON_DISPOSE)
         } }
     )
 
@@ -41,20 +38,6 @@ object EntitySystem : ComponentSystem {
     operator fun contains(entityId: CompId) = entityId in systemEntities
     operator fun contains(name: String) = name in systemEntities
     operator fun contains(index: Int) = index in systemEntities
-
-    private fun activated(entity: Entity) {
-        EntityActivationEvent.send(
-            entity = entity,
-            type = ACTIVATED
-        )
-    }
-
-    private fun deactivated(entity: Entity) {
-        EntityActivationEvent.send(
-            entity = entity,
-            type = DEACTIVATED
-        )
-    }
 
     override fun clearSystem() = systemEntities.clear()
 

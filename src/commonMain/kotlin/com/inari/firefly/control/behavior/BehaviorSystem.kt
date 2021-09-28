@@ -2,14 +2,12 @@ package com.inari.firefly.control.behavior
 
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
-import com.inari.firefly.control.action.Action
-import com.inari.firefly.control.action.ActionSystem
 import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.Entity
-import com.inari.firefly.entity.EntityActivationEvent
-import com.inari.firefly.entity.EntityActivationEventListener
+import com.inari.firefly.entity.EntityEvent
+import com.inari.firefly.entity.EntityEventListener
 import com.inari.firefly.entity.EntitySystem
 import com.inari.util.OpResult
 import com.inari.util.aspect.Aspect
@@ -54,7 +52,7 @@ object BehaviorSystem : ComponentSystem {
             BxNode
     )
 
-    private val entityActivationListener: EntityActivationEventListener = object : EntityActivationEventListener {
+    private val entityActivationListener: EntityEventListener = object : EntityEventListener {
         override fun entityActivated(entity: Entity) =
             entityIds.set(entity.index)
         override fun entityDeactivated(entity: Entity) =
@@ -67,7 +65,7 @@ object BehaviorSystem : ComponentSystem {
 
     init {
         FFContext.registerListener(FFApp.UpdateEvent, this::update)
-        FFContext.registerListener(EntityActivationEvent, entityActivationListener)
+        FFContext.registerListener(EntityEvent, entityActivationListener)
         FFContext.loadSystem(this)
     }
 

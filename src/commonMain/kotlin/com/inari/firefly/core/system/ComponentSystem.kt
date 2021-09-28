@@ -3,10 +3,9 @@ package com.inari.firefly.core.system
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.NO_NAME
-import com.inari.firefly.core.component.CompId
-import com.inari.firefly.core.component.ComponentMap
-import com.inari.firefly.core.component.ComponentType
-import com.inari.firefly.core.component.NamedComponent
+import com.inari.firefly.core.ComponentRefPredicate
+import com.inari.firefly.core.ComponentRefResolver
+import com.inari.firefly.core.component.*
 import com.inari.util.*
 import com.inari.util.aspect.Aspects
 import com.inari.util.collection.BitSet
@@ -34,6 +33,19 @@ interface ComponentSystem : FFSystem {
             if (mapToContext)
                 FFContext.componentMaps[mapper.typeIndex] = mapper
             return mapper
+        }
+
+        inline fun <reified C : Component> createLoaderDispatcher(
+            componentType: ComponentType<C>,
+            loadDispatch: ComponentRefResolver<C>,
+            isLoaded: ComponentRefPredicate<C>,
+            disposeDispatch: ComponentRefResolver<C>,
+            mapToContext: Boolean = true
+        ): ComponentLoadDispatcher<C> {
+            val handler =  ComponentLoadDispatcher(loadDispatch, isLoaded, disposeDispatch)
+            if (mapToContext)
+                FFContext.componentLoadDispatcher[componentType.aspectIndex] = handler
+            return handler
         }
     }
 
@@ -166,8 +178,7 @@ interface ComponentSystem : FFSystem {
         override fun indexIterator(predicate: Predicate<C?>): IntFunction =  { from ->
                 nextIndex(predicate, from)
             }
-
-
+        
         override fun receiver(): Receiver<C> = { c -> add(c) }
 
         override fun forEach(expr: Consumer<C>) =
@@ -187,17 +198,16 @@ interface ComponentSystem : FFSystem {
                 expr(map[i.next()]!!)
         }
 
+        @Suppress("UNCHECKED_CAST")
         override fun <CC : C> forEachSubtypeIn(bag: DynIntArrayRO, expr: Consumer<CC>) {
             val i = bag.iterator()
-            while (i.hasNext()) {
-                @Suppress("UNCHECKED_CAST")
+            while (i.hasNext())
                 expr(map[i.next()] as CC)
-            }
         }
 
         override fun clear() {
-            for (c in _map)
-                delete(c.index)
+            while (!_map.isEmpty)
+                delete(_map.getFirstNotNull().index)
 
             _map.clear()
             if (nameMapping)
@@ -205,7 +215,6 @@ interface ComponentSystem : FFSystem {
             if (activationMapping)
                 active.clear()
         }
-
 
         private fun <CC : C> add(c: CC, alsoActivate: Boolean = false): CC {
             _map[c.index] = c

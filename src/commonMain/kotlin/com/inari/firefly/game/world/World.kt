@@ -7,12 +7,12 @@ import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.util.geom.Rectangle
 import kotlin.jvm.JvmField
 
-class World : GenericComposite() {
+class World private constructor(): GenericComposite() {
 
     @JvmField var orientationType: WorldOrientationType = WorldOrientationType.COUNT
     @JvmField val orientation: Rectangle = Rectangle()
 
-    override fun componentType() = Room
+    override fun componentType() = Companion
     companion object : SystemComponentSubType<Composite, World>(Composite, World::class) {
         init { CompositeSystem.compositeBuilderMapping[World::class.simpleName!!] = this }
         override fun createEmpty() = World()

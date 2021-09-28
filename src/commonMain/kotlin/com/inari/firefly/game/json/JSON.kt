@@ -85,8 +85,10 @@ data class AreaJson(
 data class RoomMetaJson(
     val name: String,
     val tiledMapResource: String? = null,
-    val orientationType: WorldOrientationType = WorldOrientationType.TILES,
+    val orientationType: WorldOrientationType = WorldOrientationType.PIXELS,
     val orientation: String = "0,0,0,0",
+    val areaOrientationType: WorldOrientationType = WorldOrientationType.SECTION,
+    val areaOrientation: String = "0,0,0,0",
     val onActivationTasks: String? = null,
     val attributes: Map<String, String> = emptyMap()
 )
@@ -141,7 +143,9 @@ data class TiledObject(
     val gid: Int = -1,
     val point: Boolean = false,
     val properties: Array<PropertyJson> = emptyArray()
-)
+){
+    val mappedProperties: Map<String, PropertyJson> = properties.associateBy(PropertyJson::name)
+}
 
 data class PropertyJson(
     val name: String,

@@ -10,4 +10,8 @@ object TestApp : FFApp(
     { InputMock },
     { TestTimer },
     { FFResourceService }
-)
+) {
+
+    fun resetTimer() = (timer as TestTimer).reset()
+
+}

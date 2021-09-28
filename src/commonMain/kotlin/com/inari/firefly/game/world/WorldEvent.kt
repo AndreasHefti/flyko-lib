@@ -7,11 +7,7 @@ import com.inari.firefly.core.component.CompId
 import com.inari.util.event.Event
 
 typealias WorldEventListener = (type: WorldEventType, id: CompId) -> Unit
-enum class WorldEventType {
-    WORLD_LOADED, WORLD_ACTIVATED, WORLD_DEACTIVATED, WORLD_DISPOSED,
-    AREA_LOADED, AREA_ACTIVATED, AREA_DEACTIVATED, AREA_DISPOSED,
-    ROOM_LOADED, ROOM_ACTIVATED, ROOM_DEACTIVATED, ROOM_DISPOSED
-}
+enum class WorldEventType { WORLD_LOADED, WORLD_ACTIVATED, WORLD_DEACTIVATED, WORLD_DISPOSED }
 class WorldEvent(override val eventType: Event.EventType) : Event<WorldEventListener>() {
 
     var compId: CompId = NO_COMP_ID
