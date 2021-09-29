@@ -27,15 +27,33 @@ class CompId (
     val instanceId: Int,
     val componentType: ComponentType<*>
 ) : Indexed {
+
     fun checkType(typeAspect: Aspect): CompId {
         componentType.aspectType.typeCheck(typeAspect)
         return this
     }
 
     override val index: Int = instanceId
-
     override val indexedTypeName: String
         get() = componentType.aspectName
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as CompId
+
+        if (instanceId != other.instanceId) return false
+        if (componentType != other.componentType) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = instanceId
+        result = 31 * result + componentType.hashCode()
+        return result
+    }
 
     override fun toString(): String {
         return "CompId(instanceId=$instanceId, componentType=$componentType)"

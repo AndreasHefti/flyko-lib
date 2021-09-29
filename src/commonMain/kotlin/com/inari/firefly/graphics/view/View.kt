@@ -70,7 +70,7 @@ class View private constructor (
 
     override fun dispose() {
         layers.clear()
-        ControllerSystem.unregister(componentId, true)
+        disposeController()
         super.dispose()
     }
 

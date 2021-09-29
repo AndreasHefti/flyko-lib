@@ -4,7 +4,6 @@ import com.inari.firefly.FFContext
 import com.inari.util.geom.PositionF
 import com.inari.firefly.NO_CAMERA_PIVOT
 import com.inari.firefly.control.Controller
-import com.inari.firefly.control.SingleComponentController
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.view.View
@@ -14,10 +13,10 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 
-class SimpleCameraController private constructor() : SingleComponentController() {
+class SimpleCameraController private constructor() : Controller() {
 
     private val pos = PositionF()
-    private var view: View? = null
+    private lateinit var view: View
 
     var pivot: CameraPivot = NO_CAMERA_PIVOT
     var snapToBounds: Rectangle = Rectangle()
@@ -25,8 +24,6 @@ class SimpleCameraController private constructor() : SingleComponentController()
     var velocity: Float = 0.25f
 
     fun adjust() {
-        val view = this.view ?: FFContext[componentId] ?: return
-
         if (getPos(view.data.zoom, view.data.bounds, view.data.worldPosition)) {
             view.data.worldPosition.x = floor(view.data.worldPosition.x.toDouble() + pos.x).toFloat()
             view.data.worldPosition.y = floor(view.data.worldPosition.y.toDouble() + pos.y).toFloat()
@@ -34,9 +31,11 @@ class SimpleCameraController private constructor() : SingleComponentController()
         }
     }
 
-    override fun update(componentId: CompId) {
-        val view = this.view ?: FFContext[componentId] ?: return
+    override fun init(componentId: CompId) {
+        this.view = FFContext[componentId]
+    }
 
+    override fun update(componentId: CompId) {
         if (getPos(view.data.zoom, view.data.bounds, view.data.worldPosition)) {
             view.data.worldPosition.x += pos.x * velocity
             view.data.worldPosition.y += pos.y * velocity

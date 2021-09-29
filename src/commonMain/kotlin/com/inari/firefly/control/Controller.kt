@@ -10,6 +10,7 @@ import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentType
 import com.inari.util.IntConsumer
 import com.inari.util.collection.BitSet
+import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 
 abstract class Controller protected constructor() : SystemComponent(Controller::class.simpleName!!) {
@@ -19,12 +20,10 @@ abstract class Controller protected constructor() : SystemComponent(Controller::
         get() = throw UnsupportedOperationException()
         set(value) { scheduler = FFContext.timer.createUpdateScheduler(value) }
 
-    internal abstract fun update()
-
-    abstract fun register(componentId: CompId)
-    abstract fun unregister(componentId: CompId, disposeWhenEmpty: Boolean = false)
+    abstract fun init(componentId: CompId)
     abstract fun update(componentId: CompId)
 
     override fun componentType() = Companion
     companion object : SystemComponentType<Controller>(Controller::class)
+
 }

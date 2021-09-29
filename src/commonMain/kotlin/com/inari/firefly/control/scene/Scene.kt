@@ -24,6 +24,9 @@ import kotlin.jvm.JvmField
 class Scene private constructor() : GenericComposite() {
 
     @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
+    var updateResolution: Float
+        get() = throw UnsupportedOperationException()
+        set(value) { scheduler = FFContext.timer.createUpdateScheduler(value) }
     var internal_callback: Call = VOID_CALL
         internal set
     @JvmField var removeAfterRun: Boolean = false

@@ -7,8 +7,8 @@ import com.inari.firefly.DesktopApp
 import com.inari.firefly.FFContext
 import com.inari.firefly.asset.Asset
 import com.inari.firefly.asset.AssetSystem
-import com.inari.firefly.control.ControllerComposite
 import com.inari.firefly.control.EControl
+import com.inari.firefly.control.state.StateSystem.updateResolution
 import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.api.FFInput
 import com.inari.firefly.entity.Entity
@@ -110,14 +110,12 @@ class TiledTileMapTest : DesktopApp() {
         val playerEntityId = Entity.buildAndActivate {
             name = "player"
             withComponent(EControl) {
-                withActiveController(ControllerComposite) {
-                    withActiveController(PlatformerHMoveController) {
-                        updateResolution = 20f
-                        inputDevice = FFContext.input.getDevice("INPUT_DEVICE_KEY1")
-                    }
-                    withActiveController(PlatformerJumpController) {
-                        inputDevice = FFContext.input.getDevice("INPUT_DEVICE_KEY1")
-                    }
+                withController(PlatformerHMoveController) {
+                    updateResolution = 20f
+                    inputDevice = FFContext.input.getDevice("INPUT_DEVICE_KEY1")
+                }
+                withController(PlatformerJumpController) {
+                    inputDevice = FFContext.input.getDevice("INPUT_DEVICE_KEY1")
                 }
             }
             withComponent(ETransform) {

@@ -30,7 +30,7 @@ object ViewSystem : ComponentSystem {
         activationMapping = true,
         nameMapping = true,
         listener = { view, action -> when (action) {
-            CREATED -> created(view)
+            CREATED       -> created(view)
             ACTIVATED     -> activated(view)
             DEACTIVATED   -> deactivated(view)
             DELETED       -> deleted(view)
