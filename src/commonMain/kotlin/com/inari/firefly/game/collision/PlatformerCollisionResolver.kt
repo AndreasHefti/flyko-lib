@@ -3,11 +3,15 @@ package com.inari.firefly.game.collision
 import com.inari.firefly.EMPTY_INT_CONSUMER
 import com.inari.firefly.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.UNDEFINED_MATERIAL
+import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSingleType
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.entity.Entity
+import com.inari.firefly.game.VOID_LOOS_GROUND_CALLBACK
+import com.inari.firefly.game.VOID_ON_SLOPE_CALLBACK
+import com.inari.firefly.game.VOID_TOUCH_GROUND_CALLBACK
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.physics.contact.*
 import com.inari.firefly.physics.movement.EMovement
@@ -27,9 +31,9 @@ class PlatformerCollisionResolver : CollisionResolver()  {
     private val fullContactCallbacks = DynArray.of<CollisionCallback>()
     private var terrainContactConstraintRef = -1
 
-    @JvmField var touchGroundCallback: IntConsumer = EMPTY_INT_CONSUMER
-    @JvmField var looseGroundContactCallback: IntConsumer = EMPTY_INT_CONSUMER
-    @JvmField var onSlopeCallback: (Int, Int, Contacts) -> Unit = { _, _, _ -> }
+    @JvmField var touchGroundCallback = VOID_TOUCH_GROUND_CALLBACK
+    @JvmField var looseGroundContactCallback = VOID_LOOS_GROUND_CALLBACK
+    @JvmField var onSlopeCallback = VOID_ON_SLOPE_CALLBACK
 
     val withFullContactConstraint = ComponentRefResolver(ContactConstraint) {
         fullContactConstraintRef = it
@@ -146,6 +150,8 @@ class PlatformerCollisionResolver : CollisionResolver()  {
                 contactSensorB1.cardinality != contactSensorB3.cardinality &&
                 contactSensorGround.cardinality < contactSensorGround.width
 
+        //println("onSlope $onSlope")
+
         if (onSlope && movement.velocity.dy >= 0.0f) {
             //println("adjust slope ${contactSensorB2.cardinality}")
             if (contactSensorB1.cardinality > contactSensorB3.cardinality) {
@@ -165,8 +171,8 @@ class PlatformerCollisionResolver : CollisionResolver()  {
                 setOnGround = true
                 onSlopeCallback(entity.index, contactSensorB1.cardinality - contactSensorB3.cardinality, contacts)
             }
-        } else if (bmax > gapSouth) {
-            //println("adjust ground: ${bmax - gapSouth}")
+        } else if (bmax > gapSouth && movement.velocity.dy >= 0.0f) {
+            //println("adjust ground: ${bmax - gapSouth} : ${movement.velocity.dy}")
             transform.move(dy = -(bmax - gapSouth))
             transform.position.y = ceil(transform.position.y)
             movement.velocity.dy = 0.0f
@@ -203,6 +209,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
             //println("adjust left: $lmax")
             transform.move(dx = lmax)
             transform.position.x = floor(transform.position.x)
+            movement.velocity.dx = ZERO_FLOAT
             refresh = true
         }
 
@@ -210,6 +217,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
             //println("adjust right: $rmax")
             transform.move(dx = -rmax)
             transform.position.x = ceil(transform.position.x)
+            movement.velocity.dx = ZERO_FLOAT
             refresh = true
         }
 

@@ -15,6 +15,8 @@ import com.inari.util.indexed.Indexed
 import kotlin.jvm.JvmField
 import kotlin.reflect.KClass
 
+const val ZERO_INT = 0
+const val ZERO_FLOAT = 0.0f
 const val SYSTEM_FONT_ASSET = "SYSTEM_FONT_ASSET"
 const val SYSTEM_FONT = "SYSTEM_FONT"
 

@@ -4,7 +4,7 @@ import com.inari.firefly.CONTACT_TYPE_ASPECT_GROUP
 import com.inari.firefly.MATERIAL_ASPECT_GROUP
 import com.inari.firefly.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.UNDEFINED_MATERIAL
-import com.inari.firefly.control.Controller
+import com.inari.firefly.control.action.Action
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSingleType
@@ -20,10 +20,11 @@ import kotlin.jvm.JvmField
 
 class EContact private constructor() : EntityComponent(EContact::class.simpleName!!) {
 
-    @JvmField internal var resolverRef = -1
+    @JvmField internal var collisionResolverRef = -1
     @JvmField internal val contactScan = ContactScan()
+    @JvmField var notifyContacts = false
 
-    val withResolver = ComponentRefResolver(CollisionResolver) { index -> resolverRef = index }
+    val withCollisionResolver = ComponentRefResolver(CollisionResolver) { index -> collisionResolverRef = index }
     var bounds: Rectangle = Rectangle()
     var mask: BitMask = BitMask(width = 0, height = 0)
         set(value) {
@@ -56,7 +57,7 @@ class EContact private constructor() : EntityComponent(EContact::class.simpleNam
 
     fun <A : CollisionResolver> withResolver(builder: SystemComponentSubType<CollisionResolver, A>, configure: (A.() -> Unit)): CompId {
         val id = builder.build(configure)
-        resolverRef = id.instanceId
+        collisionResolverRef = id.instanceId
         return id
     }
 
@@ -83,7 +84,7 @@ class EContact private constructor() : EntityComponent(EContact::class.simpleNam
 
 
     override fun reset() {
-        resolverRef = -1
+        collisionResolverRef = -1
         bounds(0, 0, 0, 0)
         mask.clearMask()
         material = UNDEFINED_MATERIAL

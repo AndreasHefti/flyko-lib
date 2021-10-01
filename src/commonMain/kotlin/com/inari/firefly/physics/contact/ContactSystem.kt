@@ -31,12 +31,13 @@ import kotlin.math.floor
 
 object ContactSystem : ComponentSystem {
 
-    override val supportedComponents: Aspects =
-        SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(ContactMap, ContactConstraint, CollisionResolver)
+    override val supportedComponents: Aspects = SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(
+        ContactMap,
+        ContactConstraint,
+        CollisionResolver)
 
     @JvmField val contactMapViewLayer: ViewLayerMapping<ContactMap> = ViewLayerMapping.of()
-    @JvmField val contactMaps =
-        ComponentSystem.createComponentMapping(
+    @JvmField val contactMaps = ComponentSystem.createComponentMapping(
             ContactMap,
             listener = { contactMap, action -> when (action) {
                 CREATED -> contactMapViewLayer.add(contactMap)
@@ -44,11 +45,9 @@ object ContactSystem : ComponentSystem {
                 else -> {}
             } }
         )
-    @JvmField val constraints =
-        ComponentSystem.createComponentMapping(ContactConstraint)
+    @JvmField val constraints = ComponentSystem.createComponentMapping(ContactConstraint)
 
-    @JvmField val collisionResolver =
-        ComponentSystem.createComponentMapping(CollisionResolver)
+    @JvmField val collisionResolver = ComponentSystem.createComponentMapping(CollisionResolver)
 
     private val viewListener: Consumer<ViewEvent> = { event ->
         when(event.type) {
@@ -193,11 +192,11 @@ object ContactSystem : ComponentSystem {
 
             scanContacts(entity, contacts)
 
-            if (contacts.resolverRef >= 0)
-                collisionResolver[contacts.resolverRef].resolve(entity, contacts, contacts.contactScan)
+            if (contacts.collisionResolverRef >= 0)
+                collisionResolver[contacts.collisionResolverRef].resolve(entity, contacts, contacts.contactScan)
 
-            if (contacts.contactScan.hasAnyContact()) {
-                ContactEvent.contactEvent.entity = entity.index
+            if (contacts.notifyContacts && contacts.contactScan.hasAnyContact()) {
+                ContactEvent.contactEvent.entityId = entity.index
                 FFContext.notify(ContactEvent.contactEvent)
             }
 

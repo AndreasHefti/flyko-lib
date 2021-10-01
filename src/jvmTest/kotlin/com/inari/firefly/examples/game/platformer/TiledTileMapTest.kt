@@ -29,11 +29,12 @@ import com.inari.firefly.info.FFInfoSystem
 import com.inari.firefly.info.FrameRateInfo
 import com.inari.firefly.physics.animation.AnimationSystem
 import com.inari.firefly.physics.contact.ContactConstraint
+import com.inari.firefly.physics.contact.ContactEvent
 import com.inari.firefly.physics.contact.ContactSystem
 import com.inari.firefly.physics.contact.EContact
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.MovementSystem
-import com.inari.util.indexed.Indexer
+import com.inari.util.IntConsumer
 import org.lwjgl.glfw.GLFW
 
 
@@ -148,8 +149,15 @@ class TiledTileMapTest : DesktopApp() {
                 withResolver(PlatformerCollisionResolver) {
                     withFullContactConstraint(fullContactId)
                     withTerrainContactConstraint(terrainContactsId)
+                    looseGroundContactCallback = {
+                        println("loose ground")
+                    }
                 }
             }
+        }
+
+        FFContext.registerListener<IntConsumer>(ContactEvent) { entityId ->
+            println("contact event: $entityId")
         }
 
         // camera
@@ -160,9 +168,8 @@ class TiledTileMapTest : DesktopApp() {
         }
         FFContext.get<View>(viewId).withController(camId)
 
-        println(FFContext.dump(true))
-
-        println(Indexer.dump())
+        //println(FFContext.dump(true))
+        //println(Indexer.dump())
     }
 }
 

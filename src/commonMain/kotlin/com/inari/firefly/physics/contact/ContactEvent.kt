@@ -6,10 +6,10 @@ import com.inari.util.event.Event
 
 class ContactEvent(override val eventType: EventType) : Event<IntConsumer>() {
 
-    var entity: Int = -1
+    var entityId: Int = -1
         internal set
 
-    override fun notify(listener: IntConsumer) { listener(entity) }
+    override fun notify(listener: IntConsumer) { listener(entityId) }
 
     companion object : EventType("ContactEvent") {
         internal val contactEvent = ContactEvent(this)
