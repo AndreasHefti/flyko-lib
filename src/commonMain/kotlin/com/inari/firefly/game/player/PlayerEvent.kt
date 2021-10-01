@@ -1,9 +1,8 @@
-package com.inari.firefly.game.world.player
+package com.inari.firefly.game.player
 
 import com.inari.firefly.FFContext
 import com.inari.firefly.game.world.RoomKey
-import com.inari.firefly.game.world.WorldSystem
-import com.inari.firefly.game.world.player.PlayerSystem.UNDEFINED_PLAYER_ASPECT
+import com.inari.firefly.game.player.PlayerSystem.UNDEFINED_PLAYER_ASPECT
 import com.inari.util.aspect.Aspect
 import com.inari.util.event.Event
 

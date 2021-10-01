@@ -7,21 +7,16 @@ import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.composite.*
 import com.inari.firefly.control.scene.SceneSystem
-import com.inari.firefly.core.ComponentRefResolver
+import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.FFSystem
-import com.inari.firefly.entity.Entity
-import com.inari.firefly.entity.EntitySystem
-import com.inari.firefly.game.world.player.PlayerEvent
-import com.inari.firefly.game.world.player.PlayerEventListener
-import com.inari.firefly.game.world.player.PlayerEventType
-import com.inari.firefly.game.world.player.PlayerSystem
-import com.inari.firefly.physics.contact.EContact
-import com.inari.firefly.physics.movement.EMovement
+import com.inari.firefly.game.player.PlayerEvent
+import com.inari.firefly.game.player.PlayerEventListener
+import com.inari.firefly.game.player.PlayerEventType
+import com.inari.firefly.game.player.PlayerSystem
 import com.inari.util.Call
 import com.inari.util.Consumer
 import com.inari.util.collection.BitSet
-import com.inari.util.collection.DynArray
 import com.inari.util.geom.*
 import kotlin.jvm.JvmField
 import kotlin.math.ceil
@@ -107,6 +102,9 @@ object WorldSystem : FFSystem {
 
     fun pauseRoom() {
         if (activeRoomId != NO_COMP_ID && !paused) {
+            val room = FFContext[Room, activeRoomId]
+            if (room.pauseTaskRef >= 0)
+                TaskSystem.runTask(room.pauseTaskRef, room.componentId)
             paused = true
             RoomEvent.send(RoomEventType.ROOM_PAUSED, activeRoomId)
         }
@@ -114,6 +112,9 @@ object WorldSystem : FFSystem {
 
     fun resumeRoom() {
         if (activeRoomId != NO_COMP_ID && paused) {
+            val room = FFContext[Room, activeRoomId]
+            if (room.resumeTaskRef >= 0)
+                TaskSystem.runTask(room.resumeTaskRef, room.componentId)
             paused = false
             RoomEvent.send(RoomEventType.ROOM_RESUMED, activeRoomId)
         }

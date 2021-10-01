@@ -1,4 +1,4 @@
-package com.inari.firefly.game.movement
+package com.inari.firefly.game.player.movement
 
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.ETransform

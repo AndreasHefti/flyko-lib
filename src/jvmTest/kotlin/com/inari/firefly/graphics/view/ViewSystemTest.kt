@@ -3,7 +3,7 @@ package com.inari.firefly.graphics.view
 import com.inari.firefly.GraphicsMock
 import com.inari.firefly.TestApp
 import com.inari.firefly.control.ControllerSystem
-import com.inari.firefly.game.camera.SimpleCameraController
+import com.inari.firefly.game.world.SimpleCameraController
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertNotNull

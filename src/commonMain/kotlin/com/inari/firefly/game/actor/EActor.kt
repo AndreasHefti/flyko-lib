@@ -1,4 +1,4 @@
-package com.inari.firefly.actor
+package com.inari.firefly.game.actor
 
 import com.inari.firefly.*
 import com.inari.firefly.core.ComponentRefResolver

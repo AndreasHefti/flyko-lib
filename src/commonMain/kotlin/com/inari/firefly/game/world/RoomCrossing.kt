@@ -3,7 +3,7 @@ package com.inari.firefly.game.world
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.core.component.CompId
-import com.inari.firefly.game.world.player.PlayerSystem
+import com.inari.firefly.game.player.PlayerSystem
 import com.inari.util.geom.GeomUtils
 import com.inari.util.geom.Orientation
 

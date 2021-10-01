@@ -1,6 +1,5 @@
 package com.inari.firefly.game.world
 
-import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
 import com.inari.firefly.TestApp
 import com.inari.firefly.composite.CompositeSystem
@@ -8,10 +7,9 @@ import com.inari.firefly.control.task.GenericTask
 import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntitySystem
-import com.inari.firefly.game.world.player.PlayerComposite
-import com.inari.firefly.game.world.player.PlayerSystem
+import com.inari.firefly.game.player.PlayerComposite
+import com.inari.firefly.game.player.PlayerSystem
 import com.inari.firefly.graphics.ETransform
-import com.inari.firefly.physics.contact.EContact
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

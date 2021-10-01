@@ -1,21 +1,16 @@
-package com.inari.firefly.game.world.player
+package com.inari.firefly.game.player
 
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.composite.Composite
-import com.inari.firefly.composite.CompositeSystem
 import com.inari.firefly.composite.GenericComposite
-import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.entity.Entity
-import com.inari.firefly.game.world.Area
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.physics.movement.EMovement
-import com.inari.util.collection.DynArray
 import com.inari.util.geom.PositionF
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector2i
-import kotlin.jvm.JvmField
 
 class PlayerComposite private constructor(override var name: String = PLAYER_COMPOSITE_NAME) : GenericComposite() {
 

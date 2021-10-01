@@ -6,7 +6,7 @@ import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentBuilder
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
-import com.inari.firefly.game.world.player.PlayerSystem
+import com.inari.firefly.game.player.PlayerSystem
 import kotlin.jvm.JvmField
 
 class EComposite private constructor () : EntityComponent(EComposite::class.simpleName!!) {

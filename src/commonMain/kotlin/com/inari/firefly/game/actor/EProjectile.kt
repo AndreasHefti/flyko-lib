@@ -1,4 +1,4 @@
-package com.inari.firefly.actor
+package com.inari.firefly.game.actor
 
 import com.inari.firefly.CONTACT_TYPE_ASPECT_GROUP
 import com.inari.firefly.PROJECTILE_TYPE_ASPECT_GROUP

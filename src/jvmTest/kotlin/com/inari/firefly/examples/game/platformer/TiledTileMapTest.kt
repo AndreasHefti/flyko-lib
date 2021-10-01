@@ -8,15 +8,13 @@ import com.inari.firefly.FFContext
 import com.inari.firefly.asset.Asset
 import com.inari.firefly.asset.AssetSystem
 import com.inari.firefly.control.EControl
-import com.inari.firefly.control.state.StateSystem.updateResolution
 import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.api.FFInput
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntitySystem
-import com.inari.firefly.game.camera.CameraPivot
-import com.inari.firefly.game.camera.SimpleCameraController
+import com.inari.firefly.game.world.SimpleCameraController
 import com.inari.firefly.game.collision.PlatformerCollisionResolver
-import com.inari.firefly.game.movement.*
+import com.inari.firefly.game.player.movement.*
 import com.inari.firefly.game.tile.TileMapSystem
 import com.inari.firefly.game.tile.TileMaterialType
 import com.inari.firefly.game.json.TiledJsonRoomAsset
@@ -35,7 +33,6 @@ import com.inari.firefly.physics.contact.ContactSystem
 import com.inari.firefly.physics.contact.EContact
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.MovementSystem
-import com.inari.util.geom.PositionF
 import com.inari.util.indexed.Indexer
 import org.lwjgl.glfw.GLFW
 
@@ -158,10 +155,7 @@ class TiledTileMapTest : DesktopApp() {
         // camera
         val camId = SimpleCameraController.buildAndActivate {
             name="Player_Camera"
-            pivot = object : CameraPivot {
-                override fun init() {}
-                override operator fun invoke(): PositionF = FFContext[ETransform, playerEntityId].position
-            }
+            pivot = FFContext[ETransform, playerEntityId].position
             snapToBounds(-100, -100, 840, 840)
         }
         FFContext.get<View>(viewId).withController(camId)

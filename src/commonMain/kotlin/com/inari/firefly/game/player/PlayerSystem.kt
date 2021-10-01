@@ -1,19 +1,14 @@
 @file:Suppress("VARIABLE_IN_SINGLETON_WITHOUT_THREAD_LOCAL")
 
-package com.inari.firefly.game.world.player
+package com.inari.firefly.game.player
 
 import com.inari.firefly.FFContext
-import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.control.task.Task
 import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.core.ComponentRefResolver
-import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.FFSystem
 import com.inari.firefly.core.system.SystemComponentBuilder
-import com.inari.firefly.entity.Entity
-import com.inari.firefly.graphics.ETransform
 import com.inari.util.aspect.IndexedAspectType
-import com.inari.util.geom.PositionF
 import kotlin.jvm.JvmField
 
 object PlayerSystem : FFSystem {

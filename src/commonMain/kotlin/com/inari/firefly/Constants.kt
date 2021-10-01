@@ -6,7 +6,6 @@ import com.inari.firefly.core.component.Component
 import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.property.VirtualPropertyRef
-import com.inari.firefly.game.camera.CameraPivot
 import com.inari.util.*
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.AspectType
@@ -62,10 +61,6 @@ val EMPTY_FLOAT_ARRAY: FloatArray = FloatArray(0)
     override val propertyName: String = NO_NAME
     override val type: KClass<*> get() = throw UnsupportedOperationException()
     override fun accessor(entity: Entity): VirtualPropertyRef.PropertyAccessor = throw UnsupportedOperationException()
-}
-@JvmField val NO_CAMERA_PIVOT = object : CameraPivot {
-    override fun init() = throw UnsupportedOperationException()
-    override operator fun invoke(): PositionF = throw UnsupportedOperationException()
 }
 
 @JvmField val VOID_INT_CONSUMER: IntConsumer = { _ -> }

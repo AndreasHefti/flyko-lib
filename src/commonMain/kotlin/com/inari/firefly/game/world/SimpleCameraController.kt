@@ -1,14 +1,14 @@
-package com.inari.firefly.game.camera
+package com.inari.firefly.game.world
 
 import com.inari.firefly.FFContext
 import com.inari.util.geom.PositionF
-import com.inari.firefly.NO_CAMERA_PIVOT
 import com.inari.firefly.control.Controller
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewChangeEvent
 import com.inari.util.geom.Rectangle
+import kotlin.jvm.JvmField
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -18,10 +18,9 @@ class SimpleCameraController private constructor() : Controller() {
     private val pos = PositionF()
     private lateinit var view: View
 
-    var pivot: CameraPivot = NO_CAMERA_PIVOT
-    var snapToBounds: Rectangle = Rectangle()
-        set(value) {snapToBounds(value)}
-    var velocity: Float = 0.25f
+    @JvmField var pivot: PositionF = PositionF()
+    @JvmField var snapToBounds: Rectangle = Rectangle()
+    @JvmField var velocity: Float = 0.25f
 
     fun adjust() {
         if (getPos(view.data.zoom, view.data.bounds, view.data.worldPosition)) {
@@ -44,10 +43,8 @@ class SimpleCameraController private constructor() : Controller() {
     }
 
     private fun getPos(zoom: Float, viewBounds: Rectangle, worldPosition: PositionF): Boolean {
-        if (pivot === NO_CAMERA_PIVOT)
-            return false
 
-        val following = pivot()
+        val following = pivot
         val oneDivZoom = 1f / zoom
         val viewHorizontal = viewBounds.width / oneDivZoom
         val viewHorizontalHalf = viewHorizontal / 2f
