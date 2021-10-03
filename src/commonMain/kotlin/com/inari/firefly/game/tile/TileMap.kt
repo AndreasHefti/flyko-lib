@@ -1,9 +1,6 @@
 package com.inari.firefly.game.tile
 
-import com.inari.firefly.BlendMode
-import com.inari.firefly.FFContext
-import com.inari.firefly.NO_COMP_ID
-import com.inari.firefly.NO_NAME
+import com.inari.firefly.*
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.ComponentDSL
@@ -259,7 +256,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         val viewPos = FFContext[View, viewRef].worldPosition
 
         tileMapLayer.forEach { mapLayer ->
-            if (mapLayer.parallaxFactorX != 0.0f || mapLayer.parallaxFactorY != 0.0f) {
+            if (mapLayer.parallaxFactorX != ZERO_FLOAT || mapLayer.parallaxFactorY != ZERO_FLOAT) {
                 FFContext[TileGrid, mapLayer.tileGridId].position(
                     -viewPos.x * mapLayer.parallaxFactorX,
                     -viewPos.y * mapLayer.parallaxFactorY)
@@ -296,9 +293,9 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         @JvmField var mapHeight = 0
         @JvmField var tileWidth = 0
         @JvmField var tileHeight = 0
-        @JvmField var parallaxFactorX = 0.0f
-        @JvmField var parallaxFactorY = 0.0f
-        @JvmField var position: PositionF = PositionF(0.0f, 0.0f)
+        @JvmField var parallaxFactorX = ZERO_FLOAT
+        @JvmField var parallaxFactorY = ZERO_FLOAT
+        @JvmField var position: PositionF = PositionF(ZERO_FLOAT, ZERO_FLOAT)
         @JvmField var spherical: Boolean = false
         @JvmField var blend = BlendMode.NORMAL_ALPHA
         @JvmField var tint = MutableColor(1f, 1f, 1f, 1f)

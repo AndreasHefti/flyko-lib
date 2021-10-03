@@ -160,7 +160,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
         refresh = false
         setOnGround = false
         if (contacts.hasAnyContact()) {
-            if (movement.velocity.dy < 0.0f) {
+            if (movement.velocity.dy < ZERO_FLOAT) {
                 val d1 = getAdjustDistance(sensorMatrix.distances[0].dy, verticalContactSensorThreshold)
                 val d2 = getAdjustDistance(sensorMatrix.distances[1].dy, verticalContactSensorThreshold)
                 val d3 = getAdjustDistance(sensorMatrix.distances[2].dy, verticalContactSensorThreshold)
@@ -173,10 +173,10 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
                     sensorMatrix.contactSensorLineRight.cardinality < verticalContactSensorThreshold &&
                     sensorMatrix.contactSensorLineRight.getBit(0, sensorMatrix.gapNorth))) {
 
-                    movement.velocity.dy = 0.0f
+                    movement.velocity.dy = ZERO_FLOAT
                     refresh = true
                 } else if (minDistTop != sensorMatrix.noDistanceValue && minDistTop < 0) {
-                    movement.velocity.dy = 0.0f
+                    movement.velocity.dy = ZERO_FLOAT
                     refresh = true
                 }
             } else {
@@ -194,7 +194,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
                         // slope south-west
                         val d4 = abs(d3 - d1)
                         if (d4 < slopeAdaptionThreshold && d4 != d2) {
-                            val wrongDirection = movement.velocity.dx < 0.0f && d2 > 0
+                            val wrongDirection = movement.velocity.dx < ZERO_FLOAT && d2 > 0
                             if (!wrongDirection) {
                                 println("adjust slope south-west d4 $d4 d2 $d2")
                                 transform.move(dy = d2)
@@ -209,7 +209,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
                         // slope south-east
                         val d4 = abs(d1 - d3)
                         if (d4 < slopeAdaptionThreshold && d4 != d2) {
-                            val wrongDirection = movement.velocity.dx > 0.0f && d2 > 0
+                            val wrongDirection = movement.velocity.dx > ZERO_FLOAT && d2 > 0
                             if (!wrongDirection) {
                                 println("adjust slope south-east d4 $d4 d2 $d2")
                                 transform.move(dy = d2)
@@ -239,7 +239,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
         // set on ground
         movement.onGround =
             setOnGround ||
-            (movement.velocity.dy >= 0.0f &&
+            (movement.velocity.dy >= ZERO_FLOAT &&
             (sensorMatrix.distances[5].dy == 0 ||
             sensorMatrix.distances[6].dy == 0 ||
             sensorMatrix.distances[7].dy == 0) &&
@@ -257,7 +257,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
 
     private fun resolveHorizontally(entity: Entity, contacts: Contacts, movement: EMovement, transform: ETransform, ) {
         var refresh = false
-        if (movement.velocity.dx > 0.0f) {
+        if (movement.velocity.dx > ZERO_FLOAT) {
             if (sensorMatrix.contactSensorLineRight.cardinality > verticalScanLineThreshold || sensorMatrix.distances[2].dx != 0) {
                 val specialCase = movement.velocity.dy < 0 && sensorMatrix.distances[2].dx != 0 && sensorMatrix.distances[4].dx == sensorMatrix.noDistanceValue
                 val minDistRight = minDist(sensorMatrix.distances[2].dx, sensorMatrix.distances[4].dx)
@@ -272,7 +272,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
                     refresh = true
                 }
             }
-        } else if (movement.velocity.dx < 0.0f) {
+        } else if (movement.velocity.dx < ZERO_FLOAT) {
             if (sensorMatrix.contactSensorLineLeft.cardinality > verticalScanLineThreshold || sensorMatrix.distances[0].dx != 0) {
                 val specialCase = movement.velocity.dy < 0 && sensorMatrix.distances[0].dx != 0 && sensorMatrix.distances[3].dx == sensorMatrix.noDistanceValue
                 val minDistLeft = minDist(sensorMatrix.distances[0].dx, sensorMatrix.distances[3].dx)

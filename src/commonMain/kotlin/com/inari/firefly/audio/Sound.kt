@@ -1,6 +1,7 @@
 package com.inari.firefly.audio
 
 import com.inari.firefly.FFContext
+import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.control.ControlledSystemComponent
 import com.inari.firefly.control.trigger.Trigger
 import com.inari.firefly.control.trigger.TriggerSystem.trigger
@@ -25,7 +26,7 @@ class Sound private constructor() : SystemComponent(Sound::class.simpleName!!), 
     var looping: Boolean = false
     var volume: Float = 1.0f
     var pitch: Float = 1.0f
-    var pan: Float = 0.0f
+    var pan: Float = ZERO_FLOAT
     var channel: Int = 0
 
     fun <A : Trigger> withPlayTrigger(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): A {

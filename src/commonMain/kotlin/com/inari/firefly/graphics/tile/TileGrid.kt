@@ -1,5 +1,6 @@
 package com.inari.firefly.graphics.tile
 
+import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentSingleType
@@ -36,7 +37,7 @@ class TileGrid private constructor() : SystemComponent(TileGrid::class.simpleNam
     var cellHeight: Int
         get() = cellDim.dy
         set(value) {cellDim.dy = setIfNotInitialized(value, "cellHeight")}
-    var position: PositionF = PositionF(0.0f, 0.0f)
+    var position: PositionF = PositionF(ZERO_FLOAT, ZERO_FLOAT)
     var spherical: Boolean = false
         set(value) {field = setIfNotInitialized(value, "spherical")}
 

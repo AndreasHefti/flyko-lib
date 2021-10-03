@@ -7,7 +7,7 @@ import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.api.InputDevice
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSubType
-import com.inari.firefly.game.EMPTY_MOVE_CALLBACK
+import com.inari.firefly.game.VOID_MOVE_CALLBACK
 import com.inari.firefly.physics.movement.EMovement
 import kotlin.jvm.JvmField
 import kotlin.math.max
@@ -22,7 +22,7 @@ class PlatformerHMoveController : Controller() {
     @JvmField var buttonLeft = ButtonType.LEFT
     @JvmField var buttonRight = ButtonType.RIGHT
 
-    @JvmField var directionChangeCallback = EMPTY_MOVE_CALLBACK
+    @JvmField var directionChangeCallback = VOID_MOVE_CALLBACK
 
     private lateinit var playerMovement: EMovement
 

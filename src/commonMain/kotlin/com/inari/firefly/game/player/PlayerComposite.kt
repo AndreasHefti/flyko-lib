@@ -2,6 +2,7 @@ package com.inari.firefly.game.player
 
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
+import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.composite.Composite
 import com.inari.firefly.composite.GenericComposite
 import com.inari.firefly.core.system.SystemComponentSubType
@@ -35,7 +36,7 @@ class PlayerComposite private constructor(override var name: String = PLAYER_COM
         if (EMovement in entity.aspects)
             playerVelocity = FFContext[EMovement, entityId].velocity
         else
-            playerVelocity = Vector2f(0.0f, 0.0f)
+            playerVelocity = Vector2f(ZERO_FLOAT, ZERO_FLOAT)
         // notify
         PlayerEvent.send(PlayerEventType.PLAYER_LOADED)
     }

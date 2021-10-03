@@ -3,6 +3,7 @@ package com.inari.firefly.physics.movement
 import com.inari.firefly.FFContext
 import com.inari.firefly.INFINITE_SCHEDULER
 import com.inari.firefly.MOVEMENT_ASPECT_GROUP
+import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.FFTimer
 import com.inari.firefly.core.component.CompId
@@ -20,7 +21,7 @@ class EMovement private constructor() : EntityComponent(EMovement::class.simpleN
 
     @JvmField var active = true
     @JvmField val integrator = ComponentRefResolver(Integrator) { index-> integratorRef = index }
-    @JvmField var mass = 0.0f
+    @JvmField var mass = ZERO_FLOAT
     @JvmField val force = Vector2f(0f, 0f)
     @JvmField val acceleration = Vector2f(0f, 0f)
     @JvmField val velocity = Vector2f(0f, 0f)

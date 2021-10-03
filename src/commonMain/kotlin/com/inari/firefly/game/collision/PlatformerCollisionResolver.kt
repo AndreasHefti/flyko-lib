@@ -152,13 +152,13 @@ class PlatformerCollisionResolver : CollisionResolver()  {
 
         //println("onSlope $onSlope")
 
-        if (onSlope && movement.velocity.dy >= 0.0f) {
+        if (onSlope && movement.velocity.dy >= ZERO_FLOAT) {
             //println("adjust slope ${contactSensorB2.cardinality}")
             if (contactSensorB1.cardinality > contactSensorB3.cardinality) {
                 //println("slope south-east")
                 transform.move(dy = -(contactSensorB1.cardinality - gapSouth))
                 transform.position.y = ceil(transform.position.y)
-                movement.velocity.dy = 0.0f
+                movement.velocity.dy = ZERO_FLOAT
                 refresh = true
                 setOnGround = true
                 onSlopeCallback(entity.index, contactSensorB1.cardinality - contactSensorB3.cardinality, contacts)
@@ -166,16 +166,16 @@ class PlatformerCollisionResolver : CollisionResolver()  {
                 //println("slope south-west")
                 transform.move(dy = -(contactSensorB3.cardinality - gapSouth))
                 transform.position.y = ceil(transform.position.y)
-                movement.velocity.dy = 0.0f
+                movement.velocity.dy = ZERO_FLOAT
                 refresh = true
                 setOnGround = true
                 onSlopeCallback(entity.index, contactSensorB1.cardinality - contactSensorB3.cardinality, contacts)
             }
-        } else if (bmax > gapSouth && movement.velocity.dy >= 0.0f) {
+        } else if (bmax > gapSouth && movement.velocity.dy >= ZERO_FLOAT) {
             //println("adjust ground: ${bmax - gapSouth} : ${movement.velocity.dy}")
             transform.move(dy = -(bmax - gapSouth))
             transform.position.y = ceil(transform.position.y)
-            movement.velocity.dy = 0.0f
+            movement.velocity.dy = ZERO_FLOAT
             refresh = true
             setOnGround = true
         }
@@ -184,8 +184,8 @@ class PlatformerCollisionResolver : CollisionResolver()  {
             //println("adjust top: $tmax")
             transform.move(dy = tmax)
             transform.position.y = floor(transform.position.y)
-            if (movement.velocity.dy < 0.0f)
-                movement.velocity.dy = 0.0f
+            if (movement.velocity.dy < ZERO_FLOAT)
+                movement.velocity.dy = ZERO_FLOAT
             refresh = true
         }
 

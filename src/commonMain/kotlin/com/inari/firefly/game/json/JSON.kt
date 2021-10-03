@@ -1,6 +1,7 @@
 package com.inari.firefly.game.json
 
 import com.inari.firefly.NO_NAME
+import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.game.world.WorldOrientationType
 
 /** example-world.json
@@ -134,11 +135,11 @@ data class TiledObject(
     val id: Int = -1,
     val name: String = NO_NAME,
     val type: String = NO_NAME,
-    val x: Float = 0.0f,
-    val y: Float = 0.0f,
-    val width: Float = 0.0f,
-    val height: Float = 0.0f,
-    val rotation: Float = 0.0f,
+    val x: Float = ZERO_FLOAT,
+    val y: Float = ZERO_FLOAT,
+    val width: Float = ZERO_FLOAT,
+    val height: Float = ZERO_FLOAT,
+    val rotation: Float = ZERO_FLOAT,
     val visible: Boolean = false,
     val gid: Int = -1,
     val point: Boolean = false,

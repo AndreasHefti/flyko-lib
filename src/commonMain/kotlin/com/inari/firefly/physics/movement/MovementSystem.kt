@@ -2,6 +2,7 @@ package com.inari.firefly.physics.movement
 
 import com.inari.firefly.FFApp.UpdateEvent
 import com.inari.firefly.FFContext
+import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.Entity
@@ -67,7 +68,7 @@ object MovementSystem : ComponentSystem {
                 integrator[movement.integratorRef]
             val transform = entity[ETransform]
             movementIntegrator.integrate(movement, transform, deltaTimeInSeconds)
-            if (movement.velocity.dx != 0.0f || movement.velocity.dy != 0.0f) {
+            if (movement.velocity.dx != ZERO_FLOAT || movement.velocity.dy != ZERO_FLOAT) {
                 movementIntegrator.step(movement, transform, deltaTimeInSeconds)
                 MoveEvent.moveEvent.entities.set(entity.index)
             }

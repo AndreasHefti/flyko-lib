@@ -1,5 +1,6 @@
 package com.inari.firefly.graphics
 
+import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.TransformData
 import com.inari.util.geom.PositionF
@@ -41,7 +42,7 @@ class ETransform private constructor() : EntityComponent(ETransform::class.simpl
     override val layerIndex: Int
         get() = layerRef
 
-    fun move(dx: Float = 0.0f, dy: Float = 0.0f) {
+    fun move(dx: Float = ZERO_FLOAT, dy: Float = ZERO_FLOAT) {
         data.position.x += dx
         data.position.y += dy
     }

@@ -1,14 +1,15 @@
 package com.inari.firefly.core.api
 
+import com.inari.firefly.ZERO_FLOAT
 import com.inari.util.geom.PositionF
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 
 class TransformData constructor(
-    @JvmField val position: PositionF = PositionF(0.0f, 0.0f),
-    @JvmField val pivot: PositionF = PositionF(0.0f, 0.0f),
+    @JvmField val position: PositionF = PositionF(ZERO_FLOAT, ZERO_FLOAT),
+    @JvmField val pivot: PositionF = PositionF(ZERO_FLOAT, ZERO_FLOAT),
     @JvmField val scale: Vector2f = Vector2f(1.0f, 1.0f),
-    @JvmField var rotation: Float = 0.0f
+    @JvmField var rotation: Float = ZERO_FLOAT
 ) {
     val hasRotation: Boolean get() = rotation != 0f
     val hasScale: Boolean get() = scale.dx != 1.0f || scale.dy != 1.0f
@@ -22,12 +23,12 @@ class TransformData constructor(
     }
 
     fun reset() {
-        position.x = 0.0f
-        position.y = 0.0f
-        pivot.x = 0.0f
-        pivot.y = 0.0f
+        position.x = ZERO_FLOAT
+        position.y = ZERO_FLOAT
+        pivot.x = ZERO_FLOAT
+        pivot.y = ZERO_FLOAT
         scale.dx = 1.0f
         scale.dy = 1.0f
-        rotation = 0.0f
+        rotation = ZERO_FLOAT
     }
 }
