@@ -53,9 +53,16 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation("com.badlogicgames.gdx:gdx:1.9.12")
-                implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:1.9.12")
-                implementation("com.badlogicgames.gdx:gdx-platform:1.9.12:natives-desktop")
+                //implementation("com.badlogicgames.gdx:gdx:1.9.12")
+                //implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:1.9.12")
+                //implementation("org.lwjgl.lwjgl:lwjgl:3.2.1")
+                implementation ("org.lwjgl:lwjgl:3.2.3")
+                implementation("org.lwjgl:lwjgl-glfw:3.2.3")
+                implementation("org.lwjgl:lwjgl-opengl:3.2.3")
+                //implementation ("org.lwjgl:lwjgl-platform:3.2.3:natives-windows")
+                //implementation ("org.lwjgl:lwjgl-platform:3.2.3:natives-linux")
+                //implementation ("org.lwjgl:lwjgl-platform:3.2.3:natives-osx")
+                //implementation("com.badlogicgames.gdx:gdx-platform:1.9.12:natives-desktop")
                 implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.0")
             }
         }
