@@ -107,7 +107,8 @@ data class TiledTileMap(
     val tilesets: Array<TilesetCodeOffsets> = emptyArray(),
     val properties: Array<PropertyJson> = emptyArray()
 ) {
-    val mappedProperties: Map<String, PropertyJson> = properties.associateBy(PropertyJson::name)
+    val mappedProperties: Map<String, PropertyJson>
+        get() = properties.associateBy(PropertyJson::name)
 }
 
 data class TiledLayer(
@@ -115,8 +116,8 @@ data class TiledLayer(
     val type: String,               // "tilelayer" or "objectgroup"
     val x: Int,                     // position in pixel
     val y: Int,                     // position in pixel
-    val width: Int,                 // width in tiles
-    val height: Int,                // height in tiles
+    val width: Int = 0,             // width in tiles
+    val height: Int = 0,            // height in tiles
     val offsetx: Float = 0f,        // offset x-axis in pixel
     val offsety: Float = 0f,        // offset y-axis in pixel
     val parallaxx: Float = 1f,      // parallax scroll factor
@@ -128,7 +129,8 @@ data class TiledLayer(
     val objects: Array<TiledObject>?,
     val properties: Array<PropertyJson> = emptyArray()
 ) {
-    val mappedProperties: Map<String, PropertyJson> = properties.associateBy(PropertyJson::name)
+    val mappedProperties: Map<String, PropertyJson>
+        get() = properties.associateBy(PropertyJson::name)
 }
 
 data class TiledObject(
@@ -145,14 +147,20 @@ data class TiledObject(
     val point: Boolean = false,
     val properties: Array<PropertyJson> = emptyArray()
 ){
-    val mappedProperties: Map<String, PropertyJson> = properties.associateBy(PropertyJson::name)
+    val mappedProperties: Map<String, PropertyJson>
+        get() = properties.associateBy(PropertyJson::name)
 }
 
 data class PropertyJson(
     val name: String,
     val type: String,
-    val value: String
-)
+    val value: Any
+) {
+    val stringValue: String
+        get() = value.toString()
+    val intValue: Int
+        get() = value as Int
+}
 
 data class TilesetCodeOffsets(
     val firstgid: Int,
@@ -167,7 +175,8 @@ data class TileSetJson(
     val properties: Array<PropertyJson> = emptyArray(),
     val tiles: Array<TileJson> = emptyArray()
 ) {
-    val mappedProperties: Map<String, PropertyJson> = properties.associateBy(PropertyJson::name)
+    val mappedProperties: Map<String, PropertyJson>
+        get() = properties.associateBy(PropertyJson::name)
 }
 
 data class TileJson(
@@ -175,6 +184,7 @@ data class TileJson(
     val type: String,
     val properties: Array<PropertyJson> = emptyArray()
 ) {
-    val mappedProperties: Map<String, PropertyJson> = properties.associateBy(PropertyJson::name)
+    val mappedProperties: Map<String, PropertyJson>
+        get() = properties.associateBy(PropertyJson::name)
 }
 

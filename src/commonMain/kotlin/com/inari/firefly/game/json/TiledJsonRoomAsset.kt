@@ -53,7 +53,7 @@ class TiledJsonRoomAsset private constructor() : Asset() {
         val tileMapJson = resource.invoke()
 
         // create TiledTileSetAssets
-        val tilesets = tileMapJson.mappedProperties["tilesets"]?.value?.split(",")
+        val tilesets = tileMapJson.mappedProperties["tilesets"]?.stringValue?.split(",")
             ?: throw RuntimeException("Missing tilesets definition")
 
         tileSetAssetToCodeOffsetMapping.clear()
@@ -73,7 +73,7 @@ class TiledJsonRoomAsset private constructor() : Asset() {
 
         // create TileMap
         tileMapId = TileMap.build {
-            name = tileMapJson.mappedProperties["name"]?.value ?: super.name
+            name = tileMapJson.mappedProperties["name"]?.stringValue ?: super.name
             view(this@TiledJsonRoomAsset.viewRef)
 
             tileMapJson.layers.forEach { layerJson ->
@@ -104,7 +104,7 @@ class TiledJsonRoomAsset private constructor() : Asset() {
                     name = tiledObject.name
                     view(this@TiledJsonRoomAsset.viewRef)
                     layer(layerJson.name)
-                    layerJson.properties.forEach { setAttribute(it.name, it.value) }
+                    layerJson.properties.forEach { setAttribute(it.name, it.stringValue) }
                 }
                 composite.systemLoad()
                 tileMap.compositeIds + composite.componentId
@@ -121,19 +121,19 @@ class TiledJsonRoomAsset private constructor() : Asset() {
                     }
                     withComponent(EComposite) {
                         layerJson.properties.forEach {
-                            setAttribute(it.name, it.value)
+                            setAttribute(it.name, it.stringValue)
                         }
                         tiledObject.mappedProperties["loadTask"]?.also {
-                            withLoadTask(it.value)
+                            withLoadTask(it.stringValue)
                         }
                         tiledObject.mappedProperties["activationTask"]?.also {
-                            withActivationTask(it.value)
+                            withActivationTask(it.stringValue)
                         }
                         tiledObject.mappedProperties["deactivationTask"]?.also {
-                            withDeactivationTask(it.value)
+                            withDeactivationTask(it.stringValue)
                         }
                         tiledObject.mappedProperties["disposeTask"]?.also {
-                            withDisposeTask(it.value)
+                            withDisposeTask(it.stringValue)
                         }
                     }
                 }
@@ -145,15 +145,15 @@ class TiledJsonRoomAsset private constructor() : Asset() {
     }
 
     private fun loadTileLayer(tileMap: TileMap, tileMapJson: TiledTileMap, layerJson: TiledLayer) {
-        val layerTileSets = layerJson.mappedProperties["tilesets"]?.value
+        val layerTileSets = layerJson.mappedProperties["tilesets"]?.stringValue
             ?: throw RuntimeException("Missing tilesets for layer")
 
         tileMap.withLayer {
             position(layerJson.x + layerJson.offsetx, layerJson.y + layerJson.offsety)
             tileWidth = tileMapJson.tilewidth
             tileHeight = tileMapJson.tileheight
-            mapWidth = layerJson.mappedProperties["width"]?.value?.toInt() ?: tileMapJson.width
-            mapHeight = layerJson.mappedProperties["height"]?.value?.toInt() ?: tileMapJson.height
+            mapWidth = layerJson.mappedProperties["width"]?.intValue ?: tileMapJson.width
+            mapHeight = layerJson.mappedProperties["height"]?.intValue ?: tileMapJson.height
             parallaxFactorX = layerJson.parallaxx - 1
             parallaxFactorY = layerJson.parallaxy - 1
             layer(layerJson.name)
@@ -164,9 +164,9 @@ class TiledJsonRoomAsset private constructor() : Asset() {
             if (layerJson.opacity < 1.0f)
                 tint(tint.r, tint.g, tint.b, layerJson.opacity)
             if ("blend" in layerJson.mappedProperties)
-                blend = BlendMode.valueOf(layerJson.mappedProperties["blend"]?.value!!)
+                blend = BlendMode.valueOf(layerJson.mappedProperties["blend"]?.stringValue!!)
             if ("renderer" in layerJson.mappedProperties)
-                renderer(layerJson.mappedProperties["renderer"]?.value!!)
+                renderer(layerJson.mappedProperties["renderer"]?.stringValue!!)
 
             // define tile sets for this map layer
             val tileSetNames = layerTileSets.split(",")

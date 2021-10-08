@@ -37,7 +37,7 @@ class TiledJsonTileSetAsset private constructor() : Asset() {
         val tileSetJson = resource.invoke()
 
         // create texture asset for the tile set if not exists and load it
-        val atlasResource = tileSetJson.mappedProperties["atlas"]?.value ?: throw RuntimeException("Missing atlas texture resource")
+        val atlasResource = tileSetJson.mappedProperties["atlas"]?.stringValue ?: throw RuntimeException("Missing atlas texture resource")
         AssetSystem.assets.forEach loop@ {  asset ->
             if (asset is TextureAsset && atlasResource == asset.resourceName) {
                 textureAssetId = asset.componentId
@@ -100,12 +100,12 @@ class TiledJsonTileSetAsset private constructor() : Asset() {
                 )
 
                 val atlasProps = atlasPropsString.split(":")
-                val tileTintColor = TileUtils.getColorFromString(tileJson.mappedProperties["blend"]?.value ?: "")
+                val tileTintColor = TileUtils.getColorFromString(tileJson.mappedProperties["blend"]?.stringValue ?: "")
 
                 withTile {
                     name = tileName
                     blendMode = try {
-                        BlendMode.valueOf(tileJson.mappedProperties["blend"]!!.value)
+                        BlendMode.valueOf(tileJson.mappedProperties["blend"]!!.stringValue)
                     } catch (e: Exception) {
                         null
                     }
@@ -129,7 +129,7 @@ class TiledJsonTileSetAsset private constructor() : Asset() {
                     }
 
                     if (tileJson.mappedProperties.contains("animation")) {
-                        val frames = tileJson.mappedProperties["animation"]!!.value.split(",")
+                        val frames = tileJson.mappedProperties["animation"]!!.stringValue.split(",")
                         withAnimation {
                             frames.forEachIndexed { index, fString ->
                                 val timeSprite = fString.split("_")

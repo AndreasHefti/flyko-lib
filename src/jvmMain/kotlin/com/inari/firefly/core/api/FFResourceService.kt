@@ -1,8 +1,9 @@
 package com.inari.firefly.core.api
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapter
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.File
 import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
@@ -12,11 +13,15 @@ import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 import kotlin.reflect.KClass
 
-actual object FFResourceService : ResourceServiceAPI {
+actual object  FFResourceService : ResourceServiceAPI {
 
-    private val JSONMapper = ObjectMapper()
-        .registerModule(KotlinModule())
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    private val JSONMapper = Moshi
+        .Builder()
+        .addLast(KotlinJsonAdapterFactory())
+        .build();
+//    private val JSONMapper = GsonBuilder().
+//        .registerModule(KotlinModule())
+//        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     actual override fun loadTextResource(resourceName: String, encryption: String?): String {
         if (encryption != null) {
@@ -56,7 +61,10 @@ actual object FFResourceService : ResourceServiceAPI {
     actual override fun <T : Any> loadJSONResource(resourceName: String, type: KClass<T>, encryption: String?): T {
         try {
             val text = loadTextResource(resourceName, encryption)
-            return JSONMapper.readValue(text, type.javaObjectType)
+            val jsonAdapter: JsonAdapter<T> = JSONMapper.adapter(type.java)
+            val result = jsonAdapter.fromJson(text)
+            return result!!
+            //return JSONMapper.readValue(text, type.javaObjectType)
         } catch (e: Exception) {
             throw RuntimeException("Failed to load world from resource: $resourceName", e)
         }
@@ -64,7 +72,8 @@ actual object FFResourceService : ResourceServiceAPI {
 
     actual override fun <T : Any> writeJSNONResource(resourceName: String, jsonObject: T, encryption: String?) {
         try {
-            writeTextResource(resourceName, JSONMapper.writeValueAsString(jsonObject), encryption)
+            val jsonAdapter: JsonAdapter<T> = JSONMapper.adapter(jsonObject.javaClass)
+            writeTextResource(resourceName, jsonAdapter.toJson(jsonObject), encryption)
         } catch (e: Exception) {
             throw RuntimeException("Failed to write to resource to File: $resourceName", e)
         }

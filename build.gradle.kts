@@ -1,6 +1,6 @@
 
 plugins {
-    kotlin("multiplatform") version "1.4.32"
+    kotlin("multiplatform") version "1.5.31"
     id("maven-publish")
 }
 
@@ -53,22 +53,18 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation("com.badlogicgames.gdx:gdx:1.9.12")
                 implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:1.9.12")
                 implementation("com.badlogicgames.gdx:gdx-platform:1.9.12:natives-desktop")
-
-                //implementation("org.lwjgl.lwjgl:lwjgl:3.2.1")
-                //implementation ("org.lwjgl:lwjgl:3.2.3")
-                //implementation("org.lwjgl:lwjgl-glfw:3.2.3")
-                //implementation("org.lwjgl:lwjgl-opengl:3.2.3")
-
-                implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.0")
+                //implementation( "com.google.code.gson:gson:2.8.8")
+                implementation("com.squareup.moshi:moshi:1.12.0")
+                implementation("com.squareup.moshi:moshi-kotlin:1.12.0")
+                //implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.0")
             }
         }
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
-                implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.0")
+
             }
         }
         val jsMain by getting {
