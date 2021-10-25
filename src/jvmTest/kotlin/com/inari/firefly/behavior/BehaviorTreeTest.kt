@@ -3,9 +3,8 @@ package com.inari.firefly.behavior
 import com.inari.firefly.TestApp
 import com.inari.firefly.control.behavior.*
 import com.inari.firefly.control.behavior.BehaviorSystem.FALSE_CONDITION
-import com.inari.firefly.control.task.GenericTask
+import com.inari.firefly.control.task.SimpleTask
 import com.inari.firefly.control.task.TaskSystem
-import com.inari.util.OpResult
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -21,7 +20,7 @@ class BehaviorTreeTest {
     @Test
     fun testCreation() {
 
-        GenericTask.build {
+        SimpleTask.build {
             name = "Task_Name"
             withSimpleOperation {  }
         }

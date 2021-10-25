@@ -16,7 +16,9 @@ enum class OpResult {
 
 typealias Consumer<C> = (C) -> Unit
 typealias Operation<C> = (C) -> OpResult
+typealias UpdateOperation = () -> OpResult
 typealias TaskOperation = () -> OpResult
+typealias TaskCallback = (OpResult) -> Any
 typealias ComponentTaskOperation = (CompId, CompId, CompId) -> OpResult
 typealias Call = () -> Unit
 typealias Supplier<C> = () -> C
@@ -39,6 +41,11 @@ typealias BooleanFunction = (Boolean) -> Boolean
 typealias BooleanOperation = (Boolean) -> OpResult
 typealias BooleanSupplier = () -> Boolean
 typealias BooleanConsumer = (Boolean) -> Unit
+
+typealias ComponentIdFunction = (CompId) -> CompId
+typealias ComponentIdOperation = (CompId) -> OpResult
+typealias ComponentIdSupplier = () -> CompId
+typealias ComponentIdConsumer = (CompId) -> Unit
 
 /** Use this on types that can be disposed  */
 interface Disposable {

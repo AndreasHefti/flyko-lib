@@ -3,44 +3,51 @@ package com.inari.firefly.game.json
 import com.inari.firefly.NO_NAME
 import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.game.world.WorldOrientationType
+import kotlin.jvm.JvmField
 
 /** example-world.json
  *  {
  *      "name": "world1",
  *      "orientationType": "COUNT",
  *      "orientation": "1",
- *      "onActivationTasks": = "Task1,Task2,...",
- *      "attributess": {
+ *      "onLoadTasks": "Task1|Task2|...",
+ *      "onActivationTasks": "Task1|Task2|...",
+ *      "onDeactivationTasks" :"Task1|Task2|...",
+ *      "onDisposeTasks": "Task1|Task2|...",
+ *      "attributes": {
  *          ...
  *      },
  *      "areasData": [{
  *          "name": "area1",
  *          "resource": "area1.json",
- *          "attributess": {
+ *          "attributes": {
  *              ...
  *          }
  *      },
  *      {
  *          "name": "area2",
  *          "resource": "area2.json",
- *          "attributess": {
+ *          "attributes": {
  *              ...
  *          }
  *      }]
  *  }
  */
-data class WorldJson(
-    val name: String,
-    val orientationType: WorldOrientationType = WorldOrientationType.COUNT,
-    val orientation: String = "0",
-    val onActivationTasks: String? = null,
-    val attributes: Map<String, String> = emptyMap(),
-    val areasData: Collection<AreaMetaJson>
+class WorldJson(
+    @JvmField val name: String,
+    @JvmField val orientationType: WorldOrientationType = WorldOrientationType.COUNT,
+    @JvmField val orientation: String = "0",
+    @JvmField val onLoadTasks: String = NO_NAME,
+    @JvmField val onActivationTasks: String = NO_NAME,
+    @JvmField val onDeactivationTasks: String = NO_NAME,
+    @JvmField val onDisposeTasks: String = NO_NAME,
+    @JvmField val attributes: Map<String, String> = emptyMap(),
+    @JvmField val areasData: Collection<AreaMetaJson>
 )
-data class AreaMetaJson(
-    val name: String,
-    val resource: String,
-    val attributes: Map<String, String> = emptyMap()
+class AreaMetaJson(
+    @JvmField val name: String,
+    @JvmField val resource: String,
+    @JvmField val attributes: Map<String, String> = emptyMap()
 )
 
 /** example-area.json
@@ -48,8 +55,11 @@ data class AreaMetaJson(
  *      "name": "area1",
  *      "orientationType": "COUNT",
  *      "orientation": "1",
- *      "onActivationTasks": = "Task1,Task2,...",
- *      "attributess": {
+ *      "onLoadTasks": "Task1|Task2|...",
+ *      "onActivationTasks": "Task1|Task2|...",
+ *      "onDeactivationTasks" :"Task1|Task2|...",
+ *      "onDisposeTasks": "Task1|Task2|...",
+ *      "attributes": {
  *          ...
  *      },
  *      "roomsData": [{
@@ -57,8 +67,11 @@ data class AreaMetaJson(
  *          "tiledMapResource": "room1Map.json",
  *          "orientationType": "TILES",
  *          "orientation": "0,0,40,20",
- *          "onActivationTasks": = "Task1,Task2,...",
- *          "attributess": {
+ *          "onLoadTasks": "Task1|Task2|...",
+ *          "onActivationTasks": "Task1|Task2|...",
+ *          "onDeactivationTasks" :"Task1|Task2|...",
+ *          "onDisposeTasks": "Task1|Task2|...",
+ *          "attributes": {
  *              ...
  *          }
  *      },
@@ -68,93 +81,110 @@ data class AreaMetaJson(
  *          "orientationType": "tiles|pixels",
  *          "orientationType": "PIXELS",
  *          "orientation": "0,0,40,20",
- *          "onActivationTasks": = "Task1,Task2,...",
- *          "attributess": {
+ *          "onLoadTasks": "Task1|Task2|...",
+ *          "onActivationTasks": "Task1|Task2|...",
+ *          "onDeactivationTasks" :"Task1|Task2|...",
+ *          "onDisposeTasks": "Task1|Task2|...",
+ *          "pauseTask": "RoomPauseTask",
+ *          "resumeTask": "RoomResumeTask",
+ *          "activationScene": "Scene1",
+ *          "deactivationScene": "Scene1",
+ *          "attributes": {
  *              ...
  *          }
  *      }]
  *  }
  */
-data class AreaJson(
-    val name: String,
-    val orientationType: WorldOrientationType = WorldOrientationType.COUNT,
-    val orientation: String = "0",
-    val onActivationTasks: String? = null,
-    val attributes: Map<String, String> = emptyMap(),
-    val roomsData: Collection<RoomMetaJson>
+class AreaJson(
+    @JvmField val name: String,
+    @JvmField val orientationType: WorldOrientationType = WorldOrientationType.COUNT,
+    @JvmField val orientation: String = "0",
+    @JvmField val onLoadTasks: String = NO_NAME,
+    @JvmField val onActivationTasks: String = NO_NAME,
+    @JvmField val onDeactivationTasks: String = NO_NAME,
+    @JvmField val onDisposeTasks: String = NO_NAME,
+    @JvmField val attributes: Map<String, String> = emptyMap(),
+    @JvmField val roomsData: Collection<RoomMetaJson>
 )
-data class RoomMetaJson(
-    val name: String,
-    val tiledMapResource: String? = null,
-    val orientationType: WorldOrientationType = WorldOrientationType.PIXELS,
-    val orientation: String = "0,0,0,0",
-    val areaOrientationType: WorldOrientationType = WorldOrientationType.SECTION,
-    val areaOrientation: String = "0,0,0,0",
-    val onActivationTasks: String? = null,
-    val attributes: Map<String, String> = emptyMap()
+class RoomMetaJson(
+    @JvmField val name: String,
+    @JvmField val tiledMapResource: String? = null,
+    @JvmField val orientationType: WorldOrientationType = WorldOrientationType.PIXELS,
+    @JvmField val orientation: String = "0,0,0,0",
+    @JvmField val areaOrientationType: WorldOrientationType = WorldOrientationType.SECTION,
+    @JvmField val areaOrientation: String = "0,0,0,0",
+    @JvmField val onLoadTasks: String = NO_NAME,
+    @JvmField val onActivationTasks: String = NO_NAME,
+    @JvmField val onDeactivationTasks: String = NO_NAME,
+    @JvmField val onDisposeTasks: String = NO_NAME,
+    @JvmField val pauseTask: String = NO_NAME,
+    @JvmField val resumeTask: String = NO_NAME,
+    @JvmField val activationScene: String = NO_NAME,
+    @JvmField val deactivationScene: String = NO_NAME,
+    @JvmField val attributes: Map<String, String> = emptyMap()
 )
 
 
 
-data class TiledTileMap(
-    val width: Int,
-    val height: Int,
-    val tilewidth: Int,
-    val tileheight: Int,
-    val infinite: Boolean = false,
-    val orientation: String,
-    val layers: Array<TiledLayer> = emptyArray(),
-    val tilesets: Array<TilesetCodeOffsets> = emptyArray(),
-    val properties: Array<PropertyJson> = emptyArray()
+class TiledTileMap(
+    @JvmField val width: Int,
+    @JvmField val height: Int,
+    @JvmField val tilewidth: Int,
+    @JvmField val tileheight: Int,
+    @JvmField val infinite: Boolean = false,
+    @JvmField val orientation: String,
+    @JvmField val layers: Array<TiledLayer> = emptyArray(),
+    @JvmField val tilesets: Array<TilesetCodeOffsets> = emptyArray(),
+    @JvmField val properties: Array<PropertyJson> = emptyArray()
 ) {
     val mappedProperties: Map<String, PropertyJson>
         get() = properties.associateBy(PropertyJson::name)
 }
 
-data class TiledLayer(
-    val name: String,
-    val type: String,               // "tilelayer" or "objectgroup"
-    val x: Int,                     // position in pixel
-    val y: Int,                     // position in pixel
-    val width: Int = 0,             // width in tiles
-    val height: Int = 0,            // height in tiles
-    val offsetx: Float = 0f,        // offset x-axis in pixel
-    val offsety: Float = 0f,        // offset y-axis in pixel
-    val parallaxx: Float = 1f,      // parallax scroll factor
-    val parallaxy: Float = 1f,      // parallax scroll factor
-    val opacity: Float = 1f,
-    val tintcolor: String = "",          // #rrggbbaa
-    val visible: Boolean,
-    val data: IntArray?,
-    val objects: Array<TiledObject>?,
-    val properties: Array<PropertyJson> = emptyArray()
+class TiledLayer(
+    @JvmField val name: String,
+    @JvmField val type: String,               // "tilelayer" or "objectgroup"
+    @JvmField val x: Int,                     // position in pixel
+    @JvmField val y: Int,                     // position in pixel
+    @JvmField val width: Int = 0,             // width in tiles
+    @JvmField val height: Int = 0,            // height in tiles
+    @JvmField val offsetx: Float = 0f,        // offset x-axis in pixel
+    @JvmField val offsety: Float = 0f,        // offset y-axis in pixel
+    @JvmField val parallaxx: Float = 1f,      // parallax scroll factor
+    @JvmField val parallaxy: Float = 1f,      // parallax scroll factor
+    @JvmField val opacity: Float = 1f,
+    @JvmField val tintcolor: String = "",          // #rrggbbaa
+    @JvmField val visible: Boolean,
+    @JvmField val data: IntArray?,
+    @JvmField val objects: Array<TiledObject>?,
+    @JvmField val properties: Array<PropertyJson> = emptyArray()
 ) {
     val mappedProperties: Map<String, PropertyJson>
         get() = properties.associateBy(PropertyJson::name)
 }
 
-data class TiledObject(
-    val id: Int = -1,
-    val name: String = NO_NAME,
-    val type: String = NO_NAME,
-    val x: Float = ZERO_FLOAT,
-    val y: Float = ZERO_FLOAT,
-    val width: Float = ZERO_FLOAT,
-    val height: Float = ZERO_FLOAT,
-    val rotation: Float = ZERO_FLOAT,
-    val visible: Boolean = false,
-    val gid: Int = -1,
-    val point: Boolean = false,
-    val properties: Array<PropertyJson> = emptyArray()
+class TiledObject(
+    @JvmField val id: Int = -1,
+    @JvmField val name: String = NO_NAME,
+    @JvmField val type: String = NO_NAME,
+    @JvmField val x: Float = ZERO_FLOAT,
+    @JvmField val y: Float = ZERO_FLOAT,
+    @JvmField val width: Float = ZERO_FLOAT,
+    @JvmField val height: Float = ZERO_FLOAT,
+    @JvmField val rotation: Float = ZERO_FLOAT,
+    @JvmField val visible: Boolean = false,
+    @JvmField val gid: Int = -1,
+    @JvmField val point: Boolean = false,
+    @JvmField val properties: Array<PropertyJson> = emptyArray()
 ){
     val mappedProperties: Map<String, PropertyJson>
         get() = properties.associateBy(PropertyJson::name)
 }
 
-data class PropertyJson(
-    val name: String,
-    val type: String,
-    val value: Any
+class PropertyJson(
+    @JvmField val name: String,
+    @JvmField val type: String,
+    @JvmField val value: Any
 ) {
     val stringValue: String
         get() = value.toString()
@@ -162,27 +192,27 @@ data class PropertyJson(
         get() = value as Int
 }
 
-data class TilesetCodeOffsets(
-    val firstgid: Int,
+class TilesetCodeOffsets(
+    @JvmField val firstgid: Int,
 )
 
-data class TileSetJson(
-    val name: String,
-    val tilewidth: Int,
-    val tileheight: Int,
-    val columns: Int,
-    val tilecount: Int,
-    val properties: Array<PropertyJson> = emptyArray(),
-    val tiles: Array<TileJson> = emptyArray()
+class TileSetJson(
+    @JvmField val name: String,
+    @JvmField val tilewidth: Int,
+    @JvmField val tileheight: Int,
+    @JvmField val columns: Int,
+    @JvmField val tilecount: Int,
+    @JvmField val properties: Array<PropertyJson> = emptyArray(),
+    @JvmField val tiles: Array<TileJson> = emptyArray()
 ) {
     val mappedProperties: Map<String, PropertyJson>
         get() = properties.associateBy(PropertyJson::name)
 }
 
-data class TileJson(
-    val id: Int,
-    val type: String,
-    val properties: Array<PropertyJson> = emptyArray()
+class TileJson(
+    @JvmField val id: Int,
+    @JvmField val type: String,
+    @JvmField val properties: Array<PropertyJson> = emptyArray()
 ) {
     val mappedProperties: Map<String, PropertyJson>
         get() = properties.associateBy(PropertyJson::name)

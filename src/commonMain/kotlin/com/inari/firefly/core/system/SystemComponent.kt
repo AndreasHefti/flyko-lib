@@ -1,11 +1,13 @@
 package com.inari.firefly.core.system
 
+import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.NO_NAME
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.core.component.NamedComponent
 import com.inari.firefly.core.system.SystemComponent.Companion.SYSTEM_COMPONENT_ASPECTS
+import com.inari.util.Named
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.AspectType
 import com.inari.util.aspect.IndexedAspectType
@@ -81,6 +83,11 @@ abstract class SystemComponentType<C : SystemComponent>(
     final override val aspectType: AspectType = compAspect.aspectType
     override val subTypeClass: KClass<out C> = typeClass
     override fun toString() = "SystemComponentType:$aspectName"
+
+    operator fun get(id: Int): C = FFContext[this, id]
+    operator fun get(name: String): C = FFContext[this, name]
+    operator fun get(name: Named): C = FFContext[this, name]
+    operator fun get(compId: CompId): C = FFContext[this, compId]
 }
 
 abstract class SystemComponentSingleType<C : SystemComponent>(
@@ -93,6 +100,11 @@ abstract class SystemComponentSingleType<C : SystemComponent>(
     final override val aspectName: String = compAspect.aspectName
     final override val aspectType: AspectType = compAspect.aspectType
     override fun toString() = "SystemComponentType:$aspectName"
+
+    operator fun get(id: Int): C = FFContext[this, id]
+    operator fun get(name: String): C = FFContext[this, name]
+    operator fun get(name: Named): C = FFContext[this, name]
+    operator fun get(compId: CompId): C = FFContext[this, compId]
 }
 
 abstract class SystemComponentSubType<C : SystemComponent, CC : C>(
@@ -105,4 +117,9 @@ abstract class SystemComponentSubType<C : SystemComponent, CC : C>(
     final override val aspectName: String = baseType.aspectName
     final override val aspectType: AspectType = baseType.aspectType
     override fun toString() = "SystemComponentType:${aspectName}:${subTypeClass.simpleName}"
+
+    operator fun get(id: Int): CC = FFContext[this, id]
+    operator fun get(name: String): CC = FFContext[this, name]
+    operator fun get(name: Named): CC = FFContext[this, name]
+    operator fun get(compId: CompId): CC = FFContext[this, compId]
 }

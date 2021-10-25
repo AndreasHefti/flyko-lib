@@ -1,10 +1,12 @@
 package com.inari.firefly.entity
 
+import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.Component
 import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.entity.EntityComponent.Companion.ENTITY_COMPONENT_ASPECTS
+import com.inari.util.Named
 import com.inari.util.Receiver
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.AspectType
@@ -98,4 +100,9 @@ abstract class EntityComponentType<C : EntityComponent>(
     final override val aspectIndex: Int = compAspect.aspectIndex
     final override val aspectName: String = compAspect.aspectName
     final override val aspectType: AspectType = compAspect.aspectType
+
+    operator fun get(id: Int): C = FFContext[this, id]
+    operator fun get(name: String): C = FFContext[this, name]
+    operator fun get(name: Named): C = FFContext[this, name]
+    operator fun get(compId: CompId): C = FFContext[this, compId]
 }

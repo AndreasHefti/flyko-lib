@@ -7,8 +7,6 @@ import com.inari.firefly.asset.Asset
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.game.world.Area
 import com.inari.firefly.game.world.Room
-import com.inari.firefly.game.world.WorldSystem
-import com.inari.util.StringUtils
 import com.inari.util.Supplier
 import kotlin.jvm.JvmField
 
@@ -37,10 +35,10 @@ class FireflyJsonAreaAsset private constructor() : Asset() {
             orientation(areaData.orientation)
             attributes.putAll(areaData.attributes)
 
-            if (areaData.onActivationTasks != null)
-                areaData.onActivationTasks.split(StringUtils.KEY_VALUE_SEPARATOR).forEach { taskName ->
-                    withActivationTask(taskName)
-                }
+            loadTasks = areaData.onLoadTasks
+            activationTasks = areaData.onActivationTasks
+            deactivationTasks = areaData.onDeactivationTasks
+            disposeTasks = areaData.onDisposeTasks
         }
 
         // create rooms meta data
@@ -53,10 +51,19 @@ class FireflyJsonAreaAsset private constructor() : Asset() {
                 areaOrientation(roomData.areaOrientation)
                 attributes.putAll(roomData.attributes)
 
-                if (roomData.onActivationTasks != null)
-                    roomData.onActivationTasks.split(StringUtils.KEY_VALUE_SEPARATOR).forEach { taskName ->
-                        withActivationTask(taskName)
-                    }
+                loadTasks = roomData.onLoadTasks
+                activationTasks = roomData.onActivationTasks
+                deactivationTasks = roomData.onDeactivationTasks
+                disposeTasks = roomData.onDisposeTasks
+
+                if (roomData.pauseTask != NO_NAME)
+                    withPauseTask(roomData.pauseTask)
+                if (roomData.resumeTask != NO_NAME)
+                    withResumeTask(roomData.resumeTask)
+                if (roomData.activationScene != NO_NAME)
+                    withActivationScene(roomData.activationScene)
+                if (roomData.deactivationScene != NO_NAME)
+                    withDeactivationScene(roomData.deactivationScene)
             }
         }
     }

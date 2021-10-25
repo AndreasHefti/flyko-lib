@@ -388,7 +388,7 @@ object ContactSystem : ComponentSystem {
     }
 
     private fun addTransformPos(parent: Int) {
-        val parentEntity = FFContext[Entity, parent]
+        val parentEntity = Entity[parent]
         worldTempPos + parentEntity[ETransform].position
         if (EChild in parentEntity.aspects)
             addTransformPos(parentEntity[EChild].int_parent)

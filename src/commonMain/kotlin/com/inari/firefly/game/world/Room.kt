@@ -22,7 +22,11 @@ class Room private constructor(): GenericComposite() {
     @JvmField var areaOrientationType: WorldOrientationType = WorldOrientationType.SECTION
     @JvmField val areaOrientation: Rectangle = Rectangle()
 
-    internal var activationSceneRef = -1
+    @JvmField internal var activationSceneRef = -1
+    @JvmField internal var deactivationSceneRef = -1
+    @JvmField internal var pauseTaskRef = -1
+    @JvmField internal var resumeTaskRef = -1
+
     @JvmField val withActivationScene = ComponentRefResolver(Scene) { activationSceneRef = it }
     fun <A : Scene> withActivationScene(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
@@ -30,7 +34,6 @@ class Room private constructor(): GenericComposite() {
         return result
     }
 
-    internal var deactivationSceneRef = -1
     @JvmField val withDeactivationScene = ComponentRefResolver(Scene) { deactivationSceneRef = it }
     fun <A : Scene> withDeactivationScene(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
@@ -38,17 +41,16 @@ class Room private constructor(): GenericComposite() {
         return result
     }
 
-    internal var pauseTaskRef = -1
-    @JvmField val withPauseTaskRef = ComponentRefResolver(Scene) { pauseTaskRef = it }
-    fun <A : Task> withPauseTaskRef(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
+
+    @JvmField val withPauseTask = ComponentRefResolver(Scene) { pauseTaskRef = it }
+    fun <A : Task> withPauseTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
         pauseTaskRef = result.instanceId
         return result
     }
 
-    internal var resumeTaskRef = -1
-    @JvmField val withResumeTaskRef = ComponentRefResolver(Scene) { resumeTaskRef = it }
-    fun <A : Task> withResumeTaskRef(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
+    @JvmField val withResumeTask = ComponentRefResolver(Scene) { resumeTaskRef = it }
+    fun <A : Task> withResumeTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
         resumeTaskRef = result.instanceId
         return result

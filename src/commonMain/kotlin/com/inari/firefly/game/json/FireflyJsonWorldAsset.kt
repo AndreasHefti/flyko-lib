@@ -36,10 +36,10 @@ class FireflyJsonWorldAsset private constructor() : Asset() {
             orientation(worldData.orientation)
             attributes.putAll(worldData.attributes)
 
-            if (worldData.onActivationTasks != null)
-                worldData.onActivationTasks.split(StringUtils.KEY_VALUE_SEPARATOR).forEach { taskName ->
-                    withActivationTask(taskName)
-                }
+            loadTasks = worldData.onLoadTasks
+            activationTasks = worldData.onActivationTasks
+            deactivationTasks = worldData.onDeactivationTasks
+            disposeTasks = worldData.onDisposeTasks
 
             // create area assets to load areas from json resources
             worldData.areasData.forEach { areaData ->

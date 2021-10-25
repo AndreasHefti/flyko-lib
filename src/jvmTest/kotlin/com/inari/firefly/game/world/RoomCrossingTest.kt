@@ -3,7 +3,7 @@ package com.inari.firefly.game.world
 import com.inari.firefly.FFContext
 import com.inari.firefly.TestApp
 import com.inari.firefly.composite.CompositeSystem
-import com.inari.firefly.control.task.GenericTask
+import com.inari.firefly.control.task.SimpleTask
 import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntitySystem
@@ -24,7 +24,7 @@ class RoomCrossingTest {
         WorldSystem
         TaskSystem
         PlayerSystem
-            .withPlayerLoadTask(GenericTask) {
+            .withPlayerLoadTask(SimpleTask) {
                 withSimpleOperation {
                     Entity.build {
                         name = PlayerComposite.PLAYER_ENTITY_NAME

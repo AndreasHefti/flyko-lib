@@ -8,6 +8,8 @@ import com.inari.firefly.FFContext
 import com.inari.firefly.asset.Asset
 import com.inari.firefly.asset.AssetSystem
 import com.inari.firefly.control.EControl
+import com.inari.firefly.control.scene.Scene
+import com.inari.firefly.control.task.SimpleTask
 import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.api.FFInput
 import com.inari.firefly.entity.Entity
@@ -35,6 +37,7 @@ import com.inari.firefly.physics.contact.EContact
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.MovementSystem
 import com.inari.util.IntConsumer
+import com.inari.util.OpResult
 import org.lwjgl.glfw.GLFW
 
 
@@ -57,6 +60,70 @@ class TiledTileMapTest : DesktopApp() {
         MovementSystem
         ContactSystem
         TestGameObject
+
+        SimpleTask.build {
+            name = "TestLoadTask"
+            withSimpleOperation { id -> println("load -> $id") }
+        }
+        SimpleTask.build {
+            name = "TestActivationTask"
+            withSimpleOperation { id -> println("activate -> $id") }
+        }
+        SimpleTask.build {
+            name = "TestDeactivationTask"
+            withSimpleOperation { id -> println("deactivate -> $id") }
+        }
+        SimpleTask.build {
+            name = "TestDisposeTask"
+            withSimpleOperation { id -> println("dispose -> $id") }
+        }
+
+        SimpleTask.build {
+            name = "TestRoomPauseTask"
+            withSimpleOperation { id -> println("pauseRoom -> $id") }
+        }
+        SimpleTask.build {
+            name = "TestRoomResumeTask"
+            withSimpleOperation { id -> println("pauseResume -> $id") }
+        }
+
+        Scene.build {
+            name = "TestActivationScene"
+            updateResolution = 1f
+            withUpdate {
+                println("TestActivationScene Update")
+                OpResult.SUCCESS
+            }
+            withCallback {
+                println("TestActivationScene Finished")
+            }
+        }
+
+        Scene.build {
+            name = "TestDeactivationScene"
+            updateResolution = 1f
+            withUpdate {
+                println("TestDeactivationScene Update")
+                OpResult.SUCCESS
+            }
+            withCallback {
+                println("TestDeactivationScene Finished")
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         val playerTextureAsset = TextureAsset.buildAndActivate {
             name = "playerTex"

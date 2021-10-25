@@ -1,6 +1,7 @@
 package com.inari.firefly.composite
 
 import com.inari.firefly.FFContext
+import com.inari.firefly.NO_NAME
 import com.inari.firefly.asset.Asset
 import com.inari.firefly.control.scene.SceneSystem
 import com.inari.firefly.control.task.Task
@@ -12,6 +13,7 @@ import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentBuilder
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.util.Call
+import com.inari.util.StringUtils
 import com.inari.util.collection.BitSet
 import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
@@ -22,17 +24,22 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         internal set
     val withParent = ComponentRefResolver(Composite) { index -> parentRef = index }
 
-    @JvmField internal var loadDependsOnParent = true
-    @JvmField internal var activationDependsOnParent = false
-    @JvmField internal var deactivateAlsoParent = false
-    @JvmField internal var disposeAlsoParent = false
+    @JvmField var loadDependsOnParent = true
+    @JvmField var activationDependsOnParent = false
+    @JvmField var deactivateAlsoParent = false
+    @JvmField var disposeAlsoParent = false
 
-    @JvmField internal var loadTaskRef = -1
-    @JvmField internal var activationTaskRef = -1
-    @JvmField internal var deactivationTaskRef = -1
-    @JvmField internal var disposeTaskRef = -1
+    /** Task name or pipe '|' separated list of task names or NO_NAME for empty (null) */
+    @JvmField var loadTasks = NO_NAME
+    /** Task name or pipe '|' separated list of task names or NO_NAME for empty (null) */
+    @JvmField var activationTasks = NO_NAME
+    /** Task name or pipe '|' separated list of task names or NO_NAME for empty (null) */
+    @JvmField var deactivationTasks = NO_NAME
+    /** Task name or pipe '|' separated list of task names or NO_NAME for empty (null) */
+    @JvmField var disposeTasks = NO_NAME
 
-    @JvmField internal val attributes = mutableMapOf<String, String>()
+    @JvmField val attributes = mutableMapOf<String, String>()
+
     @JvmField internal val assetRefs = BitSet()
     @JvmField internal val loadedComponents = DynArray.of<CompId>(5, 10)
     @JvmField internal val activatableComponents = DynArray.of<CompId>(5, 10)
@@ -52,33 +59,37 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
             activatableComponents + id
     }
 
-    val withLoadTask = ComponentRefResolver(Task) { index -> loadTaskRef = index }
+
+    val withLoadTask = ComponentRefResolver(Task) { index -> loadTasks = appendTaskRef(loadTasks, Task[index]) }
     fun <A : Task> withLoadTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
-        val result = cBuilder.build(configure)
-        loadTaskRef = result.instanceId
-        return result
+        val result = cBuilder.buildAndGet(configure)
+        loadTasks = appendTaskRef(loadTasks, result)
+        return result.componentId
     }
 
-    val withActivationTask = ComponentRefResolver(Task) { index -> activationTaskRef = index }
+    val withActivationTask = ComponentRefResolver(Task) { index -> activationTasks = appendTaskRef(activationTasks, Task[index]) }
     fun <A : Task> withActivationTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
-        val result = cBuilder.build(configure)
-        activationTaskRef = result.instanceId
-        return result
+        val result = cBuilder.buildAndGet(configure)
+        activationTasks = appendTaskRef(activationTasks, result)
+        return result.componentId
     }
 
-    val withDeactivationTask = ComponentRefResolver(Task) { index -> deactivationTaskRef = index }
+    val withDeactivationTask = ComponentRefResolver(Task) { index -> deactivationTasks = appendTaskRef(deactivationTasks, Task[index]) }
     fun <A : Task> withDeactivationTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
-        val result = cBuilder.build(configure)
-        deactivationTaskRef = result.instanceId
-        return result
+        val result = cBuilder.buildAndGet(configure)
+        deactivationTasks = appendTaskRef(deactivationTasks, result)
+        return result.componentId
     }
 
-    val withDisposeTask = ComponentRefResolver(Task) { index -> disposeTaskRef = index }
+    val withDisposeTask = ComponentRefResolver(Task) { index -> disposeTasks = appendTaskRef(disposeTasks, Task[index]) }
     fun <A : Task> withDisposeTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
-        val result = cBuilder.build(configure)
-        disposeTaskRef = result.instanceId
-        return result
+        val result = cBuilder.buildAndGet(configure)
+        disposeTasks = appendTaskRef(disposeTasks, result)
+        return result.componentId
     }
+
+    private fun appendTaskRef(taskNames: String, task: Task): String =
+        if (taskNames != NO_NAME) "$taskNames,${task.name}" else task.name
 
     fun <A : Trigger> withLoadTrigger(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): A {
         val result = super.withTrigger(cBuilder, configure)
@@ -113,9 +124,11 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         // first load all registered assets
         FFContext.activateAll(Asset, assetRefs)
 
-        // run additional load task if defined
-        if (loadTaskRef >= 0)
-            TaskSystem.runTask(loadTaskRef, this.componentId)
+        // run additional load tasks if defined
+        if (loadTasks != NO_NAME)
+            loadTasks
+                .split(StringUtils.LIST_VALUE_SEPARATOR)
+                .forEach { TaskSystem.runTask(it, this.componentId) }
     }
 
     override fun activateComposite() {
@@ -124,9 +137,11 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (activationDependsOnParent && parentRef >= 0)
             FFContext.activate(Composite, parentRef)
 
-        // run additional activation task if defined
-        if (activationTaskRef >= 0)
-            TaskSystem.runTask(activationTaskRef, this.componentId)
+        // run additional activation tasks if defined
+        if (activationTasks != NO_NAME)
+            activationTasks
+                .split(StringUtils.LIST_VALUE_SEPARATOR)
+                .forEach { TaskSystem.runTask(it, this.componentId) }
 
         // activate all registered components
         FFContext.activateAll(activatableComponents)
@@ -138,8 +153,10 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         FFContext.deactivateAll(activatableComponents)
 
         // run additional deactivation task if defined
-        if (deactivationTaskRef >= 0)
-            TaskSystem.runTask(deactivationTaskRef, this.componentId)
+        if (deactivationTasks != NO_NAME)
+            deactivationTasks
+                .split(StringUtils.LIST_VALUE_SEPARATOR)
+                .forEach { TaskSystem.runTask(it, this.componentId) }
 
         // if depends on parent and parent is defined deactivate the parent also
         if (deactivateAlsoParent && parentRef >= 0)
@@ -149,8 +166,10 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
     override fun disposeComposite() {
 
         // run additional dispose task if defined
-        if (disposeTaskRef >= 0)
-            TaskSystem.runTask(disposeTaskRef, this.componentId)
+        if (disposeTasks != NO_NAME)
+            disposeTasks
+                .split(StringUtils.LIST_VALUE_SEPARATOR)
+                .forEach { TaskSystem.runTask(it, this.componentId) }
 
         // clear data
         attributes.clear()

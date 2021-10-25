@@ -17,3 +17,7 @@ actual fun arraycopy(source: IntArray, fromS: Int, dest: IntArray, fromD: Int, s
 actual fun <T : Any?> arraycopy(source: Array<T>, fromS: Int, dest: Array<T>, fromD: Int, size: Int) {
     source.copyInto(dest, fromD, fromS, size)
 }
+
+actual fun startParallelTask(name: String, task: () -> Unit, callback: (String, Boolean) -> Unit) {
+    throw UnsupportedOperationException()
+}

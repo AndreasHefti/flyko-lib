@@ -1,5 +1,6 @@
 package com.inari.firefly.control.scene
 
+import com.inari.firefly.EMPTY_TASK_OPERATION
 import com.inari.firefly.FFContext
 import com.inari.firefly.INFINITE_SCHEDULER
 import com.inari.firefly.VOID_CALL
@@ -18,31 +19,42 @@ import com.inari.firefly.core.system.SystemComponentBuilder
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.core.system.SystemComponentType
 import com.inari.util.Call
+import com.inari.util.UpdateOperation
 import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
 
 class Scene private constructor() : GenericComposite() {
 
     @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
+    @JvmField internal var activateTaskRef = -1
+    @JvmField internal var deactivateTaskRef = -1
+    @JvmField internal var update: UpdateOperation = EMPTY_TASK_OPERATION
+    @JvmField internal var callback: Call = VOID_CALL
+    @JvmField var removeAfterRun: Boolean = false
+
     var updateResolution: Float
         get() = throw UnsupportedOperationException()
         set(value) { scheduler = FFContext.timer.createUpdateScheduler(value) }
-    var internal_callback: Call = VOID_CALL
-        internal set
-    @JvmField var removeAfterRun: Boolean = false
-    @JvmField internal var runTaskRef = -1
 
     fun withCallback(callback: Call) {
-        internal_callback = {
-            FFContext.dispose(componentId)
-            callback()
-        }
+        this.callback = callback
     }
 
-    val withRunTask = ComponentRefResolver(Task) { index -> runTaskRef = index }
-    fun <A : Task> withRunTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
+    fun withUpdate(update: UpdateOperation) {
+        this.update = update
+    }
+
+    val withActivateTask = ComponentRefResolver(Task) { index -> activateTaskRef = index }
+    fun <A : Task> withActivateTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
-        runTaskRef = result.instanceId
+        activateTaskRef = result.instanceId
+        return result
+    }
+
+    val withDeactivateTask = ComponentRefResolver(Task) { index -> deactivateTaskRef = index }
+    fun <A : Task> withDeactivateTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
+        val result = cBuilder.build(configure)
+        deactivateTaskRef = result.instanceId
         return result
     }
 
