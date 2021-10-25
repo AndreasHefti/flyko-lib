@@ -225,6 +225,5 @@ interface ComponentSystem : FFSystem {
                 activate(c.index)
             return c
         }
-
     }
 }

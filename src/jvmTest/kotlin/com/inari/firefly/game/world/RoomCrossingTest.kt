@@ -25,6 +25,7 @@ class RoomCrossingTest {
         TaskSystem
         PlayerSystem
             .withPlayerLoadTask(SimpleTask) {
+                name = "PlayerLoadTask"
                 withSimpleOperation {
                     Entity.build {
                         name = PlayerComposite.PLAYER_ENTITY_NAME

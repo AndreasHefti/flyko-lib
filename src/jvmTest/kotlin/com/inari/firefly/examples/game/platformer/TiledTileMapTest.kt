@@ -63,28 +63,28 @@ class TiledTileMapTest : DesktopApp() {
 
         SimpleTask.build {
             name = "TestLoadTask"
-            withSimpleOperation { id -> println("load -> $id") }
+            withOperation { id -> println("load -> $id") }
         }
         SimpleTask.build {
             name = "TestActivationTask"
-            withSimpleOperation { id -> println("activate -> $id") }
+            withOperation { id -> println("activate -> $id") }
         }
         SimpleTask.build {
             name = "TestDeactivationTask"
-            withSimpleOperation { id -> println("deactivate -> $id") }
+            withOperation { id -> println("deactivate -> $id") }
         }
         SimpleTask.build {
             name = "TestDisposeTask"
-            withSimpleOperation { id -> println("dispose -> $id") }
+            withOperation { id -> println("dispose -> $id") }
         }
 
         SimpleTask.build {
             name = "TestRoomPauseTask"
-            withSimpleOperation { id -> println("pauseRoom -> $id") }
+            withOperation { id -> println("pauseRoom -> $id") }
         }
         SimpleTask.build {
             name = "TestRoomResumeTask"
-            withSimpleOperation { id -> println("pauseResume -> $id") }
+            withOperation { id -> println("pauseResume -> $id") }
         }
 
         Scene.build {

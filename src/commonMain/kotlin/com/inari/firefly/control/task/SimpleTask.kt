@@ -12,7 +12,7 @@ class SimpleTask private constructor() : Task() {
     fun withOperation(op: ComponentTaskOperation) {
         operation = op
     }
-    fun withSimpleOperation(op: ComponentIdConsumer) {
+    fun withOperation(op: ComponentIdConsumer) {
         operation = { id, _, _ ->
             op(id)
             OpResult.SUCCESS

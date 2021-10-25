@@ -4,6 +4,7 @@ import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.NO_NAME
 import com.inari.firefly.core.component.CompId
+import com.inari.firefly.core.component.ComponentMap
 import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.core.component.NamedComponent
 import com.inari.firefly.core.system.SystemComponent.Companion.SYSTEM_COMPONENT_ASPECTS
@@ -20,9 +21,8 @@ abstract class SystemComponent protected constructor(
 
     override var name: String = NO_NAME
         set(value) {
-            if (name !== NO_NAME) {
+            if (name !== NO_NAME)
                 throw IllegalStateException("An illegal reassignment of name: $value to: $name")
-            }
             field = value
         }
 

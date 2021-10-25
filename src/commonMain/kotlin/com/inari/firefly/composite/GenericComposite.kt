@@ -88,8 +88,11 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         return result.componentId
     }
 
-    private fun appendTaskRef(taskNames: String, task: Task): String =
-        if (taskNames != NO_NAME) "$taskNames,${task.name}" else task.name
+    private fun appendTaskRef(taskNames: String, task: Task): String {
+        if (task.name == NO_NAME)
+            throw IllegalStateException("Task needs a name. Please define a name for this task on creation")
+        return if (taskNames != NO_NAME) "$taskNames,${task.name}" else task.name
+    }
 
     fun <A : Trigger> withLoadTrigger(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): A {
         val result = super.withTrigger(cBuilder, configure)
