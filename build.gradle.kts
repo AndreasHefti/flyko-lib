@@ -52,7 +52,7 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:1.9.12")
-                implementation("com.badlogicgames.gdx:gdx-platform:1.9.12:natives-desktop")
+                compileOnly("com.badlogicgames.gdx:gdx-platform:1.9.12:natives-desktop")
                 //implementation( "com.google.code.gson:gson:2.8.8")
                 implementation("com.squareup.moshi:moshi:1.12.0")
                 implementation("com.squareup.moshi:moshi-kotlin:1.12.0")
