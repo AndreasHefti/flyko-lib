@@ -19,7 +19,7 @@ abstract class AppRunner (
             config.useVsync(vsync)
             val desktopApp =  object : DesktopApp() {
                 override val title = appTitle
-                override fun init() = this@AppRunner.init()
+                override fun init() = this@AppRunner.init(this)
             }
 
             Lwjgl3Application(desktopApp, config)
@@ -28,5 +28,5 @@ abstract class AppRunner (
         }
     }
 
-    abstract fun init()
+    abstract fun init(desktopApp: DesktopApp)
 }
