@@ -11,15 +11,17 @@ abstract class AppRunner (
     vsync: Boolean = true
 ) {
 
+    private lateinit var desktopApp: DesktopApp
+
     init {
         try {
             val config = Lwjgl3ApplicationConfiguration()
             config.setResizable(resizable)
             config.setWindowedMode(width, height)
             config.useVsync(vsync)
-            val desktopApp =  object : DesktopApp() {
+            desktopApp = object : DesktopApp() {
                 override val title = appTitle
-                override fun init() = this@AppRunner.init(this)
+                override fun init() = this@AppRunner.init()
             }
 
             Lwjgl3Application(desktopApp, config)
@@ -28,5 +30,7 @@ abstract class AppRunner (
         }
     }
 
-    abstract fun init(desktopApp: DesktopApp)
+    protected fun dispose() = desktopApp.dispose()
+
+    abstract fun init()
 }
