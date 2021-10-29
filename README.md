@@ -23,8 +23,11 @@ lower-level libraries that can be used to render graphics, play sounds or gather
 This is a Kotlin multiplatform library project with the usual four main modules:
 
 - common: where the Firefly framework lives
+
 - js: Kotlin JavaScript implementation (not done yet)
+
 - jvm: Kotlin implementation to run on a JVM for desktop or mobile (done for desktop with lwjgl/libgdx as lower level framework)
+
 - native: Kotlin native implementations (not done yet)
 
 Currently, only the JVM part for desktop (Windows/Mac/Linux) is implemented and fully working and 
@@ -37,20 +40,31 @@ Key Features
 *Firefly framework (Kotlin common)*
 
 - Strong backing on components and Component-Entity-System approach.
+
 - Lightweight but powerfull and easy extendable event system for communication between Systems.
+
 - Independent lower level interface definition.
+
 - Stringent component builder API with DSL support.
+
 - Indexing for component types and instances for fast access
+
 - Multiple Views by using render-to-texture with FBO - Framebuffer Object.
+
 - OpenGL shader support.
+
 - Basic libraries for input, audio, tile-maps, animation, movement, contact/collision, particle, action, state, behavior and many more.
+
 - Extendable by design. Easily add and integrate third party libraries for physics or other needs within your game.  
+
 - Simple and concise lower level API for additional Kotlin multiplatform implementations
 
 *Kotlin JVM implementation*
 
 - Ready to use JVM implementation available over Jitpack 
+
 - JVM implementation that can be used for Desktop apps (Win,Mac,Linux)
+
 - TODO: JVM implementation that can be used for Android development
 
 *Kotlin JS implementation*
