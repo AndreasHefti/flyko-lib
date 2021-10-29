@@ -4,7 +4,7 @@ plugins {
     id("maven-publish")
 }
 
-group = "com.inari.firefly-lib"
+group = "com.inari.firefly"
 version = "0.1"
 
 repositories {
@@ -53,10 +53,8 @@ kotlin {
             dependencies {
                 implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:1.9.12")
                 runtimeOnly("com.badlogicgames.gdx:gdx-platform:1.9.12:natives-desktop")
-                //implementation( "com.google.code.gson:gson:2.8.8")
                 implementation("com.squareup.moshi:moshi:1.12.0")
                 implementation("com.squareup.moshi:moshi-kotlin:1.12.0")
-                //implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.0")
             }
         }
         val jvmTest by getting {
