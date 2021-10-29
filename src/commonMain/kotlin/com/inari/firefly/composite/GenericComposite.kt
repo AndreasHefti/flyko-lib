@@ -131,7 +131,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (loadTasks != NO_NAME)
             loadTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
-                .forEach { TaskSystem.runTask(it, this.componentId) }
+                .forEach { FFContext.runTask(it, this.componentId) }
     }
 
     override fun activateComposite() {
@@ -144,7 +144,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (activationTasks != NO_NAME)
             activationTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
-                .forEach { TaskSystem.runTask(it, this.componentId) }
+                .forEach { FFContext.runTask(it, this.componentId) }
 
         // activate all registered components
         FFContext.activateAll(activatableComponents)
@@ -159,7 +159,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (deactivationTasks != NO_NAME)
             deactivationTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
-                .forEach { TaskSystem.runTask(it, this.componentId) }
+                .forEach { FFContext.runTask(it, this.componentId) }
 
         // if depends on parent and parent is defined deactivate the parent also
         if (deactivateAlsoParent && parentRef >= 0)
@@ -172,7 +172,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (disposeTasks != NO_NAME)
             disposeTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
-                .forEach { TaskSystem.runTask(it, this.componentId) }
+                .forEach { FFContext.runTask(it, this.componentId) }
 
         // clear data
         attributes.clear()

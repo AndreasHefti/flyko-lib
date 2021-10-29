@@ -95,22 +95,22 @@ object CompositeSystem : ComponentSystem {
 
     private fun loadEntityComposite(entity: Entity) = with(entity[EComposite]) {
         if (loadTaskRef >= 0)
-            TaskSystem.runTask(loadTaskRef, entity.componentId)
+            FFContext.runTask(loadTaskRef, entity.componentId)
     }
 
     private fun activateEntityComposite(entity: Entity) = with(entity[EComposite]) {
         if (activationTaskRef >= 0)
-            TaskSystem.runTask(activationTaskRef, entity.componentId)
+            FFContext.runTask(activationTaskRef, entity.componentId)
     }
 
     private fun deactivateEntityComposite(entity: Entity) = with(entity[EComposite]) {
         if (deactivationTaskRef >= 0)
-            TaskSystem.runTask(deactivationTaskRef, entity.componentId)
+            FFContext.runTask(deactivationTaskRef, entity.componentId)
     }
 
     private fun disposeEntityComposite(entity: Entity) = with(entity[EComposite]) {
         if (disposeTaskRef >= 0)
-            TaskSystem.runTask(disposeTaskRef, entity.componentId)
+            FFContext.runTask(disposeTaskRef, entity.componentId)
     }
 
     fun <C : Composite> getCompositeBuilder(name: String): SystemComponentBuilder<C> {

@@ -1,5 +1,6 @@
 package com.inari.firefly.behavior
 
+import com.inari.firefly.FFContext
 import com.inari.firefly.TestApp
 import com.inari.firefly.control.behavior.*
 import com.inari.firefly.control.behavior.BehaviorSystem.FALSE_CONDITION
@@ -35,7 +36,7 @@ class BehaviorTreeTest {
                 }
                 node(BxAction) {
                     name = "First Task"
-                    tickOp = { entity, _ -> TaskSystem.runTask("Task_Name", entity.componentId) }
+                    tickOp = { entity, _ -> FFContext.runTask("Task_Name", entity.componentId) }
                 }
                 node(BxSequence) {
                     name = ""

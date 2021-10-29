@@ -22,7 +22,7 @@ object SceneSystem : FFSystem {
                     activeScenes.set(id.index, true)
                     val scene = Scene[id.index]
                     if (scene.activateTaskRef >= 0)
-                        TaskSystem.runTask(scene.activateTaskRef, scene.componentId)
+                        FFContext.runTask(scene.activateTaskRef, scene.componentId)
                 }
                 else -> {}
             }
@@ -31,7 +31,7 @@ object SceneSystem : FFSystem {
                     activeScenes.set(id.index, false)
                     val scene = Scene[id.index]
                     if (scene.deactivateTaskRef >= 0)
-                        TaskSystem.runTask(scene.deactivateTaskRef, scene.componentId)
+                        FFContext.runTask(scene.deactivateTaskRef, scene.componentId)
                     scene.callback()
                     if (scene.removeAfterRun)
                         FFContext.delete(scene)

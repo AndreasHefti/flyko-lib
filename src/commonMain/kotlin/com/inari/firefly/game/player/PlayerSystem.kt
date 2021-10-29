@@ -54,7 +54,7 @@ object PlayerSystem : FFSystem {
     fun disposePlayer() = FFContext.dispose(playerComposite)
 
     val applyPlayerTask = ComponentRefResolver(Task) { index ->
-        TaskSystem.runTask(index, playerComposite.entityId)
+        FFContext.runTask(index, playerComposite.entityId)
     }
 
     override fun clearSystem() {

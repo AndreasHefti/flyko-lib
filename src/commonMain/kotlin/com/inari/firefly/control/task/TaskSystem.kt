@@ -25,23 +25,6 @@ object TaskSystem : ComponentSystem {
         FFContext.loadSystem(this)
     }
 
-    fun runTask(
-        name: String,
-        compId1: CompId = NO_COMP_ID,
-        compId2: CompId = NO_COMP_ID,
-        compId3: CompId = NO_COMP_ID): OpResult = tasks[name](compId1, compId2, compId3)
-
-    fun runTask(
-        taskId: CompId,
-        compId1: CompId = NO_COMP_ID,
-        compId2: CompId = NO_COMP_ID,
-        compId3: CompId = NO_COMP_ID): OpResult = tasks[taskId](compId1, compId2, compId3)
-
-    fun runTask(
-        taskIndex: Int,
-        compId1: CompId = NO_COMP_ID,
-        compId2: CompId = NO_COMP_ID,
-        compId3: CompId = NO_COMP_ID): OpResult = tasks[taskIndex](compId1, compId2, compId3)
 
     override fun clearSystem() {
         _tasks.clear()
