@@ -22,13 +22,13 @@ Firefly's Entity-Component-System is implemented on-top of a small set of interf
 lower-level libraries that can be used to render graphics, play sounds or gather or poll input events.
 This is a Kotlin multiplatform library project with the usual four main modules:
 
-- common: where the Firefly framework lives
+- **common**: where the Firefly framework lives
 
-- js: Kotlin JavaScript implementation (not done yet)
+- **js**: Kotlin JavaScript implementation (not done yet)
 
-- jvm: Kotlin implementation to run on a JVM for desktop or mobile (done for desktop with lwjgl/libgdx as lower level framework)
+- **jvm**: Kotlin implementation to run on a JVM for desktop or mobile (done for desktop with lwjgl/libgdx as lower level framework)
 
-- native: Kotlin native implementations (not done yet)
+- **native**: Kotlin native implementations (not done yet)
 
 Currently, only the JVM part for desktop (Windows/Mac/Linux) is implemented and fully working and 
 building and packaging apps and games for desktop (Win, Mac and Linux) is currently supported
@@ -37,11 +37,11 @@ building and packaging apps and games for desktop (Win, Mac and Linux) is curren
 Key Features 
 -----------------
 
-*Firefly framework (Kotlin common)*
+**Firefly framework (Kotlin common)**
 
 - Strong backing on components and Component-Entity-System approach.
 
-- Lightweight but powerfull and easy extendable event system for communication between Systems.
+- Lightweight but powerful and easy extendable event system for communication between Systems.
 
 - Independent lower level interface definition.
 
@@ -59,7 +59,7 @@ Key Features
 
 - Simple and concise lower level API for additional Kotlin multiplatform implementations
 
-*Kotlin JVM implementation*
+**Kotlin JVM implementation**
 
 - Ready to use JVM implementation available over Jitpack 
 
@@ -67,16 +67,16 @@ Key Features
 
 - TODO: JVM implementation that can be used for Android development
 
-*Kotlin JS implementation*
+**Kotlin JS implementation**
 
 - TODO
 
-*Kotlin Natives implementation*
+**Kotlin Natives implementation**
 
 - TODO
 
-[Project Board](https://view.monday.com/1824751381-dbd29f0e327df610ad7628d957a2afcd?r=use1)
------------------------------------
+### [Project Board](https://view.monday.com/1824751381-dbd29f0e327df610ad7628d957a2afcd?r=use1)
+
 Code Example
 --------------
 <div align="center"><img src="https://github.com/Inari-Soft/flyKo/raw/master/wiki/example1.gif" alt="Result of Code Example"></div>
