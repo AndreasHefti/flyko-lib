@@ -51,14 +51,14 @@ class WorkflowEvent(override val eventType: EventType) : Event<Consumer<Workflow
         fun send(
             type: Type,
             workflowId: CompId,
-            stateChange: Workflow.StateChange
+            stateChange: StateChange
         ) {
             workflowEvent.type = type
             workflowEvent.workflowId = workflowId
             workflowEvent.workflowName = StateSystem.workflows[workflowId].name
             workflowEvent.stateChangeName = stateChange.name
-            workflowEvent.fromName = stateChange.from
-            workflowEvent.toName = stateChange.to
+            workflowEvent.fromName = stateChange.fromState
+            workflowEvent.toName = stateChange.toState
             FFContext.notify(workflowEvent)
         }
     }

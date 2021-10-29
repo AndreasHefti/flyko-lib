@@ -3,7 +3,7 @@ package com.inari.firefly.control.state
 import com.inari.firefly.*
 import com.inari.firefly.control.scene.Scene
 import com.inari.firefly.control.scene.SceneSystem
-import com.inari.firefly.control.state.Workflow.StateChange
+import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.core.api.FFTimer
 import com.inari.firefly.core.component.ComponentMap.MapAction.*
 import com.inari.firefly.core.component.ComponentMapRO
@@ -81,21 +81,26 @@ object StateSystem : ComponentSystem {
     }
 
     private fun doStateChange(workflow: Workflow, stateChange: StateChange) {
-        workflow.currentState = stateChange.to
+        if (stateChange.disposeStateTaskRef != -1)
+            TaskSystem.runTask(stateChange.disposeStateTaskRef, workflow.componentId)
 
-        if (stateChange.to !== NO_STATE) {
+        workflow.currentState = stateChange.toState
+
+        if (stateChange.initStateTaskRef != -1)
+            TaskSystem.runTask(stateChange.initStateTaskRef, workflow.componentId)
+
+        if (stateChange.toState !== NO_STATE)
             WorkflowEvent.send(
                 WorkflowEvent.Type.STATE_CHANGED,
                 workflow.componentId,
                 stateChange
             )
-        } else {
+        else
             WorkflowEvent.send(
                 WorkflowEvent.Type.WORKFLOW_FINISHED,
                 workflow.componentId,
                 stateChange
             )
-        }
     }
 
     private fun activated(workflow: Workflow) {
