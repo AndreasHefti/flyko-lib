@@ -61,11 +61,8 @@ Key Features
 
 - TODO
 
-Project
--------
-
-<iframe src="https://view.monday.com/embed/1824751381-dbd29f0e327df610ad7628d957a2afcd?r=use1" width=770 height=500 style="border: 0; box-shadow: 5px 5px 56px 0px rgba(0,0,0,0.25);"></iframe>
-
+[Project Board](https://view.monday.com/1824751381-dbd29f0e327df610ad7628d957a2afcd?r=use1)
+-----------------------------------
 Code Example
 --------------
 <div align="center"><img src="https://github.com/Inari-Soft/flyKo/raw/master/wiki/example1.gif" alt="Result of Code Example"></div>
