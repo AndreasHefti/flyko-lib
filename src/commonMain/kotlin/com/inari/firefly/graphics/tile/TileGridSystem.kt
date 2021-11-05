@@ -1,5 +1,6 @@
 package com.inari.firefly.graphics.tile
 
+import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFContext
 import com.inari.firefly.core.component.ComponentMap.MapAction.*
 import com.inari.firefly.core.system.ComponentSystem
@@ -29,7 +30,7 @@ object TileGridSystem : ComponentSystem {
         listener = { grid, action -> when (action) {
             CREATED -> viewLayerMapping.add(grid)
             DELETED -> viewLayerMapping.delete(grid)
-            else -> {}
+            else -> DO_NOTHING
         } }
     )
 
@@ -37,7 +38,7 @@ object TileGridSystem : ComponentSystem {
         when(e.type) {
             VIEW_DELETED -> viewLayerMapping[e.id.instanceId]
                 .forEach { grid -> grids.delete(grid.index) }
-            else -> {}
+            else -> DO_NOTHING
         }
     }
 

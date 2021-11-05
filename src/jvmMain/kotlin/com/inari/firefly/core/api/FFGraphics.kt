@@ -14,13 +14,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.GdxRuntimeException
-import com.inari.firefly.BlendMode
-import com.inari.firefly.FFContext
-import com.inari.firefly.NO_PROGRAM
-import com.inari.firefly.NULL_INT_FUNCTION
-import com.inari.firefly.core.component.CompId
-import com.inari.firefly.graphics.TextureAsset
-import com.inari.firefly.graphics.view.View
+import com.inari.firefly.*
 import com.inari.firefly.graphics.view.ViewEvent
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
@@ -66,11 +60,11 @@ actual object FFGraphics : GraphicsAPI {
             "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords);" +
             "}"
 
-    private val textures: DynArray<Texture> = DynArray.of(100, 50)
+    private val viewports: DynArray<ViewportData> = DynArray.of(10, 10)
+    private val textures: DynArray<Texture> = DynArray.of(30, 50)
+    private val fboTextures: DynArray<FBOTexture> = DynArray.of(10, 10)
     private val sprites: DynArray<TextureRegion> = DynArray.of(200, 300)
-    private val viewports: DynArray<ViewportData> = DynArray.of(20, 10)
-    private val shaderPrograms: DynArray<ShaderInitData> = DynArray.of(20, 10)
-    private val shaderInit: GDXShaderInitAdapter = GDXShaderInitAdapter()
+    private val effects: DynArray<EffectInstanceData> = DynArray.of(5, 10)
 
     private val spriteBatch = PolygonSpriteBatch()
     private val meshBuilder = PolygonShapeDrawer()
@@ -80,9 +74,9 @@ actual object FFGraphics : GraphicsAPI {
     private var baseView: ViewData? = null
 
     private var activeViewport: ViewportData? = null
-    private var activeShaderId = -1
+    private var activeEffectId = -1
     private var activeBlend = BlendMode.NONE
-    private var activeShapeShaderId = -1
+    private var activeShapeEffectId = -1
 
     private val SHAPE_COLOR_1 = Color()
     private val SHAPE_COLOR_2 = Color()
@@ -171,44 +165,48 @@ actual object FFGraphics : GraphicsAPI {
         sprites.remove(spriteId)
     }
 
-    actual override fun createShader(data: ShaderData): Int {
-        var vertexShader = data.vertexShaderProgram
-        var fragmentShader = data.fragmentShaderProgram
+    actual override fun createEffect(data: EffectData): Int {
+        var vertexShader = data.shaderData.vertexShaderProgram
+        var fragmentShader = data.shaderData.fragmentShaderProgram
 
-        if (vertexShader === NO_PROGRAM) {
+        if (vertexShader == NO_PROGRAM) {
             // try to load from resource
             vertexShader = try {
-                Gdx.files.internal(data.vertexShaderResourceName).readString()
+                Gdx.files.internal(data.shaderData.vertexShaderResourceName).readString()
             } catch (e: Exception) {
-                System.err.println("Failed to load vertex shader from resource: ${data.vertexShaderResourceName}")
+                System.err.println("Failed to load vertex shader from resource: ${data.shaderData.vertexShaderResourceName}")
                 println("Use default vertex shader")
                 DEFAULT_VERTEX_SHADER
             }
         }
 
-        if (fragmentShader === NO_PROGRAM) {
+        if (fragmentShader == NO_PROGRAM) {
             fragmentShader = try {
-                Gdx.files.internal(data.fragmentShaderResourceName).readString()
+                Gdx.files.internal(data.shaderData.fragmentShaderResourceName).readString()
             } catch (e: Exception) {
-                System.err.println("Failed to load fragment shader from resource: ${data.fragmentShaderResourceName}")
+                System.err.println("Failed to load fragment shader from resource: ${data.shaderData.fragmentShaderResourceName}")
                 println("Use default fragment shader")
                 DEFAULT_FRAGMENT_SHADER
             }
         }
 
         val shaderProgram = ShaderProgram(vertexShader, fragmentShader)
-        if (shaderProgram.isCompiled) {
-            val compileLog = shaderProgram.log
-            println("Shader Compiled: $compileLog")
-        } else {
-            throw RuntimeException("ShaderData with name: " + data.name + " failed to compile:" + shaderProgram.log)
-        }
+        if (shaderProgram.isCompiled)
+            println("Shader Compiled: ${shaderProgram.log}")
+        else
+            throw RuntimeException("ShaderData failed to compile:" + shaderProgram.log)
 
-        return shaderPrograms.add(ShaderInitData(data.shaderInit, shaderProgram))
+        val effectDataInstance =  EffectInstanceData(
+            shaderProgram,
+            data.textureBindings.toArray(),
+            data.fboTextureBindings.map{ createFBOTexture(it) }.toTypedArray()
+        )
+
+        return effects + effectDataInstance
     }
 
-    actual override fun disposeShader(shaderId: Int) {
-        shaderPrograms.remove( shaderId )?.program?.dispose()
+    actual override fun disposeEffect(effectId: Int) {
+        effects.remove(effectId)?.dispose()
     }
 
     actual override fun startRendering(view: ViewData, clear: Boolean) {
@@ -220,7 +218,7 @@ actual object FFGraphics : GraphicsAPI {
     actual override fun renderSprite(renderableSprite: SpriteRenderable, xOffset: Float, yOffset: Float) {
         setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
         val sprite = sprites[renderableSprite.spriteId]
-        setShaderForSpriteBatch(renderableSprite.shaderId)
+        setEffect(renderableSprite.effectInstanceRef)
 
         spriteBatch.draw(sprite, xOffset, yOffset)
     }
@@ -228,7 +226,7 @@ actual object FFGraphics : GraphicsAPI {
     actual override fun renderSprite(renderableSprite: SpriteRenderable, transform: TransformData) {
         val sprite = sprites[renderableSprite.spriteId] ?: return
         setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
-        setShaderForSpriteBatch(renderableSprite.shaderId)
+        setEffect(renderableSprite.effectInstanceRef)
         spriteBatch.draw(
             sprite,
             transform.position.x,
@@ -246,7 +244,7 @@ actual object FFGraphics : GraphicsAPI {
     actual override fun renderSprite(renderableSprite: SpriteRenderable, transform: TransformData, xOffset: Float, yOffset: Float) {
         val sprite = sprites[renderableSprite.spriteId] ?: return
         setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
-        setShaderForSpriteBatch(renderableSprite.shaderId)
+        setEffect(renderableSprite.effectInstanceRef)
         spriteBatch.draw(
             sprite,
             transform.position.x + xOffset,
@@ -273,7 +271,7 @@ actual object FFGraphics : GraphicsAPI {
         getShapeColor(data.color4 ?: data.color1, SHAPE_COLOR_4)
 
         setColorAndBlendMode(data.color1, data.blend)
-        setShaderForSpriteBatch(data.shaderRef)
+        setEffect(data.effectInstanceRef)
 
         meshBuilder.setColor(SHAPE_COLOR_1)
 
@@ -365,12 +363,17 @@ actual object FFGraphics : GraphicsAPI {
         getShapeColor(data.color3 ?: data.color1, SHAPE_COLOR_3)
         getShapeColor(data.color4 ?: data.color1, SHAPE_COLOR_4)
 
-        if (data.shaderRef != activeShapeShaderId)
-            shapeRenderer = if (data.shaderRef < 0)
-                ShapeRenderer()
-            else
-                ShapeRenderer(1000, shaderPrograms[data.shaderRef]?.program)
-        activeShapeShaderId = data.shaderRef
+        if (data.effectInstanceRef != activeShapeEffectId)
+            if (data.effectInstanceRef < 0)
+                shapeRenderer = ShapeRenderer()
+            else {
+                val effect = effects[data.effectInstanceRef]
+                if (effect != null) {
+                    effect.activate(true)
+                    shapeRenderer = ShapeRenderer(1000, effect.program)
+                }
+            }
+        activeShapeEffectId = data.effectInstanceRef
 
         shapeRenderer.color = SHAPE_COLOR_1
         var restartSpriteBatch = false
@@ -523,7 +526,7 @@ actual object FFGraphics : GraphicsAPI {
                 val viewport = viewports[virtualView.index] ?: continue
                 val bounds = virtualView.bounds
                 setColorAndBlendMode(virtualView.tintColor, virtualView.blendMode)
-                setShaderForSpriteBatch(virtualView.shaderId)
+                setEffect(virtualView.effectInstanceRef)
 
                 spriteBatch.draw(
                     viewport.fboTexture,
@@ -578,11 +581,10 @@ actual object FFGraphics : GraphicsAPI {
             viewPort.bounds.width.toFloat(),
             viewPort.bounds.height.toFloat()
         )
-        val fboScale = viewPort.fboScale
         val frameBuffer = FrameBuffer(
             Pixmap.Format.RGBA8888,
-            (viewPort.bounds.width * fboScale).toInt(),
-            (viewPort.bounds.height * fboScale).toInt(),
+            (viewPort.bounds.width * viewPort.fboScale).toInt(),
+            (viewPort.bounds.height * viewPort.fboScale).toInt(),
             false
         )
         val textureRegion = TextureRegion(frameBuffer.colorBufferTexture)
@@ -591,12 +593,22 @@ actual object FFGraphics : GraphicsAPI {
         return ViewportData(camera, frameBuffer, textureRegion)
     }
 
-    private class ViewportData internal constructor(
-        internal val camera: OrthographicCamera,
-        internal val fbo: FrameBuffer?,
-        internal val fboTexture: TextureRegion?) {
+    private fun createFBOTexture(binding: FBOTextureBind): TextureBind {
+        val instanceId = createFBOTexture(binding.width, binding.height, binding.clearColor)
+        return TextureBind(binding.bindingName, instanceId)
+    }
 
-        internal fun activate(
+    private fun createFBOTexture(width: Int, height: Int, clearColor: IColor): Int {
+        val fboTex = FBOTexture(width, height, Color(clearColor.r, clearColor.g, clearColor.b, clearColor.a))
+        return fboTextures + fboTex
+    }
+
+    private class ViewportData constructor(
+        val camera: OrthographicCamera,
+        val fbo: FrameBuffer?,
+        val fboTexture: TextureRegion?) {
+
+         fun activate(
             spriteBatch: PolygonSpriteBatch,
             shapeRenderer: ShapeRenderer,
             view: ViewData,
@@ -622,10 +634,8 @@ actual object FFGraphics : GraphicsAPI {
             }
         }
 
-        internal fun dispose() =
-            fbo?.dispose()
+        fun dispose() = fbo?.dispose()
     }
-
 
     private fun getLibGDXTextureWrap(glConst: Int): TextureWrap =
         TextureWrap.values().firstOrNull { it.glEnum == glConst }
@@ -642,25 +652,22 @@ actual object FFGraphics : GraphicsAPI {
             if (activeBlend !== BlendMode.NONE) {
                 spriteBatch.enableBlending()
                 spriteBatch.setBlendFunction(activeBlend.source, activeBlend.dest)
-            } else {
+            } else
                 spriteBatch.disableBlending()
-            }
         }
     }
 
-    private fun setShaderForSpriteBatch(shaderId: Int) {
-        if (shaderId != activeShaderId) {
+    private fun setEffect(effectId: Int) {
+        if (effectId != activeEffectId) {
             spriteBatch.flush()
-            if (shaderId < 0) {
+            if (effectId < 0) {
                 spriteBatch.shader = null
-                activeShaderId = -1
+                activeEffectId = -1
             } else {
-                val shaderData = shaderPrograms[shaderId]
-                if (shaderData != null) {
-                    spriteBatch.shader = shaderData.program
-                    activeShaderId = shaderId
-                    shaderInit.shaderId = shaderId
-                    shaderData.init.invoke(shaderInit)
+                val effectInstance = effects[effectId]
+                if (effectInstance != null) {
+                    effectInstance.activate(true)
+                    activeEffectId = effectId
                 }
             }
         }
@@ -700,94 +707,64 @@ actual object FFGraphics : GraphicsAPI {
         }
     }
 
-    private class ShaderInitData (
-            internal val init: ShaderInit,
-            internal val program: ShaderProgram
-    )
+    private class EffectInstanceData (
+        val program: ShaderProgram,
+        val textureArray: Array<TextureBind> = emptyArray(),
+        val fboTextureArray: Array<TextureBind> = emptyArray(),
+        val shaderInit: ShaderInit = {}
+    ) {
+        fun activate(clear: Boolean = true) {
+            spriteBatch.shader = program
+            shaderInit(GDXShaderInitAdapter(program))
 
-    private class GDXShaderInitAdapter : ShaderInitAdapter {
+            var texNum = 1
+            textureArray.forEach { bindTexture(it, texNum++) }
+            fboTextureArray.forEach { fboTextures[it.textureId]?.bindToShader(program, it.bindingName, texNum++) }
 
-        internal var shaderId: Int = -1
-
-        override fun setUniformFloat(name: String, value: Float) {
-            if (shaderId < 0)
-                return
-
-            shaderPrograms[shaderId]?.program?.setUniformf(name, value)
+            // (re)activate default texture
+            Gdx.graphics.gL20.glActiveTexture(GL20.GL_TEXTURE0)
         }
 
-        override fun setTexture(name: String, textureName: String) {
-            if (shaderId < 0)
-                return
-
-            val texture = FFContext[TextureAsset, textureName]
-            setTexture(name, texture.instanceId)
+        private fun bindTexture(texBind: TextureBind, num: Int) {
+            program.setUniformi(texBind.bindingName, num)
+            textures[texBind.textureId]?.bind(1)
         }
 
-        override fun setTexture(name: String, textureId: CompId) {
-            if (shaderId < 0)
-                return
-
-            val texture = FFContext[TextureAsset, textureId]
-            setTexture(name, texture.instanceId)
+        fun dispose() {
+            fboTextureArray.forEach { fboTextures[it.textureId]?.dispose() }
         }
+    }
 
-        override fun setViewTexture(name: String, viewName: String) {
-            if (shaderId < 0)
-                return
+    private class GDXShaderInitAdapter(val program: ShaderProgram) : ShaderInitAdapter {
+        override fun setUniformFloat(name: String, value: Float) = program.setUniformf(name, value)
+        override fun setUniformVec2(name: String, position: PositionF) = program.setUniformf(name, position.x, position.y)
+        override fun setUniformVec2(name: String, position: Position) = program.setUniformf(name, position.x.toFloat(), position.y.toFloat())
+        override fun setUniformColorVec4(name: String, color: IColor) = program.setUniformf(name, color.r, color.g, color.b, color.a)
+    }
 
-            val view = FFContext[View, viewName]
-            val viewport = viewports[view.index]
-            if (viewport != null)
-                setTexture(name, viewport.fboTexture?.texture)
-        }
+    private class FBOTexture(
+        width: Int,
+        height: Int,
+        val clearColor: Color) {
 
-        override fun setViewTexture(name: String, viewId: CompId) {
-            if (shaderId < 0)
-                return
+        val frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
+        val textureRegion = TextureRegion(frameBuffer.colorBufferTexture)
 
-            val view = FFContext[View, viewId]
-            val viewport = viewports[view.index]
-            if (viewport != null)
-                setTexture(name, viewport.fboTexture?.texture)
-        }
+        fun activate(clear: Boolean) {
+            textureRegion.flip(false, false)
+            frameBuffer.begin()
 
-        override fun setUniformVec2(name: String, position: PositionF) {
-            if (shaderId < 0)
-                return
-
-            shaderPrograms[shaderId]?.program?.setUniformf(name, position.x, position.y)
-        }
-
-        override fun setUniformVec2(name: String, position: Position) {
-            if (shaderId < 0)
-                return
-
-            shaderPrograms[shaderId]?.program?.setUniformf(
-                    name,
-                    position.x.toFloat(),
-                    position.y.toFloat())
-        }
-
-        override fun setUniformColorVec4(name: String, color: IColor) {
-            if (shaderId < 0)
-                return
-
-            shaderPrograms[shaderId]?.program?.setUniformf(
-                    name, color.r, color.g, color.b, color.a)
-        }
-
-        private fun setTexture(name: String, textureId: Int) =
-                setTexture(name, textures[textureId])
-
-        private fun setTexture(name: String, texture: Texture?) {
-            val shaderData = shaderPrograms[shaderId]
-            if (texture != null && shaderData != null) {
-                Gdx.graphics.gL20.glActiveTexture(GL20.GL_TEXTURE1)
-                texture.bind(1)
-                shaderData.program.setUniformi(name, 1)
-                Gdx.graphics.gL20.glActiveTexture(GL20.GL_TEXTURE0)
+            if (clear) {
+                Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a)
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
             }
         }
+
+        fun bindToShader(program: ShaderProgram, binding: String, num: Int) {
+            program.setUniformi(binding, num)
+            textureRegion.texture.bind(num)
+        }
+
+        fun dispose() = frameBuffer.dispose()
     }
 }

@@ -1,7 +1,9 @@
 package com.inari.firefly.graphics.sprite
 
 import com.inari.firefly.BlendMode
+import com.inari.firefly.FFContext
 import com.inari.firefly.asset.AssetInstanceRefResolver
+import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.SpriteRenderable
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityComponent
@@ -9,6 +11,7 @@ import com.inari.firefly.entity.EntityComponentType
 import com.inari.firefly.entity.property.FloatPropertyAccessor
 import com.inari.firefly.entity.property.IntPropertyAccessor
 import com.inari.firefly.entity.property.VirtualPropertyRef
+import com.inari.firefly.graphics.effect.ShaderEffectAsset
 import com.inari.util.graphics.MutableColor
 import kotlin.jvm.JvmField
 import kotlin.reflect.KClass
@@ -21,9 +24,9 @@ class ESprite private constructor() : EntityComponent(ESprite::class.simpleName!
     val sprite = AssetInstanceRefResolver(
         { index -> spriteRenderable.spriteId = index },
         { spriteRenderable.spriteId })
-    val shader = AssetInstanceRefResolver(
-        { index -> spriteRenderable.shaderId = index },
-        { spriteRenderable.shaderId })
+    val effect = AssetInstanceRefResolver(
+        { index -> spriteRenderable.effectInstanceRef = FFContext[ShaderEffectAsset, index].instanceId },
+        { spriteRenderable.effectInstanceRef })
     var blend: BlendMode
         get() = spriteRenderable.blendMode
         set(value) { spriteRenderable.blendMode = value }
@@ -37,7 +40,7 @@ class ESprite private constructor() : EntityComponent(ESprite::class.simpleName!
 
     override fun toString(): String {
         return "ESprite(spriteRef=${spriteRenderable.spriteId}, " +
-            "shaderRef=${spriteRenderable.shaderId}, " +
+            "effectInstanceRef=${spriteRenderable.effectInstanceRef}, " +
             "blend=${spriteRenderable.blendMode}, " +
             "tint=${spriteRenderable.tintColor}, "
     }

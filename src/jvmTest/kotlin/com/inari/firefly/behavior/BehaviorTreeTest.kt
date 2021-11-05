@@ -29,7 +29,7 @@ class BehaviorTreeTest {
         BxSelection.build {
             name = "First Selection"
             node(BxSelection) {
-                name = "Second Selection"
+                name = "Second Sele ction"
                 node(BxCondition) {
                     name ="Condition 1"
                     condition = FALSE_CONDITION

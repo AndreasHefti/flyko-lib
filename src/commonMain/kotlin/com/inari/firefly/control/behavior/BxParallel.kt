@@ -1,5 +1,6 @@
 package com.inari.firefly.control.behavior
 
+import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.entity.Entity
 import com.inari.util.OpResult
@@ -18,7 +19,7 @@ class BxParallel private constructor() : BxBranch() {
         var i = 0
         loop@ while (i < children.capacity) {
             when(children[i++]?.tick(entity, behavior) ?: continue@loop) {
-                OpResult.RUNNING -> {}
+                OpResult.RUNNING -> DO_NOTHING
                 OpResult.SUCCESS -> successCount++
                 OpResult.FAILED -> failuresCount++
             }

@@ -12,7 +12,7 @@ abstract class ViewData constructor(
     @JvmField var clearColor: MutableColor = MutableColor( 0f, 0f, 0f, 1f ),
     @JvmField var tintColor: MutableColor = MutableColor( 1f, 1f, 1f, 1f ),
     @JvmField var blendMode: BlendMode = BlendMode.NONE,
-    @JvmField var shaderId: Int = -1,
+    @JvmField var effectInstanceRef: Int = -1,
     @JvmField var zoom: Float = 1.0f,
     @JvmField var fboScale: Float = 1.0f
 ) {
@@ -26,7 +26,7 @@ abstract class ViewData constructor(
                 "clearColor=$clearColor, " +
                 "tintColor=$tintColor, " +
                 "blendMode=$blendMode, " +
-                "shaderId=$shaderId, " +
+                "effectInstanceRef=$effectInstanceRef, " +
                 "zoom=$zoom, " +
                 "fboScale=$fboScale, " +
                 "index=$index, " +

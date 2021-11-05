@@ -1,5 +1,6 @@
 package com.inari.firefly.physics.contact
 
+import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFContext
 import com.inari.firefly.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.UNDEFINED_MATERIAL
@@ -42,7 +43,7 @@ object ContactSystem : ComponentSystem {
             listener = { contactMap, action -> when (action) {
                 CREATED -> contactMapViewLayer.add(contactMap)
                 DELETED -> contactMapViewLayer.delete(contactMap)
-                else -> {}
+                else -> DO_NOTHING
             } }
         )
     @JvmField val constraints = ComponentSystem.createComponentMapping(ContactConstraint)
@@ -52,7 +53,7 @@ object ContactSystem : ComponentSystem {
     private val viewListener: Consumer<ViewEvent> = { event ->
         when(event.type) {
             ViewEvent.Type.VIEW_DELETED -> contactMaps.deleteAll { c -> event.id.instanceId == c?.viewRef }
-            else -> {}
+            else -> DO_NOTHING
         }
     }
 

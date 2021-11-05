@@ -60,15 +60,13 @@ object GraphicsMock : GraphicsAPI {
         _loadedAssets.remove(spriteId)
     }
 
-    override fun createShader(data: ShaderData): Int {
-        return _loadedAssets.add(data.name)
+    override fun createEffect(data: EffectData): Int {
+        return _loadedAssets.add(data.toString())
     }
 
-    override fun disposeShader(shaderId: Int) {
-        _loadedAssets.remove(shaderId)
+    override fun disposeEffect(effectId: Int) {
+        _loadedAssets.remove(effectId)
     }
-
-
 
     override fun startRendering(view: ViewData, clear: Boolean) {
         _log.add("startRendering::$view")

@@ -2,6 +2,7 @@
 
 package com.inari.firefly.game.world
 
+import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
@@ -44,31 +45,31 @@ object WorldSystem : FFSystem {
                 World -> worlds[id.index] = true
                 Area -> areas[id.index] = true
                 Room -> rooms[id.index] = true
-                else -> {}
+                else -> DO_NOTHING
             }
             CompositeEventType.LOADED -> when (compositeAspect) {
                 World -> WorldEvent.send(WorldEventType.WORLD_LOADED, id)
                 Area -> AreaEvent.send(AreaEventType.AREA_LOADED, id)
                 Room -> RoomEvent.send(RoomEventType.ROOM_LOADED, id)
-                else -> {}
+                else -> DO_NOTHING
             }
             CompositeEventType.ACTIVATED ->  when (compositeAspect) {
                 World -> activateWorld(id)
                 Area -> activateArea(id)
                 Room -> activateRoom(id)
-                else -> {}
+                else -> DO_NOTHING
             }
             CompositeEventType.DEACTIVATED ->  when (compositeAspect) {
                 World -> deactivateWorld(id)
                 Area -> deactivateArea(id)
                 Room -> deactivateRoom(id)
-                else -> {}
+                else -> DO_NOTHING
             }
             CompositeEventType.DISPOSED -> when (compositeAspect) {
                 World -> WorldEvent.send(WorldEventType.WORLD_DISPOSED, id)
                 Area -> AreaEvent.send(AreaEventType.AREA_DISPOSED, id)
                 Room -> RoomEvent.send(RoomEventType.ROOM_DISPOSED, id)
-                else -> {}
+                else -> DO_NOTHING
             }
             CompositeEventType.DELETED -> when (compositeAspect) {
                 World -> {
@@ -86,7 +87,7 @@ object WorldSystem : FFSystem {
                     areas[id.index] = false
                 }
                 Room -> rooms[id.index] = false
-                else -> {}
+                else -> DO_NOTHING
             }
         }
     }
@@ -262,7 +263,7 @@ object WorldSystem : FFSystem {
                     roomY1 = -1
                     roomY2 = -1
                 }
-                else -> {}
+                else -> DO_NOTHING
             }
         }
 

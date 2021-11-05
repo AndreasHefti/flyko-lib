@@ -43,8 +43,7 @@ const val NO_STATE: String = "[[NO_STATE]]"
 const val NO_PROGRAM: String = "[[NO_PROGRAM]]"
 const val BASE_VIEW: String = "[[BASE_VIEW]]"
 
-@JvmField
-val EMPTY_FLOAT_ARRAY: FloatArray = FloatArray(0)
+@JvmField val EMPTY_FLOAT_ARRAY: FloatArray = FloatArray(0)
 
 @JvmField val NO_NAMED = object : Named { override val name = NO_NAME }
 @JvmField val NO_COMP_ID: CompId = CompId(-1, object : ComponentType<Component> {
@@ -73,12 +72,13 @@ val EMPTY_FLOAT_ARRAY: FloatArray = FloatArray(0)
 @JvmField val EMPTY_INT_CONSUMER: IntConsumer = { _ -> }
 @JvmField val NULL_CONSUMER: Consumer<Any> = { _ -> throw IllegalStateException("NULL_CONSUMER") }
 @JvmField val NULL_CALL: Call = { throw IllegalStateException("NULL_CALL called") }
-@JvmField val VOID_CALL: Call = {}
+@JvmField val DO_NOTHING = {}
 @JvmField val FALSE_SUPPLIER: BooleanSupplier = { false }
 @JvmField val TRUE_SUPPLIER: BooleanSupplier = { true }
 @JvmField val FALSE_PREDICATE: Predicate<Any> = { false }
 @JvmField val TRUE_PREDICATE: Predicate<Any> = { true }
 @JvmField val VOID_COMP_ID_CONSUMER: Consumer<CompId> = { _ -> }
+@JvmField val VOID_CONSUMER: Consumer<Any> = { _ -> }
 
 @JvmField val INFINITE_SCHEDULER: FFTimer.Scheduler = object : FFTimer.Scheduler {
     override fun needsUpdate(): Boolean = true

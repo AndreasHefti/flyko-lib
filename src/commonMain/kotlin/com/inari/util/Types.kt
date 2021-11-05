@@ -12,8 +12,6 @@ enum class OpResult {
     FAILED
 }
 
-
-
 typealias Consumer<C> = (C) -> Unit
 typealias Operation<C> = (C) -> OpResult
 typealias UpdateOperation = () -> OpResult

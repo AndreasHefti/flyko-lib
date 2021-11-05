@@ -52,7 +52,7 @@ class RenderingSystemTest {
         TestApp.render()
 
         assertEquals(
-            "[startRendering::ViewData(bounds=[x=0,y=0,width=100,height=100], worldPosition=[x=0.0,y=0.0], clearColor=[r=0.0,g=0.0,b=0.0,a=1.0], tintColor=[r=1.0,g=1.0,b=1.0,a=1.0], blendMode=NONE, shaderId=-1, zoom=1.0, fboScale=1.0, index=0, isBase=true), renderSprite::Sprite(SpriteRenderable(spriteId=1, tintColor=[r=1.0,g=1.0,b=1.0,a=1.0], blendMode=NONE, shaderId=-1)), endRendering::ViewData(bounds=[x=0,y=0,width=100,height=100], worldPosition=[x=0.0,y=0.0], clearColor=[r=0.0,g=0.0,b=0.0,a=1.0], tintColor=[r=1.0,g=1.0,b=1.0,a=1.0], blendMode=NONE, shaderId=-1, zoom=1.0, fboScale=1.0, index=0, isBase=true), flush]",
+            "[startRendering::ViewData(bounds=[x=0,y=0,width=100,height=100], worldPosition=[x=0.0,y=0.0], clearColor=[r=0.0,g=0.0,b=0.0,a=1.0], tintColor=[r=1.0,g=1.0,b=1.0,a=1.0], blendMode=NONE, effectInstanceRef=-1, zoom=1.0, fboScale=1.0, index=0, isBase=true), renderSprite::Sprite(SpriteRenderable(spriteId=1, tintColor=[r=1.0,g=1.0,b=1.0,a=1.0], blendMode=NONE, effectInstanceRef=-1)), endRendering::ViewData(bounds=[x=0,y=0,width=100,height=100], worldPosition=[x=0.0,y=0.0], clearColor=[r=0.0,g=0.0,b=0.0,a=1.0], tintColor=[r=1.0,g=1.0,b=1.0,a=1.0], blendMode=NONE, effectInstanceRef=-1, zoom=1.0, fboScale=1.0, index=0, isBase=true), flush]",
             GraphicsMock.log())
     }
 }

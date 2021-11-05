@@ -2,15 +2,13 @@ package com.inari.firefly.graphics.view
 
 import com.inari.firefly.BlendMode
 import com.inari.firefly.FFContext
-import com.inari.firefly.NO_NAME
 import com.inari.firefly.asset.AssetInstanceRefResolver
 import com.inari.firefly.control.ControlledSystemComponent
-import com.inari.firefly.control.ControllerSystem
+import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.ViewData
-import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentSingleType
-import com.inari.util.collection.DynIntArray
+import com.inari.firefly.graphics.effect.ShaderEffectAsset
 import com.inari.util.geom.PositionF
 import com.inari.util.geom.Rectangle
 import com.inari.util.graphics.MutableColor
@@ -43,9 +41,9 @@ class View private constructor (
     var blendMode: BlendMode
         get() = data.blendMode
         set(value) { data.blendMode = value }
-    val shader = AssetInstanceRefResolver(
-        { index -> data.shaderId = index },
-        { data.shaderId })
+    val effect = AssetInstanceRefResolver(
+        { index -> data.effectInstanceRef = FFContext[ShaderEffectAsset, index].instanceId },
+        { data.effectInstanceRef })
     var zoom: Float
         get() = data.zoom
         set(value) { data.zoom = value }
@@ -81,7 +79,7 @@ class View private constructor (
             "clearColor=${data.clearColor}, " +
             "tintColor=${data.tintColor}, " +
             "blendMode=${data.blendMode}, " +
-            "shaderId=${data.shaderId}, " +
+            "effectInstanceRef=${data.effectInstanceRef}, " +
             "zoom=${data.zoom}, " +
             "fboScale=${data.fboScale})"
     }

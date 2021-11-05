@@ -1,6 +1,7 @@
 package com.inari.firefly.game.tile
 
 import com.inari.firefly.BASE_VIEW
+import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.core.ComponentRefResolver
@@ -36,7 +37,7 @@ object TileMapSystem : ComponentSystem {
         listener = { tileSet, action -> when (action) {
             CREATED -> initTileSet(tileSet)
             DELETED -> disposeTileSet(tileSet)
-            else -> {}
+            else -> DO_NOTHING
         } }
     )
 
@@ -49,7 +50,7 @@ object TileMapSystem : ComponentSystem {
             ACTIVATED -> tileMap.activate()
             DEACTIVATED -> tileMap.deactivate()
             DELETED -> tileMap.unload()
-            else -> {}
+            else -> DO_NOTHING
         } }
     )
 
@@ -59,7 +60,7 @@ object TileMapSystem : ComponentSystem {
                 if (tileMap.viewRef == e.id.instanceId)
                     FFContext.delete(tileMap.componentId)
             }
-            else -> {}
+            else -> DO_NOTHING
         }
     }
 

@@ -1,8 +1,11 @@
 package com.inari.firefly.graphics.particle
 
 import com.inari.firefly.BlendMode
+import com.inari.firefly.FFContext
 import com.inari.firefly.asset.AssetInstanceRefResolver
+import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.SpriteRenderable
+import com.inari.firefly.graphics.effect.ShaderEffectAsset
 import com.inari.util.graphics.MutableColor
 import kotlin.jvm.JvmField
 
@@ -14,9 +17,9 @@ class SpriteParticle : Particle() {
     val sprite = AssetInstanceRefResolver(
             { index -> spriteRenderable.spriteId = index },
             { spriteRenderable.spriteId })
-    val shader = AssetInstanceRefResolver(
-            { index -> spriteRenderable.shaderId = index },
-            { spriteRenderable.shaderId })
+    val effect = AssetInstanceRefResolver(
+        { index -> spriteRenderable.effectInstanceRef = FFContext[ShaderEffectAsset, index].instanceId },
+        { spriteRenderable.effectInstanceRef })
     var blend: BlendMode
         get() = spriteRenderable.blendMode
         set(value) { spriteRenderable.blendMode = value }

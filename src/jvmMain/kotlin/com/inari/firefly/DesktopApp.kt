@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.inari.firefly.asset.AssetSystem
 import com.inari.firefly.control.ControllerSystem
+import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.control.trigger.TriggerSystem
 import com.inari.firefly.control.trigger.UpdateEventTrigger
 import com.inari.firefly.core.api.DesktopAppAdapter
@@ -29,6 +30,7 @@ abstract class DesktopApp : ApplicationAdapter() {
         // load some initial systems
         AssetSystem
         ViewSystem
+        TaskSystem
         RenderingSystem
         EntitySystem
         TriggerSystem

@@ -63,7 +63,7 @@ abstract class SystemComponent protected constructor(
         if (initialized) alreadyInit(name)
         else value
 
-    private fun <T> alreadyInit(name: String): T =
+    protected fun <T> alreadyInit(name: String): T =
         throw IllegalStateException("Invalid modification on an immutable property of an already initialized component for: $name")
 
     abstract fun componentType(): ComponentType<out SystemComponent>

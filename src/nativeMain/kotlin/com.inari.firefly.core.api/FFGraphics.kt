@@ -51,21 +51,22 @@ actual object FFGraphics : GraphicsAPI {
     actual override fun disposeSprite(spriteId: Int) {
     }
 
-    /** This is called from the firefly API when a shader script is created/loaded and gives an identifier for that shader script.
+    /** This is called from the firefly API when an effect is created/loaded and gives an identifier for that effect script.
      *
      * @param data the shader DAO
      * @return the shader identifier to identify the shader on lower level API.
      */
-    actual override fun createShader(data: ShaderData): Int {
+    actual override fun createEffect(data: EffectData): Int {
         TODO("Not yet implemented")
     }
 
-    /** This is called from the firefly API when a shader script is disposed
-     * and must release and delete the shader script on GPU level
+    /** This is called from the firefly API when am Effect is disposed
+     * and must release and delete all effect related data
      *
-     * @param shaderId identifier of the shader to dispose.
+     * @param effectId identifier of the effect to dispose.
      */
-    actual override fun disposeShader(shaderId: Int) {
+    actual override fun disposeEffect(effectId: Int) {
+        TODO("Not yet implemented")
     }
 
     /** This is called form the firefly API before rendering to a given [ViewData] and must

@@ -27,7 +27,7 @@ object StateSystem : ComponentSystem {
         listener = { workflow, action -> when (action) {
             ACTIVATED     -> activated(workflow)
             DEACTIVATED   -> deactivated(workflow)
-            else -> {}
+            else -> DO_NOTHING
         } }
     )
 

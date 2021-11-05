@@ -1,6 +1,7 @@
 package com.inari.firefly.graphics.view
 
 import com.inari.firefly.BASE_VIEW
+import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFContext
 import com.inari.firefly.asset.Asset
 import com.inari.firefly.core.api.ViewData
@@ -45,7 +46,7 @@ object ViewSystem : ComponentSystem {
         listener = { layer, action -> when (action) {
             CREATED       -> created(layer)
             DELETED       -> deleted(layer)
-            else -> {}
+            else -> DO_NOTHING
         } }
     )
 

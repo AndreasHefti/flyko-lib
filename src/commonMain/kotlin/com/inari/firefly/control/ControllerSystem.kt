@@ -1,5 +1,6 @@
 package com.inari.firefly.control
 
+import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
 import com.inari.firefly.core.component.CompId
@@ -27,7 +28,7 @@ object ControllerSystem : ComponentSystem {
         listener = { controller, action  -> when (action) {
             ComponentMap.MapAction.ACTIVATED -> activateCompIds(controller)
             ComponentMap.MapAction.DEACTIVATED -> deactivateCompIds(controller)
-            else -> {}
+            else -> DO_NOTHING
         } }
     )
 

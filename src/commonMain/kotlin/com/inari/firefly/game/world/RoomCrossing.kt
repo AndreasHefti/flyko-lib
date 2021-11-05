@@ -1,5 +1,6 @@
 package com.inari.firefly.game.world
 
+import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.core.component.CompId
@@ -64,7 +65,7 @@ val DEFAULT_SECTION_BASED_ROOM_SUPPLIER: NextRoomSupplier = nextRoomSupplier@ { 
                 newPx = newRoom.areaOrientation.width * sWidth + PlayerSystem.playerPivot.dx
                 newPy = sy * sHeight + sOffsetY
             }
-            else -> {}
+            else -> DO_NOTHING
         }
         // assemble new room key
         RoomKey(WorldSystem.activeWorldId, WorldSystem.activeAreaId, newRoom.componentId, newPx, newPy)

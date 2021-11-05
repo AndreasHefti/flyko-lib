@@ -50,13 +50,7 @@ class TiledTileMapTest : DesktopApp() {
             .addInfo(FrameRateInfo)
             .activate()
 
-        ViewSystem
-        RenderingSystem
-        AssetSystem
-        EntitySystem
-        ViewSystem
         TileMapSystem
-        AnimationSystem
         MovementSystem
         ContactSystem
         TestGameObject

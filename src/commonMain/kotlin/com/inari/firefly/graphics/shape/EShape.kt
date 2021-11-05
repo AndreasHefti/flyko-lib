@@ -1,7 +1,9 @@
 package com.inari.firefly.graphics.shape
 
 import com.inari.firefly.BlendMode
+import com.inari.firefly.FFContext
 import com.inari.firefly.asset.AssetInstanceRefResolver
+import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.ShapeData
 import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.core.component.ComponentType
@@ -10,6 +12,7 @@ import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
 import com.inari.firefly.entity.property.FloatPropertyAccessor
 import com.inari.firefly.entity.property.VirtualPropertyRef
+import com.inari.firefly.graphics.effect.ShaderEffectAsset
 import com.inari.util.graphics.MutableColor
 import kotlin.jvm.JvmField
 import kotlin.reflect.KClass
@@ -45,9 +48,10 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
     var blend: BlendMode
         get() = data.blend
         set(value) { data.blend = value }
-    val shader = AssetInstanceRefResolver(
-        { index -> data.shaderRef = index },
-        { data.shaderRef })
+    val effect = AssetInstanceRefResolver(
+        { index -> data.effectInstanceRef = FFContext[ShaderEffectAsset, index].instanceId },
+        { data.effectInstanceRef }
+    )
 
     override fun reset() {
         data.reset()
@@ -56,15 +60,15 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
     override fun toString(): String {
         return "EShape(subType=$data.subType, " +
             "vertices=${data.vertices.contentToString()}, " +
-            "color1=$data.color1, " +
-            "color2=$data.color2, " +
-            "color3=$data.color3, " +
-            "color4=$data.color4, " +
-            "segments=$data.segments, " +
-            "fill=$data.fill, " +
-            "blend=$data.blend, " +
-            "shaderRef=$data.shaderRef, " +
-            "ShaderAsset=$shader)"
+            "color1=${data.color1}, " +
+            "color2=${data.color2}, " +
+            "color3=${data.color3}, " +
+            "color4=${data.color4}, " +
+            "segments=${data.segments}, " +
+            "fill=${data.fill}, " +
+            "blend=${data.blend}, " +
+            "effectInstanceRef=${data.effectInstanceRef}, " +
+            "ShaderAsset=$effect)"
     }
 
     private val accessorColorRed: FloatPropertyAccessor = object : FloatPropertyAccessor {

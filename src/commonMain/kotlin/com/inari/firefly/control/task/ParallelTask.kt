@@ -1,6 +1,8 @@
 package com.inari.firefly.control.task
 
+import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.EMPTY_COMPONENT_TASK_OPERATION
+import com.inari.firefly.VOID_CONSUMER
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.util.*
@@ -8,7 +10,7 @@ import com.inari.util.*
 class ParallelTask private constructor() : Task() {
 
     private var operation: ComponentTaskOperation = EMPTY_COMPONENT_TASK_OPERATION
-    private val callback: TaskCallback = {}
+    private val callback: TaskCallback = VOID_CONSUMER
 
     fun withOperation(op: ComponentTaskOperation) {
         operation = op

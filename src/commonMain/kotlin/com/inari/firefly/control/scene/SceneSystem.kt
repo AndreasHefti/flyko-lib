@@ -1,5 +1,6 @@
 package com.inari.firefly.control.scene
 
+import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
 import com.inari.firefly.composite.CompositeEvent
@@ -24,7 +25,7 @@ object SceneSystem : FFSystem {
                     if (scene.activateTaskRef >= 0)
                         FFContext.runTask(scene.activateTaskRef, scene.componentId)
                 }
-                else -> {}
+                else -> DO_NOTHING
             }
             CompositeEventType.DEACTIVATED -> when (compositeAspect) {
                 Scene -> {
@@ -36,7 +37,7 @@ object SceneSystem : FFSystem {
                     if (scene.removeAfterRun)
                         FFContext.delete(scene)
                 }
-                else -> {}
+                else -> DO_NOTHING
             }
             CompositeEventType.DISPOSED  ->  when (compositeAspect) {
                 Scene -> {
@@ -44,7 +45,7 @@ object SceneSystem : FFSystem {
                     if (scene.removeAfterRun)
                         FFContext.delete(id)
                 }
-                else -> {}
+                else -> DO_NOTHING
             }
         }
     }

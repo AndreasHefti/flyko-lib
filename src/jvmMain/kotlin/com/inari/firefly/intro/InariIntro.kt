@@ -22,7 +22,7 @@ object InariIntro {
     private var spriteAssetId = NO_COMP_ID
     private var entityId = NO_COMP_ID
     private var animationId = NO_COMP_ID
-    private var callback: Call = VOID_CALL
+    private var callback: Call = DO_NOTHING
     private var disposing = false
 
     internal fun show(callback: Call) {
