@@ -150,7 +150,7 @@ Code Example
 Let's Get Started with Fly-Ko
 ------------------------------
 
-TODO - Dokumentation
+TODO - Documentation
 
 Install
 -------
