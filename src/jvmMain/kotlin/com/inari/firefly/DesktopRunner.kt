@@ -3,7 +3,7 @@ package com.inari.firefly
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 
-abstract class AppRunner (
+abstract class DesktopRunner (
     appTitle: String,
     width: Int,
     height: Int,
@@ -21,7 +21,7 @@ abstract class AppRunner (
             config.useVsync(vsync)
             desktopApp = object : DesktopApp() {
                 override val title = appTitle
-                override fun init() = this@AppRunner.init()
+                override fun init() = this@DesktopRunner.init()
             }
 
             Lwjgl3Application(desktopApp, config)

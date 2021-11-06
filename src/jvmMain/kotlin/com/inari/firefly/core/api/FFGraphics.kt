@@ -36,29 +36,29 @@ import java.nio.ByteOrder
 actual object FFGraphics : GraphicsAPI {
 
     private const val DEFAULT_VERTEX_SHADER =
-            "attribute vec4 a_position;" +
-             "attribute vec4 a_color;" +
-             "attribute vec2 a_texCoord0;" +
-             "uniform mat4 u_projTrans;" +
-             "varying vec4 v_color;" +
-             "varying vec2 v_texCoords;" +
-             "void main() {" +
-             "    v_color = a_color;" +
-             "    v_texCoords = a_texCoord0;" +
-             "    gl_Position = u_projTrans * a_position;" +
-             "}"
+            "attribute vec4 a_position;\n" +
+             "attribute vec4 a_color;\n" +
+             "attribute vec2 a_texCoord0;\n" +
+             "uniform mat4 u_projTrans;\n" +
+             "varying vec4 v_color;\n" +
+             "varying vec2 v_texCoords;\n" +
+             "void main() {\n" +
+             "    v_color = a_color;\n" +
+             "    v_texCoords = a_texCoord0;\n" +
+             "    gl_Position = u_projTrans * a_position;\n" +
+             "}\n"
 
     private const val DEFAULT_FRAGMENT_SHADER =
-            "#ifdef GL_ES" +
-            "precision mediump float;" +
-            "#endif" +
-            "varying vec4 v_color;" +
-            "varying vec2 v_texCoords;" +
-            "uniform sampler2D u_texture;" +
-            "void main()" +
-            "{" +
-            "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords);" +
-            "}"
+            "#ifdef GL_ES\n" +
+            "precision mediump float;\n" +
+            "#endif\n" +
+            "varying vec4 v_color;\n" +
+            "varying vec2 v_texCoords;\n" +
+            "uniform sampler2D u_texture;\n" +
+            "void main()\n" +
+            "{\n" +
+            "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n" +
+            "}\n"
 
     private val viewports: DynArray<ViewportData> = DynArray.of(10, 10)
     private val textures: DynArray<Texture> = DynArray.of(30, 50)
@@ -193,8 +193,14 @@ actual object FFGraphics : GraphicsAPI {
         val shaderProgram = ShaderProgram(vertexShader, fragmentShader)
         if (shaderProgram.isCompiled)
             println("Shader Compiled: ${shaderProgram.log}")
-        else
+        else {
+            System.err.println("Shader program failed to compile:")
+            System.err.println("Vertex Shader:")
+            System.err.println(vertexShader)
+            System.err.println("Fragment Shader:")
+            System.err.println(fragmentShader)
             throw RuntimeException("ShaderData failed to compile:" + shaderProgram.log)
+        }
 
         val effectDataInstance =  EffectInstanceData(
             shaderProgram,

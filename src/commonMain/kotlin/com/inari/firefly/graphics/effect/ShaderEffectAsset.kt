@@ -1,6 +1,7 @@
 package com.inari.firefly.graphics.effect
 
 import com.inari.firefly.FFContext
+import com.inari.firefly.NO_NAME
 import com.inari.firefly.asset.Asset
 import com.inari.firefly.asset.AssetInstanceRefResolver
 import com.inari.firefly.core.api.*
@@ -33,7 +34,7 @@ class ShaderEffectAsset private constructor() : Asset() {
     fun withTextureBinding(bindingName: String): AssetInstanceRefResolver {
         return AssetInstanceRefResolver(
             { index -> effectData.textureBindings.add(TextureBind(bindingName, index)) },
-            { -1 })
+            { throw IllegalStateException() })
     }
 
     fun withFBOTextureBinding(bindingName: String, texWidth: Int, texHeight: Int, clearColor: IColor = IColor.BLACK) =
@@ -45,7 +46,19 @@ class ShaderEffectAsset private constructor() : Asset() {
         if (effectId >= 0)
             return
 
-        effectData.textureBindings.forEach { FFContext.activate(TextureAsset, it.textureId) }
+        // load vertex shader program if resource is defined
+        if (effectData.shaderData.vertexShaderResourceName != NO_NAME)
+            effectData.shaderData.vertexShaderProgram =
+                FFContext.loadShaderProgram(effectData.shaderData.vertexShaderResourceName)
+
+        // load fragment shader program if resource is defined
+        if (effectData.shaderData.fragmentShaderResourceName != NO_NAME)
+            effectData.shaderData.fragmentShaderProgram =
+                FFContext.loadShaderProgram(effectData.shaderData.fragmentShaderResourceName)
+
+        effectData.textureBindings.forEach {
+            FFContext.activate(TextureAsset, it.textureId)
+        }
         effectId = FFContext.graphics.createEffect(effectData)
     }
 

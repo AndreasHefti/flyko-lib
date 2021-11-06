@@ -2,6 +2,7 @@ package com.inari.firefly.graphics.view
 
 import com.inari.firefly.BlendMode
 import com.inari.firefly.FFContext
+import com.inari.firefly.asset.Asset
 import com.inari.firefly.asset.AssetInstanceRefResolver
 import com.inari.firefly.control.ControlledSystemComponent
 import com.inari.firefly.core.ComponentRefResolver
@@ -42,7 +43,7 @@ class View private constructor (
         get() = data.blendMode
         set(value) { data.blendMode = value }
     val effect = AssetInstanceRefResolver(
-        { index -> data.effectInstanceRef = FFContext[ShaderEffectAsset, index].instanceId },
+        { index -> data.effectInstanceRef = index },
         { data.effectInstanceRef })
     var zoom: Float
         get() = data.zoom

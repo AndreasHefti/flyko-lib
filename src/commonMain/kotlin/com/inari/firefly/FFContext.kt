@@ -387,6 +387,20 @@ object FFContext {
         compId3: CompId = NO_COMP_ID): OpResult = TaskSystem.tasks[taskIndex](compId1, compId2, compId3)
 
 
+    fun loadShaderProgram(resource: String): String {
+        val shaderProgram = resourceService.loadTextResource(resource)
+            .lines()
+            .map {
+                if (it.startsWith( "#pragma flyko-lib: import") )
+                    loadShaderProgram(it.substring(it.indexOf("=") + 1).trim())
+                else it
+            }.reduce{ acc, s ->
+                acc + "\n" + s
+            }
+        return shaderProgram
+    }
+
+
     fun dump(full: Boolean = false): String {
         val builder = StringBuilder()
         builder.append("FFContext: {")
