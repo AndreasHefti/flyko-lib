@@ -7,7 +7,7 @@ import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.TextureAsset
-import com.inari.firefly.graphics.effect.ShaderEffectAsset
+import com.inari.firefly.graphics.effect.ShaderAsset
 import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.view.View
 import com.inari.util.graphics.IColor
@@ -52,11 +52,13 @@ object ShaderTest1 {
                     resourceName = "firefly/alphaMaskCircle.png"
                 }
 
-                val shaderEffectId = ShaderEffectAsset.buildAndActivate {
+                val shaderId = ShaderAsset.buildAndActivate {
                     name = "ShaderEffect1"
                     vertShaderProgram = DEFAULT_VERTEX_SHADER
                     fragShaderResource = "firefly/fragShaderTest1.glsl"
-                    withTextureBinding("my_texture")(tex1Id)
+                    shaderInit =  { adapter ->
+                        adapter.bindTexture("my_texture", tex1Id.instanceId)
+                    }
                 }
 
                 val viewId = View.buildAndActivate {
@@ -65,7 +67,7 @@ object ShaderTest1 {
                     clearColor = IColor.BLACK.mutable
                     blendMode = BlendMode.NONE
                     tintColor(1f,0f,0f,1f)          // this is the v_color
-                    effect(shaderEffectId)
+                    shader(shaderId)
                     zoom = 5f
                 }
 

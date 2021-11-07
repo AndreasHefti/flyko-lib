@@ -3,7 +3,6 @@ package com.inari.firefly.graphics.shape
 import com.inari.firefly.BlendMode
 import com.inari.firefly.FFContext
 import com.inari.firefly.asset.AssetInstanceRefResolver
-import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.ShapeData
 import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.core.component.ComponentType
@@ -12,7 +11,7 @@ import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
 import com.inari.firefly.entity.property.FloatPropertyAccessor
 import com.inari.firefly.entity.property.VirtualPropertyRef
-import com.inari.firefly.graphics.effect.ShaderEffectAsset
+import com.inari.firefly.graphics.effect.ShaderAsset
 import com.inari.util.graphics.MutableColor
 import kotlin.jvm.JvmField
 import kotlin.reflect.KClass
@@ -48,9 +47,9 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
     var blend: BlendMode
         get() = data.blend
         set(value) { data.blend = value }
-    val effect = AssetInstanceRefResolver(
-        { index -> data.effectInstanceRef = FFContext[ShaderEffectAsset, index].instanceId },
-        { data.effectInstanceRef }
+    val shader = AssetInstanceRefResolver(
+        { instanceId -> data.shaderRef = instanceId },
+        { data.shaderRef }
     )
 
     override fun reset() {
@@ -67,8 +66,7 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
             "segments=${data.segments}, " +
             "fill=${data.fill}, " +
             "blend=${data.blend}, " +
-            "effectInstanceRef=${data.effectInstanceRef}, " +
-            "ShaderAsset=$effect)"
+            "shaderRef=${data.shaderRef}"
     }
 
     private val accessorColorRed: FloatPropertyAccessor = object : FloatPropertyAccessor {

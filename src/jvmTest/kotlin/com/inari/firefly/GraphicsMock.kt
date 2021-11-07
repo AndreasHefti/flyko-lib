@@ -60,16 +60,28 @@ object GraphicsMock : GraphicsAPI {
         _loadedAssets.remove(spriteId)
     }
 
-    override fun createEffect(data: EffectData): Int {
-        return _loadedAssets.add(data.toString())
+    override fun createShader(data: ShaderData): Int {
+        return _loadedAssets.add("shader: $data")
     }
 
-    override fun disposeEffect(effectId: Int) {
-        _loadedAssets.remove(effectId)
+    override fun disposeShader(shaderId: Int) {
+        _loadedAssets.remove(shaderId)
+    }
+
+    override fun createBackBuffer(data: BackBufferData): Int {
+        return _loadedAssets.add("back-buffer: $data")
+    }
+
+    override fun disposeBackBuffer(backBufferId: Int) {
+        _loadedAssets.remove(backBufferId)
     }
 
     override fun startRendering(view: ViewData, clear: Boolean) {
         _log.add("startRendering::$view")
+    }
+
+    override fun startBackBufferRendering(backBufferId: Int, posX: Float, posY: Float, clear: Boolean) {
+        TODO("Not yet implemented")
     }
 
     override fun renderSprite(renderableSprite: SpriteRenderable, xOffset: Float, yOffset: Float) {
@@ -99,6 +111,10 @@ object GraphicsMock : GraphicsAPI {
 
     override fun renderShape(data: ShapeData, transform: TransformData, xOffset: Float, yOffset: Float) {
         _log.add("renderShape:: $data : $transform  offset: $xOffset $yOffset")
+    }
+
+    override fun endBackBufferRendering(backBufferId: Int) {
+        TODO("Not yet implemented")
     }
 
     override fun endRendering(view: ViewData) {

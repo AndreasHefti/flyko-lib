@@ -1,6 +1,7 @@
 package com.inari.firefly.core.api
 
 import com.inari.util.collection.DynArrayRO
+import com.inari.util.geom.PositionF
 import com.inari.util.geom.Rectangle
 
 /** This defines the low level API-Interface for all graphical functions used by the firefly API.
@@ -52,19 +53,35 @@ expect object FFGraphics {
      */
     fun disposeSprite(spriteId: Int)
 
-    /** This is called from the firefly API when an effect is created/loaded and gives an identifier for that effect script.
+    /** This is called from the firefly API when a shader script is created/loaded and gives an
+     * identifier for that shader script.
      *
      * @param data the shader DAO
      * @return the shader identifier to identify the shader on lower level API.
      */
-    fun createEffect(data: EffectData): Int
+    fun createShader(data: ShaderData): Int
 
-    /** This is called from the firefly API when am Effect is disposed
-     * and must release and delete all effect related data
+    /** This is called from the firefly API when a shader script is disposed
+     * and must release and delete the shader script on GPU level
      *
-     * @param effectId identifier of the effect to dispose.
+     * @param shaderId identifier of the shader to dispose.
      */
-    fun disposeEffect(effectId: Int)
+    fun disposeShader(shaderId: Int)
+
+    /** This is called from firefly API whenever a back-buffer is created and a low-level FBO (for example)
+     * id needed to represent this back buffer.
+     *
+     * @param data [BackBufferData] defining all properties for the low-level representation (FBO)
+     * @return A instance identifier of the low-level back-buffer representation
+     */
+    fun createBackBuffer(data: BackBufferData): Int
+
+    /** This is called by the firefly API whenever a given and loaded back-buffer is disposed.
+     * This shall release all low-level API representation data for the back-buffer (FBO for example)
+     *
+     * @param backBufferId The instance identifier of the low-level back-buffer representation
+     */
+    fun disposeBackBuffer(backBufferId: Int)
 
     /** This is called form the firefly API before rendering to a given [ViewData] and must
      * prepare all the stuff needed to render the that [ViewData] on following renderXXX calls.
@@ -73,6 +90,16 @@ expect object FFGraphics {
      * @param clear indicates whether the [ViewData] should be cleared with the vies clear-color before rendering or not
      */
     fun startRendering(view: ViewData, clear: Boolean)
+
+    /** This is called form the firefly API before rendering to a given back-buffer (FBO) and must
+     * prepare all the stuff needed to render the that back-buffer on following renderXXX calls.
+     *
+     * @param backBufferId the instance id of the previous created [BackBufferData] that is starting to be rendered
+     * @param posX the world (rendering) position of the back-buffers upper left corner
+     * @param posY the world (rendering) position of the back-buffers upper left corner
+     * @param clear indicates whether the back-buffer should be cleared with the vies clear-color before rendering or not
+     */
+    fun startBackBufferRendering(backBufferId: Int, posX: Float, posY: Float, clear: Boolean)
 
     /** This is called form the firefly API to render a created sprite on specified position to the actual [ViewData]
      *
@@ -123,6 +150,14 @@ expect object FFGraphics {
      * @param yOffset the y-axis offset
      */
     fun renderShape(data: ShapeData, transform: TransformData, xOffset: Float, yOffset: Float)
+
+    /** This is called form the firefly API to notify the end of rendering for a specified back-buffer.
+     * The graphics context shall unbind the current back-buffer and bind the actual [ViewData] again
+     * for further rendering.
+     *
+     * @param backBufferId the instance id of the previous created [BackBufferData] that is starting to be rendered
+     */
+    fun endBackBufferRendering(backBufferId: Int)
 
     /** This is called form the firefly API to notify the end of rendering for a specified [ViewData].
      * @param view [ViewData] that is ending to be rendered
