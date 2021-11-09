@@ -14,5 +14,4 @@ class BackBufferData(
     @JvmField var shaderRef: Int = -1,
     @JvmField var zoom: Float = 1.0f,
     @JvmField var fboScale: Float = 1.0f
-) {
-}
+)

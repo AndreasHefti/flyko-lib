@@ -2,6 +2,7 @@ package com.inari.firefly.examples
 
 import com.inari.firefly.BlendMode
 import com.inari.firefly.DesktopRunner
+import com.inari.firefly.FFContext
 import com.inari.firefly.core.api.DesktopAppAdapter
 import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.entity.Entity
@@ -57,7 +58,7 @@ object ShaderTest1 {
                     vertShaderProgram = DEFAULT_VERTEX_SHADER
                     fragShaderResource = "firefly/fragShaderTest1.glsl"
                     shaderInit =  { adapter ->
-                        adapter.bindTexture("my_texture", tex1Id.instanceId)
+                        adapter.bindTexture("my_texture", FFContext[TextureAsset, tex1Id.instanceId].instanceId)
                     }
                 }
 

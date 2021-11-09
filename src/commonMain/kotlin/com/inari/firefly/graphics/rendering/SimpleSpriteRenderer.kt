@@ -12,8 +12,6 @@ import com.inari.util.geom.Rectangle
 
 class SimpleSpriteRenderer private constructor() : Renderer() {
 
-
-
     override fun match(entity: Entity): Boolean =
         entity.components.include(MATCHING_ASPECTS) &&
             entity.components.exclude(EXCLUDING_ASPECTS)

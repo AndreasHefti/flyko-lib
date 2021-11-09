@@ -72,7 +72,7 @@ expect object FFGraphics {
      * id needed to represent this back buffer.
      *
      * @param data [BackBufferData] defining all properties for the low-level representation (FBO)
-     * @return A instance identifier of the low-level back-buffer representation
+     * @return An instance identifier of the low-level back-buffer representation
      */
     fun createBackBuffer(data: BackBufferData): Int
 
@@ -100,6 +100,11 @@ expect object FFGraphics {
      * @param clear indicates whether the back-buffer should be cleared with the vies clear-color before rendering or not
      */
     fun startBackBufferRendering(backBufferId: Int, posX: Float, posY: Float, clear: Boolean)
+
+    /** Set the active rendering shader. Note that the shader program must have been created before with createShader.
+     * @param shaderId The instance identifier of the shader.
+     */
+    fun setActiveShader(shaderId: Int)
 
     /** This is called form the firefly API to render a created sprite on specified position to the actual [ViewData]
      *

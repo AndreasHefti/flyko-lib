@@ -30,7 +30,11 @@ abstract class Renderer protected constructor(
 
     fun accept(entity: Entity): Boolean {
         return if (acceptance(entity)) {
-            forceGet(entity[ETransform])?.apply {
+            val transform = entity[ETransform]
+            if (transform.viewRef < 0)
+                return false
+
+            forceGet(transform)?.apply {
                 add(entity)
                 sort?.invoke(this)
             }

@@ -246,18 +246,42 @@ actual object FFGraphics : GraphicsAPI {
         spriteBatch.begin()
     }
 
+    actual override fun setActiveShader(shaderId: Int) {
+        if (shaderId != activeShaderId) {
+            spriteBatch.flush()
+            if (shaderId < 0) {
+                spriteBatch.shader = null
+                activeShaderId = -1
+            } else {
+                val shaderData = shaders[shaderId]
+                if (shaderData != null) {
+                    shaderData.activate()
+                    activeShaderId = shaderId
+                }
+            }
+        }
+        if (shaderId != activeShapeShaderId)
+            if (shaderId < 0)
+                shapeRenderer = ShapeRenderer()
+            else {
+                val shader = shaders[shaderId]
+                if (shader != null) {
+                    shader.activate()
+                    shapeRenderer = ShapeRenderer(1000, shader.program)
+                }
+            }
+        activeShapeShaderId = shaderId
+    }
+
     actual override fun renderSprite(renderableSprite: SpriteRenderable, xOffset: Float, yOffset: Float) {
         setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
         val sprite = sprites[renderableSprite.spriteId]
-        setShaderForSpriteBatch(renderableSprite.shaderRef)
-
         spriteBatch.draw(sprite, xOffset, yOffset)
     }
 
     actual override fun renderSprite(renderableSprite: SpriteRenderable, transform: TransformData) {
         val sprite = sprites[renderableSprite.spriteId] ?: return
         setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
-        setShaderForSpriteBatch(renderableSprite.shaderRef)
         spriteBatch.draw(
             sprite,
             transform.position.x,
@@ -275,7 +299,6 @@ actual object FFGraphics : GraphicsAPI {
     actual override fun renderSprite(renderableSprite: SpriteRenderable, transform: TransformData, xOffset: Float, yOffset: Float) {
         val sprite = sprites[renderableSprite.spriteId] ?: return
         setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
-        setShaderForSpriteBatch(renderableSprite.shaderRef)
         spriteBatch.draw(
             sprite,
             transform.position.x + xOffset,
@@ -302,7 +325,6 @@ actual object FFGraphics : GraphicsAPI {
         getShapeColor(data.color4 ?: data.color1, SHAPE_COLOR_4)
 
         setColorAndBlendMode(data.color1, data.blend)
-        setShaderForSpriteBatch(data.shaderRef)
 
         meshBuilder.setColor(SHAPE_COLOR_1)
 
@@ -393,18 +415,6 @@ actual object FFGraphics : GraphicsAPI {
         getShapeColor(data.color2 ?: data.color1, SHAPE_COLOR_2)
         getShapeColor(data.color3 ?: data.color1, SHAPE_COLOR_3)
         getShapeColor(data.color4 ?: data.color1, SHAPE_COLOR_4)
-
-        if (data.shaderRef != activeShapeShaderId)
-            if (data.shaderRef < 0)
-                shapeRenderer = ShapeRenderer()
-            else {
-                val shader = shaders[data.shaderRef]
-                if (shader != null) {
-                    shader.activate()
-                    shapeRenderer = ShapeRenderer(1000, shader.program)
-                }
-            }
-        activeShapeShaderId = data.shaderRef
 
         shapeRenderer.color = SHAPE_COLOR_1
         var restartSpriteBatch = false
@@ -561,7 +571,7 @@ actual object FFGraphics : GraphicsAPI {
             if (backBuffer.data.viewportRef != activeViewportId) continue
 
             setColorAndBlendMode(backBuffer.data.tintColor, backBuffer.data.blendMode)
-            setShaderForSpriteBatch(backBuffer.data.shaderRef)
+            setActiveShader(backBuffer.data.shaderRef)
             spriteBatch.draw(
                 backBuffer.fboTexture,
                 backBuffer.data.bounds.pos.x.toFloat(), backBuffer.data.bounds.pos.y.toFloat(),
@@ -588,7 +598,7 @@ actual object FFGraphics : GraphicsAPI {
                 val viewport = viewports[virtualView.index] ?: continue
                 val bounds = virtualView.bounds
                 setColorAndBlendMode(virtualView.tintColor, virtualView.blendMode)
-                setShaderForSpriteBatch(virtualView.shaderRef)
+                setActiveShader(virtualView.shaderRef)
 
                 spriteBatch.draw(
                     viewport.fboTexture,
@@ -601,6 +611,7 @@ actual object FFGraphics : GraphicsAPI {
 
         spriteBatch.flush()
         activeBlend = BlendMode.NONE
+        setActiveShader(-1)
     }
 
     actual override fun getScreenshotPixels(area: Rectangle): ByteArray {
@@ -653,21 +664,6 @@ actual object FFGraphics : GraphicsAPI {
         return ViewportFBO(camera, frameBuffer, textureRegion)
     }
 
-    private fun setShaderForSpriteBatch(shaderId: Int) {
-        if (shaderId != activeShaderId) {
-            spriteBatch.flush()
-            if (shaderId < 0) {
-                spriteBatch.shader = null
-                activeShaderId = -1
-            } else {
-                val shaderData = shaders[shaderId]
-                if (shaderData != null) {
-                    shaderData.activate()
-                    activeShaderId = shaderId
-                }
-            }
-        }
-    }
 
     private fun getLibGDXTextureWrap(glConst: Int): TextureWrap =
         TextureWrap.values().firstOrNull { it.glEnum == glConst }

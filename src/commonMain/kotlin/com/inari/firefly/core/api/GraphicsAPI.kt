@@ -83,6 +83,11 @@ interface GraphicsAPI {
      */
     fun disposeBackBuffer(backBufferId: Int)
 
+    /** Set the active sprite rendering shader. Note that the shader program must have been created before with createShader.
+     * @param shaderId The instance identifier of the shader.
+     */
+    fun setActiveShader(shaderId: Int)
+
     /** This is called form the firefly API before rendering to a given [ViewData] and must
      * prepare all the stuff needed to render the that [ViewData] on following renderXXX calls.
      *

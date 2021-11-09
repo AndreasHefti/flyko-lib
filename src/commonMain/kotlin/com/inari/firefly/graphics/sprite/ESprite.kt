@@ -23,9 +23,6 @@ class ESprite private constructor() : EntityComponent(ESprite::class.simpleName!
     val sprite = AssetInstanceRefResolver(
         { instanceId -> spriteRenderable.spriteId = instanceId },
         { spriteRenderable.spriteId })
-    val shader = AssetInstanceRefResolver(
-        { instanceId -> spriteRenderable.shaderRef = instanceId },
-        { spriteRenderable.shaderRef })
     var blend: BlendMode
         get() = spriteRenderable.blendMode
         set(value) { spriteRenderable.blendMode = value }
@@ -39,7 +36,6 @@ class ESprite private constructor() : EntityComponent(ESprite::class.simpleName!
 
     override fun toString(): String {
         return "ESprite(spriteRef=${spriteRenderable.spriteId}, " +
-            "shaderRef=${spriteRenderable.shaderRef}, " +
             "blend=${spriteRenderable.blendMode}, " +
             "tint=${spriteRenderable.tintColor}, "
     }

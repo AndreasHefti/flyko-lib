@@ -25,8 +25,7 @@ class ShapeData(
     @JvmField var color3: MutableColor? = null,
     @JvmField var color4: MutableColor? = null,
     @JvmField var blend: BlendMode = BlendMode.NONE,
-    @JvmField var fill: Boolean = false,
-    @JvmField var shaderRef: Int = -1
+    @JvmField var fill: Boolean = false
 ) {
 
     fun reset() {
@@ -39,7 +38,6 @@ class ShapeData(
         color4 = null
         blend = BlendMode.NONE
         fill = false
-        shaderRef = -1
     }
 }
 

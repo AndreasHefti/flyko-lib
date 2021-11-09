@@ -16,9 +16,6 @@ class SpriteParticle : Particle() {
     val sprite = AssetInstanceRefResolver(
         { instanceId -> spriteRenderable.spriteId = instanceId },
         { spriteRenderable.spriteId })
-    val effect = AssetInstanceRefResolver(
-        { instanceId -> spriteRenderable.shaderRef = instanceId },
-        { spriteRenderable.shaderRef })
     var blend: BlendMode
         get() = spriteRenderable.blendMode
         set(value) { spriteRenderable.blendMode = value }

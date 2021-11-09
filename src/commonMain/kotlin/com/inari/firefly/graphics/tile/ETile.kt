@@ -31,9 +31,6 @@ class ETile private constructor () : EntityComponent(ETile::class.simpleName!!) 
     val sprite = AssetInstanceRefResolver(
         { instanceId -> spriteRenderable.spriteId = instanceId },
         { spriteRenderable.spriteId })
-    val shader = AssetInstanceRefResolver(
-        { instanceId -> spriteRenderable.shaderRef = instanceId },
-        { spriteRenderable.shaderRef })
     var blend: BlendMode
         get() = spriteRenderable.blendMode
         set(value) { spriteRenderable.blendMode = value }

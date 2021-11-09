@@ -90,4 +90,9 @@ actual object FFGraphics : GraphicsAPI {
         TODO("Not yet implemented")
     }
 
+    actual override fun setActiveShader(shaderId: Int) {
+        TODO("Not yet implemented")
+    }
+
+
 }

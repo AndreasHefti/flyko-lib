@@ -1,6 +1,7 @@
 package com.inari.firefly
 
 
+import com.inari.firefly.FFApp.EffectRenderEvent.Companion.effectRenderEvent
 import com.inari.firefly.FFApp.PostRenderEvent.Companion.postRenderEvent
 import com.inari.firefly.FFApp.RenderEvent.Companion.renderEvent
 import com.inari.firefly.FFApp.UpdateEvent.Companion.updateEvent
@@ -57,9 +58,11 @@ abstract class FFApp protected constructor(
                     }
                 }
 
+                FFContext.notify(effectRenderEvent)
                 graphics.flush(ViewSystem.privateActiveViewPorts)
             } else {
                 render(ViewSystem.baseView.data)
+                FFContext.notify(effectRenderEvent)
                 graphics.flush(NO_VIRTUAL_VIEW_PORTS)
             }
 
@@ -87,6 +90,8 @@ abstract class FFApp protected constructor(
                     val layerId = layerIterator.next().index
                     if (!ViewSystem.layers.isActive(layerId))
                         continue
+
+                    FFContext.graphics.setActiveShader(ViewSystem.layers[layerId].shaderRef)
                     renderEvent.layerIndex = layerId
                     FFContext.notify(renderEvent)
                 }
@@ -134,6 +139,13 @@ abstract class FFApp protected constructor(
 
         companion object : EventType("RenderEvent") {
             internal val renderEvent = RenderEvent(this)
+        }
+    }
+
+    class EffectRenderEvent(override val eventType: EventType) : Event<Call>() {
+        override fun notify(listener: Call) = listener()
+        companion object : EventType("EffectRenderEvent") {
+            internal val effectRenderEvent = EffectRenderEvent(this)
         }
     }
 

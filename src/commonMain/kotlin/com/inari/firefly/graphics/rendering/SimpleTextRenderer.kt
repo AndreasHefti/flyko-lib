@@ -33,7 +33,6 @@ class SimpleTextRenderer private constructor() : Renderer() {
             val font = FFContext[FontAsset, text.fontAssetRef]
             val chars = text.text
 
-            textRenderable.shaderRef = text.shaderRef
             textRenderable.tintColor(text.tint)
             textRenderable.blendMode = text.blend
             transformCollector(transform.data)

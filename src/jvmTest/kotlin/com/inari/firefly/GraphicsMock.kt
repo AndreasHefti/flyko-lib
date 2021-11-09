@@ -76,6 +76,10 @@ object GraphicsMock : GraphicsAPI {
         _loadedAssets.remove(backBufferId)
     }
 
+    override fun setActiveShader(shaderId: Int) {
+        TODO("Not yet implemented")
+    }
+
     override fun startRendering(view: ViewData, clear: Boolean) {
         _log.add("startRendering::$view")
     }

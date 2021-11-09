@@ -47,10 +47,6 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
     var blend: BlendMode
         get() = data.blend
         set(value) { data.blend = value }
-    val shader = AssetInstanceRefResolver(
-        { instanceId -> data.shaderRef = instanceId },
-        { data.shaderRef }
-    )
 
     override fun reset() {
         data.reset()
@@ -65,8 +61,7 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
             "color4=${data.color4}, " +
             "segments=${data.segments}, " +
             "fill=${data.fill}, " +
-            "blend=${data.blend}, " +
-            "shaderRef=${data.shaderRef}"
+            "blend=${data.blend}, "
     }
 
     private val accessorColorRed: FloatPropertyAccessor = object : FloatPropertyAccessor {
