@@ -58,11 +58,11 @@ const val BASE_VIEW: String = "[[BASE_VIEW]]"
     override val index: Int = -1
     override val indexedTypeName: String = NO_NAME
 }
-@JvmField val NO_PROPERTY_REF: VirtualPropertyRef = object : VirtualPropertyRef {
-    override val propertyName: String = NO_NAME
-    override val type: KClass<*> get() = throw UnsupportedOperationException()
-    override fun accessor(entity: Entity): VirtualPropertyRef.PropertyAccessor = throw UnsupportedOperationException()
-}
+//@JvmField val NO_PROPERTY_REF: VirtualPropertyRef = object : VirtualPropertyRef {
+//    override val propertyName: String = NO_NAME
+//    override val type: KClass<*> get() = throw UnsupportedOperationException()
+//    override fun accessor(entity: Entity): VirtualPropertyRef.PropertyAccessor = throw UnsupportedOperationException()
+//}
 
 @JvmField val VOID_INT_CONSUMER: IntConsumer = { _ -> }
 @JvmField val INT_FUNCTION_IDENTITY: IntFunction = { i -> i }
@@ -73,8 +73,8 @@ const val BASE_VIEW: String = "[[BASE_VIEW]]"
 @JvmField val NULL_CONSUMER: Consumer<Any> = { _ -> throw IllegalStateException("NULL_CONSUMER") }
 @JvmField val NULL_CALL: Call = { throw IllegalStateException("NULL_CALL called") }
 @JvmField val DO_NOTHING = {}
-@JvmField val FALSE_SUPPLIER: BooleanSupplier = { false }
-@JvmField val TRUE_SUPPLIER: BooleanSupplier = { true }
+@JvmField val FALSE_SUPPLIER = { false }
+@JvmField val TRUE_SUPPLIER = { true }
 @JvmField val FALSE_PREDICATE: Predicate<Any> = { false }
 @JvmField val TRUE_PREDICATE: Predicate<Any> = { true }
 @JvmField val VOID_COMP_ID_CONSUMER: Consumer<CompId> = { _ -> }

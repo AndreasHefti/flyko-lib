@@ -29,21 +29,29 @@ typealias IntSupplier = () -> Int
 typealias IntConsumer = (Int) -> Unit
 typealias IntPredicate = (Int) -> Boolean
 
-typealias FloatFunction = (Float) -> Int
-typealias FloatOperation = (Float) -> OpResult
-typealias FloatSupplier = () -> Float
-typealias FloatConsumer = (Float) -> Unit
-typealias FloatPredicate = (Float) -> Boolean
+//typealias FloatFunction = (Float) -> Int
+//typealias FloatOperation = (Float) -> OpResult
+//typealias FloatSupplier = () -> Float
+//typealias FloatConsumer = (Float) -> Unit
+//typealias FloatPredicate = (Float) -> Boolean
+//
+//typealias BooleanFunction = (Boolean) -> Boolean
+//typealias BooleanOperation = (Boolean) -> OpResult
+//typealias BooleanSupplier = () -> Boolean
+//typealias BooleanConsumer = (Boolean) -> Unit
+//
+//typealias ComponentIdFunction = (CompId) -> CompId
+//typealias ComponentIdOperation = (CompId) -> OpResult
+//typealias ComponentIdSupplier = () -> CompId
+//typealias ComponentIdConsumer = (CompId) -> Unit
 
-typealias BooleanFunction = (Boolean) -> Boolean
-typealias BooleanOperation = (Boolean) -> OpResult
-typealias BooleanSupplier = () -> Boolean
-typealias BooleanConsumer = (Boolean) -> Unit
+typealias PropertyGetter<T> = () -> T
+typealias PropertySetter<T> = (T) -> Unit
 
-typealias ComponentIdFunction = (CompId) -> CompId
-typealias ComponentIdOperation = (CompId) -> OpResult
-typealias ComponentIdSupplier = () -> CompId
-typealias ComponentIdConsumer = (CompId) -> Unit
+class PropertyAccessor<T> (
+    val get: PropertyGetter<T>,
+    val set: PropertySetter<T>
+)
 
 /** Use this on types that can be disposed  */
 interface Disposable {
