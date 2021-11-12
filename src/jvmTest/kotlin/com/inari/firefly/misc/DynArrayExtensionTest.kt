@@ -7,8 +7,7 @@ import kotlin.test.Test
 
 class DynArrayExtensionTest {
 
-    @Test
-    @Ignore
+    //@Test
     fun testPerformance() {
 
         val dynArray: DynArray<Int> = DynArray.of(100000)
@@ -21,7 +20,7 @@ class DynArrayExtensionTest {
             if (size > 0) {
                 var i = 0
                 while (i < size) {
-                    val value = dynArray.get(i++) ?: continue
+                    val value = dynArray[i++] ?: continue
                     if (value.toInt() % 2 == 0)
                         continue
 

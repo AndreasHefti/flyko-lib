@@ -104,12 +104,12 @@ class TestEvent4(override val eventType: EventType) : Event<TestListenerInterfac
 
 class EventPerformanceTest {
 
-    @BeforeTest
+    //@BeforeTest
     fun init() {
         TestApp
     }
 
-    @Test
+    //@Test
     fun test0() {
         val intFunctionLambda: IntFunction = { i -> i + 1 }
         val intFunctionInterface: IntFunction =  { p1 -> p1 + 1 }
@@ -123,7 +123,7 @@ class EventPerformanceTest {
         }
     }
 
-    @Test
+    //@Test
     fun test1() {
 
         val testListenerType: TestListenerType = { i1, i2, i3 -> i1 + i2 + i3}
@@ -148,7 +148,7 @@ class EventPerformanceTest {
 
     }
 
-    @Test
+    //@Test
     fun test2() {
 
         FFContext.registerListener(TestEvent1) { i1: Int, i2: Int, i3: Int -> i1 + i2 + i3 }
@@ -167,7 +167,7 @@ class EventPerformanceTest {
         }
     }
 
-    @Test
+    //@Test
     fun test3() {
         val pos1 = Position(1, 2)
         val testListenerType: TestListenerTypeObj = { i1, i2, i3 -> i1.x + i2.x + i3.x}
@@ -189,7 +189,7 @@ class EventPerformanceTest {
         }
     }
 
-    @Test
+    //@Test
     fun test4() {
         val pos1 = Position(1, 2)
         FFContext.registerListener(TestEvent3) { i1: Position, i2: Position, i3: Position -> i1.x + i2.x + i3.x }
