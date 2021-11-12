@@ -58,11 +58,9 @@ abstract class FFApp protected constructor(
                     }
                 }
 
-                FFContext.notify(effectRenderEvent)
                 graphics.flush(ViewSystem.privateActiveViewPorts)
             } else {
                 render(ViewSystem.baseView.data)
-                FFContext.notify(effectRenderEvent)
                 graphics.flush(NO_VIRTUAL_VIEW_PORTS)
             }
 
@@ -79,8 +77,8 @@ abstract class FFApp protected constructor(
             view.bounds.height
         )
 
+        // view rendering
         graphics.startRendering(view, true)
-
         ViewSystem.privateLayersOfView[view.index]?.apply {
             if (isEmpty)
                 FFContext.notify(renderEvent)
@@ -97,6 +95,10 @@ abstract class FFApp protected constructor(
                 }
             }
         }
+
+        // effect rendering
+        effectRenderEvent.viewIndex = view.index
+        FFContext.notify(effectRenderEvent)
 
         graphics.endRendering(view)
     }
@@ -135,15 +137,19 @@ abstract class FFApp protected constructor(
         var clip: Rectangle = Rectangle(0, 0, 0, 0)
             internal set
 
-        override fun notify(listener: Consumer<RenderEvent>) = listener.invoke(this)
+        override fun notify(listener: Consumer<RenderEvent>) = listener(this)
 
         companion object : EventType("RenderEvent") {
             internal val renderEvent = RenderEvent(this)
         }
     }
 
-    class EffectRenderEvent(override val eventType: EventType) : Event<Call>() {
-        override fun notify(listener: Call) = listener()
+    class EffectRenderEvent(override val eventType: EventType) : Event<Consumer<EffectRenderEvent>>() {
+
+        var viewIndex: Int = -1
+            internal set
+
+        override fun notify(listener: Consumer<EffectRenderEvent>) = listener(this)
         companion object : EventType("EffectRenderEvent") {
             internal val effectRenderEvent = EffectRenderEvent(this)
         }

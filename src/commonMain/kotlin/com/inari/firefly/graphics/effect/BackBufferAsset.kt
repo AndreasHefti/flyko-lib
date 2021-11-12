@@ -2,17 +2,20 @@ package com.inari.firefly.graphics.effect
 
 import com.inari.firefly.BlendMode
 import com.inari.firefly.FFContext
+import com.inari.firefly.asset.Asset
 import com.inari.firefly.asset.AssetInstanceRefResolver
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.BackBufferData
+import com.inari.firefly.core.api.FFGraphics
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentSingleType
+import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.view.View
 import com.inari.util.geom.Rectangle
 import com.inari.util.graphics.MutableColor
 import kotlin.jvm.JvmField
 
-class BackBuffer private constructor() : SystemComponent(BackBuffer::class.simpleName!!) {
+class BackBufferAsset private constructor() : Asset() {
 
     @JvmField internal var backBufferId: Int = -1
     @JvmField internal val data = BackBufferData()
@@ -40,8 +43,25 @@ class BackBuffer private constructor() : SystemComponent(BackBuffer::class.simpl
         get() = data.fboScale
         set(value) { data.fboScale = value }
 
+    override fun instanceId(index: Int): Int = backBufferId
+
+    override fun load() {
+        if (backBufferId >= 0)
+            return
+
+        backBufferId = FFContext.graphics.createBackBuffer(data)
+    }
+
+    override fun unload() {
+        if (backBufferId < 0)
+            return
+
+        FFContext.graphics.disposeBackBuffer(backBufferId)
+        backBufferId = -1
+    }
+
     override fun componentType() = Companion
-    companion object : SystemComponentSingleType<BackBuffer>(BackBuffer::class) {
-        override fun createEmpty() = BackBuffer()
+    companion object : SystemComponentSubType<Asset, BackBufferAsset>(Asset, BackBufferAsset::class) {
+        override fun createEmpty() = BackBufferAsset()
     }
 }
