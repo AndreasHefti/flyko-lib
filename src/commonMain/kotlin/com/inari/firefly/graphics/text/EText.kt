@@ -19,12 +19,12 @@ class EText private constructor() : EntityComponent(EText::class.simpleName!!) {
     @JvmField internal var rendererRef = SimpleTextRenderer.instance.index
     @JvmField internal var fontAssetRef = -1
 
-    val renderer = ComponentRefResolver(Renderer) { index-> rendererRef = index }
-    var fontAsset = ComponentRefResolver(Asset) { index -> fontAssetRef = index }
+    @JvmField val renderer = ComponentRefResolver(Renderer) { index-> rendererRef = index }
+    @JvmField var fontAsset = ComponentRefResolver(Asset) { index -> fontAssetRef = index }
 
-    val text: StringBuilder = StringBuilder()
-    var tint: MutableColor = MutableColor(1f, 1f, 1f, 1f)
-    var blend: BlendMode = BlendMode.NONE
+    @JvmField val text: StringBuilder = StringBuilder()
+    @JvmField var tint: MutableColor = MutableColor(1f, 1f, 1f, 1f)
+    @JvmField var blend: BlendMode = BlendMode.NONE
 
     override fun reset() {
         rendererRef = -1

@@ -2,10 +2,11 @@ package com.inari.firefly.control.action
 
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentSingleType
+import kotlin.jvm.JvmField
 
 class Action private constructor() : SystemComponent(Action::class.simpleName!!) {
 
-    var call: ActionCall = { _, _, _, _ -> }
+    @JvmField var call: ActionCall = { _, _, _, _ -> }
 
     fun invoke(
             entity1: Int = -1,

@@ -8,17 +8,18 @@ import com.inari.firefly.core.api.SpriteData
 import com.inari.firefly.core.component.ArrayAccessor
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.util.collection.DynArray
+import kotlin.jvm.JvmField
 
 class SpriteSetAsset private constructor() : Asset() {
 
     private val int_spriteData: DynArray<ProtoSprite> = DynArray.of(30)
     private val tmpSpriteData = SpriteData()
 
-    val spriteData = ArrayAccessor(int_spriteData)
-    var texture = ComponentRefResolver(Asset) { index ->
+    @JvmField val spriteData = ArrayAccessor(int_spriteData)
+    @JvmField var texture = ComponentRefResolver(Asset) { index ->
         dependingRef = setIfNotInitialized(index, "TextureAsset")
     }
-    val protoSprite: (ProtoSprite.() -> Unit) -> Unit = { configure ->
+    @JvmField val protoSprite: (ProtoSprite.() -> Unit) -> Unit = { configure ->
         val sprite = ProtoSprite()
         sprite.also(configure)
         spriteData.add(sprite)

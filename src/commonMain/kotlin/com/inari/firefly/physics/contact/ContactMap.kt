@@ -19,11 +19,10 @@ abstract class ContactMap protected constructor() : SystemComponent(ContactMap::
 
     @JvmField internal var viewRef = -1
     @JvmField internal var layerRef = -1
-
-    val view = ComponentRefResolver(View) { index->
+    @JvmField val view = ComponentRefResolver(View) { index->
         viewRef = setIfNotInitialized(index, "view")
     }
-    val layer = ComponentRefResolver(Layer) { index->
+    @JvmField val layer = ComponentRefResolver(Layer) { index->
         layerRef = setIfNotInitialized(index, "layer")
     }
 

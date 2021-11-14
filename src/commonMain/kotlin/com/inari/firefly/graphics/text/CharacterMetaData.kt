@@ -22,8 +22,8 @@ class CharacterMetaData private constructor(){
     var rotation: Float
         get() = transformData.rotation
         set(value) { transformData.rotation = value }
-    var tint: MutableColor = MutableColor(1f, 1f, 1f, 1f)
-    var blend: BlendMode = BlendMode.NONE
+    @JvmField var tint: MutableColor = MutableColor(1f, 1f, 1f, 1f)
+    @JvmField var blend: BlendMode = BlendMode.NONE
 
     companion object {
         val of: (CharacterMetaData.() -> Unit) -> CharacterMetaData = { configure ->

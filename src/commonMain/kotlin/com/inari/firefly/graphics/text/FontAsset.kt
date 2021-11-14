@@ -15,11 +15,10 @@ class FontAsset : Asset() {
 
     @JvmField internal var textureAssetId = NO_COMP_ID
     @JvmField internal var dChar = -1
-
-    internal val charSpriteMap = DynIntArray(256, -1)
+    @JvmField internal val charSpriteMap = DynIntArray(256, -1)
     private val tmpSpriteData = SpriteData()
 
-    var texture = ComponentRefResolver(Asset) { index-> run {
+    @JvmField var texture = ComponentRefResolver(Asset) { index-> run {
             dependingRef = setIfNotInitialized(index, "texture")
             textureAssetId = CompId(index, TextureAsset)
         } }

@@ -44,60 +44,10 @@ class ETile private constructor () : EntityComponent(ETile::class.simpleName!!) 
         position.y = 0
     }
 
-//    private val accessorSpriteRef: IntPropertyAccessor = object : IntPropertyAccessor {
-//        override fun set(value: Int) {spriteRenderable.spriteId = value}
-//        override fun get(): Int = spriteRenderable.spriteId
-//    }
-//    private val accessorTintRed: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {spriteRenderable.tintColor.r_mutable = value}
-//        override fun get(): Float = spriteRenderable.tintColor.r
-//    }
-//    private val accessorTintGreen: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {spriteRenderable.tintColor.g_mutable = value}
-//        override fun get(): Float = spriteRenderable.tintColor.g
-//    }
-//    private val accessorTintBlue: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {spriteRenderable.tintColor.b_mutable = value}
-//        override fun get(): Float = spriteRenderable.tintColor.b
-//    }
-//    private val accessorTintAlpha: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {spriteRenderable.tintColor.a_mutable = value}
-//        override fun get(): Float = spriteRenderable.tintColor.a
-//    }
-//
-//    enum class Property(
-//        override val propertyName: String,
-//        override val type: KClass<*>
-//    ) : VirtualPropertyRef {
-//        SPRITE_REFERENCE("spriteRef", Int::class) {
-//            override fun accessor(entity: Entity): IntPropertyAccessor {
-//                return entity[ETile].accessorSpriteRef
-//            }
-//        },
-//        TINT_RED("tintRed", Float::class) {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[ETile].accessorTintRed
-//            }
-//        },
-//        TINT_GREEN("tintGreen", Float::class) {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[ETile].accessorTintGreen
-//            }
-//        },
-//        TINT_BLUE("tintBlue", Float::class) {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[ETile].accessorTintBlue
-//            }
-//        },
-//        TINT_ALPHA("tintAlpha", Float::class) {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[ETile].accessorTintAlpha
-//            }
-//        }
-//    }
-
     object Property {
         val SPRITE_REFERENCE: PropertyRefResolver<Int> = { FFContext[Entity, it][ETile].spriteRenderable::spriteId }
+        val TINT_ALPHA: PropertyRefResolver<Float> = { FFContext[Entity, it][ETile].spriteRenderable.tintColor::a_mutable }
+        val TINT_COLOR: PropertyRefResolver<MutableColor> = { FFContext[Entity, it][ETile].spriteRenderable::tintColor }
     }
 
     override fun componentType() = Companion

@@ -13,8 +13,7 @@ import kotlin.jvm.JvmField
 class EControl private constructor() : EntityComponent(EControl::class.simpleName!!) {
 
     @JvmField val aspects: Aspects = ENTITY_CONTROL_ASPECT_GROUP.createAspects()
-
-    val withController = ComponentRefResolver(Controller) { index->
+    @JvmField val withController = ComponentRefResolver(Controller) { index->
         ControllerSystem.registerMapping(index, entityId)
     }
 

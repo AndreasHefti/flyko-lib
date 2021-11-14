@@ -10,7 +10,6 @@ data class PositionF constructor(
     @JvmField var y: Float = 0.0f
 ){
 
-
     constructor(xi: Int, yi: Int) : this(xi.toFloat(), yi.toFloat())
     constructor(other: PositionF) : this(other.x, other.y)
 

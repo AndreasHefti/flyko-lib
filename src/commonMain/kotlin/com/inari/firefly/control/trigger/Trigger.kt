@@ -16,9 +16,9 @@ abstract class Trigger protected constructor() : SystemComponent(Trigger::class.
 
     @JvmField internal var triggeredComponentId = NO_COMP_ID
 
-    var disposeAfter: Boolean = false
-    var condition: () -> Boolean = TRUE_SUPPLIER
-    var call: Call = NULL_CALL
+    @JvmField var disposeAfter: Boolean = false
+    @JvmField var condition: () -> Boolean = TRUE_SUPPLIER
+    @JvmField var call: Call = NULL_CALL
 
     protected fun doTrigger() {
         if (call != NULL_CALL && condition()) {

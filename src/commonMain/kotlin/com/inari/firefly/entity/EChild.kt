@@ -7,9 +7,8 @@ import kotlin.jvm.JvmField
 class EChild private constructor () : EntityComponent(EChild::class.simpleName!!) {
 
     @JvmField internal var int_parent: Int = -1
-
-    var parent = ComponentRefResolver(Entity) { index -> int_parent = index }
-    var zPos: Int = -1
+    @JvmField var parent = ComponentRefResolver(Entity) { index -> int_parent = index }
+    @JvmField var zPos: Int = -1
 
     override fun reset() {
         int_parent = -1

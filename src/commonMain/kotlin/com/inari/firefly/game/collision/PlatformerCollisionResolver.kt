@@ -34,8 +34,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
     @JvmField var touchGroundCallback = VOID_TOUCH_GROUND_CALLBACK
     @JvmField var looseGroundContactCallback = VOID_LOOS_GROUND_CALLBACK
     @JvmField var onSlopeCallback = VOID_ON_SLOPE_CALLBACK
-
-    val withFullContactConstraint = ComponentRefResolver(ContactConstraint) {
+    @JvmField val withFullContactConstraint = ComponentRefResolver(ContactConstraint) {
         fullContactConstraintRef = it
     }
 

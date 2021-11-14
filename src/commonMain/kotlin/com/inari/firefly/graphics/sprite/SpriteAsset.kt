@@ -15,7 +15,7 @@ class SpriteAsset private constructor() : Asset() {
     @JvmField internal var spriteId: Int = -1
     @JvmField internal val spriteData = SpriteData()
 
-    var texture =
+    @JvmField var texture =
         ComponentRefResolver(Asset) { index-> run {
             dependingRef = setIfNotInitialized(index, "TextureAsset")
             textureAssetRef = index

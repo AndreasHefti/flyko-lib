@@ -23,10 +23,10 @@ class EActor private constructor () : EntityComponent(EActor::class.simpleName!!
     @JvmField var health: Int = -1
     @JvmField var maxHealth: Int = -1
     @JvmField var hitPower: Int = 0
-    val encounterConstraint = ComponentRefResolver(ContactConstraint) {
+    @JvmField val encounterConstraint = ComponentRefResolver(ContactConstraint) {
             index -> encounterContactConstraintRef = index
         }
-    val hitConstraint = ComponentRefResolver(ContactConstraint) {
+    @JvmField val hitConstraint = ComponentRefResolver(ContactConstraint) {
             index -> hitContactConstraintRef = index
         }
 

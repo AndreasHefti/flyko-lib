@@ -70,10 +70,10 @@ class ETransform private constructor() : EntityComponent(ETransform::class.simpl
     object Property {
         val POSITION_X: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.position::x }
         val POSITION_Y: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.position::y }
-        val PIVOT_X: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.pivot::x }
-        val PIVOT_Y: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.pivot::y }
+        val POSITION: PropertyRefResolver<PositionF> = { FFContext[Entity, it][ETransform]::position }
         val SCALE_X: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.scale::dx }
         val SCALE_Y: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.scale::dy }
+        val SCALE: PropertyRefResolver<Vector2f> = { FFContext[Entity, it][ETransform]::scale }
         val ROTATION: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data::rotation }
     }
 

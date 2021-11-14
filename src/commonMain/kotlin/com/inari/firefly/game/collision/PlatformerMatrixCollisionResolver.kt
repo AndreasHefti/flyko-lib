@@ -40,7 +40,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
         TileContactFormType.CIRCLE,
         TileContactFormType.RHOMBUS)
 
-    val withFullContactConstraint = ComponentRefResolver(ContactConstraint) {
+    @JvmField val withFullContactConstraint = ComponentRefResolver(ContactConstraint) {
         fullContactConstraintRef = it
     }
 

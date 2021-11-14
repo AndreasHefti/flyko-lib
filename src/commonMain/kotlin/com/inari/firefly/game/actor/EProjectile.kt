@@ -14,7 +14,7 @@ class EProjectile private constructor () : EntityComponent(EProjectile::class.si
         set(value) =
             if (PROJECTILE_TYPE_ASPECT_GROUP.typeCheck(value)) field = value
             else throw IllegalArgumentException()
-    var hitPower: Int = 0
+    @JvmField var hitPower: Int = 0
 
     override fun reset() {
         type = UNDEFINED_PROJECTILE_TYPE

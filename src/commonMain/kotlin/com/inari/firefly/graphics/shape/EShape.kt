@@ -11,6 +11,7 @@ import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.effect.ShaderAsset
+import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.physics.animation.PropertyRefResolver
 import com.inari.util.graphics.MutableColor
 import kotlin.jvm.JvmField
@@ -54,7 +55,7 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
 
     override fun toString(): String {
         return "EShape(subType=$data.subType, " +
-            "vertices=${data.vertices.contentToString()}, " +
+            "vertices=${data.vertices}, " +
             "color1=${data.color1}, " +
             "color2=${data.color2}, " +
             "color3=${data.color3}, " +
@@ -64,54 +65,9 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
             "blend=${data.blend}, "
     }
 
-//    private val accessorColorRed: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {data.color1.r_mutable = value}
-//        override fun get(): Float = data.color1.r
-//    }
-//    private val accessorColorGreen: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {data.color1.g_mutable = value}
-//        override fun get(): Float = data.color1.g
-//    }
-//    private val accessorColorBlue: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {data.color1.b_mutable = value}
-//        override fun get(): Float = data.color1.b
-//    }
-//    private val accessorColorAlpha: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {data.color1.a_mutable = value}
-//        override fun get(): Float = data.color1.a
-//    }
-//
-//    enum class Property(
-//        override val propertyName: String,
-//        override val type: KClass<*>
-//    ) : VirtualPropertyRef {
-//        COLOR_RED("colorRed", Float::class) {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[EShape].accessorColorRed
-//            }
-//        },
-//        COLOR_GREEN("colorGreen", Float::class) {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[EShape].accessorColorGreen
-//            }
-//        },
-//        COLOR_BLUE("colorBlue", Float::class) {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[EShape].accessorColorBlue
-//            }
-//        },
-//        COLOR_ALPHA("colorAlpha", Float::class) {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[EShape].accessorColorAlpha
-//            }
-//        }
-//    }
-
     object Property {
-        val COLOR_RED: PropertyRefResolver<Float> = { FFContext[Entity, it][EShape].data.color1::r_mutable }
-        val COLOR_GREEN: PropertyRefResolver<Float> = { FFContext[Entity, it][EShape].data.color1::g_mutable }
-        val COLOR_BLUE: PropertyRefResolver<Float> = { FFContext[Entity, it][EShape].data.color1::b_mutable }
-        val COLOR_ALPHA: PropertyRefResolver<Float> = { FFContext[Entity, it][EShape].data.color1::a_mutable }
+        val TINT_ALPHA: PropertyRefResolver<Float> = { FFContext[Entity, it][EShape].color::a_mutable }
+        val TINT_COLOR: PropertyRefResolver<MutableColor> = { FFContext[Entity, it][EShape]::color }
     }
 
     override fun componentType(): ComponentType<EShape> = Companion

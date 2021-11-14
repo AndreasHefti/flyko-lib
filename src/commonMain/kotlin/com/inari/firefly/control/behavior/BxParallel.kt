@@ -4,9 +4,11 @@ import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.entity.Entity
 import com.inari.util.OpResult
+import kotlin.jvm.JvmField
 
 class BxParallel private constructor() : BxBranch() {
-    var successThreshold: Int = 0
+
+    @JvmField var successThreshold: Int = 0
 
     override fun tick(entity: Entity, behavior: EBehavior): OpResult {
         val threshold = if (successThreshold > children.size)

@@ -22,9 +22,9 @@ class TileGrid private constructor() : SystemComponent(TileGrid::class.simpleNam
     @JvmField internal val gridDim = Vector2i(-1, -1)
     @JvmField internal val cellDim = Vector2i(-1, -1)
 
-    val view = ComponentRefResolver(View) { index-> viewRef = index }
-    val layer = ComponentRefResolver(Layer) { index-> layerRef = index }
-    var renderer = ComponentRefResolver(Renderer) { index-> rendererRef = index }
+    @JvmField val view = ComponentRefResolver(View) { index-> viewRef = index }
+    @JvmField val layer = ComponentRefResolver(Layer) { index-> layerRef = index }
+    @JvmField var renderer = ComponentRefResolver(Renderer) { index-> rendererRef = index }
     var gridWidth: Int
         get() = gridDim.dx
         set(value) {gridDim.dx = setIfNotInitialized(value, "gridWidth")}
@@ -37,7 +37,7 @@ class TileGrid private constructor() : SystemComponent(TileGrid::class.simpleNam
     var cellHeight: Int
         get() = cellDim.dy
         set(value) {cellDim.dy = setIfNotInitialized(value, "cellHeight")}
-    var position: PositionF = PositionF(ZERO_FLOAT, ZERO_FLOAT)
+    @JvmField var position: PositionF = PositionF(ZERO_FLOAT, ZERO_FLOAT)
     var spherical: Boolean = false
         set(value) {field = setIfNotInitialized(value, "spherical")}
 

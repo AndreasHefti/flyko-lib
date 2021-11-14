@@ -12,10 +12,11 @@ import kotlin.jvm.JvmField
 class EParticle private constructor() : EntityComponent(EParticle::class.simpleName!!) {
 
     @JvmField internal var rendererRef = SpriteParticleRenderer.instance.index
-    internal val int_particle: DynArray<Particle> = DynArray.of()
+    @JvmField internal val int_particle: DynArray<Particle> = DynArray.of()
 
-    var renderer = ComponentRefResolver(Renderer) { index-> rendererRef = index }
-    var particle = ArrayAccessor(int_particle)
+    @JvmField var renderer = ComponentRefResolver(Renderer) { index-> rendererRef = index }
+    @JvmField var particle = ArrayAccessor(int_particle)
+
     fun <P : Particle> particle(builder: Particle.ParticleBuilder<P>, configure: (P.() -> Unit)) {
         val particle = builder.createEmpty()
         particle.also(configure)

@@ -10,6 +10,7 @@ import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.rendering.Renderer
 import com.inari.util.Call
 import com.inari.util.Consumer
+import kotlin.jvm.JvmField
 
 class StateChangeTrigger private constructor(): Trigger() {
 
@@ -43,10 +44,9 @@ class StateChangeTrigger private constructor(): Trigger() {
 
     }
 
-    var type : Type = Type.STATE_CHANGE
-    val workflow = ComponentRefResolver(Workflow) { index -> workflowRef = index }
-    var typeName : String  = NO_NAME
-
+    @JvmField var type : Type = Type.STATE_CHANGE
+    @JvmField val workflow = ComponentRefResolver(Workflow) { index -> workflowRef = index }
+    @JvmField var typeName : String  = NO_NAME
 
     override fun init() {
         super.init()

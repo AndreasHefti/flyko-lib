@@ -32,10 +32,10 @@ class BackBufferAsset private constructor() : Asset() {
     var blendMode: BlendMode
         get() = data.blendMode
         set(value) { data.blendMode = value }
-    val shader = AssetInstanceRefResolver(
+    @JvmField val shader = AssetInstanceRefResolver(
         { instanceId -> data.shaderRef = instanceId },
         { data.shaderRef })
-    val view = ComponentRefResolver(View) { index-> data.viewportRef = index }
+    @JvmField val view = ComponentRefResolver(View) { index-> data.viewportRef = index }
     var zoom: Float
         get() = data.zoom
         set(value) { data.zoom = value }

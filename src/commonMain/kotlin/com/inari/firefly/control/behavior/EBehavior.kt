@@ -17,9 +17,9 @@ class EBehavior private constructor() : EntityComponent(EBehavior::class.simpleN
     @JvmField internal var actionsDone: Aspects = BEHAVIOR_STATE_ASPECT_GROUP.createAspects()
     @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
 
-    val behaviorTree = ComponentRefResolver(BxNode) { index-> treeRef = index }
-    var repeat: Boolean = true
-    var active: Boolean = true
+    @JvmField val behaviorTree = ComponentRefResolver(BxNode) { index-> treeRef = index }
+    @JvmField var repeat: Boolean = true
+    @JvmField var active: Boolean = true
     var updateResolution: Float
         get() = throw UnsupportedOperationException()
         set(value) { scheduler = FFContext.timer.createUpdateScheduler(value) }

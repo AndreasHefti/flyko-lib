@@ -20,9 +20,9 @@ abstract class Particle protected constructor() {
     var rotation: Float
         get() = transformData.rotation
         set(value) { transformData.rotation = value }
-    var xVelocity: Float  = 0f
-    var yVelocity: Float  = 0f
-    var mass: Float  = 1f
+    @JvmField var xVelocity: Float  = 0f
+    @JvmField var yVelocity: Float  = 0f
+    @JvmField var mass: Float  = 1f
 
     interface ParticleBuilder<P : Particle> {
         fun createEmpty(): P

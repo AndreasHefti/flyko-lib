@@ -40,10 +40,8 @@ class ESprite private constructor() : EntityComponent(ESprite::class.simpleName!
 
     object Property {
         val SPRITE_REFERENCE: PropertyRefResolver<Int> = { FFContext[Entity, it][ESprite].spriteRenderable::spriteId }
-        val TINT_RED: PropertyRefResolver<Float> = { FFContext[Entity, it][ESprite].spriteRenderable.tintColor::r_mutable }
-        val TINT_GREEN: PropertyRefResolver<Float> = { FFContext[Entity, it][ESprite].spriteRenderable.tintColor::g_mutable }
-        val TINT_BLUE: PropertyRefResolver<Float> = { FFContext[Entity, it][ESprite].spriteRenderable.tintColor::b_mutable }
         val TINT_ALPHA: PropertyRefResolver<Float> = { FFContext[Entity, it][ESprite].spriteRenderable.tintColor::a_mutable }
+        val TINT_COLOR: PropertyRefResolver<MutableColor> = { FFContext[Entity, it][ESprite].spriteRenderable::tintColor }
     }
 
     override fun componentType() = Companion

@@ -22,7 +22,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
 
     var parentRef = -1
         internal set
-    val withParent = ComponentRefResolver(Composite) { index -> parentRef = index }
+    @JvmField val withParent = ComponentRefResolver(Composite) { index -> parentRef = index }
 
     @JvmField var loadDependsOnParent = true
     @JvmField var activationDependsOnParent = false
@@ -52,36 +52,35 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
     fun getAttribute(name: String): String? = attributes[name]
     fun setAttribute(name: String, value: String) { attributes[name] = value }
 
-    val withAsset = ComponentRefResolver(Asset) { index -> assetRefs.set(index) }
+    @JvmField val withAsset = ComponentRefResolver(Asset) { index -> assetRefs.set(index) }
     fun registerLoadedComponent(id: CompId, activatable: Boolean = false) {
         loadedComponents + id
         if (activatable)
             activatableComponents + id
     }
 
-
-    val withLoadTask = ComponentRefResolver(Task) { index -> loadTasks = appendTaskRef(loadTasks, Task[index]) }
+    @JvmField val withLoadTask = ComponentRefResolver(Task) { index -> loadTasks = appendTaskRef(loadTasks, Task[index]) }
     fun <A : Task> withLoadTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.buildAndGet(configure)
         loadTasks = appendTaskRef(loadTasks, result)
         return result.componentId
     }
 
-    val withActivationTask = ComponentRefResolver(Task) { index -> activationTasks = appendTaskRef(activationTasks, Task[index]) }
+    @JvmField val withActivationTask = ComponentRefResolver(Task) { index -> activationTasks = appendTaskRef(activationTasks, Task[index]) }
     fun <A : Task> withActivationTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.buildAndGet(configure)
         activationTasks = appendTaskRef(activationTasks, result)
         return result.componentId
     }
 
-    val withDeactivationTask = ComponentRefResolver(Task) { index -> deactivationTasks = appendTaskRef(deactivationTasks, Task[index]) }
+    @JvmField val withDeactivationTask = ComponentRefResolver(Task) { index -> deactivationTasks = appendTaskRef(deactivationTasks, Task[index]) }
     fun <A : Task> withDeactivationTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.buildAndGet(configure)
         deactivationTasks = appendTaskRef(deactivationTasks, result)
         return result.componentId
     }
 
-    val withDisposeTask = ComponentRefResolver(Task) { index -> disposeTasks = appendTaskRef(disposeTasks, Task[index]) }
+    @JvmField val withDisposeTask = ComponentRefResolver(Task) { index -> disposeTasks = appendTaskRef(disposeTasks, Task[index]) }
     fun <A : Task> withDisposeTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.buildAndGet(configure)
         disposeTasks = appendTaskRef(disposeTasks, result)

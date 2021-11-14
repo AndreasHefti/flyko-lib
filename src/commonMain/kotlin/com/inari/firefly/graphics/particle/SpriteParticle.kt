@@ -13,7 +13,7 @@ class SpriteParticle : Particle() {
     @JvmField internal val spriteRenderable = SpriteRenderable()
     @JvmField internal val spriteRef: Int = -1
 
-    val sprite = AssetInstanceRefResolver(
+    @JvmField val sprite = AssetInstanceRefResolver(
         { instanceId -> spriteRenderable.spriteId = instanceId },
         { spriteRenderable.spriteId })
     var blend: BlendMode

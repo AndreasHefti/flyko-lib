@@ -22,12 +22,12 @@ class Sound private constructor() : SystemComponent(Sound::class.simpleName!!), 
     private val playCall: Call = { FFContext.activate(this) }
     private val stopCall: Call = { FFContext.deactivate(this) }
 
-    val soundAsset = ComponentRefResolver(SoundAsset) { index -> soundAssetId = index }
-    var looping: Boolean = false
-    var volume: Float = 1.0f
-    var pitch: Float = 1.0f
-    var pan: Float = ZERO_FLOAT
-    var channel: Int = 0
+    @JvmField val soundAsset = ComponentRefResolver(SoundAsset) { index -> soundAssetId = index }
+    @JvmField var looping: Boolean = false
+    @JvmField var volume: Float = 1.0f
+    @JvmField var pitch: Float = 1.0f
+    @JvmField var pan: Float = ZERO_FLOAT
+    @JvmField var channel: Int = 0
 
     fun <A : Trigger> withPlayTrigger(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): A {
         val result = super.withTrigger(cBuilder, configure)

@@ -13,12 +13,10 @@ import kotlin.jvm.JvmField
 class ContactConstraint private constructor() : SystemComponent(ContactConstraint::class.simpleName!!) {
 
     @JvmField internal var layerRef = -1
-
-    val layer =
-        ComponentRefResolver(Layer) { index->
-            layerRef = setIfNotInitialized(index, "Layer")
-        }
-    var bounds: Rectangle  = Rectangle()
+    @JvmField val layer = ComponentRefResolver(Layer) { index->
+        layerRef = setIfNotInitialized(index, "Layer")
+    }
+    @JvmField var bounds: Rectangle  = Rectangle()
     @JvmField val materialFilter: Aspects = MATERIAL_ASPECT_GROUP.createAspects()
     @JvmField val typeFilter: Aspects = CONTACT_TYPE_ASPECT_GROUP.createAspects()
 
