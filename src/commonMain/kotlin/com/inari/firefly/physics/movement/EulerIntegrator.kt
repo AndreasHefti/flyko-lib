@@ -27,28 +27,28 @@ class EulerIntegrator private constructor() : Integrator() {
         val velocity = movement.velocity
         val acceleration = movement.acceleration
 
-        velocity.dx = velocity.dx + acceleration.dx * deltaTimeInSeconds
-        velocity.dy = velocity.dy + acceleration.dy * deltaTimeInSeconds
+        velocity.v0 = velocity.v0 + acceleration.v0 * deltaTimeInSeconds
+        velocity.v1 = velocity.v1 + acceleration.v1 * deltaTimeInSeconds
     }
 
     override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) {
         transform.move(
-            (movement.velocity.dx * deltaTimeInSeconds * shift).roundToInt() / shift,
-            (movement.velocity.dy * deltaTimeInSeconds * shift).roundToInt() / shift
+            (movement.velocity.v0 * deltaTimeInSeconds * shift).roundToInt() / shift,
+            (movement.velocity.v1 * deltaTimeInSeconds * shift).roundToInt() / shift
         )
     }
 
     private fun gravityIntegration(movement: EMovement) {
         if (MovementAspect.ON_GROUND in movement.aspects) {
-            movement.velocity.dy = 0f
-            movement.acceleration.dy = 0f
+            movement.velocity.v1 = 0f
+            movement.acceleration.v1 = 0f
         } else {
-            if (movement.velocity.dy >= maxGravityVelocity) {
-                movement.acceleration.dy = 0f
-                movement.velocity.dy = maxGravityVelocity
+            if (movement.velocity.v1 >= maxGravityVelocity) {
+                movement.acceleration.v1 = 0f
+                movement.velocity.v1 = maxGravityVelocity
                 return
             }
-            movement.acceleration.dy = gravity * (movement.mass * massFactor)
+            movement.acceleration.v1 = gravity * (movement.mass * massFactor)
         }
     }
 

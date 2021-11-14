@@ -39,8 +39,8 @@ class SimpleTextRenderer private constructor() : Renderer() {
             if (EChild in entity.aspects)
                 collectTransformData(entity[EChild].int_parent, transformCollector)
 
-            val horizontalStep = (font.charWidth + font.charSpace) * transform.data.scale.dx
-            val verticalStep = (font.charHeight + font.lineSpace) * transform.data.scale.dy
+            val horizontalStep = (font.charWidth + font.charSpace) * transform.data.scale.v0
+            val verticalStep = (font.charHeight + font.lineSpace) * transform.data.scale.v1
             val newLinePos = transformCollector.data.position.x
             var j = 0
             while (j < chars.length) {

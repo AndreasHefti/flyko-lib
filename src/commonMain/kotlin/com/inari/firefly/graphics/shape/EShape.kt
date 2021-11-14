@@ -13,7 +13,7 @@ import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.effect.ShaderAsset
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.physics.animation.PropertyRefResolver
-import com.inari.util.graphics.MutableColor
+import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 import kotlin.reflect.KClass
 
@@ -27,16 +27,16 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
     var vertices: FloatArray
         get() = data.vertices
         set(value) { data.vertices = value }
-    var color: MutableColor
+    var color: Vector4f
         get() = data.color1
         set(value) = data.color1(value)
-    var gradientColor1: MutableColor
+    var gradientColor1: Vector4f
         get() = data.color2!!
         set(value) {data.color2 = value}
-    var gradientColor2: MutableColor
+    var gradientColor2: Vector4f
         get() = data.color3!!
         set(value) {data.color3 = value}
-    var gradientColor3: MutableColor
+    var gradientColor3: Vector4f
         get() = data.color4!!
         set(value) {data.color4 = value}
     var segments: Int
@@ -66,8 +66,8 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
     }
 
     object Property {
-        val TINT_ALPHA: PropertyRefResolver<Float> = { FFContext[Entity, it][EShape].color::a_mutable }
-        val TINT_COLOR: PropertyRefResolver<MutableColor> = { FFContext[Entity, it][EShape]::color }
+        val TINT_ALPHA: PropertyRefResolver<Float> = { FFContext[Entity, it][EShape].color::a }
+        val TINT_COLOR: PropertyRefResolver<Vector4f> = { FFContext[Entity, it][EShape]::color }
     }
 
     override fun componentType(): ComponentType<EShape> = Companion

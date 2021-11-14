@@ -1,8 +1,10 @@
 package com.inari.firefly.util.graphics
 
-import com.inari.util.graphics.IColor
-import com.inari.util.graphics.IColor.Companion.of
-import com.inari.util.graphics.ImmutableColor
+import com.inari.util.geom.GeomUtils.colorOf
+import com.inari.util.geom.GeomUtils.hasAlpha
+import com.inari.util.geom.GeomUtils.rgB8888
+import com.inari.util.geom.GeomUtils.rgbA8888
+import com.inari.util.geom.Vector4f
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -13,53 +15,44 @@ class ColorTest {
 
     @Test
     fun testCreation() {
-        var color: IColor = ImmutableColor()
+        var color = Vector4f()
         assertEquals("[r=0.0,g=0.0,b=0.0,a=1.0]", color.toString())
-        assertFalse(color.hasAlpha)
-        color = ImmutableColor(.5f, .3f, .4f)
+        assertFalse(hasAlpha(color))
+        color = Vector4f(.5f, .3f, .4f)
         assertEquals("[r=0.5,g=0.3,b=0.4,a=1.0]", color.toString())
-        assertFalse(color.hasAlpha)
-        color = ImmutableColor(.5f, .3f, .4f, .6f)
+        assertFalse(hasAlpha(color))
+        color = Vector4f(.5f, .3f, .4f, .6f)
         assertEquals("[r=0.5,g=0.3,b=0.4,a=0.6]", color.toString())
         // out of range --> range correction
-        color = ImmutableColor(500.5f, -.3f, .4f, .6f)
+        color = Vector4f(500.5f, -.3f, .4f, .6f)
         assertEquals("[r=1.0,g=0.0,b=0.4,a=0.6]", color.toString())
 
-        color = of(100, 100, 200)
+        color = colorOf(100, 100, 200)
         assertEquals("[r=0.39215687,g=0.39215687,b=0.78431374,a=1.0]", color.toString())
         // out of range --> range correction
-        color = of(100, -100, 500, 20)
+        color = colorOf(100, -100, 500, 20)
         assertEquals("[r=0.39215687,g=0.0,b=1.0,a=0.078431375]", color.toString())
 
-        val color2 = ImmutableColor(color)
+        val color2 = Vector4f(color)
         assertEquals(color2, color)
-        assertNotEquals(color2, ImmutableColor())
+        assertNotEquals(color2, Vector4f())
     }
 
 
     @Test
     fun testRGBA8888() {
-        val color = ImmutableColor(.5f, .3f, .4f, .6f)
-        assertEquals("2135713535", color.rgB8888.toString())
-        assertEquals("2135713433", color.rgbA8888.toString())
-    }
-
-    @Test
-    fun testConstants() {
-        assertEquals("[r=0.0,g=0.0,b=0.0,a=1.0]", IColor.BLACK.toString())
-        assertEquals("[r=0.0,g=0.0,b=1.0,a=1.0]", IColor.BLU.toString())
-        assertEquals("[r=0.0,g=1.0,b=0.0,a=1.0]", IColor.GREEN.toString())
-        assertEquals("[r=1.0,g=0.0,b=0.0,a=1.0]", IColor.RED.toString())
-        assertEquals("[r=1.0,g=1.0,b=1.0,a=1.0]", IColor.WHITE.toString())
+        val color = Vector4f(.5f, .3f, .4f, .6f)
+        assertEquals("2135713535", rgB8888(color).toString())
+        assertEquals("2135713433", rgbA8888(color).toString())
     }
 
     @Test
     fun testFromHexString() {
-        val color1 = IColor.ofMutable("#AABBCC12")
+        val color1 = colorOf("#AABBCC12")
         assertEquals("[r=0.6666667,g=0.73333335,b=0.8,a=0.07058824]", color1.toString())
-        val color2 = IColor.ofMutable("FFFFFF")
+        val color2 = colorOf("FFFFFF")
         assertEquals("[r=1.0,g=1.0,b=1.0,a=1.0]", color2.toString())
-        val color3 = IColor.ofMutable("#101010")
+        val color3 = colorOf("#101010")
         assertEquals("[r=0.0627451,g=0.0627451,b=0.0627451,a=1.0]", color3.toString())
     }
 

@@ -11,7 +11,7 @@ import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.EasedPositionAnimation
 import com.inari.util.geom.Easing
-import com.inari.util.geom.PositionF
+import com.inari.util.geom.Vector2f
 
 class EasingTest : DesktopApp() {
 
@@ -34,13 +34,13 @@ class EasingTest : DesktopApp() {
                 vertices = floatArrayOf(10f,0f,1f)
             }
             withComponent(EAnimation) {
-                withAnimated<PositionF> {
+                withAnimated<Vector2f> {
                     looping = true
                     inverseOnLoop = true
                     animatedProperty = ETransform.Property.POSITION
                     applyToNewActiveAnimation(EasedPositionAnimation) {
-                        startValue = PositionF(50f, 50f)
-                        endValue = PositionF(500f, 100f)
+                        startValue = Vector2f(50f, 50f)
+                        endValue = Vector2f(500f, 100f)
                         duration = 5000
                         easing = Easing.Type.LINEAR
                     }

@@ -3,7 +3,6 @@ package com.inari.firefly.graphics.view
 import com.inari.firefly.BASE_VIEW
 import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFContext
-import com.inari.firefly.asset.Asset
 import com.inari.firefly.core.api.ViewData
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.ComponentMap
@@ -11,12 +10,10 @@ import com.inari.firefly.core.component.ComponentMap.MapAction.*
 import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
-import com.inari.util.Consumer
 import com.inari.util.aspect.Aspects
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
 import com.inari.util.collection.DynIntArray
-import com.inari.util.collection.DynIntArrayRO
 import kotlin.jvm.JvmField
 
 object ViewSystem : ComponentSystem {

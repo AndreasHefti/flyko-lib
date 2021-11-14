@@ -23,8 +23,8 @@ import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.TimelineIntAnimation
 import com.inari.firefly.physics.contact.EContact
 import com.inari.util.Consumer
-import com.inari.util.geom.PositionF
-import com.inari.util.graphics.MutableColor
+import com.inari.util.geom.Vector2f
+import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
 class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!!) {
@@ -296,10 +296,10 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         @JvmField var tileHeight = 0
         @JvmField var parallaxFactorX = ZERO_FLOAT
         @JvmField var parallaxFactorY = ZERO_FLOAT
-        @JvmField var position: PositionF = PositionF(ZERO_FLOAT, ZERO_FLOAT)
+        @JvmField var position: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT)
         @JvmField var spherical: Boolean = false
         @JvmField var blend = BlendMode.NORMAL_ALPHA
-        @JvmField var tint = MutableColor(1f, 1f, 1f, 1f)
+        @JvmField var tint = Vector4f(1f, 1f, 1f, 1f)
         @JvmField var layer = ComponentRefResolver(Layer) { index -> layerRef = index }
         @JvmField var mapCodes: IntArray = intArrayOf()
 

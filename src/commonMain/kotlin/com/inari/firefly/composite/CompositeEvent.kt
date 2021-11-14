@@ -3,10 +3,8 @@ package com.inari.firefly.composite
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.core.component.CompId
-import com.inari.firefly.core.system.SystemComponent
 import com.inari.util.aspect.Aspect
 import com.inari.util.event.Event
-import kotlin.reflect.KClass
 
 typealias CompositeEventListener = (
     type: CompositeEventType,

@@ -3,8 +3,6 @@ package com.inari.util.geom
 
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Direction.*
-import com.inari.util.graphics.IColor
-import com.inari.util.graphics.MutableColor
 import kotlin.math.*
 
 
@@ -24,23 +22,24 @@ object GeomUtils {
 
     fun lerp(v0: Int, v1: Int, t: Float): Int = ((1 - t) * v0 + t * v1).toInt()
     fun lerp(v0: Float, v1: Float, t: Float): Float = (1 - t) * v0 + t * v1
-    fun lerp(v0: Position, v1: Position, t: Float, target: Position) {
+    fun lerp(v0: Vector2i, v1: Vector2i, t: Float, target: Vector2i) {
         target.x = lerp(v0.x, v1.x, t)
         target.y = lerp(v0.y, v1.y, t)
     }
-    fun lerp(v0: PositionF, v1: PositionF, t: Float, target: PositionF) {
-        target.x = lerp(v0.x, v1.x, t)
-        target.y = lerp(v0.y, v1.y, t)
+    fun lerp(v0: Vector2f, v1: Vector2f, t: Float, target: Vector2f) {
+        target.v0 = lerp(v0.v0, v1.v0, t)
+        target.v1 = lerp(v0.v1, v1.v1, t)
     }
-    fun lerp(v0: Vec2f, v1: Vec2f, t: Float, target: Vector2f) {
-        target.dx = lerp(v0.dx, v1.dx, t)
-        target.dy = lerp(v0.dy, v1.dy, t)
+    fun lerp(v0: Vector3f, v1: Vector3f, t: Float, target: Vector3f) {
+        target.v0 = lerp(v0.v0, v1.v0, t)
+        target.v1 = lerp(v0.v1, v1.v1, t)
+        target.v2 = lerp(v0.v2, v1.v2, t)
     }
-    fun lerp(v0: IColor, v1: IColor, t: Float, target: MutableColor) {
-        target.r_mutable = lerp(v0.r, v1.r, t)
-        target.g_mutable = lerp(v0.g, v1.g, t)
-        target.b_mutable = lerp(v0.b, v1.b, t)
-        target.a_mutable = lerp(v0.a, v1.a, t)
+    fun lerp(v0: Vector4f, v1: Vector4f, t: Float, target: Vector4f) {
+        target.v0 = lerp(v0.v0, v1.v0, t)
+        target.v1 = lerp(v0.v1, v1.v1, t)
+        target.v2 = lerp(v0.v2, v1.v2, t)
+        target.v3 = lerp(v0.v3, v1.v3, t)
     }
 
     fun sqrtf(value: Float): Float =
@@ -55,7 +54,7 @@ object GeomUtils {
     fun cosf(value: Float): Float =
         cos(value.toDouble()).toFloat()
 
-    fun getDistance(p1: Position, p2: Position): Float {
+    fun getDistance(p1: Vector2i, p2: Vector2i): Float {
         val dx = p2.x - p1.x
         val dy = p2.y - p1.y
 
@@ -162,7 +161,7 @@ object GeomUtils {
             y < r.y + r.height
     }
 
-    fun contains(r: Rectangle, p: Position): Boolean =
+    fun contains(r: Rectangle, p: Vector2i): Boolean =
         contains(r, p.x, p.y)
 
     fun contains(r: Rectangle, r1: Rectangle): Boolean =
@@ -263,31 +262,26 @@ object GeomUtils {
     fun isVertical(d: Direction): Boolean =
         d == NORTH || d == SOUTH
 
-    fun translateTo(p: Position, to: Position) {
+    fun translateTo(p: Vector2i, to: Vector2i) {
         p.x = to.x
         p.y = to.y
     }
 
-    fun translate(p: Position, d: Vector2i) {
-        p.x += d.dx
-        p.y += d.dy
-    }
-
-    fun getTranslatedXPos(p: Position, d: Direction, dx: Int = 1): Int =
+    fun getTranslatedXPos(p: Vector2i, d: Direction, dx: Int = 1): Int =
         when (d.horizontal) {
             Orientation.WEST -> p.x - dx
             Orientation.EAST -> p.x + dx
             else -> p.x
         }
 
-    fun getTranslatedYPos(p: Position, d: Direction, dy: Int = 1): Int =
+    fun getTranslatedYPos(p: Vector2i, d: Direction, dy: Int = 1): Int =
         when (d.vertical) {
             Orientation.SOUTH -> p.y + dy
             Orientation.NORTH -> p.y - dy
             else -> p.y
         }
 
-    fun movePosition(position: Position, d: Direction, distance: Int, originUpperCorner: Boolean) {
+    fun movePosition(position: Vector2i, d: Direction, distance: Int, originUpperCorner: Boolean) {
         movePosition(position, d.horizontal, distance, originUpperCorner)
         movePosition(position, d.vertical, distance, originUpperCorner)
     }
@@ -311,7 +305,7 @@ object GeomUtils {
     fun getFlatArrayIndex(x: Int, y: Int, width: Int): Int =
         y * width + x
 
-    fun movePosition(pos: Position, orientation: Orientation, distance: Int = 1, originUpperCorner: Boolean = true) =
+    fun movePosition(pos: Vector2i, orientation: Orientation, distance: Int = 1, originUpperCorner: Boolean = true) =
         when (orientation) {
             Orientation.NORTH -> pos.y = if (originUpperCorner) pos.y - distance else pos.y + distance
             Orientation.SOUTH -> pos.y = if (originUpperCorner) pos.y + distance else pos.y - distance
@@ -319,4 +313,55 @@ object GeomUtils {
             Orientation.EAST -> pos.x += distance
             else -> {}
         }
+
+    fun newVec4f(jsonString: String): Vector4f {
+        val result = Vector4f()
+        result(jsonString)
+        return result
+    }
+
+    fun hasAlpha(color: Vector4f): Boolean = color.a < 1f
+
+    fun rgbA8888(color: Vector4f): Int =
+        (color.r * 255).toInt() shl 24 or
+        ((color.g * 255).toInt() shl 16) or
+        ((color.b * 255).toInt() shl 8) or
+        (color.a * 255).toInt()
+
+    fun rgB8888(color: Vector4f): Int =
+        (color.r * 255).toInt() shl 24 or
+        ((color.g * 255).toInt() shl 16) or
+        ((color.b * 255).toInt() shl 8) or
+        255
+
+    /** Create new Vector4f with specified r/g/b ratio values and no alpha (-1.0f)
+     * @param r The red ratio value of the color: 0 - 255
+     * @param g The green ratio value of the color: 0 - 255
+     * @param b The blue ratio value of the color: 0 - 255
+     */
+    fun colorOf(r: Int, g: Int, b: Int): Vector4f = Vector4f(r / 255f, g / 255f, b / 255f, 1f)
+
+    /** Create new Vector4f with specified r/g/b/a ratio values
+     * @param r The red ratio value of the color: 0 - 255
+     * @param g The green ratio value of the color: 0 - 255
+     * @param b The blue ratio value of the color: 0 - 255
+     * @param a The alpha ratio value of the color: 0 - 255
+     */
+    fun colorOf(r: Int, g: Int, b: Int, a: Int): Vector4f = Vector4f(r / 255f, g / 255f, b / 255f, a / 255f)
+
+    // #rrggbbaa
+    fun colorOf(rgba: String): Vector4f {
+        val hexString = if (rgba.startsWith("#"))
+            rgba.subSequence(1, rgba.length)
+        else rgba
+
+        val ints = hexString
+            .chunked(2)
+            .map { it.toInt(16) }
+
+        return if (ints.size == 3)
+            colorOf(ints[0], ints[1], ints[2])
+        else colorOf(ints[0], ints[1], ints[2], ints[3])
+    }
+
 }

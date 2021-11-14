@@ -3,9 +3,7 @@ package com.inari.firefly.composite
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_NAME
 import com.inari.firefly.asset.Asset
-import com.inari.firefly.control.scene.SceneSystem
 import com.inari.firefly.control.task.Task
-import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.control.trigger.Trigger
 import com.inari.firefly.control.trigger.TriggeredSystemComponent
 import com.inari.firefly.core.ComponentRefResolver

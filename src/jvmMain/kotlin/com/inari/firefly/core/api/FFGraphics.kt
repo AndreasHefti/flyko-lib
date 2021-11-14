@@ -2,6 +2,7 @@ package com.inari.firefly.core.api
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.badlogic.gdx.graphics.Texture.TextureWrap
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
@@ -21,11 +22,7 @@ import com.inari.util.collection.DynArrayRO
 import com.inari.firefly.core.api.ShapeType.*
 import com.inari.firefly.filter.ColorFilteredTextureData
 import com.inari.util.Consumer
-import com.inari.util.geom.GeomUtils
-import com.inari.util.geom.Position
-import com.inari.util.geom.PositionF
-import com.inari.util.geom.Rectangle
-import com.inari.util.graphics.IColor
+import com.inari.util.geom.*
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL12
 import org.lwjgl.opengl.GL20
@@ -290,8 +287,8 @@ actual object FFGraphics : GraphicsAPI {
             transform.pivot.y,
             sprite.regionWidth.toFloat(),
             sprite.regionHeight.toFloat(),
-            transform.scale.dx,
-            transform.scale.dy,
+            transform.scale.v0,
+            transform.scale.v1,
             transform.rotation
         )
     }
@@ -307,8 +304,8 @@ actual object FFGraphics : GraphicsAPI {
             transform.pivot.y,
             sprite.regionWidth.toFloat(),
             sprite.regionHeight.toFloat(),
-            transform.scale.dx,
-            transform.scale.dy,
+            transform.scale.v0,
+            transform.scale.v1,
             transform.rotation
         )
     }
@@ -382,7 +379,7 @@ actual object FFGraphics : GraphicsAPI {
 
         if (transform.hasScale) {
             transformMatrix.translate(transform.pivot.x, transform.pivot.y, 0f)
-            transformMatrix.scale(transform.scale.dx, transform.scale.dy, 0f)
+            transformMatrix.scale(transform.scale.v0, transform.scale.v1, 0f)
             transformMatrix.translate(-transform.pivot.x, -transform.pivot.y, 0f)
             spriteBatch.transformMatrix = transformMatrix
         }
@@ -534,7 +531,7 @@ actual object FFGraphics : GraphicsAPI {
 
         if (transform.hasScale) {
             shapeRenderer.translate(transform.pivot.x, transform.pivot.y, 0f)
-            shapeRenderer.scale(transform.scale.dx, transform.scale.dy, 0f)
+            shapeRenderer.scale(transform.scale.v0, transform.scale.v1, 0f)
             shapeRenderer.translate(-transform.pivot.x, -transform.pivot.y, 0f)
         }
 
@@ -673,7 +670,7 @@ actual object FFGraphics : GraphicsAPI {
         TextureFilter.values().firstOrNull { it.glEnum == glConst }
             ?: TextureFilter.Linear
 
-    private fun setColorAndBlendMode(renderColor: IColor, blendMode: BlendMode) {
+    private fun setColorAndBlendMode(renderColor: Vector4f, blendMode: BlendMode) {
         spriteBatch.setColor(renderColor.r, renderColor.g, renderColor.b, renderColor.a)
         if (activeBlend !== blendMode) {
             activeBlend = blendMode
@@ -685,7 +682,7 @@ actual object FFGraphics : GraphicsAPI {
         }
     }
 
-    private fun getShapeColor(rgbColor: IColor, color: Color) =
+    private fun getShapeColor(rgbColor: Vector4f, color: Color) =
         color.set(rgbColor.r, rgbColor.g, rgbColor.b, rgbColor.a)
 
     class PolygonShapeDrawer : MeshBuilder() {
@@ -819,11 +816,11 @@ actual object FFGraphics : GraphicsAPI {
 
         override fun setUniformFloat(bindingName: String, value: Float) =
             program.setUniformf(bindingName, value)
-        override fun setUniformVec2(bindingName: String, position: PositionF) =
+        override fun setUniformVec2(bindingName: String, position: Vector2f) =
             program.setUniformf(bindingName, position.x, position.y)
-        override fun setUniformVec2(bindingName: String, position: Position) =
+        override fun setUniformVec2(bindingName: String, position: Vector2i) =
             program.setUniformf(bindingName, position.x.toFloat(), position.y.toFloat())
-        override fun setUniformColorVec4(bindingName: String, color: IColor) =
+        override fun setUniformColorVec4(bindingName: String, color: Vector4f) =
             program.setUniformf(bindingName, color.r, color.g, color.b, color.a)
 
         override fun bindTexture(bindingName: String, textureId: Int) {

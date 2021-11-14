@@ -23,8 +23,8 @@ import com.inari.util.aspect.Aspects
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.BitMask
 import com.inari.util.geom.GeomUtils
-import com.inari.util.geom.PositionF
 import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector2f
 import com.inari.util.indexed.Indexed
 import kotlin.jvm.JvmField
 import kotlin.math.floor
@@ -379,8 +379,8 @@ object ContactSystem : ComponentSystem {
                 CONTACTS_POOL.removeFirst()
     }
 
-    private val worldTempPos = PositionF()
-    private fun getWorldPos(entity: Entity, transform: ETransform): PositionF {
+    private val worldTempPos = Vector2f()
+    private fun getWorldPos(entity: Entity, transform: ETransform): Vector2f {
         return if (EChild in entity.aspects) {
             addTransformPos(entity[EChild].int_parent)
             worldTempPos

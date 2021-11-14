@@ -11,7 +11,7 @@ import com.inari.firefly.entity.EntityComponentType
 import com.inari.firefly.graphics.effect.ShaderAsset
 import com.inari.firefly.graphics.rendering.Renderer
 import com.inari.firefly.graphics.rendering.SimpleTextRenderer
-import com.inari.util.graphics.MutableColor
+import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
 class EText private constructor() : EntityComponent(EText::class.simpleName!!) {
@@ -23,14 +23,14 @@ class EText private constructor() : EntityComponent(EText::class.simpleName!!) {
     @JvmField var fontAsset = ComponentRefResolver(Asset) { index -> fontAssetRef = index }
 
     @JvmField val text: StringBuilder = StringBuilder()
-    @JvmField var tint: MutableColor = MutableColor(1f, 1f, 1f, 1f)
+    @JvmField var tint: Vector4f = Vector4f(1f, 1f, 1f, 1f)
     @JvmField var blend: BlendMode = BlendMode.NONE
 
     override fun reset() {
         rendererRef = -1
         fontAssetRef = -1
         text.setLength(0)
-        tint.r_mutable = 1f; tint.g_mutable = 1f; tint.b_mutable = 1f; tint.a_mutable = 1f
+        tint.r = 1f; tint.g = 1f; tint.b = 1f; tint.a = 1f
         blend = BlendMode.NONE
     }
 

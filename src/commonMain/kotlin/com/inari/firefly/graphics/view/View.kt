@@ -6,9 +6,9 @@ import com.inari.firefly.control.ControlledSystemComponent
 import com.inari.firefly.core.api.ViewData
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentSingleType
-import com.inari.util.geom.PositionF
 import com.inari.util.geom.Rectangle
-import com.inari.util.graphics.MutableColor
+import com.inari.util.geom.Vector2f
+import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
 class View private constructor (
@@ -26,13 +26,13 @@ class View private constructor (
     var bounds: Rectangle
         get() = data.bounds
         set(value) { data.bounds(value) }
-    var worldPosition: PositionF
+    var worldPosition: Vector2f
         get() = data.worldPosition
         set(value) { data.worldPosition(value) }
-    var clearColor: MutableColor
+    var clearColor: Vector4f
         get() = data.clearColor
         set(value) { data.clearColor(value) }
-    var tintColor: MutableColor
+    var tintColor: Vector4f
         get() = data.tintColor
         set(value) { data.tintColor(value) }
     var blendMode: BlendMode

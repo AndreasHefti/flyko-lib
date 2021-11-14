@@ -6,7 +6,6 @@ import com.inari.firefly.ZERO_INT
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.TransformData
 import com.inari.firefly.entity.Entity
-import com.inari.util.geom.PositionF
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
 import com.inari.firefly.graphics.view.Layer
@@ -24,10 +23,10 @@ class ETransform private constructor() : EntityComponent(ETransform::class.simpl
 
     val view = ComponentRefResolver(View) { index-> viewRef = index }
     val layer = ComponentRefResolver(Layer) { index-> layerRef = index }
-    var position: PositionF
+    var position: Vector2f
         get() = data.position
         set(value) = data.position(value)
-    var pivot: PositionF
+    var pivot: Vector2f
         get() = data.pivot
         set(value) = data.pivot(value)
     var scale: Vector2f
@@ -70,9 +69,9 @@ class ETransform private constructor() : EntityComponent(ETransform::class.simpl
     object Property {
         val POSITION_X: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.position::x }
         val POSITION_Y: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.position::y }
-        val POSITION: PropertyRefResolver<PositionF> = { FFContext[Entity, it][ETransform]::position }
-        val SCALE_X: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.scale::dx }
-        val SCALE_Y: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.scale::dy }
+        val POSITION: PropertyRefResolver<Vector2f> = { FFContext[Entity, it][ETransform]::position }
+        val SCALE_X: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.scale::v0 }
+        val SCALE_Y: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.scale::v1 }
         val SCALE: PropertyRefResolver<Vector2f> = { FFContext[Entity, it][ETransform]::scale }
         val ROTATION: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data::rotation }
     }

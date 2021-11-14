@@ -32,24 +32,24 @@ abstract class Integrator protected constructor() : SystemComponent(Integrator::
     protected fun adjustVelocity(movement: EMovement) {
 
         if (adjustBlock) {
-            if (BLOCK_NORTH in movement.aspects && movement.velocity.dy < 0f)
-                movement.velocity.dy = 0f
-            if (BLOCK_EAST in movement.aspects && movement.velocity.dx > 0f)
-                movement.velocity.dx = 0f
-            if (BLOCK_SOUTH in movement.aspects && movement.velocity.dy > 0f)
-                movement.velocity.dy = 0f
-            if (BLOCK_WEST in movement.aspects && movement.velocity.dx < 0f)
-                movement.velocity.dx = 0f
+            if (BLOCK_NORTH in movement.aspects && movement.velocity.v1 < 0f)
+                movement.velocity.v1 = 0f
+            if (BLOCK_EAST in movement.aspects && movement.velocity.v0 > 0f)
+                movement.velocity.v0 = 0f
+            if (BLOCK_SOUTH in movement.aspects && movement.velocity.v1 > 0f)
+                movement.velocity.v1 = 0f
+            if (BLOCK_WEST in movement.aspects && movement.velocity.v0 < 0f)
+                movement.velocity.v0 = 0f
         }
 
         if (adjustGround && movement.onGround)
-            movement.velocity.dy = 0f
+            movement.velocity.v1 = 0f
 
         if (adjustMax) {
-            movement.velocity.dy = min(movement.velocity.dy, movement.maxVelocitySouth)
-            movement.velocity.dx = min(movement.velocity.dx, movement.maxVelocityEast)
-            movement.velocity.dy = max(movement.velocity.dy, -movement.maxVelocityNorth)
-            movement.velocity.dx = max(movement.velocity.dx, -movement.maxVelocityWest)
+            movement.velocity.v1 = min(movement.velocity.v1, movement.maxVelocitySouth)
+            movement.velocity.v0 = min(movement.velocity.v0, movement.maxVelocityEast)
+            movement.velocity.v1 = max(movement.velocity.v1, -movement.maxVelocityNorth)
+            movement.velocity.v0 = max(movement.velocity.v0, -movement.maxVelocityWest)
         }
     }
 

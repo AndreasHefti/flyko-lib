@@ -4,7 +4,6 @@ import com.inari.firefly.CONTACT_TYPE_ASPECT_GROUP
 import com.inari.firefly.MATERIAL_ASPECT_GROUP
 import com.inari.firefly.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.UNDEFINED_MATERIAL
-import com.inari.firefly.control.action.Action
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSingleType

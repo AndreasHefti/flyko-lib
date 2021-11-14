@@ -160,30 +160,30 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
         refresh = false
         setOnGround = false
         if (contacts.hasAnyContact()) {
-            if (movement.velocity.dy < ZERO_FLOAT) {
-                val d1 = getAdjustDistance(sensorMatrix.distances[0].dy, verticalContactSensorThreshold)
-                val d2 = getAdjustDistance(sensorMatrix.distances[1].dy, verticalContactSensorThreshold)
-                val d3 = getAdjustDistance(sensorMatrix.distances[2].dy, verticalContactSensorThreshold)
+            if (movement.velocity.v1 < ZERO_FLOAT) {
+                val d1 = getAdjustDistance(sensorMatrix.distances[0].v1, verticalContactSensorThreshold)
+                val d2 = getAdjustDistance(sensorMatrix.distances[1].v1, verticalContactSensorThreshold)
+                val d3 = getAdjustDistance(sensorMatrix.distances[2].v1, verticalContactSensorThreshold)
                 val minDistTop = minDist(d1, d2, d3)
                 // special case jump under slope
-                if ((sensorMatrix.distances[0].dy != sensorMatrix.noDistanceValue &&
+                if ((sensorMatrix.distances[0].v1 != sensorMatrix.noDistanceValue &&
                     sensorMatrix.contactSensorLineLeft.cardinality < verticalContactSensorThreshold &&
                     sensorMatrix.contactSensorLineLeft.getBit(0, sensorMatrix.gapNorth)) ||
-                    (sensorMatrix.distances[2].dy != sensorMatrix.noDistanceValue &&
+                    (sensorMatrix.distances[2].v1 != sensorMatrix.noDistanceValue &&
                     sensorMatrix.contactSensorLineRight.cardinality < verticalContactSensorThreshold &&
                     sensorMatrix.contactSensorLineRight.getBit(0, sensorMatrix.gapNorth))) {
 
-                    movement.velocity.dy = ZERO_FLOAT
+                    movement.velocity.v1 = ZERO_FLOAT
                     refresh = true
                 } else if (minDistTop != sensorMatrix.noDistanceValue && minDistTop < 0) {
-                    movement.velocity.dy = ZERO_FLOAT
+                    movement.velocity.v1 = ZERO_FLOAT
                     refresh = true
                 }
             } else {
                 val slopeContact = contacts.hasContact(slopeAspects)
-                val d1 = getAdjustDistance(sensorMatrix.distances[5].dy, verticalContactSensorThreshold, sensorMatrix.gapSouth)
-                val d2 = getAdjustDistance(sensorMatrix.distances[6].dy, verticalContactSensorThreshold, sensorMatrix.gapSouth)
-                val d3 = getAdjustDistance(sensorMatrix.distances[7].dy, verticalContactSensorThreshold, sensorMatrix.gapSouth)
+                val d1 = getAdjustDistance(sensorMatrix.distances[5].v1, verticalContactSensorThreshold, sensorMatrix.gapSouth)
+                val d2 = getAdjustDistance(sensorMatrix.distances[6].v1, verticalContactSensorThreshold, sensorMatrix.gapSouth)
+                val d3 = getAdjustDistance(sensorMatrix.distances[7].v1, verticalContactSensorThreshold, sensorMatrix.gapSouth)
                 val minDistBottom = if (slopeContact) d2
                                     else if (d1 != 0 && d2 != 0) min(d1, d2)
                                     else if (d2 != 0 && d3 != 0) min(d2, d3)
@@ -194,7 +194,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
                         // slope south-west
                         val d4 = abs(d3 - d1)
                         if (d4 < slopeAdaptionThreshold && d4 != d2) {
-                            val wrongDirection = movement.velocity.dx < ZERO_FLOAT && d2 > 0
+                            val wrongDirection = movement.velocity.v0 < ZERO_FLOAT && d2 > 0
                             if (!wrongDirection) {
                                 println("adjust slope south-west d4 $d4 d2 $d2")
                                 transform.move(dy = d2)
@@ -209,7 +209,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
                         // slope south-east
                         val d4 = abs(d1 - d3)
                         if (d4 < slopeAdaptionThreshold && d4 != d2) {
-                            val wrongDirection = movement.velocity.dx > ZERO_FLOAT && d2 > 0
+                            val wrongDirection = movement.velocity.v0 > ZERO_FLOAT && d2 > 0
                             if (!wrongDirection) {
                                 println("adjust slope south-east d4 $d4 d2 $d2")
                                 transform.move(dy = d2)
@@ -239,10 +239,10 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
         // set on ground
         movement.onGround =
             setOnGround ||
-            (movement.velocity.dy >= ZERO_FLOAT &&
-            (sensorMatrix.distances[5].dy == 0 ||
-            sensorMatrix.distances[6].dy == 0 ||
-            sensorMatrix.distances[7].dy == 0) &&
+            (movement.velocity.v1 >= ZERO_FLOAT &&
+            (sensorMatrix.distances[5].v1 == 0 ||
+            sensorMatrix.distances[6].v1 == 0 ||
+            sensorMatrix.distances[7].v1 == 0) &&
             sensorMatrix.contactSensorLineBottom.cardinality > 2)
     }
 
@@ -257,34 +257,34 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
 
     private fun resolveHorizontally(entity: Entity, contacts: Contacts, movement: EMovement, transform: ETransform, ) {
         var refresh = false
-        if (movement.velocity.dx > ZERO_FLOAT) {
-            if (sensorMatrix.contactSensorLineRight.cardinality > verticalScanLineThreshold || sensorMatrix.distances[2].dx != 0) {
-                val specialCase = movement.velocity.dy < 0 && sensorMatrix.distances[2].dx != 0 && sensorMatrix.distances[4].dx == sensorMatrix.noDistanceValue
-                val minDistRight = minDist(sensorMatrix.distances[2].dx, sensorMatrix.distances[4].dx)
+        if (movement.velocity.v0 > ZERO_FLOAT) {
+            if (sensorMatrix.contactSensorLineRight.cardinality > verticalScanLineThreshold || sensorMatrix.distances[2].v0 != 0) {
+                val specialCase = movement.velocity.v1 < 0 && sensorMatrix.distances[2].v0 != 0 && sensorMatrix.distances[4].v0 == sensorMatrix.noDistanceValue
+                val minDistRight = minDist(sensorMatrix.distances[2].v0, sensorMatrix.distances[4].v0)
                 //println("minDistRight $minDistRight")
                 if (minDistRight > -horizontalContactSensorThreshold && minDistRight < 0) {
                     transform.move(dx = minDistRight)
                     transform.position.x = ceil(transform.position.x)
                     refresh = true
-                } else if (!contacts.hasContact(slopeAspects) && !movement.onGround && sensorMatrix.distances[7].dx > -3 && sensorMatrix.distances[7].dx < 0) {
-                    transform.move(dx = sensorMatrix.distances[7].dx)
+                } else if (!contacts.hasContact(slopeAspects) && !movement.onGround && sensorMatrix.distances[7].v0 > -3 && sensorMatrix.distances[7].v0 < 0) {
+                    transform.move(dx = sensorMatrix.distances[7].v0)
                     transform.position.x = ceil(transform.position.x)
                     refresh = true
                 }
             }
-        } else if (movement.velocity.dx < ZERO_FLOAT) {
-            if (sensorMatrix.contactSensorLineLeft.cardinality > verticalScanLineThreshold || sensorMatrix.distances[0].dx != 0) {
-                val specialCase = movement.velocity.dy < 0 && sensorMatrix.distances[0].dx != 0 && sensorMatrix.distances[3].dx == sensorMatrix.noDistanceValue
-                val minDistLeft = minDist(sensorMatrix.distances[0].dx, sensorMatrix.distances[3].dx)
+        } else if (movement.velocity.v0 < ZERO_FLOAT) {
+            if (sensorMatrix.contactSensorLineLeft.cardinality > verticalScanLineThreshold || sensorMatrix.distances[0].v0 != 0) {
+                val specialCase = movement.velocity.v1 < 0 && sensorMatrix.distances[0].v0 != 0 && sensorMatrix.distances[3].v0 == sensorMatrix.noDistanceValue
+                val minDistLeft = minDist(sensorMatrix.distances[0].v0, sensorMatrix.distances[3].v0)
                 //println("specialCase $specialCase")
                 if (minDistLeft > -horizontalContactSensorThreshold && minDistLeft < 0 ) {
-                    println("adjust left $minDistLeft : ${movement.velocity.dy}")
+                    println("adjust left $minDistLeft : ${movement.velocity.v1}")
                     transform.move(dx = -minDistLeft)
                     transform.position.x = floor(transform.position.x)
                     refresh = true
-                } else if (!contacts.hasContact(slopeAspects) && !movement.onGround && sensorMatrix.distances[5].dx > -3 && sensorMatrix.distances[5].dx <= 0) {
-                    transform.move(dx = -sensorMatrix.distances[5].dx)
-                    if (sensorMatrix.distances[5].dx == 0)
+                } else if (!contacts.hasContact(slopeAspects) && !movement.onGround && sensorMatrix.distances[5].v0 > -3 && sensorMatrix.distances[5].v0 <= 0) {
+                    transform.move(dx = -sensorMatrix.distances[5].v0)
+                    if (sensorMatrix.distances[5].v0 == 0)
                         transform.position.x = ceil(transform.position.x)
                     refresh = true
                 }

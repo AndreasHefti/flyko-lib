@@ -12,7 +12,6 @@ import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.EasedFloatAnimation
 import com.inari.util.Call
 import com.inari.util.geom.Easing
-import com.inari.util.geom.PositionF
 import com.inari.util.geom.Rectangle
 import org.lwjgl.glfw.GLFW
 
@@ -41,10 +40,10 @@ object InariIntro {
         entityId = Entity.buildAndActivate {
             withComponent(ETransform) {
                 view(BASE_VIEW)
-                position(PositionF(
+                position(
                     FFContext.screenWidth / 2 - texture.width / 2,
                     FFContext.screenHeight / 2 - texture.height / 2
-                ))
+                )
             }
 
             withComponent(ESprite) {

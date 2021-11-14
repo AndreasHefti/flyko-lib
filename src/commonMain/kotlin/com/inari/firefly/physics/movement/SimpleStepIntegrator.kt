@@ -13,15 +13,15 @@ class SimpleStepIntegrator  private constructor() : Integrator() {
             return
 
         if (MovementAspect.ON_GROUND in movement.aspects) {
-            if (velocity.dy != 0f )
-                velocity.dy = 0f
+            if (velocity.v1 != 0f )
+                velocity.v1 = 0f
             return
         }
-        velocity.dy = velocity.dy + abs( (velocity.dy / movement.mass - 1f ) * 0.2f )
+        velocity.v1 = velocity.v1 + abs( (velocity.v1 / movement.mass - 1f ) * 0.2f )
     }
 
     override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) =
-        transform.move(movement.velocity.dx, movement.velocity.dy)
+        transform.move(movement.velocity.v0, movement.velocity.v1)
 
     override fun componentType() = Companion
     companion object : SystemComponentSubType<Integrator, SimpleStepIntegrator>(Integrator, SimpleStepIntegrator::class) {

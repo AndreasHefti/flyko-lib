@@ -9,7 +9,7 @@ import kotlin.jvm.JvmField
  *  @param height The height of the Rectangle
  *  */
 data class Rectangle constructor(
-    @JvmField var pos: Position = Position(0, 0),
+    @JvmField var pos: Vector2i = Vector2i(0, 0),
     @JvmField var width: Int = 0,
     @JvmField var height: Int = 0
 ){
@@ -21,7 +21,7 @@ data class Rectangle constructor(
      * @param width the width of the new Rectangle
      * @param height the height of the new Rectangle
      */
-    constructor(x: Int, y: Int, width: Int, height: Int) : this(Position(x, y), width, height)
+    constructor(x: Int, y: Int, width: Int, height: Int) : this(Vector2i(x, y), width, height)
     constructor(other: Rectangle) : this(other.pos, other.width, other.height)
 
     var x: Int

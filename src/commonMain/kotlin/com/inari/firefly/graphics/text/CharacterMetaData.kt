@@ -3,9 +3,8 @@ package com.inari.firefly.graphics.text
 import com.inari.firefly.BlendMode
 import com.inari.firefly.core.api.TransformData
 import com.inari.firefly.core.component.ComponentDSL
-import com.inari.util.geom.PositionF
 import com.inari.util.geom.Vector2f
-import com.inari.util.graphics.MutableColor
+import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
 @ComponentDSL
@@ -13,16 +12,16 @@ class CharacterMetaData private constructor(){
 
     @JvmField internal val transformData = TransformData()
 
-    val position: PositionF
+    val position: Vector2f
         get() = transformData.position
-    val pivot: PositionF
+    val pivot: Vector2f
         get() = transformData.pivot
     val scale: Vector2f
         get() = transformData.scale
     var rotation: Float
         get() = transformData.rotation
         set(value) { transformData.rotation = value }
-    @JvmField var tint: MutableColor = MutableColor(1f, 1f, 1f, 1f)
+    @JvmField var tint: Vector4f = Vector4f(1f, 1f, 1f, 1f)
     @JvmField var blend: BlendMode = BlendMode.NONE
 
     companion object {

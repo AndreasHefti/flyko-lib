@@ -10,7 +10,8 @@ import com.inari.firefly.entity.EntityComponentType
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.effect.ShaderAsset
 import com.inari.firefly.physics.animation.PropertyRefResolver
-import com.inari.util.graphics.MutableColor
+import com.inari.util.geom.Vector2f
+import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 import kotlin.reflect.KClass
 
@@ -24,7 +25,7 @@ class ESprite private constructor() : EntityComponent(ESprite::class.simpleName!
     var blend: BlendMode
         get() = spriteRenderable.blendMode
         set(value) { spriteRenderable.blendMode = value }
-    var tint: MutableColor
+    var tint: Vector4f
         get() = spriteRenderable.tintColor
         set(value) { spriteRenderable.tintColor(value) }
 
@@ -40,8 +41,8 @@ class ESprite private constructor() : EntityComponent(ESprite::class.simpleName!
 
     object Property {
         val SPRITE_REFERENCE: PropertyRefResolver<Int> = { FFContext[Entity, it][ESprite].spriteRenderable::spriteId }
-        val TINT_ALPHA: PropertyRefResolver<Float> = { FFContext[Entity, it][ESprite].spriteRenderable.tintColor::a_mutable }
-        val TINT_COLOR: PropertyRefResolver<MutableColor> = { FFContext[Entity, it][ESprite].spriteRenderable::tintColor }
+        val TINT_ALPHA: PropertyRefResolver<Float> = { FFContext[Entity, it][ESprite].spriteRenderable.tintColor::a }
+        val TINT_COLOR: PropertyRefResolver<Vector4f> = { FFContext[Entity, it][ESprite].spriteRenderable::tintColor }
     }
 
     override fun componentType() = Companion

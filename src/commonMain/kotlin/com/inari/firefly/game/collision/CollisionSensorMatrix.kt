@@ -1,7 +1,6 @@
 package com.inari.firefly.game.collision
 
 import com.inari.util.geom.BitMask
-import com.inari.util.geom.Position
 import com.inari.util.geom.Rectangle
 import com.inari.util.geom.Vector2i
 import kotlin.jvm.JvmField
@@ -40,14 +39,14 @@ class CollisionSensorMatrix(
     @JvmField val contactSensorLineBottom = BitMask()
 
     @JvmField val rect = Rectangle()
-    @JvmField val contactSensorPointTopLeft = Position()
-    @JvmField val contactSensorPointTopMiddle = Position()
-    @JvmField val contactSensorPointTopRight = Position()
-    @JvmField val contactSensorPointCenterLeft = Position()
-    @JvmField val contactSensorPointCenterRight = Position()
-    @JvmField val contactSensorPointBottomLeft = Position()
-    @JvmField val contactSensorPointBottomMiddle = Position()
-    @JvmField val contactSensorPointBottomRight = Position()
+    @JvmField val contactSensorPointTopLeft = Vector2i()
+    @JvmField val contactSensorPointTopMiddle = Vector2i()
+    @JvmField val contactSensorPointTopRight = Vector2i()
+    @JvmField val contactSensorPointCenterLeft = Vector2i()
+    @JvmField val contactSensorPointCenterRight = Vector2i()
+    @JvmField val contactSensorPointBottomLeft = Vector2i()
+    @JvmField val contactSensorPointBottomMiddle = Vector2i()
+    @JvmField val contactSensorPointBottomRight = Vector2i()
 
     @JvmField val firstIndices = intArrayOf(-1 , -1, -1, -1, -1, -1)
     @JvmField val lastIndices = intArrayOf(-1 , -1, -1, -1, -1, -1)
@@ -136,65 +135,65 @@ class CollisionSensorMatrix(
     private fun calcDistances() {
         // distances contactSensorPointTopLeft
         if (firstIndices[3] != -1 && firstIndices[3] < contactSensorPointTopLeft.x)
-            distances[0].dx = -(lastIndices[3] - contactSensorPointTopLeft.x)
+            distances[0].v0 = -(lastIndices[3] - contactSensorPointTopLeft.x)
         if (firstIndices[0] != -1 && firstIndices[0] < contactSensorPointTopLeft.y)
-            distances[0].dy = -(lastIndices[0] - contactSensorPointTopLeft.y)
+            distances[0].v1 = -(lastIndices[0] - contactSensorPointTopLeft.y)
 
         // distances contactSensorPointTopMiddle
         if (lastIndices[3] != -1 && lastIndices[3] < contactSensorPointTopMiddle.x)
-            distances[1].dx = contactSensorPointTopMiddle.x - lastIndices[3]
+            distances[1].v0 = contactSensorPointTopMiddle.x - lastIndices[3]
         else if (firstIndices[3] != -1 && firstIndices[3] >= contactSensorPointTopMiddle.x)
-            distances[1].dx = firstIndices[3] - contactSensorPointTopMiddle.x
+            distances[1].v0 = firstIndices[3] - contactSensorPointTopMiddle.x
         if (firstIndices[1] != -1 && firstIndices[1] < contactSensorPointTopMiddle.y)
-            distances[1].dy = -(lastIndices[1] - contactSensorPointTopMiddle.y)
+            distances[1].v1 = -(lastIndices[1] - contactSensorPointTopMiddle.y)
 
         // distances contactSensorPointTopRight
         if (lastIndices[3] != -1 && lastIndices[3] > contactSensorPointTopRight.x)
-            distances[2].dx = firstIndices[3] - contactSensorPointTopRight.x
+            distances[2].v0 = firstIndices[3] - contactSensorPointTopRight.x
         if (firstIndices[2] != -1 && firstIndices[2] < contactSensorPointTopRight.y)
-            distances[2].dy = -(lastIndices[2] - contactSensorPointTopRight.y)
+            distances[2].v1 = -(lastIndices[2] - contactSensorPointTopRight.y)
 
 
 
 
         // distances contactSensorPointCenterLeft
         if (firstIndices[4] != -1 && firstIndices[4] < contactSensorPointCenterLeft.x)
-            distances[3].dx = -(lastIndices[4] - contactSensorPointCenterLeft.x)
+            distances[3].v0 = -(lastIndices[4] - contactSensorPointCenterLeft.x)
         if (lastIndices[0] != -1 && lastIndices[0] < contactSensorPointCenterLeft.y)
-            distances[3].dy = contactSensorPointCenterLeft.y - lastIndices[1]
+            distances[3].v1 = contactSensorPointCenterLeft.y - lastIndices[1]
         else if (firstIndices[1] != -1 && firstIndices[1] >= contactSensorPointCenterLeft.y)
-            distances[3].dy = -(contactSensorPointCenterLeft.y - firstIndices[1])
+            distances[3].v1 = -(contactSensorPointCenterLeft.y - firstIndices[1])
 
         // distances contactSensorPointCenterRight
         if (lastIndices[4] != -1 && lastIndices[4] > contactSensorPointCenterRight.x)
-            distances[4].dx = firstIndices[4] - contactSensorPointCenterRight.x
+            distances[4].v0 = firstIndices[4] - contactSensorPointCenterRight.x
         if (lastIndices[2] != -1 && lastIndices[2] < contactSensorPointCenterRight.y)
-            distances[4].dy = contactSensorPointCenterRight.y - lastIndices[2]
+            distances[4].v1 = contactSensorPointCenterRight.y - lastIndices[2]
         else if (firstIndices[2] != -1 && firstIndices[2] >= contactSensorPointCenterRight.y)
-            distances[4].dy = -(contactSensorPointCenterRight.y - firstIndices[2])
+            distances[4].v1 = -(contactSensorPointCenterRight.y - firstIndices[2])
 
 
 
 
         // distances contactSensorPointBottomLeft
         if (firstIndices[5] != -1 && firstIndices[5] < contactSensorPointBottomLeft.x)
-            distances[5].dx = -(lastIndices[5] - contactSensorPointBottomLeft.x)
+            distances[5].v0 = -(lastIndices[5] - contactSensorPointBottomLeft.x)
         if (lastIndices[0] != -1 && lastIndices[0] > contactSensorPointBottomLeft.y)
-            distances[5].dy = firstIndices[0] - contactSensorPointBottomLeft.y
+            distances[5].v1 = firstIndices[0] - contactSensorPointBottomLeft.y
 
         // distances contactSensorPointBottomMiddle
         if (lastIndices[5] != -1 && lastIndices[5] < contactSensorPointBottomMiddle.x)
-            distances[6].dx = contactSensorPointBottomMiddle.x - lastIndices[5]
+            distances[6].v0 = contactSensorPointBottomMiddle.x - lastIndices[5]
         else if (firstIndices[5] != -1 && firstIndices[5] >= contactSensorPointBottomMiddle.x)
-            distances[6].dx = firstIndices[5] - contactSensorPointBottomMiddle.x
+            distances[6].v0 = firstIndices[5] - contactSensorPointBottomMiddle.x
         if (lastIndices[1] != -1 && lastIndices[1] > contactSensorPointBottomMiddle.y)
-            distances[6].dy = firstIndices[1] - contactSensorPointBottomMiddle.y
+            distances[6].v1 = firstIndices[1] - contactSensorPointBottomMiddle.y
 
         // distances contactSensorPointBottomRight
         if (lastIndices[5] != -1 && lastIndices[5] > contactSensorPointBottomRight.x)
-            distances[7].dx = firstIndices[5] - contactSensorPointBottomRight.x
+            distances[7].v0 = firstIndices[5] - contactSensorPointBottomRight.x
         if (lastIndices[2] != -1 && lastIndices[2] > contactSensorPointBottomRight.y)
-            distances[7].dy = firstIndices[2] - contactSensorPointBottomRight.y
+            distances[7].v1 = firstIndices[2] - contactSensorPointBottomRight.y
     }
 
     private fun clear() {
@@ -231,5 +230,5 @@ class CollisionSensorMatrix(
                 "${distanceToString(distances[5])}    ${distanceToString(distances[6])}    ${distanceToString(distances[7])}"
     }
 
-    private fun distanceToString(distance: Vector2i) = "[${ if (distance.dx != noDistanceValue) distance.dx else "--" }, ${ if (distance.dy != noDistanceValue) distance.dy else "--" }]"
+    private fun distanceToString(distance: Vector2i) = "[${ if (distance.v0 != noDistanceValue) distance.v0 else "--" }, ${ if (distance.v1 != noDistanceValue) distance.v1 else "--" }]"
 }

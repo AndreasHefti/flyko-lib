@@ -13,7 +13,6 @@ import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
 import com.inari.util.event.Event
 import com.inari.util.event.IEventDispatcher
-import com.inari.util.geom.PositionF
 import com.inari.util.geom.Rectangle
 import kotlin.jvm.JvmField
 import kotlin.math.floor

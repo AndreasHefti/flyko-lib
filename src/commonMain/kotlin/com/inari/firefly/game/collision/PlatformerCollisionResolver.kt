@@ -1,6 +1,5 @@
 package com.inari.firefly.game.collision
 
-import com.inari.firefly.EMPTY_INT_CONSUMER
 import com.inari.firefly.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.UNDEFINED_MATERIAL
 import com.inari.firefly.ZERO_FLOAT
@@ -15,7 +14,6 @@ import com.inari.firefly.game.VOID_TOUCH_GROUND_CALLBACK
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.physics.contact.*
 import com.inari.firefly.physics.movement.EMovement
-import com.inari.util.IntConsumer
 import com.inari.util.Predicate
 import com.inari.util.aspect.Aspect
 import com.inari.util.collection.DynArray
@@ -151,13 +149,13 @@ class PlatformerCollisionResolver : CollisionResolver()  {
 
         //println("onSlope $onSlope")
 
-        if (onSlope && movement.velocity.dy >= ZERO_FLOAT) {
+        if (onSlope && movement.velocity.v1 >= ZERO_FLOAT) {
             //println("adjust slope ${contactSensorB2.cardinality}")
             if (contactSensorB1.cardinality > contactSensorB3.cardinality) {
                 //println("slope south-east")
                 transform.move(dy = -(contactSensorB1.cardinality - gapSouth))
                 transform.position.y = ceil(transform.position.y)
-                movement.velocity.dy = ZERO_FLOAT
+                movement.velocity.v1 = ZERO_FLOAT
                 refresh = true
                 setOnGround = true
                 onSlopeCallback(entity.index, contactSensorB1.cardinality - contactSensorB3.cardinality, contacts)
@@ -165,16 +163,16 @@ class PlatformerCollisionResolver : CollisionResolver()  {
                 //println("slope south-west")
                 transform.move(dy = -(contactSensorB3.cardinality - gapSouth))
                 transform.position.y = ceil(transform.position.y)
-                movement.velocity.dy = ZERO_FLOAT
+                movement.velocity.v1 = ZERO_FLOAT
                 refresh = true
                 setOnGround = true
                 onSlopeCallback(entity.index, contactSensorB1.cardinality - contactSensorB3.cardinality, contacts)
             }
-        } else if (bmax > gapSouth && movement.velocity.dy >= ZERO_FLOAT) {
+        } else if (bmax > gapSouth && movement.velocity.v1 >= ZERO_FLOAT) {
             //println("adjust ground: ${bmax - gapSouth} : ${movement.velocity.dy}")
             transform.move(dy = -(bmax - gapSouth))
             transform.position.y = ceil(transform.position.y)
-            movement.velocity.dy = ZERO_FLOAT
+            movement.velocity.v1 = ZERO_FLOAT
             refresh = true
             setOnGround = true
         }
@@ -183,8 +181,8 @@ class PlatformerCollisionResolver : CollisionResolver()  {
             //println("adjust top: $tmax")
             transform.move(dy = tmax)
             transform.position.y = floor(transform.position.y)
-            if (movement.velocity.dy < ZERO_FLOAT)
-                movement.velocity.dy = ZERO_FLOAT
+            if (movement.velocity.v1 < ZERO_FLOAT)
+                movement.velocity.v1 = ZERO_FLOAT
             refresh = true
         }
 
@@ -208,7 +206,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
             //println("adjust left: $lmax")
             transform.move(dx = lmax)
             transform.position.x = floor(transform.position.x)
-            movement.velocity.dx = ZERO_FLOAT
+            movement.velocity.v0 = ZERO_FLOAT
             refresh = true
         }
 
@@ -216,7 +214,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
             //println("adjust right: $rmax")
             transform.move(dx = -rmax)
             transform.position.x = ceil(transform.position.x)
-            movement.velocity.dx = ZERO_FLOAT
+            movement.velocity.v0 = ZERO_FLOAT
             refresh = true
         }
 

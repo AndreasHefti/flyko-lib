@@ -9,7 +9,6 @@ import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.physics.movement.EMovement
-import com.inari.util.geom.PositionF
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector2i
 
@@ -17,7 +16,7 @@ class PlayerComposite private constructor(override var name: String = PLAYER_COM
 
     var entityId = NO_COMP_ID
         internal set
-    var playerPosition = PositionF()
+    var playerPosition = Vector2f()
         internal set
     var playerPivot = Vector2i()
         internal set
@@ -67,7 +66,7 @@ class PlayerComposite private constructor(override var name: String = PLAYER_COM
 
         // clear data
         entityId = NO_COMP_ID
-        playerPosition = PositionF()
+        playerPosition = Vector2f()
         playerPivot(0, 0)
 
         // notify

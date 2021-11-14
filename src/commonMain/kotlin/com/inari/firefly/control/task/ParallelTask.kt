@@ -1,6 +1,5 @@
 package com.inari.firefly.control.task
 
-import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.EMPTY_COMPONENT_TASK_OPERATION
 import com.inari.firefly.VOID_CONSUMER
 import com.inari.firefly.core.component.CompId

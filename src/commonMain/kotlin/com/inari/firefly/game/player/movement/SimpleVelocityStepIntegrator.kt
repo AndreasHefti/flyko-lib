@@ -18,16 +18,16 @@ class SimpleVelocityStepIntegrator  private constructor() : Integrator() {
         val accMass = 1 / movement.mass * massFactor
         gravityAcc / accMass
 
-        movement.velocity.dx += deltaTimeInSeconds * gravityAcc.dx
-        movement.velocity.dy += deltaTimeInSeconds * gravityAcc.dy
+        movement.velocity.v0 += deltaTimeInSeconds * gravityAcc.v0
+        movement.velocity.v1 += deltaTimeInSeconds * gravityAcc.v1
 
         adjustVelocity(movement)
     }
 
     override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) =
         transform.move(
-            movement.velocity.dx * deltaTimeInSeconds,
-            movement.velocity.dy * deltaTimeInSeconds)
+            movement.velocity.v0 * deltaTimeInSeconds,
+            movement.velocity.v1 * deltaTimeInSeconds)
 
     override fun componentType() = Companion
     companion object : SystemComponentSubType<Integrator, SimpleVelocityStepIntegrator>(Integrator, SimpleVelocityStepIntegrator::class) {

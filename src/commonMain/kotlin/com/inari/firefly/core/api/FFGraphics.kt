@@ -1,7 +1,6 @@
 package com.inari.firefly.core.api
 
 import com.inari.util.collection.DynArrayRO
-import com.inari.util.geom.PositionF
 import com.inari.util.geom.Rectangle
 
 /** This defines the low level API-Interface for all graphical functions used by the firefly API.

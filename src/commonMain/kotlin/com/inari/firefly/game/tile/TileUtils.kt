@@ -1,7 +1,7 @@
 package com.inari.firefly.game.tile
 
 import com.inari.util.geom.BitMask
-import com.inari.util.graphics.MutableColor
+import com.inari.util.geom.Vector4f
 
 object TileUtils {
 
@@ -126,10 +126,10 @@ object TileUtils {
         }
     }
 
-    fun getColorFromString(stringValue: String): MutableColor? {
+    fun getColorFromString(stringValue: String): Vector4f? {
         return try {
             val rgbaString = stringValue.split(":")
-            MutableColor(
+            Vector4f(
                 rgbaString[0].toFloat(),
                 rgbaString[1].toFloat(),
                 rgbaString[2].toFloat(),

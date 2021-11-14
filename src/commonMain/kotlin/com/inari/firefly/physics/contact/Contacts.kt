@@ -24,14 +24,14 @@ class Contacts internal constructor(
     @JvmField internal val intersectionMask = BitMask(width = 0, height = 0)
     @JvmField internal val contacts: DynArray<Contact> = DynArray.of(5, 5)
 
-    internal fun update(contactBounds: Rectangle, position: PositionF, velocity: Vector2f) {
+    internal fun update(contactBounds: Rectangle, position: Vector2f, velocity: Vector2f) {
         clear()
 
         normalizedContactBounds.width = contactBounds.width
         normalizedContactBounds.height = contactBounds.height
 
-        worldBounds.x = (if (velocity.dx > 0) ceil(position.x.toDouble()).toInt() else floor(position.x.toDouble()).toInt()) + contactBounds.x
-        worldBounds.y = (if (velocity.dy > 0) ceil(position.y.toDouble()).toInt() else floor(position.y.toDouble()).toInt()) + contactBounds.y
+        worldBounds.x = (if (velocity.v0 > 0) ceil(position.x.toDouble()).toInt() else floor(position.x.toDouble()).toInt()) + contactBounds.x
+        worldBounds.y = (if (velocity.v1 > 0) ceil(position.y.toDouble()).toInt() else floor(position.y.toDouble()).toInt()) + contactBounds.y
         worldBounds.width = contactBounds.width
         worldBounds.height = contactBounds.height
         intersectionMask.reset(0, 0, contactBounds.width, contactBounds.height)
@@ -62,16 +62,16 @@ class Contacts internal constructor(
     fun allContacts(): DynArrayRO<Contact> =
         contacts
 
-    fun hasContact(p: Position): Boolean =
+    fun hasContact(p: Vector2i): Boolean =
         intersectionMask.getBit(p.x, p.y)
 
-    fun hasContact(p1: Position, p2: Position): Boolean =
+    fun hasContact(p1: Vector2i, p2: Vector2i): Boolean =
         intersectionMask.getBit(p1.x, p1.y) || intersectionMask.getBit(p2.x, p2.y)
 
     fun hasContact(x: Int, y: Int): Boolean =
         intersectionMask.getBit(x, y)
 
-    fun hasContactType(contactType: Aspect, p: Position): Boolean =
+    fun hasContactType(contactType: Aspect, p: Vector2i): Boolean =
         hasContactType(contactType, p.x, p.y)
 
     fun hasContactType(contactType: Aspect, x: Int, y: Int): Boolean {
@@ -90,7 +90,7 @@ class Contacts internal constructor(
         return false
     }
 
-    fun hasContactTypeExclusive(contactType: Aspect, p: Position): Boolean =
+    fun hasContactTypeExclusive(contactType: Aspect, p: Vector2i): Boolean =
         hasContactTypeExclusive(contactType, p.x, p.y)
 
     fun hasContactTypeExclusive(contactType: Aspect, x: Int, y: Int): Boolean {
@@ -109,7 +109,7 @@ class Contacts internal constructor(
         return false
     }
 
-    fun hasContact(material: Aspect, p: Position): Boolean =
+    fun hasContact(material: Aspect, p: Vector2i): Boolean =
         hasContact(material, p.x, p.y)
 
     fun hasContact(material: Aspect, x: Int, y: Int): Boolean {
@@ -128,7 +128,7 @@ class Contacts internal constructor(
         return false
     }
 
-    fun hasContactExclusive(material: Aspect, p: Position): Boolean =
+    fun hasContactExclusive(material: Aspect, p: Vector2i): Boolean =
         hasContactExclusive(material, p.x, p.y)
 
     fun hasContactExclusive(material: Aspect, x: Int, y: Int): Boolean {
@@ -147,7 +147,7 @@ class Contacts internal constructor(
         return false
     }
 
-    fun get(pos: Position): Contact = this[pos.x, pos.y]
+    fun get(pos: Vector2i): Contact = this[pos.x, pos.y]
 
     operator fun get(x: Int, y: Int): Contact {
         var i = 0
