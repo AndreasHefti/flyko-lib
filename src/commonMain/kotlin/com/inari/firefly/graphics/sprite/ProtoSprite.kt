@@ -12,13 +12,12 @@ class ProtoSprite internal constructor() : IndexedInstantiable {
     @JvmField internal var instId = -1
     override val instanceId: Int get() = instId
 
-    var name: String = NO_NAME
-    val textureBounds: Rectangle = Rectangle()
-    var hFlip: Boolean = false
-    var vFlip: Boolean = false
+    @JvmField var name: String = NO_NAME
+    @JvmField val textureBounds: Rectangle = Rectangle()
+    @JvmField var hFlip: Boolean = false
+    @JvmField var vFlip: Boolean = false
 
     companion object {
-
         val of: (ProtoSprite.() -> Unit) -> ProtoSprite = { configure ->
             val instance = ProtoSprite()
             instance.also(configure)

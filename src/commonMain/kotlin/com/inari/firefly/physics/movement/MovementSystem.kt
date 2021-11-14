@@ -21,7 +21,6 @@ object MovementSystem : ComponentSystem {
         Integrator
     )
 
-
     @JvmField val integrator = ComponentSystem.createComponentMapping(
         Integrator,
         activationMapping = true,

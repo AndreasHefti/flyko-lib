@@ -3,7 +3,6 @@ package com.inari.firefly.graphics
 import com.inari.firefly.TestApp
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntitySystem
-import com.inari.firefly.entity.property.FloatPropertyAccessor
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewSystem
 import com.inari.firefly.measureTime
@@ -36,8 +35,7 @@ class ETransformTest {
             transform.toString()
         )
 
-        val xposAccessor: FloatPropertyAccessor =
-            ETransform.Property.POSITION_X.accessor(EntitySystem[entityId]) as FloatPropertyAccessor
+        val xposAccessor = ETransform.Property.POSITION_X(entityId)
         assertTrue(10f == xposAccessor.get())
         xposAccessor.set(30f)
         assertTrue(30f == xposAccessor.get())

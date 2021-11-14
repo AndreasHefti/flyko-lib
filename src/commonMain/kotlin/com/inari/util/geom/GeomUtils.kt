@@ -3,6 +3,8 @@ package com.inari.util.geom
 
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Direction.*
+import com.inari.util.graphics.IColor
+import com.inari.util.graphics.MutableColor
 import kotlin.math.*
 
 
@@ -19,6 +21,27 @@ object GeomUtils {
     const val RIGHT_SIDE = 1 shl 2
     const val BOTTOM_SIDE = 1 shl 3
     const val LEFT_SIDE = 1 shl 4
+
+    fun lerp(v0: Int, v1: Int, t: Float): Int = ((1 - t) * v0 + t * v1).toInt()
+    fun lerp(v0: Float, v1: Float, t: Float): Float = (1 - t) * v0 + t * v1
+    fun lerp(v0: Position, v1: Position, t: Float, target: Position) {
+        target.x = lerp(v0.x, v1.x, t)
+        target.y = lerp(v0.y, v1.y, t)
+    }
+    fun lerp(v0: PositionF, v1: PositionF, t: Float, target: PositionF) {
+        target.x = lerp(v0.x, v1.x, t)
+        target.y = lerp(v0.y, v1.y, t)
+    }
+    fun lerp(v0: Vec2f, v1: Vec2f, t: Float, target: Vector2f) {
+        target.dx = lerp(v0.dx, v1.dx, t)
+        target.dy = lerp(v0.dy, v1.dy, t)
+    }
+    fun lerp(v0: IColor, v1: IColor, t: Float, target: MutableColor) {
+        target.r_mutable = lerp(v0.r, v1.r, t)
+        target.g_mutable = lerp(v0.g, v1.g, t)
+        target.b_mutable = lerp(v0.b, v1.b, t)
+        target.a_mutable = lerp(v0.a, v1.a, t)
+    }
 
     fun sqrtf(value: Float): Float =
         sqrt(value.toDouble()).toFloat()

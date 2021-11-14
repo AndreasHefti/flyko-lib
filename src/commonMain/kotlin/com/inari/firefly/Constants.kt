@@ -5,7 +5,6 @@ import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.Component
 import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.entity.Entity
-import com.inari.firefly.entity.property.VirtualPropertyRef
 import com.inari.util.*
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.AspectType
@@ -58,11 +57,6 @@ const val BASE_VIEW: String = "[[BASE_VIEW]]"
     override val index: Int = -1
     override val indexedTypeName: String = NO_NAME
 }
-//@JvmField val NO_PROPERTY_REF: VirtualPropertyRef = object : VirtualPropertyRef {
-//    override val propertyName: String = NO_NAME
-//    override val type: KClass<*> get() = throw UnsupportedOperationException()
-//    override fun accessor(entity: Entity): VirtualPropertyRef.PropertyAccessor = throw UnsupportedOperationException()
-//}
 
 @JvmField val VOID_INT_CONSUMER: IntConsumer = { _ -> }
 @JvmField val INT_FUNCTION_IDENTITY: IntFunction = { i -> i }

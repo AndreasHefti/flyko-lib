@@ -1,21 +1,20 @@
 package com.inari.firefly.graphics
 
+import com.inari.firefly.FFContext
 import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.ZERO_INT
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.TransformData
-import com.inari.util.geom.PositionF
 import com.inari.firefly.entity.Entity
+import com.inari.util.geom.PositionF
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
-import com.inari.firefly.entity.EntityPropertyRef
 import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewLayerAware
-import com.inari.util.PropertyAccessor
+import com.inari.firefly.physics.animation.PropertyRefResolver
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
-import kotlin.reflect.KClass
 
 class ETransform private constructor() : EntityComponent(ETransform::class.simpleName!!), ViewLayerAware {
 
@@ -59,14 +58,6 @@ class ETransform private constructor() : EntityComponent(ETransform::class.simpl
         data.reset()
     }
 
-    private val accessorPosX = PropertyAccessor<Float>({ data.position.x }, { data.position.x = it })
-    private val accessorPosY = PropertyAccessor<Float>({ data.position.y }, { data.position.y = it })
-    private val accessorPivotX = PropertyAccessor<Float>({ data.pivot.x }, { data.pivot.x = it })
-    private val accessorPivotY = PropertyAccessor<Float>({ data.pivot.y }, { data.pivot.y = it })
-    private val accessorScaleX = PropertyAccessor<Float>({ data.scale.dx }, { data.scale.dx = it })
-    private val accessorScaleY = PropertyAccessor<Float>({ data.scale.dy }, { data.scale.dy = it })
-    private val accessorRotation = PropertyAccessor<Float>({ data.rotation }, { data.rotation = it })
-
     override fun toString(): String {
         return "ETransform(viewRef=$viewRef, " +
             "layerRef=$layerRef, " +
@@ -76,82 +67,14 @@ class ETransform private constructor() : EntityComponent(ETransform::class.simpl
             "rot=${data.rotation})"
     }
 
-//    private val accessorPosX: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {data.position.x = value}
-//        override fun get(): Float = data.position.x
-//    }
-//    private val accessorPosY: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {data.position.y = value}
-//        override fun get(): Float = data.position.y
-//    }
-//    private val accessorPivotX: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {data.pivot.x = value}
-//        override fun get(): Float = data.pivot.x
-//    }
-//    private val accessorPivotY: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {data.pivot.y = value}
-//        override fun get(): Float = data.pivot.y
-//    }
-//    private val accessorScaleX: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {data.scale.dx = value}
-//        override fun get(): Float = data.scale.dx
-//    }
-//    private val accessorScaleY: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {data.scale.dy = value}
-//        override fun get(): Float = data.scale.dy
-//    }
-//    private val accessorRotation: FloatPropertyAccessor = object : FloatPropertyAccessor {
-//        override fun set(value: Float) {data.rotation = value}
-//        override fun get(): Float = data.rotation
-//    }
-//
-//    enum class Property(
-//    ) : VirtualPropertyRef {
-//        POSITION_X() {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[ETransform].accessorPosX
-//            }
-//        },
-//        POSITION_Y() {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[ETransform].accessorPosY
-//            }
-//        },
-//        PIVOT_X() {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[ETransform].accessorPivotX
-//            }
-//        },
-//        PIVOT_Y() {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[ETransform].accessorPivotY
-//            }
-//        },
-//        SCALE_X() {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[ETransform].accessorScaleX
-//            }
-//        },
-//        SCALE_Y() {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[ETransform].accessorScaleY
-//            }
-//        },
-//        ROTATION() {
-//            override fun accessor(entity: Entity): FloatPropertyAccessor {
-//                return entity[ETransform].accessorRotation
-//            }
-//        }
-//    }
-
     object Property {
-        val POSITION_X = EntityPropertyRef<Float> { it[ETransform].accessorPosX }
-        val POSITION_Y = EntityPropertyRef<Float> { it[ETransform].accessorPosX }
-        val PIVOT_X = EntityPropertyRef<Float> { it[ETransform].accessorPivotX }
-        val PIVOT_Y = EntityPropertyRef<Float> { it[ETransform].accessorPivotY }
-        val SCALE_X = EntityPropertyRef<Float> { it[ETransform].accessorScaleY }
-        val SCALE_Y = EntityPropertyRef<Float> { it[ETransform].accessorScaleY }
-        val ROTATION = EntityPropertyRef<Float> { it[ETransform].accessorRotation }
+        val POSITION_X: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.position::x }
+        val POSITION_Y: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.position::y }
+        val PIVOT_X: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.pivot::x }
+        val PIVOT_Y: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.pivot::y }
+        val SCALE_X: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.scale::dx }
+        val SCALE_Y: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.scale::dy }
+        val ROTATION: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data::rotation }
     }
 
     override fun componentType() = Companion

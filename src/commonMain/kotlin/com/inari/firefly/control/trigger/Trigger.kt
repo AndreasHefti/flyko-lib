@@ -6,7 +6,6 @@ import com.inari.firefly.core.component.ComponentDSL
 import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentType
-import com.inari.util.BooleanSupplier
 import com.inari.util.Call
 import com.inari.util.aspect.AspectType
 import kotlin.jvm.JvmField
@@ -18,7 +17,7 @@ abstract class Trigger protected constructor() : SystemComponent(Trigger::class.
     @JvmField internal var triggeredComponentId = NO_COMP_ID
 
     var disposeAfter: Boolean = false
-    var condition: BooleanSupplier  = TRUE_SUPPLIER
+    var condition: () -> Boolean = TRUE_SUPPLIER
     var call: Call = NULL_CALL
 
     protected fun doTrigger() {

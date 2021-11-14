@@ -8,8 +8,8 @@ import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.shape.EShape
-import com.inari.firefly.physics.animation.easing.EasedProperty
-import com.inari.firefly.physics.animation.entity.EAnimation
+import com.inari.firefly.physics.animation.EAnimation
+import com.inari.firefly.physics.animation.EasedValueAnimation
 import com.inari.util.geom.Easing
 
 class EasingTest : DesktopApp() {
@@ -17,6 +17,14 @@ class EasingTest : DesktopApp() {
     override val title: String = "EasingTest"
 
     override fun init() {
+
+        val anim = EasedValueAnimation.buildAndActivate {
+            startValue = 50f
+            endValue = 500f
+            duration = 5000
+            easing = Easing.Type.LINEAR
+        }
+
         Entity.buildAndActivate {
             withComponent(ETransform) {
                 view(0)
@@ -31,15 +39,11 @@ class EasingTest : DesktopApp() {
                 vertices = floatArrayOf(10f,0f,1f)
             }
             withComponent(EAnimation) {
-                withActiveAnimation(EasedProperty) {
+                withAnimation<Float> {
+                    animation(anim)
                     looping = true
                     inverseOnLoop = true
-                    startValue = 50f
-                    endValue = 500f
-                    duration = 5000
-                    easing = Easing.Type.LINEAR
-                    propertyRef = ETransform.Property.POSITION_X
-
+                    animatedProperty = ETransform.Property.POSITION_X
                 }
             }
         }
