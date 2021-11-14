@@ -17,12 +17,4 @@ class ProtoSprite internal constructor() : IndexedInstantiable {
     @JvmField var hFlip: Boolean = false
     @JvmField var vFlip: Boolean = false
 
-    companion object {
-        val of: (ProtoSprite.() -> Unit) -> ProtoSprite = { configure ->
-            val instance = ProtoSprite()
-            instance.also(configure)
-            instance
-        }
-    }
-
 }

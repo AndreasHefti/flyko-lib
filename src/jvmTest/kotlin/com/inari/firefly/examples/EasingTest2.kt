@@ -13,7 +13,7 @@ import com.inari.firefly.info.FFInfoSystem
 import com.inari.firefly.info.FrameRateInfo
 import com.inari.firefly.physics.animation.AnimationSystem
 import com.inari.firefly.physics.animation.EAnimation
-import com.inari.firefly.physics.animation.EasedValueAnimation
+import com.inari.firefly.physics.animation.EasedFloatAnimation
 import com.inari.util.geom.Easing
 
 fun main(args: Array<String>) {
@@ -33,13 +33,6 @@ fun main(args: Array<String>) {
 
         private fun createEasingAnimation(type: Easing.Type, position: Int) {
             val ypos = position.toFloat() * (20f + 10f) + 50f
-
-            val anim = EasedValueAnimation.buildAndActivate {
-                startValue = 100f
-                endValue = 400f
-                duration = 5000
-                easing = type
-            }
 
             Entity.buildAndActivate {
                 withComponent(ETransform) {
@@ -65,11 +58,16 @@ fun main(args: Array<String>) {
                     vertices = floatArrayOf(100f, ypos, 20f, 20f)
                 }
                 withComponent(EAnimation) {
-                    withAnimation<Float> {
-                        animation(anim)
+                    withAnimated<Float> {
                         looping = true
                         inverseOnLoop = true
                         animatedProperty = ETransform.Property.POSITION_X
+                        applyToNewActiveAnimation(EasedFloatAnimation) {
+                            easing = type
+                            startValue = 100f
+                            endValue = 400f
+                            duration = 5000
+                        }
                     }
                 }
             }

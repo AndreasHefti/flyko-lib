@@ -20,7 +20,7 @@ import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGrid
 import com.inari.firefly.graphics.view.ViewChangeEvent
 import com.inari.firefly.physics.animation.EAnimation
-import com.inari.firefly.physics.animation.EasedValueAnimation
+import com.inari.firefly.physics.animation.TimelineIntAnimation
 import com.inari.firefly.physics.contact.EContact
 import com.inari.util.Consumer
 import com.inari.util.geom.PositionF
@@ -196,13 +196,13 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
 
                     if (tile.animationData != null) {
                         withComponent(EAnimation) {
-                            // TODO with new timeline
-//                            withActiveAnimation(IntTimelineProperty) {
-//                                name = "tileAnim_${tile.name}_view:${this@TileMap.viewRef}_layer:${layer.layerRef}"
-//                                looping = true
-//                                timeline = tile.animationData!!.frames.toArray()
-//                                propertyRef = ETile.Property.SPRITE_REFERENCE
-//                            }
+                            withAnimated<Int> {
+                                animatedProperty = ETile.Property.SPRITE_REFERENCE
+                                looping = true
+                                applyToNewActiveAnimation(TimelineIntAnimation) {
+                                    timeline = tile.animationData!!.frames.toArray()
+                                }
+                            }
                         }
                     }
                 }

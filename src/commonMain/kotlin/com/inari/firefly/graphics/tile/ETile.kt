@@ -9,6 +9,8 @@ import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
 import com.inari.firefly.graphics.effect.ShaderAsset
+import com.inari.firefly.graphics.sprite.ESprite
+import com.inari.firefly.physics.animation.PropertyRefResolver
 import com.inari.util.aspect.Aspects
 import com.inari.util.geom.Position
 import com.inari.util.graphics.MutableColor
@@ -93,6 +95,10 @@ class ETile private constructor () : EntityComponent(ETile::class.simpleName!!) 
 //            }
 //        }
 //    }
+
+    object Property {
+        val SPRITE_REFERENCE: PropertyRefResolver<Int> = { FFContext[Entity, it][ETile].spriteRenderable::spriteId }
+    }
 
     override fun componentType() = Companion
     companion object : EntityComponentType<ETile>(ETile::class) {

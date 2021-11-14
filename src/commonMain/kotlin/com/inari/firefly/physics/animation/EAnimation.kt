@@ -14,7 +14,7 @@ class EAnimation : EntityComponent(EAnimation::class.simpleName!!) {
 
     @JvmField internal val animations = DynArray.of<AnimatedObjectData<*>>(2, 5)
 
-    fun <A> withAnimation(builder: AnimatedObjectData<A>.() -> Unit) {
+    fun <A> withAnimated(builder: AnimatedObjectData<A>.() -> Unit) {
         val result = AnimatedObjectData<A>()
         result.also(builder)
         animations + result

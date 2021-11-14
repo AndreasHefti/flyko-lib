@@ -48,7 +48,7 @@ object AnimationSystem : ComponentSystem {
         FFContext.registerListener(FFApp.UpdateEvent, this::update)
         FFContext.registerListener(EntityEvent, entityActivationListener)
     }
-    
+
     private fun update() = animations.forEachActive { it.update() }
 
     override fun clearSystem() =
