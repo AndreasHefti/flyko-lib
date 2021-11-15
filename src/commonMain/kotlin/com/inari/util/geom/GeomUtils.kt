@@ -339,7 +339,7 @@ object GeomUtils {
      * @param g The green ratio value of the color: 0 - 255
      * @param b The blue ratio value of the color: 0 - 255
      */
-    fun colorOf(r: Int, g: Int, b: Int): Vector4f = Vector4f(r / 255f, g / 255f, b / 255f, 1f)
+    fun colorOf(r: Int, g: Int, b: Int): Vector4f = colorOf(r, g, b, 255)
 
     /** Create new Vector4f with specified r/g/b/a ratio values
      * @param r The red ratio value of the color: 0 - 255
@@ -347,7 +347,15 @@ object GeomUtils {
      * @param b The blue ratio value of the color: 0 - 255
      * @param a The alpha ratio value of the color: 0 - 255
      */
-    fun colorOf(r: Int, g: Int, b: Int, a: Int): Vector4f = Vector4f(r / 255f, g / 255f, b / 255f, a / 255f)
+    fun colorOf(r: Int, g: Int, b: Int, a: Int): Vector4f =
+        colorOf(r / 255f, g / 255f, b / 255f, a / 255f)
+
+    fun colorOf(r: Float, g: Float, b: Float, a: Float) = Vector4f(
+        if (r > 1.0f) 1.0f else if (r < 0.0f) 0.0f else r,
+        if (g > 1.0f) 1.0f else if (g < 0.0f) 0.0f else g,
+        if (b > 1.0f) 1.0f else if (b < 0.0f) 0.0f else b,
+        if (a > 1.0f) 1.0f else if (a < 0.0f) 0.0f else a
+    )
 
     // #rrggbbaa
     fun colorOf(rgba: String): Vector4f {

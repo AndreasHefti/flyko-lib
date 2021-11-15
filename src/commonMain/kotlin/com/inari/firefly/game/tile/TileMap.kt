@@ -174,15 +174,15 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
 
                     withComponent(ETile) {
                         sprite.instanceId = spriteId
-                        tint = tile.tintColor ?: layer.tint ?: tint
-                        blend = tile.blendMode ?: layer.blend ?: blend
+                        tint = tile.tintColor ?: layer.tint
+                        blend = tile.blendMode ?: layer.blend
                     }
 
                     withComponent(EMultiplier) {}
 
                     if (tile.hasContactComp) {
                         withComponent(EContact) {
-                            if (tile.contactType !== com.inari.firefly.UNDEFINED_CONTACT_TYPE) {
+                            if (tile.contactType !== UNDEFINED_CONTACT_TYPE) {
                                 bounds(0,0,
                                     tile.protoSprite.textureBounds.width,
                                     tile.protoSprite.textureBounds.height)

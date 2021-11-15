@@ -330,10 +330,10 @@ class ImmutableVector4f constructor(
     fun instance(): Vector4f = Vector4f(v0, v1, v2, v3)
 }
 class Vector4f constructor(
-    v0: Float = 1.0f,
-    v1: Float = 1.0f,
-    v2: Float = 1.0f,
-    @JvmField var v3: Float = 1.0f
+    v0: Float = 0.0f,
+    v1: Float = 0.0f,
+    v2: Float = 0.0f,
+    @JvmField var v3: Float = 0.0f
 ) : Vector3f(v0, v1, v2) {
 
     constructor(v0: Int = 1, v1: Int = 1, v2: Int = 1, v3: Int) : this(v0.toFloat(), v1.toFloat(), v2.toFloat(), v3.toFloat())
@@ -350,7 +350,7 @@ class Vector4f constructor(
 
     operator fun invoke(v: Vector4f) {
         super.invoke(v)
-        this.v3 = v3
+        this.v3 = v.v3
     }
 
     override operator fun invoke(jsonString: String) {

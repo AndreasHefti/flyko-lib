@@ -5,10 +5,7 @@ import com.inari.util.geom.GeomUtils.hasAlpha
 import com.inari.util.geom.GeomUtils.rgB8888
 import com.inari.util.geom.GeomUtils.rgbA8888
 import com.inari.util.geom.Vector4f
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotEquals
+import kotlin.test.*
 
 
 class ColorTest {
@@ -16,15 +13,15 @@ class ColorTest {
     @Test
     fun testCreation() {
         var color = Vector4f()
-        assertEquals("[r=0.0,g=0.0,b=0.0,a=1.0]", color.toString())
-        assertFalse(hasAlpha(color))
+        assertEquals("[r=0.0,g=0.0,b=0.0,a=0.0]", color.toString())
+        assertTrue(hasAlpha(color))
         color = Vector4f(.5f, .3f, .4f)
-        assertEquals("[r=0.5,g=0.3,b=0.4,a=1.0]", color.toString())
-        assertFalse(hasAlpha(color))
+        assertEquals("[r=0.5,g=0.3,b=0.4,a=0.0]", color.toString())
+        assertTrue(hasAlpha(color))
         color = Vector4f(.5f, .3f, .4f, .6f)
         assertEquals("[r=0.5,g=0.3,b=0.4,a=0.6]", color.toString())
         // out of range --> range correction
-        color = Vector4f(500.5f, -.3f, .4f, .6f)
+        color = colorOf(500.5f, -.3f, .4f, .6f)
         assertEquals("[r=1.0,g=0.0,b=0.4,a=0.6]", color.toString())
 
         color = colorOf(100, 100, 200)
