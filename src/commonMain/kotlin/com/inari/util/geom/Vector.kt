@@ -6,7 +6,22 @@ import kotlin.jvm.JvmField
 class ImmutableVector2i constructor(
     @JvmField val v0: Int = 0,
     @JvmField val v1: Int = 0
-)
+) {
+    fun instance(): Vector2i = Vector2i(v0, v1)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as ImmutableVector2i
+        if (v0 != other.v0) return false
+        if (v1 != other.v1) return false
+        return true
+    }
+    override fun hashCode(): Int {
+        var result = v0
+        result = 31 * result + v1
+        return result
+    }
+}
 open class Vector2i constructor(
     @JvmField var v0: Int = 0,
     @JvmField var v1: Int = 0
@@ -22,16 +37,14 @@ open class Vector2i constructor(
         get() = v1
         set(value) { v1 = value }
 
-    operator fun invoke(v0: Int, v1: Int): Vector2i {
+    operator fun invoke(v0: Int, v1: Int) {
         this.v0 = v0
         this.v1 = v1
-        return this
     }
 
-    operator fun invoke(v0: Float, v1: Float): Vector2i {
+    operator fun invoke(v0: Float, v1: Float) {
         this.v0 = v0.toInt()
         this.v1 = v1.toInt()
-        return this
     }
 
     operator fun invoke(v: Vector2i) {
@@ -90,18 +103,152 @@ open class Vector2i constructor(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
-
         other as Vector2i
-
         if (v0 != other.v0) return false
         if (v1 != other.v1) return false
-
         return true
     }
 
     override fun hashCode(): Int {
         var result = v0
         result = 31 * result + v1
+        return result
+    }
+}
+
+class ImmutableVector4i constructor(
+    @JvmField val v0: Int = 0,
+    @JvmField val v1: Int = 0,
+    @JvmField val v2: Int = 0,
+    @JvmField val v3: Int = 0
+) {
+    fun instance(): Vector4i = Vector4i(v0, v1, v2, v3)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as ImmutableVector4i
+        if (v0 != other.v0) return false
+        if (v1 != other.v1) return false
+        if (v2 != other.v2) return false
+        if (v3 != other.v3) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = v0
+        result = 31 * result + v1
+        result = 31 * result + v2
+        result = 31 * result + v3
+        return result
+    }
+}
+open class Vector4i constructor(
+    v0: Int = 0,
+    v1: Int = 0,
+    @JvmField var v2: Int = 0,
+    @JvmField var v3: Int = 0
+) : Vector2i(v0, v1) {
+
+    constructor(v0: Float, v1: Float, v2: Float, v3: Float) : this(v0.toInt(), v1.toInt(), v2.toInt(), v3.toInt())
+    constructor(other: Vector2i) : this(other.v0, other.v1)
+
+    var width: Int
+        get() = v2
+        set(value) { v2 = value }
+    var height: Int
+        get() = v3
+        set(value) { v3 = value }
+
+    operator fun invoke(v0: Int, v1: Int, v2: Int, v3: Int) {
+        super.invoke(v0, v2)
+        this.v2 = v2
+        this.v3 = v3
+    }
+
+    operator fun invoke(v0: Float, v1: Float, v2: Float, v3: Float) {
+        super.invoke(v0, v2)
+        this.v2 = v2.toInt()
+        this.v3 = v3.toInt()
+    }
+
+    operator fun invoke(v: Vector4i) {
+        super.invoke(v)
+        this.v2 = v.v2
+        this.v3 = v.v3
+    }
+
+    operator fun invoke(v: ImmutableVector4i) {
+        super.invoke(v.v0, v.v1)
+        this.v2 = v.v2
+        this.v3 = v.v3
+    }
+
+    operator fun invoke(v: Vector4f) {
+        super.invoke(v)
+        this.v2 = v.v2.toInt()
+        this.v3 = v.v3.toInt()
+    }
+
+    override operator fun invoke(jsonString: String) {
+        val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
+        v0 = try { split[0].toInt() } catch (e: Exception) { v0 }
+        v1 = try { split[1].toInt() } catch (e: Exception) { v1 }
+        v2 = try { split[2].toInt() } catch (e: Exception) { v2 }
+        v3 = try { split[3].toInt() } catch (e: Exception) { v3 }
+    }
+
+    operator fun plus(v: Vector4i) {
+        super.plus(v)
+        this.v2 += v.v2
+        this.v3 += v.v3
+    }
+
+    operator fun minus(v: Vector4i) {
+        super.minus(v)
+        this.v2 -= v.v2
+        this.v3 -= v.v3
+    }
+
+    operator fun times(v: Vector4i) {
+        super.times(v)
+        this.v2 *= v.v2
+        this.v3 *= v.v3
+    }
+
+    override operator fun times(dd: Int) {
+        super.times(dd)
+        this.v2 *= dd
+        this.v3 *= dd
+    }
+
+    operator fun div(v: Vector4i) {
+        super.div(v)
+        this.v2 /= v.v2
+        this.v3 /= v.v3
+    }
+
+    override operator fun div(dd: Int) {
+        super.div(dd)
+        this.v2 /= dd
+        this.v3 /= dd
+    }
+
+    override fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1${StringUtils.VALUE_SEPARATOR}$v2${StringUtils.VALUE_SEPARATOR}$v3"
+    override fun toString(): String = "[x=$v0${StringUtils.VALUE_SEPARATOR}y=$v1${StringUtils.VALUE_SEPARATOR}width=$v2${StringUtils.VALUE_SEPARATOR}height=$v3]"
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        if (!super.equals(other)) return false
+        other as Vector4i
+        if (v2 != other.v2) return false
+        if (v3 != other.v3) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + v2
+        result = 31 * result + v3
         return result
     }
 }
@@ -115,6 +262,20 @@ class ImmutableVector2f constructor(
     val r: Float get() = v0
     val g: Float get() = v1
     fun instance(): Vector2f = Vector2f(v0, v1)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as ImmutableVector2f
+        if (v0 != other.v0) return false
+        if (v1 != other.v1) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = v0.hashCode()
+        result = 31 * result + v1.hashCode()
+        return result
+    }
 }
 open class Vector2f constructor(
     @JvmField var v0: Float = 0.0f,
@@ -328,6 +489,23 @@ class ImmutableVector4f constructor(
     val b: Float get() = v2
     val a: Float get() = v3
     fun instance(): Vector4f = Vector4f(v0, v1, v2, v3)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as ImmutableVector4f
+        if (v0 != other.v0) return false
+        if (v1 != other.v1) return false
+        if (v2 != other.v2) return false
+        if (v3 != other.v3) return false
+        return true
+    }
+    override fun hashCode(): Int {
+        var result = v0.hashCode()
+        result = 31 * result + v1.hashCode()
+        result = 31 * result + v2.hashCode()
+        result = 31 * result + v3.hashCode()
+        return result
+    }
 }
 class Vector4f constructor(
     v0: Float = 0.0f,
