@@ -5,7 +5,6 @@ import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.Component
 import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.entity.Entity
-import com.inari.firefly.entity.property.VirtualPropertyRef
 import com.inari.util.*
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.AspectType
@@ -19,6 +18,11 @@ const val ZERO_INT = 0
 const val ZERO_FLOAT = 0.0f
 const val SYSTEM_FONT_ASSET = "SYSTEM_FONT_ASSET"
 const val SYSTEM_FONT = "SYSTEM_FONT"
+
+object Color {
+    val BLACK = ImmutableVector4f(0.0f, 0.0f, 0.0f, 1.0f)
+    val WHITE = ImmutableVector4f(1.0f, 1.0f, 1.0f, 1.0f)
+}
 
 object GLBlendMode {
     const val GL_ZERO = 0x0
@@ -58,11 +62,6 @@ const val BASE_VIEW: String = "[[BASE_VIEW]]"
     override val index: Int = -1
     override val indexedTypeName: String = NO_NAME
 }
-@JvmField val NO_PROPERTY_REF: VirtualPropertyRef = object : VirtualPropertyRef {
-    override val propertyName: String = NO_NAME
-    override val type: KClass<*> get() = throw UnsupportedOperationException()
-    override fun accessor(entity: Entity): VirtualPropertyRef.PropertyAccessor = throw UnsupportedOperationException()
-}
 
 @JvmField val VOID_INT_CONSUMER: IntConsumer = { _ -> }
 @JvmField val INT_FUNCTION_IDENTITY: IntFunction = { i -> i }
@@ -73,8 +72,8 @@ const val BASE_VIEW: String = "[[BASE_VIEW]]"
 @JvmField val NULL_CONSUMER: Consumer<Any> = { _ -> throw IllegalStateException("NULL_CONSUMER") }
 @JvmField val NULL_CALL: Call = { throw IllegalStateException("NULL_CALL called") }
 @JvmField val DO_NOTHING = {}
-@JvmField val FALSE_SUPPLIER: BooleanSupplier = { false }
-@JvmField val TRUE_SUPPLIER: BooleanSupplier = { true }
+@JvmField val FALSE_SUPPLIER = { false }
+@JvmField val TRUE_SUPPLIER = { true }
 @JvmField val FALSE_PREDICATE: Predicate<Any> = { false }
 @JvmField val TRUE_PREDICATE: Predicate<Any> = { true }
 @JvmField val VOID_COMP_ID_CONSUMER: Consumer<CompId> = { _ -> }

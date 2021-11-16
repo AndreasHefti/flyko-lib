@@ -89,7 +89,7 @@ class RoomCrossingTest {
         assertEquals("200", WorldSystem.RoomPlayerListener.roomY2.toString())
 
         // simulate room change by players crossing rooms
-        PlayerSystem.playerPosition.x += PlayerSystem.playerPivot.dx
+        PlayerSystem.playerPosition.x += PlayerSystem.playerPivot.v0
         TestApp.update()
 
         assertEquals( "Room2",  FFContext[Room, WorldSystem.activeRoomId].name)

@@ -19,12 +19,12 @@ import com.inari.firefly.graphics.rendering.Renderer
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGrid
 import com.inari.firefly.graphics.view.ViewChangeEvent
-import com.inari.firefly.physics.animation.entity.EAnimation
-import com.inari.firefly.physics.animation.timeline.IntTimelineProperty
+import com.inari.firefly.physics.animation.EAnimation
+import com.inari.firefly.physics.animation.TimelineIntAnimation
 import com.inari.firefly.physics.contact.EContact
 import com.inari.util.Consumer
-import com.inari.util.geom.PositionF
-import com.inari.util.graphics.MutableColor
+import com.inari.util.geom.Vector2f
+import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
 class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!!) {
@@ -174,15 +174,15 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
 
                     withComponent(ETile) {
                         sprite.instanceId = spriteId
-                        tint = tile.tintColor ?: layer.tint ?: tint
-                        blend = tile.blendMode ?: layer.blend ?: blend
+                        tint = tile.tintColor ?: layer.tint
+                        blend = tile.blendMode ?: layer.blend
                     }
 
                     withComponent(EMultiplier) {}
 
                     if (tile.hasContactComp) {
                         withComponent(EContact) {
-                            if (tile.contactType !== com.inari.firefly.UNDEFINED_CONTACT_TYPE) {
+                            if (tile.contactType !== UNDEFINED_CONTACT_TYPE) {
                                 bounds(0,0,
                                     tile.protoSprite.textureBounds.width,
                                     tile.protoSprite.textureBounds.height)
@@ -196,11 +196,12 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
 
                     if (tile.animationData != null) {
                         withComponent(EAnimation) {
-                            withActiveAnimation(IntTimelineProperty) {
-                                name = "tileAnim_${tile.name}_view:${this@TileMap.viewRef}_layer:${layer.layerRef}"
+                            withAnimated<Int> {
+                                animatedProperty = ETile.Property.SPRITE_REFERENCE
                                 looping = true
-                                timeline = tile.animationData!!.frames.toArray()
-                                propertyRef = ETile.Property.SPRITE_REFERENCE
+                                applyToNewActiveAnimation(TimelineIntAnimation) {
+                                    timeline = tile.animationData!!.frames.toArray()
+                                }
                             }
                         }
                     }
@@ -295,10 +296,10 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         @JvmField var tileHeight = 0
         @JvmField var parallaxFactorX = ZERO_FLOAT
         @JvmField var parallaxFactorY = ZERO_FLOAT
-        @JvmField var position: PositionF = PositionF(ZERO_FLOAT, ZERO_FLOAT)
+        @JvmField var position: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT)
         @JvmField var spherical: Boolean = false
         @JvmField var blend = BlendMode.NORMAL_ALPHA
-        @JvmField var tint = MutableColor(1f, 1f, 1f, 1f)
+        @JvmField var tint = Vector4f(1f, 1f, 1f, 1f)
         @JvmField var layer = ComponentRefResolver(Layer) { index -> layerRef = index }
         @JvmField var mapCodes: IntArray = intArrayOf()
 

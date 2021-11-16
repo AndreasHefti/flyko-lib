@@ -21,8 +21,8 @@ class VelocityVerletIntegrator private constructor() : Integrator() {
         newAcc / accMass
 
         // velocity += timestep * (acceleration + newAcceleration) / 2;
-        movement.velocity.dx += deltaTimeInSeconds * (movement.acceleration.dx + newAcc.dx) / 2
-        movement.velocity.dy += deltaTimeInSeconds * (movement.acceleration.dy + newAcc.dy) / 2
+        movement.velocity.v0 += deltaTimeInSeconds * (movement.acceleration.v0 + newAcc.v0) / 2
+        movement.velocity.v1 += deltaTimeInSeconds * (movement.acceleration.v1 + newAcc.v1) / 2
 
         adjustVelocity(movement)
     }
@@ -30,8 +30,8 @@ class VelocityVerletIntegrator private constructor() : Integrator() {
     override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) =
         // position += timestep * (velocity + timestep * acceleration / 2);
         transform.move(
-            deltaTimeInSeconds * (movement.velocity.dx + deltaTimeInSeconds * movement.acceleration.dx / 2),
-            deltaTimeInSeconds * (movement.velocity.dy + deltaTimeInSeconds * movement.acceleration.dy / 2))
+            deltaTimeInSeconds * (movement.velocity.v0 + deltaTimeInSeconds * movement.acceleration.v0 / 2),
+            deltaTimeInSeconds * (movement.velocity.v1 + deltaTimeInSeconds * movement.acceleration.v1 / 2))
 
     override fun componentType() = Companion
     companion object : SystemComponentSubType<Integrator, VelocityVerletIntegrator>(Integrator, VelocityVerletIntegrator::class) {

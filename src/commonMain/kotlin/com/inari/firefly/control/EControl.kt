@@ -1,7 +1,6 @@
 package com.inari.firefly.control
 
 import com.inari.firefly.ENTITY_CONTROL_ASPECT_GROUP
-import com.inari.firefly.FFContext
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSubType
@@ -13,8 +12,7 @@ import kotlin.jvm.JvmField
 class EControl private constructor() : EntityComponent(EControl::class.simpleName!!) {
 
     @JvmField val aspects: Aspects = ENTITY_CONTROL_ASPECT_GROUP.createAspects()
-
-    val withController = ComponentRefResolver(Controller) { index->
+    @JvmField val withController = ComponentRefResolver(Controller) { index->
         ControllerSystem.registerMapping(index, entityId)
     }
 

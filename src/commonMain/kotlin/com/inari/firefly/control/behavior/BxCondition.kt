@@ -4,10 +4,11 @@ import com.inari.firefly.control.behavior.BehaviorSystem.TRUE_CONDITION
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.entity.Entity
 import com.inari.util.OpResult
+import kotlin.jvm.JvmField
 
 class BxCondition private constructor() : BxNode() {
 
-    var condition: BxConditionOp = TRUE_CONDITION
+    @JvmField var condition: BxConditionOp = TRUE_CONDITION
 
     override fun tick(entity: Entity, behavior: EBehavior): OpResult =
             when (condition(entity, behavior) ) {

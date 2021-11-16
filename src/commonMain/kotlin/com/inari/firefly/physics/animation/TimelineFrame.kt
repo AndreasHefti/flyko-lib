@@ -1,19 +1,19 @@
-package com.inari.firefly.physics.animation.timeline
+package com.inari.firefly.physics.animation
 
 import com.inari.firefly.core.component.ComponentDSL
 import com.inari.firefly.graphics.sprite.ProtoSprite
 
-interface Frame {
+interface TimelineFrame {
 
     val timeInterval: Long
 
-    interface IntFrame : Frame {
+    interface IntFrame : TimelineFrame {
         val value: Int
     }
-    interface FloatFrame : Frame {
+    interface FloatFrame : TimelineFrame {
         val value: Float
     }
-    interface ValueFrame<out T> : Frame {
+    interface ValueFrame<out T> : TimelineFrame {
         val value: T
     }
 

@@ -34,35 +34,35 @@ class PlatformerHMoveController : Controller() {
         if (inputDevice.buttonPressed(buttonLeft)) {
             with (playerMovement) {
                 val outRef = this@PlatformerHMoveController
-                if (velocity.dx <= -maxVelocityWest)
+                if (velocity.v0 <= -maxVelocityWest)
                     return
 
-                if (velocity.dx > ZERO_FLOAT) {
-                    velocity.dx = max(ZERO_FLOAT, velocity.dx - outRef.stopVelocityStep)
-                    outRef.directionChangeCallback(componentId.index, velocity.dx, outRef.buttonLeft)
+                if (velocity.v0 > ZERO_FLOAT) {
+                    velocity.v0 = max(ZERO_FLOAT, velocity.v0 - outRef.stopVelocityStep)
+                    outRef.directionChangeCallback(componentId.index, velocity.v0, outRef.buttonLeft)
                 }
                 else
-                    velocity.dx = max( -maxVelocityWest, velocity.dx - outRef.runVelocityStep)
+                    velocity.v0 = max( -maxVelocityWest, velocity.v0 - outRef.runVelocityStep)
             }
         } else if (inputDevice.buttonPressed(buttonRight)) {
             with (playerMovement) {
                 val outRef = this@PlatformerHMoveController
-                if (velocity.dx >= maxVelocityWest)
+                if (velocity.v0 >= maxVelocityWest)
                     return
-                if (velocity.dx < ZERO_FLOAT) {
-                    velocity.dx = min(ZERO_FLOAT, velocity.dx + outRef.stopVelocityStep)
-                    outRef.directionChangeCallback(componentId.index, velocity.dx, outRef.buttonRight)
+                if (velocity.v0 < ZERO_FLOAT) {
+                    velocity.v0 = min(ZERO_FLOAT, velocity.v0 + outRef.stopVelocityStep)
+                    outRef.directionChangeCallback(componentId.index, velocity.v0, outRef.buttonRight)
                 }
                 else
-                    velocity.dx = min(maxVelocityWest, velocity.dx + outRef.runVelocityStep)
+                    velocity.v0 = min(maxVelocityWest, velocity.v0 + outRef.runVelocityStep)
             }
-        } else if (playerMovement.velocity.dx != ZERO_FLOAT) {
+        } else if (playerMovement.velocity.v0 != ZERO_FLOAT) {
             with (playerMovement) {
                 val outRef = this@PlatformerHMoveController
-                if (velocity.dx > ZERO_FLOAT)
-                    velocity.dx = max(ZERO_FLOAT, velocity.dx - outRef.stopVelocityStep)
+                if (velocity.v0 > ZERO_FLOAT)
+                    velocity.v0 = max(ZERO_FLOAT, velocity.v0 - outRef.stopVelocityStep)
                 else
-                    velocity.dx = min(ZERO_FLOAT, velocity.dx + outRef.stopVelocityStep)
+                    velocity.v0 = min(ZERO_FLOAT, velocity.v0 + outRef.stopVelocityStep)
             }
         }
     }

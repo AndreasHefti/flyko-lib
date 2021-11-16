@@ -8,7 +8,6 @@ import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.composite.*
 import com.inari.firefly.control.scene.SceneSystem
-import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.FFSystem
 import com.inari.firefly.game.player.PlayerEvent
@@ -245,10 +244,10 @@ object WorldSystem : FFSystem {
                     roomY1 = room.roomOrientation.y
                     roomY2 = room.roomOrientation.y + room.roomOrientation.height
                     if (room.roomOrientationType == WorldOrientationType.TILES) {
-                        roomX1 *= room.tileDimension.dx
-                        roomX2 *= room.tileDimension.dx
-                        roomY1 *= room.tileDimension.dy
-                        roomY2 *= room.tileDimension.dy
+                        roomX1 *= room.tileDimension.v0
+                        roomX2 *= room.tileDimension.v0
+                        roomY1 *= room.tileDimension.v1
+                        roomY2 *= room.tileDimension.v1
                     }
 
                     FFContext.registerListener(FFApp.UpdateEvent, updateListener)
@@ -272,16 +271,16 @@ object WorldSystem : FFSystem {
                 return@call
 
             val px = (
-                 if (PlayerSystem.playerVelocity.dx <= 0)
+                 if (PlayerSystem.playerVelocity.v0 <= 0)
                     ceil(PlayerSystem.playerPosition.x)
                  else
-                     floor(PlayerSystem.playerPosition.x) - PlayerSystem.playerPivot.dx
+                     floor(PlayerSystem.playerPosition.x) - PlayerSystem.playerPivot.v0
             ).toInt()
             val py = (
-                if (PlayerSystem.playerVelocity.dy <= 0)
+                if (PlayerSystem.playerVelocity.v1 <= 0)
                     ceil(PlayerSystem.playerPosition.y)
                 else
-                    floor(PlayerSystem.playerPosition.y) - PlayerSystem.playerPivot.dy
+                    floor(PlayerSystem.playerPosition.y) - PlayerSystem.playerPivot.v1
             ).toInt()
 
             var orientation = Orientation.NONE

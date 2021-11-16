@@ -11,7 +11,6 @@ import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentBuilder
 import com.inari.firefly.core.system.SystemComponentSingleType
 import com.inari.firefly.graphics.particle.Particle
-import com.inari.util.BooleanSupplier
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
 import kotlin.jvm.JvmField

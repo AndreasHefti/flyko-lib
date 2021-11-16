@@ -1,6 +1,6 @@
 package com.inari.firefly.util.geom
 
-import com.inari.util.geom.PositionF
+import com.inari.util.geom.Vector2f
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -10,17 +10,17 @@ class PositionFTest {
 
     @Test
     fun testPoint() {
-        var p1 = PositionF()
+        var p1 = Vector2f()
 
         assertTrue(p1.x == 0f)
         assertTrue(p1.y == 0f)
 
-        p1 = PositionF(10, 4)
+        p1 = Vector2f(10, 4)
 
         assertTrue(p1.x == 10f)
         assertTrue(p1.y == 4f)
 
-        val p2 = PositionF(p1)
+        val p2 = Vector2f(p1)
 
         assertTrue(p2.x == 10f)
         assertTrue(p2.y == 4f)
@@ -29,7 +29,7 @@ class PositionFTest {
 
     @Test
     fun testToString() {
-        val p1 = PositionF(30, 40)
+        val p1 = Vector2f(30, 40)
 
         assertTrue(p1.x == 30f)
         assertTrue(p1.y == 40f)
@@ -39,8 +39,8 @@ class PositionFTest {
 
     @Test
     fun testEquality() {
-        val p1 = PositionF(30, 40)
-        val p2 = PositionF(30, 40)
+        val p1 = Vector2f(30, 40)
+        val p2 = Vector2f(30, 40)
 
         assertEquals(p1, p1)
         assertEquals(p1, p2)
@@ -50,7 +50,7 @@ class PositionFTest {
         assertEquals(p1, p2)
         assertEquals(p2, p1)
 
-        val p3 = PositionF(40, 30)
+        val p3 = Vector2f(40, 30)
 
         assertNotEquals(p1, p3)
         assertNotEquals(p3, p1)

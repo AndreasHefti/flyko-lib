@@ -9,9 +9,8 @@ import kotlin.jvm.JvmField
 class ETextMeta private constructor() : EntityComponent(ETextMeta::class.simpleName!!) {
 
     @JvmField internal val metaData: DynArray<CharacterMetaData> = DynArray.of()
-
-    var data = ArrayAccessor(metaData)
-    var resolver: (Int) -> CharacterMetaData? = { index -> metaData[index] }
+    @JvmField var data = ArrayAccessor(metaData)
+    @JvmField var resolver: (Int) -> CharacterMetaData? = { index -> metaData[index] }
 
     override fun reset() {
         metaData.clear()

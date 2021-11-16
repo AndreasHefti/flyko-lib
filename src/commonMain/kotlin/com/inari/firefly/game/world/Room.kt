@@ -9,18 +9,18 @@ import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentBuilder
 import com.inari.firefly.core.system.SystemComponentSubType
-import com.inari.util.geom.Rectangle
 import com.inari.util.geom.Vector2i
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
 class Room private constructor(): GenericComposite() {
 
     @JvmField var roomOrientationType: WorldOrientationType = WorldOrientationType.PIXELS
-    @JvmField val roomOrientation: Rectangle = Rectangle()
+    @JvmField val roomOrientation: Vector4i = Vector4i()
     @JvmField val tileDimension: Vector2i = Vector2i()
 
     @JvmField var areaOrientationType: WorldOrientationType = WorldOrientationType.SECTION
-    @JvmField val areaOrientation: Rectangle = Rectangle()
+    @JvmField val areaOrientation: Vector4i = Vector4i()
 
     @JvmField internal var activationSceneRef = -1
     @JvmField internal var deactivationSceneRef = -1

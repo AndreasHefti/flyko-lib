@@ -17,8 +17,9 @@ import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewSystem
 import com.inari.firefly.physics.contact.SimpleContactMap
 import com.inari.util.Supplier
-import com.inari.util.graphics.IColor
-import com.inari.util.graphics.MutableColor
+import com.inari.util.geom.GeomUtils.colorOf
+import com.inari.util.geom.GeomUtils.newVec4f
+import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
 class TiledJsonRoomAsset private constructor() : Asset() {
@@ -39,7 +40,7 @@ class TiledJsonRoomAsset private constructor() : Asset() {
         resource = { tileMapJson }
     }
     @JvmField var defaultBlend: BlendMode = BlendMode.NONE
-    @JvmField var defaultTint: MutableColor = MutableColor(1f, 1f, 1f, 1f)
+    @JvmField var defaultTint: Vector4f = Vector4f(1f, 1f, 1f, 1f)
 
     override fun instanceId(index: Int): Int = tileMapId.instanceId
 
@@ -160,9 +161,9 @@ class TiledJsonRoomAsset private constructor() : Asset() {
             mapCodes = layerJson.data!!
             spherical = tileMapJson.infinite
             if (layerJson.tintcolor.isNotEmpty())
-                tint = IColor.ofMutable(layerJson.tintcolor)
+                tint = colorOf(layerJson.tintcolor)
             if (layerJson.opacity < 1.0f)
-                tint(tint.r, tint.g, tint.b, layerJson.opacity)
+                tint.a = layerJson.opacity
             if ("blend" in layerJson.mappedProperties)
                 blend = BlendMode.valueOf(layerJson.mappedProperties["blend"]?.stringValue!!)
             if ("renderer" in layerJson.mappedProperties)

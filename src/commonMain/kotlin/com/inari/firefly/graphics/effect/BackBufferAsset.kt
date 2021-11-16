@@ -6,13 +6,10 @@ import com.inari.firefly.asset.Asset
 import com.inari.firefly.asset.AssetInstanceRefResolver
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.BackBufferData
-import com.inari.firefly.core.api.FFGraphics
-import com.inari.firefly.core.system.SystemComponent
-import com.inari.firefly.core.system.SystemComponentSingleType
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.view.View
-import com.inari.util.geom.Rectangle
-import com.inari.util.graphics.MutableColor
+import com.inari.util.geom.Vector4f
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
 class BackBufferAsset private constructor() : Asset() {
@@ -20,22 +17,22 @@ class BackBufferAsset private constructor() : Asset() {
     @JvmField internal var backBufferId: Int = -1
     @JvmField internal val data = BackBufferData()
 
-    var bounds: Rectangle
+    var bounds: Vector4i
         get() = data.bounds
         set(value) { data.bounds(value) }
-    var clearColor: MutableColor
+    var clearColor: Vector4f
         get() = data.clearColor
         set(value) { data.clearColor(value) }
-    var tintColor: MutableColor
+    var tintColor: Vector4f
         get() = data.tintColor
         set(value) { data.tintColor(value) }
     var blendMode: BlendMode
         get() = data.blendMode
         set(value) { data.blendMode = value }
-    val shader = AssetInstanceRefResolver(
+    @JvmField val shader = AssetInstanceRefResolver(
         { instanceId -> data.shaderRef = instanceId },
         { data.shaderRef })
-    val view = ComponentRefResolver(View) { index-> data.viewportRef = index }
+    @JvmField val view = ComponentRefResolver(View) { index-> data.viewportRef = index }
     var zoom: Float
         get() = data.zoom
         set(value) { data.zoom = value }

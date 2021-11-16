@@ -1,13 +1,11 @@
 package com.inari.firefly.misc
 
-import com.inari.util.geom.Position
 import com.inari.firefly.FFContext
 import com.inari.firefly.TestApp
 import com.inari.firefly.measureTime
 import com.inari.util.IntFunction
 import com.inari.util.event.Event
-import kotlin.test.BeforeTest
-import kotlin.test.Test
+import com.inari.util.geom.Vector2i
 
 typealias TestListenerType = (Int, Int, Int) -> Unit
 
@@ -15,10 +13,10 @@ interface TestListenerInterface {
     operator fun invoke(i1: Int, i2: Int, i3: Int)
 }
 
-typealias TestListenerTypeObj = (Position, Position, Position) -> Unit
+typealias TestListenerTypeObj = (Vector2i, Vector2i, Vector2i) -> Unit
 
 interface TestListenerInterfaceObj {
-    operator fun invoke(i1: Position, i2: Position, i3: Position)
+    operator fun invoke(i1: Vector2i, i2: Vector2i, i3: Vector2i)
 }
 
 class TestEvent1(override val eventType: EventType) : Event<TestListenerType>() {
@@ -64,16 +62,16 @@ class TestEvent2(override val eventType: EventType) : Event<TestListenerInterfac
 
 class TestEvent3(override val eventType: EventType) : Event<TestListenerTypeObj>() {
 
-    private var i1: Position = Position()
-    private var i2: Position = Position()
-    private var i3: Position = Position()
+    private var i1: Vector2i = Vector2i()
+    private var i2: Vector2i = Vector2i()
+    private var i3: Vector2i = Vector2i()
 
     override fun notify(listener: TestListenerTypeObj) =
         listener(i1, i2, i3)
 
     companion object : EventType("TestEvent3") {
         internal val event = TestEvent3(this)
-        fun send(i1: Position, i2: Position, i3: Position) {
+        fun send(i1: Vector2i, i2: Vector2i, i3: Vector2i) {
             event.i1 = i1
             event.i2 = i2
             event.i3 = i3
@@ -84,16 +82,16 @@ class TestEvent3(override val eventType: EventType) : Event<TestListenerTypeObj>
 
 class TestEvent4(override val eventType: EventType) : Event<TestListenerInterfaceObj>() {
 
-    private var i1: Position = Position()
-    private var i2: Position = Position()
-    private var i3: Position = Position()
+    private var i1: Vector2i = Vector2i()
+    private var i2: Vector2i = Vector2i()
+    private var i3: Vector2i = Vector2i()
 
     override fun notify(listener: TestListenerInterfaceObj) =
         listener(i1, i2, i3)
 
     companion object : EventType("TestEvent4") {
         internal val event = TestEvent4(this)
-        fun send(i1: Position, i2: Position, i3: Position) {
+        fun send(i1: Vector2i, i2: Vector2i, i3: Vector2i) {
             event.i1 = i1
             event.i2 = i2
             event.i3 = i3
@@ -169,10 +167,10 @@ class EventPerformanceTest {
 
     //@Test
     fun test3() {
-        val pos1 = Position(1, 2)
+        val pos1 = Vector2i(1, 2)
         val testListenerType: TestListenerTypeObj = { i1, i2, i3 -> i1.x + i2.x + i3.x}
         val testListenerInterface: TestListenerInterfaceObj = object : TestListenerInterfaceObj {
-            override fun invoke(i1: Position, i2: Position, i3: Position) {
+            override fun invoke(i1: Vector2i, i2: Vector2i, i3: Vector2i) {
                 i1.x + i2.x + i3.x
             }
         }
@@ -191,10 +189,10 @@ class EventPerformanceTest {
 
     //@Test
     fun test4() {
-        val pos1 = Position(1, 2)
-        FFContext.registerListener(TestEvent3) { i1: Position, i2: Position, i3: Position -> i1.x + i2.x + i3.x }
+        val pos1 = Vector2i(1, 2)
+        FFContext.registerListener(TestEvent3) { i1: Vector2i, i2: Vector2i, i3: Vector2i -> i1.x + i2.x + i3.x }
         FFContext.registerListener(TestEvent4, object : TestListenerInterfaceObj {
-            override fun invoke(i1: Position, i2: Position, i3: Position) {
+            override fun invoke(i1: Vector2i, i2: Vector2i, i3: Vector2i) {
                 i1.x + i2.x + i3.x
             }
         })

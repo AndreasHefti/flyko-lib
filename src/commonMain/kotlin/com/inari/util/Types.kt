@@ -29,17 +29,6 @@ typealias IntSupplier = () -> Int
 typealias IntConsumer = (Int) -> Unit
 typealias IntPredicate = (Int) -> Boolean
 
-typealias FloatFunction = (Float) -> Int
-typealias FloatOperation = (Float) -> OpResult
-typealias FloatSupplier = () -> Float
-typealias FloatConsumer = (Float) -> Unit
-typealias FloatPredicate = (Float) -> Boolean
-
-typealias BooleanFunction = (Boolean) -> Boolean
-typealias BooleanOperation = (Boolean) -> OpResult
-typealias BooleanSupplier = () -> Boolean
-typealias BooleanConsumer = (Boolean) -> Unit
-
 typealias ComponentIdFunction = (CompId) -> CompId
 typealias ComponentIdOperation = (CompId) -> OpResult
 typealias ComponentIdSupplier = () -> CompId

@@ -9,10 +9,11 @@ import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
-import com.inari.firefly.entity.property.FloatPropertyAccessor
-import com.inari.firefly.entity.property.VirtualPropertyRef
+import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.effect.ShaderAsset
-import com.inari.util.graphics.MutableColor
+import com.inari.firefly.graphics.tile.ETile
+import com.inari.firefly.physics.animation.PropertyRefResolver
+import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 import kotlin.reflect.KClass
 
@@ -26,16 +27,16 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
     var vertices: FloatArray
         get() = data.vertices
         set(value) { data.vertices = value }
-    var color: MutableColor
+    var color: Vector4f
         get() = data.color1
         set(value) = data.color1(value)
-    var gradientColor1: MutableColor
+    var gradientColor1: Vector4f
         get() = data.color2!!
         set(value) {data.color2 = value}
-    var gradientColor2: MutableColor
+    var gradientColor2: Vector4f
         get() = data.color3!!
         set(value) {data.color3 = value}
-    var gradientColor3: MutableColor
+    var gradientColor3: Vector4f
         get() = data.color4!!
         set(value) {data.color4 = value}
     var segments: Int
@@ -54,7 +55,7 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
 
     override fun toString(): String {
         return "EShape(subType=$data.subType, " +
-            "vertices=${data.vertices.contentToString()}, " +
+            "vertices=${data.vertices}, " +
             "color1=${data.color1}, " +
             "color2=${data.color2}, " +
             "color3=${data.color3}, " +
@@ -64,47 +65,9 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
             "blend=${data.blend}, "
     }
 
-    private val accessorColorRed: FloatPropertyAccessor = object : FloatPropertyAccessor {
-        override fun set(value: Float) {data.color1.r_mutable = value}
-        override fun get(): Float = data.color1.r
-    }
-    private val accessorColorGreen: FloatPropertyAccessor = object : FloatPropertyAccessor {
-        override fun set(value: Float) {data.color1.g_mutable = value}
-        override fun get(): Float = data.color1.g
-    }
-    private val accessorColorBlue: FloatPropertyAccessor = object : FloatPropertyAccessor {
-        override fun set(value: Float) {data.color1.b_mutable = value}
-        override fun get(): Float = data.color1.b
-    }
-    private val accessorColorAlpha: FloatPropertyAccessor = object : FloatPropertyAccessor {
-        override fun set(value: Float) {data.color1.a_mutable = value}
-        override fun get(): Float = data.color1.a
-    }
-
-    enum class Property(
-        override val propertyName: String,
-        override val type: KClass<*>
-    ) : VirtualPropertyRef {
-        COLOR_RED("colorRed", Float::class) {
-            override fun accessor(entity: Entity): FloatPropertyAccessor {
-                return entity[EShape].accessorColorRed
-            }
-        },
-        COLOR_GREEN("colorGreen", Float::class) {
-            override fun accessor(entity: Entity): FloatPropertyAccessor {
-                return entity[EShape].accessorColorGreen
-            }
-        },
-        COLOR_BLUE("colorBlue", Float::class) {
-            override fun accessor(entity: Entity): FloatPropertyAccessor {
-                return entity[EShape].accessorColorBlue
-            }
-        },
-        COLOR_ALPHA("colorAlpha", Float::class) {
-            override fun accessor(entity: Entity): FloatPropertyAccessor {
-                return entity[EShape].accessorColorAlpha
-            }
-        }
+    object Property {
+        val TINT_ALPHA: PropertyRefResolver<Float> = { FFContext[Entity, it][EShape].color::a }
+        val TINT_COLOR: PropertyRefResolver<Vector4f> = { FFContext[Entity, it][EShape]::color }
     }
 
     override fun componentType(): ComponentType<EShape> = Companion

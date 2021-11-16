@@ -1,6 +1,7 @@
 package com.inari.firefly.examples
 
 import com.inari.firefly.BlendMode
+import com.inari.firefly.Color
 import com.inari.firefly.DesktopRunner
 import com.inari.firefly.FFContext
 import com.inari.firefly.core.api.DesktopAppAdapter
@@ -11,7 +12,6 @@ import com.inari.firefly.graphics.TextureAsset
 import com.inari.firefly.graphics.effect.ShaderAsset
 import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.view.View
-import com.inari.util.graphics.IColor
 
 object ShaderTest1 {
 
@@ -65,7 +65,7 @@ object ShaderTest1 {
                 val viewId = View.buildAndActivate {
                     name = "View1"
                     bounds(100, 100, 100, 100)
-                    clearColor = IColor.BLACK.mutable
+                    clearColor = Color.BLACK.instance()
                     blendMode = BlendMode.NONE
                     tintColor(1f,0f,0f,1f)          // this is the v_color
                     shader(shaderId)

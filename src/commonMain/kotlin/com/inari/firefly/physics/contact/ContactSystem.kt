@@ -21,10 +21,8 @@ import com.inari.util.Named
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.Aspects
 import com.inari.util.collection.BitSet
-import com.inari.util.geom.BitMask
-import com.inari.util.geom.GeomUtils
-import com.inari.util.geom.PositionF
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.*
+import com.inari.util.geom.GeomUtils.area
 import com.inari.util.indexed.Indexed
 import kotlin.jvm.JvmField
 import kotlin.math.floor
@@ -268,7 +266,7 @@ object ContactSystem : ComponentSystem {
 
     }
 
-    private val checkPivot = Rectangle()
+    private val checkPivot = Vector4i()
     private fun scanContact(c: Contacts, otherEntity: Entity, x: Float, y: Float) {
         val otherContact = otherEntity[EContact]
         val constraint = constraints[c.constraintRef]
@@ -292,7 +290,7 @@ object ContactSystem : ComponentSystem {
             contact.intersection
         )
 
-        if (contact.intersection.area <= 0) {
+        if (area(contact.intersection) <= 0) {
             ContactsPool.disposeContact(contact)
             return
         }
@@ -379,8 +377,8 @@ object ContactSystem : ComponentSystem {
                 CONTACTS_POOL.removeFirst()
     }
 
-    private val worldTempPos = PositionF()
-    private fun getWorldPos(entity: Entity, transform: ETransform): PositionF {
+    private val worldTempPos = Vector2f()
+    private fun getWorldPos(entity: Entity, transform: ETransform): Vector2f {
         return if (EChild in entity.aspects) {
             addTransformPos(entity[EChild].int_parent)
             worldTempPos

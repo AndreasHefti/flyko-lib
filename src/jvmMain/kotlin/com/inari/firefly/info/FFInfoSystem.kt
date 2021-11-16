@@ -12,9 +12,8 @@ import com.inari.firefly.core.system.FFSystem
 import com.inari.firefly.graphics.text.FontAsset
 import com.inari.firefly.graphics.view.ViewSystem
 import com.inari.util.Call
-import com.inari.util.Consumer
 import com.inari.util.collection.DynArray
-import com.inari.util.graphics.MutableColor
+import com.inari.util.geom.Vector4f
 
 object FFInfoSystem : FFSystem {
 
@@ -123,7 +122,7 @@ object FFInfoSystem : FFSystem {
     private val textRenderable = SpriteRenderable(blendMode = BlendMode.NORMAL_ALPHA)
     private val infoDisplayBackground = object {
 
-        @JvmField val color = MutableColor(0.8f, 0.8f, 0.8f, 0.5f)
+        @JvmField val color = Vector4f(0.8f, 0.8f, 0.8f, 0.5f)
         @JvmField val rectVertices: FloatArray = floatArrayOf(0f, 0f, 0f, 0f)
         @JvmField val data = ShapeData(
             type = ShapeType.RECTANGLE,

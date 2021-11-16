@@ -7,7 +7,6 @@ import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.ComponentDSL
 import com.inari.firefly.core.system.SystemComponentBuilder
-import com.inari.util.BooleanSupplier
 import kotlin.jvm.JvmField
 
 @ComponentDSL
@@ -24,17 +23,17 @@ class StateChange internal constructor() {
     @JvmField internal var disposeStateTaskRef: Int = -1
     @JvmField var toState: String = NO_NAME
     @JvmField internal var initStateTaskRef: Int = -1
-    @JvmField var condition: BooleanSupplier = FALSE_SUPPLIER
+    @JvmField var condition: () -> Boolean = FALSE_SUPPLIER
 
 
-    val withDisposeStateTask = ComponentRefResolver(Task) { index -> disposeStateTaskRef = index }
+    @JvmField val withDisposeStateTask = ComponentRefResolver(Task) { index -> disposeStateTaskRef = index }
     fun <A : Task> withDisposeStateTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.buildAndGet(configure)
         disposeStateTaskRef = result.index
         return result.componentId
     }
 
-    val withInitStateTask = ComponentRefResolver(Task) { index -> initStateTaskRef = index }
+    @JvmField val withInitStateTask = ComponentRefResolver(Task) { index -> initStateTaskRef = index }
     fun <A : Task> withInitStateTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.buildAndGet(configure)
         initStateTaskRef = result.index

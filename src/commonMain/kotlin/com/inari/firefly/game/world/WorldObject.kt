@@ -7,7 +7,7 @@ import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.util.collection.BitSet
 import com.inari.util.collection.DynArray
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
 enum class WorldOrientationType {
@@ -25,7 +25,7 @@ abstract class WorldObject protected constructor(
     @JvmField internal val activationTaskRefs = BitSet()
 
     @JvmField var orientationType: WorldOrientationType = WorldOrientationType.COUNT
-    @JvmField val orientation: Rectangle = Rectangle()
+    @JvmField val orientation: Vector4i = Vector4i()
 
     @JvmField internal val loadedComponents = DynArray.of<CompId>(5, 10)
 

@@ -8,14 +8,14 @@ import com.inari.firefly.entity.EntitySystem
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGridSystem
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 
 class FullTileGridRenderer private constructor() : Renderer() {
 
     override fun match(entity: Entity): Boolean =
         entity.components.include(MATCHING_ASPECTS)
 
-    override fun render(viewIndex: Int, layerIndex: Int, clip: Rectangle) {
+    override fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i) {
         val tileGrid = TileGridSystem[viewIndex, layerIndex] ?: return
 
         if (tileGrid.rendererRef < 0 || tileGrid.rendererRef == index) {

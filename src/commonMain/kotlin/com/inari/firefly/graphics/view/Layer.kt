@@ -4,9 +4,6 @@ import com.inari.firefly.asset.AssetInstanceRefResolver
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentSingleType
-import com.inari.util.geom.Position
-import com.inari.util.geom.PositionF
-import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 
 

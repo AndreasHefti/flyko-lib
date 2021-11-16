@@ -21,7 +21,6 @@ object MovementSystem : ComponentSystem {
         Integrator
     )
 
-
     @JvmField val integrator = ComponentSystem.createComponentMapping(
         Integrator,
         activationMapping = true,
@@ -68,7 +67,7 @@ object MovementSystem : ComponentSystem {
                 integrator[movement.integratorRef]
             val transform = entity[ETransform]
             movementIntegrator.integrate(movement, transform, deltaTimeInSeconds)
-            if (movement.velocity.dx != ZERO_FLOAT || movement.velocity.dy != ZERO_FLOAT) {
+            if (movement.velocity.v0 != ZERO_FLOAT || movement.velocity.v1 != ZERO_FLOAT) {
                 movementIntegrator.step(movement, transform, deltaTimeInSeconds)
                 MoveEvent.moveEvent.entities.set(entity.index)
             }

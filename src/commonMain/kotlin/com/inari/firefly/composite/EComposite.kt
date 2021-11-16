@@ -20,28 +20,28 @@ class EComposite private constructor () : EntityComponent(EComposite::class.simp
     fun getAttribute(name: String): String? = attributes[name]
     fun setAttribute(name: String, value: String) { attributes[name] = value }
 
-    val withLoadTask = ComponentRefResolver(Task) { index -> PlayerSystem.loadTaskRef + index }
+    @JvmField val withLoadTask = ComponentRefResolver(Task) { index -> PlayerSystem.loadTaskRef + index }
     fun <A : Task> withLoadTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
         PlayerSystem.loadTaskRef = result.instanceId
         return result
     }
 
-    val withActivationTask = ComponentRefResolver(Task) { index -> PlayerSystem.activationTaskRef + index }
+    @JvmField val withActivationTask = ComponentRefResolver(Task) { index -> PlayerSystem.activationTaskRef + index }
     fun <A : Task> withActivationTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
         PlayerSystem.activationTaskRef = result.instanceId
         return result
     }
 
-    val withDeactivationTask = ComponentRefResolver(Task) { index -> PlayerSystem.deactivationTaskRef + index }
+    @JvmField val withDeactivationTask = ComponentRefResolver(Task) { index -> PlayerSystem.deactivationTaskRef + index }
     fun <A : Task> withDeactivationTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
         PlayerSystem.deactivationTaskRef = result.instanceId
         return result
     }
 
-    val withDisposeTask = ComponentRefResolver(Task) { index -> PlayerSystem.unloadTaskRef + index }
+    @JvmField val withDisposeTask = ComponentRefResolver(Task) { index -> PlayerSystem.unloadTaskRef + index }
     fun <A : Task> withDisposeTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
         PlayerSystem.unloadTaskRef = result.instanceId

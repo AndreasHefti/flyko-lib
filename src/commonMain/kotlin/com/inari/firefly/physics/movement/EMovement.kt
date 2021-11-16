@@ -36,17 +36,17 @@ class EMovement private constructor() : EntityComponent(EMovement::class.simpleN
     @JvmField val aspects: Aspects = MOVEMENT_ASPECT_GROUP.createAspects()
 
     var velocityX: Float
-        get() = velocity.dx
-        set(value) { velocity.dx = value }
+        get() = velocity.v0
+        set(value) { velocity.v0 = value }
     var velocityY: Float
-        get() = velocity.dy
-        set(value) { velocity.dy = value }
+        get() = velocity.v1
+        set(value) { velocity.v1 = value }
     var accelerationX: Float
-        get() = acceleration.dx
-        set(value) { acceleration.dx = value }
+        get() = acceleration.v0
+        set(value) { acceleration.v0 = value }
     var accelerationY: Float
-        get() = acceleration.dy
-        set(value) { acceleration.dy = value }
+        get() = acceleration.v1
+        set(value) { acceleration.v1 = value }
 
     var updateResolution: Float
         get() = throw UnsupportedOperationException()
@@ -70,10 +70,10 @@ class EMovement private constructor() : EntityComponent(EMovement::class.simpleN
 
     override fun reset() {
         active = false
-        velocity.dx = 0f
-        velocity.dy = 0f
-        acceleration.dx = 0f
-        acceleration.dy = 0f
+        velocity.v0 = 0f
+        velocity.v1 = 0f
+        acceleration.v0 = 0f
+        acceleration.v1 = 0f
         mass = 0f
         scheduler = INFINITE_SCHEDULER
     }

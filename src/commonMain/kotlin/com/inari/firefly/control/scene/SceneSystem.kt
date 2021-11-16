@@ -47,6 +47,7 @@ object SceneSystem : FFSystem {
                 }
                 else -> DO_NOTHING
             }
+            else -> DO_NOTHING
         }
     }
 

@@ -6,7 +6,6 @@ import com.inari.firefly.NO_NAME
 import com.inari.firefly.asset.Asset
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.game.world.World
-import com.inari.util.StringUtils
 import com.inari.util.Supplier
 import kotlin.jvm.JvmField
 

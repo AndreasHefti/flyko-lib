@@ -2,7 +2,6 @@ package com.inari.firefly.composite
 
 import com.inari.firefly.FFContext
 
-import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.core.ComponentRefPredicate
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.ComponentMap.MapAction.*

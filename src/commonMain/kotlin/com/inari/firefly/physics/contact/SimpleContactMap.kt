@@ -4,7 +4,7 @@ import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.graphics.ETransform
 import com.inari.util.collection.BitSet
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 
 class SimpleContactMap : ContactMap() {
 
@@ -31,7 +31,7 @@ class SimpleContactMap : ContactMap() {
         // not needed here
     }
 
-    override fun get(region: Rectangle, entity: Entity): IntIterator {
+    override fun get(region: Vector4i, entity: Entity): IntIterator {
         if (pool.isEmpty())
             pool.add(EntityIdIterator())
 

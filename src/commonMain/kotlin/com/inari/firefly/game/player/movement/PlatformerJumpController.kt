@@ -29,11 +29,11 @@ class PlatformerJumpController : Controller() {
         if (inputDevice.buttonTyped(jumpButton)) {
             if (playerMovement.onGround) {
                 playerMovement.onGround = false
-                playerMovement.velocity.dy = -jumpImpulse
+                playerMovement.velocity.v1 = -jumpImpulse
                 doubleJumpOn = false
                 jumpAction = 0
             } else if (doubleJump && !doubleJumpOn) {
-                playerMovement.velocity.dy = -jumpImpulse
+                playerMovement.velocity.v1 = -jumpImpulse
                 doubleJumpOn = true
                 jumpAction = 0
             } else
@@ -41,7 +41,7 @@ class PlatformerJumpController : Controller() {
 
         } else if (playerMovement.onGround && jumpAction > 0 && jumpAction < jumpActionTolerance) {
             playerMovement.onGround = false
-            playerMovement.velocity.dy = -jumpImpulse
+            playerMovement.velocity.v1 = -jumpImpulse
             doubleJumpOn = false
             jumpAction = 0
         } else if (jumpAction > 0)

@@ -1,9 +1,7 @@
 package com.inari.firefly.graphics.rendering
 
-import com.inari.util.geom.PositionF
 import com.inari.firefly.TRUE_PREDICATE
 import com.inari.firefly.core.api.TransformData
-import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentType
 import com.inari.firefly.entity.EChild
@@ -14,7 +12,8 @@ import com.inari.firefly.graphics.view.ViewLayerAware
 import com.inari.util.Consumer
 import com.inari.util.Predicate
 import com.inari.util.collection.DynArray
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector2f
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 import kotlin.math.floor
 
@@ -88,18 +87,18 @@ abstract class Renderer protected constructor(
 
     abstract fun match(entity: Entity): Boolean
 
-    abstract fun render(viewIndex: Int, layerIndex: Int, clip: Rectangle)
+    abstract fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i)
 
     companion object : SystemComponentType<Renderer>(Renderer::class)
 
     protected interface TransformDataCollector {
         val data : TransformData
         operator fun invoke(transform: TransformData)
-        operator fun invoke(position: PositionF)
-        operator fun set(offset: PositionF, transform: TransformData)
+        operator fun invoke(position: Vector2f)
+        operator fun set(offset: Vector2f, transform: TransformData)
         operator fun plus(transform: TransformData)
-        operator fun plus(offset: PositionF)
-        operator fun minus(offset: PositionF)
+        operator fun plus(offset: Vector2f)
+        operator fun minus(offset: Vector2f)
         fun move(dx: Float, dy:Float)
     }
 
@@ -113,11 +112,11 @@ abstract class Renderer protected constructor(
             data.rotation = transform.rotation
         }
 
-        override operator fun invoke(position: PositionF) {
+        override operator fun invoke(position: Vector2f) {
             data.position + position
         }
 
-        override operator fun set(offset: PositionF, transform: TransformData) {
+        override operator fun set(offset: Vector2f, transform: TransformData) {
             this(transform)
             data.position + offset
         }
@@ -126,11 +125,11 @@ abstract class Renderer protected constructor(
             data + transform
         }
 
-        override operator fun plus(offset: PositionF) {
+        override operator fun plus(offset: Vector2f) {
             data.position + offset
         }
 
-        override fun minus(offset: PositionF) {
+        override fun minus(offset: Vector2f) {
             data.position - offset
         }
 
@@ -157,14 +156,14 @@ abstract class Renderer protected constructor(
             data.rotation = transform.rotation
         }
 
-        override operator fun invoke(position: PositionF) {
+        override operator fun invoke(position: Vector2f) {
             data.position(
                 floor(position.x.toDouble()).toFloat(),
                 floor(position.y.toDouble()).toFloat()
             )
         }
 
-        override operator fun set(offset: PositionF, transform: TransformData) {
+        override operator fun set(offset: Vector2f, transform: TransformData) {
             this(transform)
             data.position(
                 floor((transform.position.x + offset.x).toDouble()).toFloat(),
@@ -177,17 +176,17 @@ abstract class Renderer protected constructor(
             data.position.y += floor(transform.position.y.toDouble()).toFloat()
             data.pivot.x += floor(transform.pivot.x.toDouble()).toFloat()
             data.pivot.y += floor(transform.pivot.y.toDouble()).toFloat()
-            data.scale.dx *= transform.scale.dx
-            data.scale.dy *= transform.scale.dy
+            data.scale.v0 *= transform.scale.v0
+            data.scale.v1 *= transform.scale.v1
             data.rotation += transform.rotation
         }
 
-        override operator fun plus(offset: PositionF) {
+        override operator fun plus(offset: Vector2f) {
             data.position.x += floor(offset.x.toDouble()).toFloat()
             data.position.y += floor(offset.y.toDouble()).toFloat()
         }
 
-        override fun minus(offset: PositionF) {
+        override fun minus(offset: Vector2f) {
             data.position.x -= floor(offset.x.toDouble()).toFloat()
             data.position.y -= floor(offset.y.toDouble()).toFloat()
         }

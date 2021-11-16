@@ -8,12 +8,11 @@ import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.TextureAsset
 import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.sprite.SpriteAsset
-import com.inari.firefly.physics.animation.easing.EasedProperty
-import com.inari.firefly.physics.animation.entity.EAnimation
+import com.inari.firefly.physics.animation.EAnimation
+import com.inari.firefly.physics.animation.EasedFloatAnimation
 import com.inari.util.Call
 import com.inari.util.geom.Easing
-import com.inari.util.geom.PositionF
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 import org.lwjgl.glfw.GLFW
 
 object InariIntro {
@@ -35,16 +34,16 @@ object InariIntro {
 
         spriteAssetId = SpriteAsset.buildAndActivate {
             texture(textureAssetId)
-            textureRegion = Rectangle( 0, 0, texture.width, texture.height )
+            textureRegion = Vector4i( 0, 0, texture.width, texture.height )
         }
 
         entityId = Entity.buildAndActivate {
             withComponent(ETransform) {
                 view(BASE_VIEW)
-                position(PositionF(
+                position(
                     FFContext.screenWidth / 2 - texture.width / 2,
                     FFContext.screenHeight / 2 - texture.height / 2
-                ))
+                )
             }
 
             withComponent(ESprite) {
@@ -53,13 +52,15 @@ object InariIntro {
             }
 
             withComponent(EAnimation) {
-                animationId = withActiveAnimation(EasedProperty) {
-                    easing = Easing.Type.LINEAR
-                    startValue = 0f
-                    endValue = 1f
-                    duration = 1000
-                    propertyRef = ESprite.Property.TINT_ALPHA
+                withAnimated<Float> {
+                    animatedProperty = ESprite.Property.TINT_ALPHA
                     resetOnFinish = false
+                    animationId = applyToNewActiveAnimation(EasedFloatAnimation) {
+                        easing = Easing.Type.LINEAR
+                        startValue = 0f
+                        endValue = 1f
+                        duration = 1000
+                    }
                 }
             }
         }

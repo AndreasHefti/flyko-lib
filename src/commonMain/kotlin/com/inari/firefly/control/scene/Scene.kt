@@ -39,14 +39,14 @@ class Scene private constructor() : GenericComposite() {
         this.update = update
     }
 
-    val withActivateTask = ComponentRefResolver(Task) { index -> activateTaskRef = index }
+    @JvmField val withActivateTask = ComponentRefResolver(Task) { index -> activateTaskRef = index }
     fun <A : Task> withActivateTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
         activateTaskRef = result.instanceId
         return result
     }
 
-    val withDeactivateTask = ComponentRefResolver(Task) { index -> deactivateTaskRef = index }
+    @JvmField val withDeactivateTask = ComponentRefResolver(Task) { index -> deactivateTaskRef = index }
     fun <A : Task> withDeactivateTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
         deactivateTaskRef = result.instanceId
