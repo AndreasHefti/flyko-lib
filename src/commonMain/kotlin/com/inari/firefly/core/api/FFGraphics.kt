@@ -1,7 +1,7 @@
 package com.inari.firefly.core.api
 
 import com.inari.util.collection.DynArrayRO
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 
 /** This defines the low level API-Interface for all graphical functions used by the firefly API.
  *
@@ -170,6 +170,6 @@ expect object FFGraphics {
 
     fun flush(virtualViews: DynArrayRO<ViewData>)
 
-    fun getScreenshotPixels(area: Rectangle): ByteArray
+    fun getScreenshotPixels(area: Vector4i): ByteArray
 
 }

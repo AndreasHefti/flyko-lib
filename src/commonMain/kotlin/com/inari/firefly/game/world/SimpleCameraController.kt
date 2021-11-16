@@ -6,9 +6,9 @@ import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewChangeEvent
-import com.inari.util.geom.Rectangle
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4f
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -20,7 +20,7 @@ class SimpleCameraController private constructor() : Controller() {
     private lateinit var view: View
 
     @JvmField var pivot: Vector2f = Vector2f()
-    @JvmField var snapToBounds: Rectangle = Rectangle()
+    @JvmField var snapToBounds: Vector4i = Vector4i()
     @JvmField var velocity: Float = 0.25f
 
     fun adjust() {
@@ -43,7 +43,7 @@ class SimpleCameraController private constructor() : Controller() {
         }
     }
 
-    private fun getPos(zoom: Float, viewBounds: Rectangle, worldPosition: Vector2f): Boolean {
+    private fun getPos(zoom: Float, viewBounds: Vector4i, worldPosition: Vector2f): Boolean {
 
         val following = pivot
         val oneDivZoom = 1f / zoom

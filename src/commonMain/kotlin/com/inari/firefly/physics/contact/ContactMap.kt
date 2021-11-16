@@ -12,7 +12,7 @@ import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewLayerAware
 import com.inari.util.collection.BitSet
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
 abstract class ContactMap protected constructor() : SystemComponent(ContactMap::class.simpleName!!), ViewLayerAware {
@@ -98,7 +98,7 @@ abstract class ContactMap protected constructor() : SystemComponent(ContactMap::
      * @param region The contact or collision region to check collision entity collisions against.
      * @return IntIterator of all entity id's that most possibly has a collision within the given region
      */
-    abstract operator fun get(region: Rectangle, entity: Entity): IntIterator
+    abstract operator fun get(region: Vector4i, entity: Entity): IntIterator
 
     /** Use this to clear all entity id's form a specified pool instance  */
     abstract fun clear()

@@ -6,9 +6,9 @@ import com.inari.firefly.control.ControlledSystemComponent
 import com.inari.firefly.core.api.ViewData
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentSingleType
-import com.inari.util.geom.Rectangle
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4f
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
 class View private constructor (
@@ -23,7 +23,7 @@ class View private constructor (
     }
 
     @JvmField var zPosition: Int = 0
-    var bounds: Rectangle
+    var bounds: Vector4i
         get() = data.bounds
         set(value) { data.bounds(value) }
     var worldPosition: Vector2f

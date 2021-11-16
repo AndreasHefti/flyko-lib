@@ -5,14 +5,14 @@ import com.inari.firefly.core.system.SingletonComponent
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.shape.EShape
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 
 class SimpleShapeRenderer private constructor() : Renderer() {
 
     override fun match(entity: Entity): Boolean =
         EShape in entity.aspects
 
-    override fun render(viewIndex: Int, layerIndex: Int, clip: Rectangle) {
+    override fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i) {
         val toRender = getIfNotEmpty(viewIndex, layerIndex) ?: return
 
         val graphics = FFContext.graphics

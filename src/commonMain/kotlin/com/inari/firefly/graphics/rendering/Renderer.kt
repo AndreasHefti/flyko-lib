@@ -12,8 +12,8 @@ import com.inari.firefly.graphics.view.ViewLayerAware
 import com.inari.util.Consumer
 import com.inari.util.Predicate
 import com.inari.util.collection.DynArray
-import com.inari.util.geom.Rectangle
 import com.inari.util.geom.Vector2f
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 import kotlin.math.floor
 
@@ -87,7 +87,7 @@ abstract class Renderer protected constructor(
 
     abstract fun match(entity: Entity): Boolean
 
-    abstract fun render(viewIndex: Int, layerIndex: Int, clip: Rectangle)
+    abstract fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i)
 
     companion object : SystemComponentType<Renderer>(Renderer::class)
 

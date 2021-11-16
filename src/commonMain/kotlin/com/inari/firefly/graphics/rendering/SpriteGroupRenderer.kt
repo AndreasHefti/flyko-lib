@@ -7,7 +7,7 @@ import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.sprite.ESprite
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 
 class SpriteGroupRenderer private constructor() : Renderer(
     sort = { entities -> entities.sort(COMPARATOR) }
@@ -16,7 +16,7 @@ class SpriteGroupRenderer private constructor() : Renderer(
     override fun match(entity: Entity): Boolean =
         entity.aspects.include(MATCHING_ASPECTS)
 
-    override fun render(viewIndex: Int, layerIndex: Int, clip: Rectangle) {
+    override fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i) {
         val toRender = getIfNotEmpty(viewIndex, layerIndex) ?: return
 
         val graphics = FFContext.graphics

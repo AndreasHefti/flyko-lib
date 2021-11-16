@@ -47,7 +47,7 @@ class TileGrid private constructor() : SystemComponent(TileGrid::class.simpleNam
         get() = layerRef
 
     @JvmField internal var grid: Array<IntArray> = Array(0) { IntArray(0) }
-    @JvmField internal val normalisedWorldBounds = Rectangle(0, 0, 0, 0)
+    @JvmField internal val normalisedWorldBounds = Vector4i(0, 0, 0, 0)
 
     override fun init() {
         grid = Array(gridHeight) { IntArray(gridWidth) { -1 } }
@@ -56,9 +56,6 @@ class TileGrid private constructor() : SystemComponent(TileGrid::class.simpleNam
 
         super.init()
     }
-
-    operator fun get(rectPos: Rectangle): Int =
-        this[rectPos.pos]
 
     operator fun get(pos: Vector2i): Int =
         if (spherical) {
@@ -151,7 +148,7 @@ class TileGrid private constructor() : SystemComponent(TileGrid::class.simpleNam
     val tileGridIterator: TileGridIterator
         get() = TileGridIterator.getInstance(this)
 
-    fun tileGridIterator(worldClip: Rectangle): TileGridIterator =
+    fun tileGridIterator(worldClip: Vector4i): TileGridIterator =
         TileGridIterator.getInstance(worldClip, this)
 
     override fun componentType() = Companion
@@ -162,9 +159,9 @@ class TileGrid private constructor() : SystemComponent(TileGrid::class.simpleNam
 
     class TileGridIterator private constructor() : IntIterator() {
 
-        @JvmField internal val tmpClip = Rectangle()
+        @JvmField internal val tmpClip = Vector4i()
         @JvmField internal val worldPosition = Vector2f()
-        @JvmField internal val clip = Rectangle()
+        @JvmField internal val clip = Vector4i()
         @JvmField internal var xorig: Int = 0
         @JvmField internal var xsize: Int = 0
         @JvmField internal var ysize: Int = 0
@@ -188,7 +185,7 @@ class TileGrid private constructor() : SystemComponent(TileGrid::class.simpleNam
             init(tileGrid)
         }
 
-        private fun reset(clip: Rectangle, tileGrid: TileGrid) {
+        private fun reset(clip: Vector4i, tileGrid: TileGrid) {
             mapWorldClipToTileGridClip(clip, tileGrid, this.clip)
             init(tileGrid)
         }
@@ -203,7 +200,7 @@ class TileGrid private constructor() : SystemComponent(TileGrid::class.simpleNam
             findNext()
         }
 
-        private fun mapWorldClipToTileGridClip(worldClip: Rectangle, tileGrid: TileGrid, result: Rectangle) {
+        private fun mapWorldClipToTileGridClip(worldClip: Vector4i, tileGrid: TileGrid, result: Vector4i) {
             tmpClip(
                 floor((worldClip.x.toDouble() - tileGrid.position.x) / tileGrid.cellDim.v0).toInt(),
                 floor((worldClip.y.toDouble() - tileGrid.position.y) / tileGrid.cellDim.v1).toInt()
@@ -253,7 +250,7 @@ class TileGrid private constructor() : SystemComponent(TileGrid::class.simpleNam
             private val NULL_TILE_GRID: TileGrid  = TileGrid()
             private val POOL = ArrayDeque<TileGridIterator>(5)
 
-            internal fun getInstance(clip: Rectangle, tileGrid: TileGrid): TileGridIterator {
+            internal fun getInstance(clip: Vector4i, tileGrid: TileGrid): TileGridIterator {
                 val instance = instance
 
                 instance.reset(clip, tileGrid)

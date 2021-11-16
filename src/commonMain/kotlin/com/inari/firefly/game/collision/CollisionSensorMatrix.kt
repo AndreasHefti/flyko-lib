@@ -1,8 +1,8 @@
 package com.inari.firefly.game.collision
 
 import com.inari.util.geom.BitMask
-import com.inari.util.geom.Rectangle
 import com.inari.util.geom.Vector2i
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
 /**
@@ -38,7 +38,7 @@ class CollisionSensorMatrix(
     @JvmField val contactSensorLineCenter = BitMask()
     @JvmField val contactSensorLineBottom = BitMask()
 
-    @JvmField val rect = Rectangle()
+    @JvmField val rect = Vector4i()
     @JvmField val contactSensorPointTopLeft = Vector2i()
     @JvmField val contactSensorPointTopMiddle = Vector2i()
     @JvmField val contactSensorPointTopRight = Vector2i()

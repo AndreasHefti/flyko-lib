@@ -10,7 +10,7 @@ import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.text.EText
 import com.inari.firefly.graphics.text.ETextMeta
 import com.inari.firefly.graphics.text.FontAsset
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 
 
 class SimpleTextRenderer private constructor() : Renderer() {
@@ -19,7 +19,7 @@ class SimpleTextRenderer private constructor() : Renderer() {
         entity.components.include(MATCHING_ASPECTS) &&
             entity[EText].rendererRef == index
 
-    override fun render(viewIndex: Int, layerIndex: Int, clip: Rectangle) {
+    override fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i) {
         val toRender = getIfNotEmpty(viewIndex, layerIndex) ?: return
 
         val graphics = FFContext.graphics

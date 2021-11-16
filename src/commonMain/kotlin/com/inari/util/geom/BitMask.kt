@@ -2,7 +2,7 @@ package com.inari.util.geom
 
 import com.inari.util.StringUtils
 import com.inari.util.collection.BitSet
-import kotlin.jvm.JvmField
+import com.inari.util.geom.GeomUtils.area
 
 class BitMask constructor(
     x: Int = 0,
@@ -11,15 +11,15 @@ class BitMask constructor(
     height: Int = 0
 ){
 
-    private val region = Rectangle()
+    private val region = Vector4i()
     private var bits: BitSet
 
-    private val tmpRegion = Rectangle()
-    private val intersection = Rectangle()
+    private val tmpRegion = Vector4i()
+    private val intersection = Vector4i()
 
     private var tmpBits: BitSet
 
-    constructor(region: Rectangle) : this(region.x, region.y, region.width, region.height)
+    constructor(region: Vector4i) : this(region.x, region.y, region.width, region.height)
 
     init {
         region.x = x
@@ -43,7 +43,7 @@ class BitMask constructor(
 
     fun nextSetBit(from: Int) = bits.nextSetBit(from)
 
-    fun region(): Rectangle =
+    fun region(): Vector4i =
         region
     val isEmpty: Boolean get() =
         bits.isEmpty
@@ -56,7 +56,7 @@ class BitMask constructor(
         return this
     }
 
-    fun reset(region: Rectangle): BitMask {
+    fun reset(region: Vector4i): BitMask {
         reset(region.x, region.y, region.width, region.height)
         return this
     }
@@ -141,7 +141,7 @@ class BitMask constructor(
         return this
     }
 
-    fun setRegion(region: Rectangle, relativeToOrigin: Boolean): BitMask =
+    fun setRegion(region: Vector4i, relativeToOrigin: Boolean): BitMask =
         setRegion(region.x, region.y, region.width, region.height, relativeToOrigin)
 
     fun setRegion(x: Int, y: Int, width: Int, height: Int): BitMask =
@@ -154,7 +154,7 @@ class BitMask constructor(
             setIntersectionRegion(x + region.x, y + region.y, width, height, true)
 
 
-    fun resetRegion(region: Rectangle, relativeToOrigin: Boolean): BitMask =
+    fun resetRegion(region: Vector4i, relativeToOrigin: Boolean): BitMask =
         resetRegion(region.x, region.y, region.width, region.height, relativeToOrigin)
 
     fun resetRegion(x: Int, y: Int, width: Int, height: Int): BitMask =
@@ -253,7 +253,7 @@ class BitMask constructor(
         tmpRegion.width = width
         tmpRegion.height = height
         GeomUtils.intersection(region, tmpRegion, intersection)
-        if (intersection.area <= 0) {
+        if (area(intersection) <= 0) {
             return this
         }
 
@@ -288,7 +288,7 @@ class BitMask constructor(
         tmpRegion.width = other.region.width
         tmpRegion.height = other.region.height
         GeomUtils.intersection(region, tmpRegion, intersection)
-        if (intersection.area <= 0) {
+        if (area(intersection) <= 0) {
             return this
         }
 
@@ -308,9 +308,9 @@ class BitMask constructor(
         return this
     }
 
-    fun hasIntersection(region: Rectangle): Boolean {
+    fun hasIntersection(region: Vector4i): Boolean {
         GeomUtils.intersection(this.region, region, intersection)
-        if (intersection.area <= 0) {
+        if (area(intersection) <= 0) {
             return false
         }
 
@@ -335,7 +335,7 @@ class BitMask constructor(
 
     companion object {
 
-        fun createIntersectionMask(region: Rectangle, bitmask: BitMask, result: BitMask, xoffset: Int, yoffset: Int, adjustResult: Boolean): Boolean {
+        fun createIntersectionMask(region: Vector4i, bitmask: BitMask, result: BitMask, xoffset: Int, yoffset: Int, adjustResult: Boolean): Boolean {
             bitmask.region.x += xoffset
             bitmask.region.y += yoffset
 
@@ -352,7 +352,7 @@ class BitMask constructor(
             return intersection
         }
 
-        fun createIntersectionMask(bitmask: BitMask, region: Rectangle, result: BitMask, xoffset: Int, yoffset: Int, adjustResult: Boolean): Boolean {
+        fun createIntersectionMask(bitmask: BitMask, region: Vector4i, result: BitMask, xoffset: Int, yoffset: Int, adjustResult: Boolean): Boolean {
             result.tmpRegion.x = region.x + xoffset
             result.tmpRegion.y = region.y + yoffset
             result.tmpRegion.width = region.width
@@ -368,7 +368,7 @@ class BitMask constructor(
             return intersection
         }
 
-        fun createIntersectionMask(bitmask: BitMask, region: Rectangle, result: BitMask, adjustResult: Boolean): Boolean {
+        fun createIntersectionMask(bitmask: BitMask, region: Vector4i, result: BitMask, adjustResult: Boolean): Boolean {
             val intersection = createIntersectionMask(bitmask, region, result)
 
             if (adjustResult) {
@@ -379,7 +379,7 @@ class BitMask constructor(
             return intersection
         }
 
-        fun createIntersectionMask(region: Rectangle, bitmask: BitMask, result: BitMask, adjustResult: Boolean): Boolean {
+        fun createIntersectionMask(region: Vector4i, bitmask: BitMask, result: BitMask, adjustResult: Boolean): Boolean {
             val intersection = createIntersectionMask(bitmask, region, result)
 
             if (adjustResult) {
@@ -390,11 +390,11 @@ class BitMask constructor(
             return intersection
         }
 
-        fun createIntersectionMask(bitmask: BitMask, region: Rectangle, result: BitMask): Boolean {
+        fun createIntersectionMask(bitmask: BitMask, region: Vector4i, result: BitMask): Boolean {
             result.clearMask()
 
             GeomUtils.intersection(bitmask.region, region, result.region)
-            if (result.region.area <= 0) {
+            if (area(result.region) <= 0) {
                 return false
             }
 
@@ -455,7 +455,7 @@ class BitMask constructor(
 
 
             GeomUtils.intersection(bitmask1.region, bitmask2.region, result.region)
-            if (result.region.area <= 0) {
+            if (area(result.region) <= 0) {
                 return false
             }
 

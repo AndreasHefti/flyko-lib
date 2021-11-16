@@ -1,7 +1,7 @@
 package com.inari.firefly.core.api
 
 import com.inari.util.collection.DynArrayRO
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 
 actual object FFGraphics : GraphicsAPI {
 
@@ -86,7 +86,7 @@ actual object FFGraphics : GraphicsAPI {
         TODO("Not yet implemented")
     }
 
-    actual override fun getScreenshotPixels(area: Rectangle): ByteArray {
+    actual override fun getScreenshotPixels(area: Vector4i): ByteArray {
         TODO("Not yet implemented")
     }
 

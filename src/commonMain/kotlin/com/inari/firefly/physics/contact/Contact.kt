@@ -5,24 +5,24 @@ import com.inari.firefly.UNDEFINED_MATERIAL
 import com.inari.util.aspect.Aspect
 import com.inari.util.geom.BitMask
 import com.inari.util.geom.GeomUtils
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
 
 class Contact internal constructor() {
 
     @JvmField internal var entity = -1
-    @JvmField internal val bounds = Rectangle()
-    @JvmField internal val intersection = Rectangle()
+    @JvmField internal val bounds = Vector4i()
+    @JvmField internal val intersection = Vector4i()
     @JvmField internal val mask = BitMask(width = 0, height = 0)
     @JvmField internal var contact = UNDEFINED_CONTACT_TYPE
     @JvmField internal var material = UNDEFINED_MATERIAL
 
     val entityId: Int
         get() = entity
-    val worldBounds: Rectangle
+    val worldBounds: Vector4i
         get() = bounds
-    val intersectionBounds: Rectangle
+    val intersectionBounds: Vector4i
         get() = intersection
     val intersectionMask: BitMask
         get() = mask

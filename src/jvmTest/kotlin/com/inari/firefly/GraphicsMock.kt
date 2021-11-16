@@ -7,7 +7,7 @@ import com.inari.firefly.graphics.view.ViewEvent.Type.*
 import com.inari.util.Consumer
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 
 object GraphicsMock : GraphicsAPI {
 
@@ -166,7 +166,7 @@ object GraphicsMock : GraphicsAPI {
         builder.append("]")
     }
 
-    override fun getScreenshotPixels(area: Rectangle): ByteArray {
+    override fun getScreenshotPixels(area: Vector4i): ByteArray {
         null!!
     }
 

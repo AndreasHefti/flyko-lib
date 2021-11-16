@@ -13,7 +13,7 @@ import com.inari.firefly.entity.EntityComponentType
 import com.inari.util.Named
 import com.inari.util.aspect.Aspect
 import com.inari.util.geom.BitMask
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 import com.inari.util.indexed.Indexed
 import kotlin.jvm.JvmField
 
@@ -23,7 +23,7 @@ class EContact private constructor() : EntityComponent(EContact::class.simpleNam
     @JvmField internal val contactScan = ContactScan()
     @JvmField var notifyContacts = false
     @JvmField val withCollisionResolver = ComponentRefResolver(CollisionResolver) { index -> collisionResolverRef = index }
-    @JvmField var bounds: Rectangle = Rectangle()
+    @JvmField var bounds: Vector4i = Vector4i()
     var mask: BitMask = BitMask(width = 0, height = 0)
         set(value) {
             mask.reset(value.region())

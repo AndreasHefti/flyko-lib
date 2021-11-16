@@ -571,7 +571,7 @@ actual object FFGraphics : GraphicsAPI {
             setActiveShader(backBuffer.data.shaderRef)
             spriteBatch.draw(
                 backBuffer.fboTexture,
-                backBuffer.data.bounds.pos.x.toFloat(), backBuffer.data.bounds.pos.y.toFloat(),
+                backBuffer.data.bounds.x.toFloat(), backBuffer.data.bounds.y.toFloat(),
                 backBuffer.data.bounds.width.toFloat(), backBuffer.data.bounds.height.toFloat()
             )
         }
@@ -599,7 +599,7 @@ actual object FFGraphics : GraphicsAPI {
 
                 spriteBatch.draw(
                     viewport.fboTexture,
-                    bounds.pos.x.toFloat(), bounds.pos.y.toFloat(),
+                    bounds.x.toFloat(), bounds.y.toFloat(),
                     bounds.width.toFloat(), bounds.height.toFloat()
                 )
             }
@@ -611,11 +611,11 @@ actual object FFGraphics : GraphicsAPI {
         setActiveShader(-1)
     }
 
-    actual override fun getScreenshotPixels(area: Rectangle): ByteArray {
-        val flippedY = screenHeight - area.height + area.pos.y
+    actual override fun getScreenshotPixels(area: Vector4i): ByteArray {
+        val flippedY = screenHeight - area.height + area.y
         val size = area.width * area.height * 3
         val screenContents = ByteBuffer.allocateDirect(size).order(ByteOrder.LITTLE_ENDIAN)
-        GL11.glReadPixels(area.pos.x, flippedY, area.width, area.height, GL12.GL_BGR, GL11.GL_UNSIGNED_BYTE, screenContents)
+        GL11.glReadPixels(area.x, flippedY, area.width, area.height, GL12.GL_BGR, GL11.GL_UNSIGNED_BYTE, screenContents)
         val array = ByteArray(size)
         val inverseArray = ByteArray(size)
         screenContents.get(array)

@@ -150,6 +150,7 @@ open class Vector4i constructor(
 ) : Vector2i(v0, v1) {
 
     constructor(v0: Float, v1: Float, v2: Float, v3: Float) : this(v0.toInt(), v1.toInt(), v2.toInt(), v3.toInt())
+    constructor(other: Vector4i) : this(other.v0, other.v1, other.v2, other.v3)
     constructor(other: Vector2i) : this(other.v0, other.v1)
 
     var width: Int
@@ -160,13 +161,13 @@ open class Vector4i constructor(
         set(value) { v3 = value }
 
     operator fun invoke(v0: Int, v1: Int, v2: Int, v3: Int) {
-        super.invoke(v0, v2)
+        super.invoke(v0, v1)
         this.v2 = v2
         this.v3 = v3
     }
 
     operator fun invoke(v0: Float, v1: Float, v2: Float, v3: Float) {
-        super.invoke(v0, v2)
+        super.invoke(v0, v1)
         this.v2 = v2.toInt()
         this.v3 = v3.toInt()
     }

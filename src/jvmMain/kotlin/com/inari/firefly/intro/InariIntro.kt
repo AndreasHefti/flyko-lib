@@ -12,7 +12,7 @@ import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.EasedFloatAnimation
 import com.inari.util.Call
 import com.inari.util.geom.Easing
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 import org.lwjgl.glfw.GLFW
 
 object InariIntro {
@@ -34,7 +34,7 @@ object InariIntro {
 
         spriteAssetId = SpriteAsset.buildAndActivate {
             texture(textureAssetId)
-            textureRegion = Rectangle( 0, 0, texture.width, texture.height )
+            textureRegion = Vector4i( 0, 0, texture.width, texture.height )
         }
 
         entityId = Entity.buildAndActivate {

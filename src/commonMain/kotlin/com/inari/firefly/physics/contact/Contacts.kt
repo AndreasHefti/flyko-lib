@@ -17,14 +17,14 @@ class Contacts internal constructor(
     @JvmField internal var constraintRef: Int
 ) {
 
-    @JvmField internal val normalizedContactBounds = Rectangle()
-    @JvmField internal val worldBounds = Rectangle()
+    @JvmField internal val normalizedContactBounds = Vector4i()
+    @JvmField internal val worldBounds = Vector4i()
     @JvmField internal val contactTypes = CONTACT_TYPE_ASPECT_GROUP.createAspects()
     @JvmField internal val materialTypes = MATERIAL_ASPECT_GROUP.createAspects()
     @JvmField internal val intersectionMask = BitMask(width = 0, height = 0)
     @JvmField internal val contacts: DynArray<Contact> = DynArray.of(5, 5)
 
-    internal fun update(contactBounds: Rectangle, position: Vector2f, velocity: Vector2f) {
+    internal fun update(contactBounds: Vector4i, position: Vector2f, velocity: Vector2f) {
         clear()
 
         normalizedContactBounds.width = contactBounds.width

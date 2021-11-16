@@ -61,7 +61,7 @@ object GeomUtils {
         return sqrt((dx * dx + dy * dy).toDouble()).toFloat()
     }
 
-    fun intersect(r1: Rectangle, r2: Rectangle): Boolean {
+    fun intersect(r1: Vector4i, r2: Vector4i): Boolean {
         val r1Right = r1.x + r1.width
         val r1Bottom = r1.y + r1.height
         val r2Right = r2.x + r2.width
@@ -73,7 +73,7 @@ object GeomUtils {
             r2Bottom <= r1.y)
     }
 
-    fun getIntersectionCode(r: Rectangle, r1: Rectangle): Int {
+    fun getIntersectionCode(r: Vector4i, r1: Vector4i): Int {
         val ax1 = r.x
         val ay1 = r.y
         val ax2 = r.x + r.width - 1
@@ -106,19 +106,19 @@ object GeomUtils {
         return code
     }
 
-    fun intersection(r: Rectangle, r1: Rectangle): Rectangle {
+    fun intersection(r: Vector4i, r1: Vector4i): Vector4i {
         val x1 = max(r.x, r1.x)
         val y1 = max(r.y, r1.y)
         val x2 = min(r.x + r.width - 1, r1.x + r1.width - 1)
         val y2 = min(r.y + r.height - 1, r1.y + r1.height - 1)
-        return Rectangle(x1, y1, max(0, x2 - x1 + 1), max(0, y2 - y1 + 1))
+        return Vector4i(x1, y1, max(0, x2 - x1 + 1), max(0, y2 - y1 + 1))
     }
 
     fun intersection(x1: Int, width1: Int, x2: Int, width2: Int): Int {
         return max(0, min(x1 + width1 - 1, x2 + width2 - 1) - max(x1, x2) + 1)
     }
 
-    fun intersection(r: Rectangle, r1: Rectangle, result: Rectangle): Rectangle {
+    fun intersection(r: Vector4i, r1: Vector4i, result: Vector4i): Vector4i {
         result.x = max(r.x, r1.x)
         result.y = max(r.y, r1.y)
         result.width = max(0, min(r.x + r.width - 1, r1.x + r1.width - 1) - result.x + 1)
@@ -126,15 +126,15 @@ object GeomUtils {
         return result
     }
 
-    fun union(r: Rectangle, r1: Rectangle): Rectangle {
+    fun union(r: Vector4i, r1: Vector4i): Vector4i {
         val x1 = min(r.x, r1.x)
         val y1 = min(r.y, r1.y)
         val x2 = max(r.x + r.width - 1, r1.x + r1.width - 1)
         val y2 = max(r.y + r.height - 1, r1.y + r1.height - 1)
-        return Rectangle(x1, y1, x2 - x1 + 1, y2 - y1 + 1)
+        return Vector4i(x1, y1, x2 - x1 + 1, y2 - y1 + 1)
     }
 
-    fun unionAdd(r: Rectangle, r1: Rectangle) {
+    fun unionAdd(r: Vector4i, r1: Vector4i) {
         val x1 = min(r.x, r1.x)
         val y1 = min(r.y, r1.y)
         val x2 = max(r.x + r.width - 1, r1.x + r1.width - 1)
@@ -145,7 +145,7 @@ object GeomUtils {
         r.height = y2 - y1 + 1
     }
 
-    fun getBoundary(r: Rectangle, side: Int): Int =
+    fun getBoundary(r: Vector4i, side: Int): Int =
         when (side) {
             LEFT_SIDE -> r.x
             TOP_SIDE -> r.y
@@ -154,17 +154,17 @@ object GeomUtils {
             else -> r.x
         }
 
-    fun contains(r: Rectangle, x: Int, y: Int): Boolean {
+    fun contains(r: Vector4i, x: Int, y: Int): Boolean {
         return x >= r.x &&
             y >= r.y &&
             x < r.x + r.width &&
             y < r.y + r.height
     }
 
-    fun contains(r: Rectangle, p: Vector2i): Boolean =
+    fun contains(r: Vector4i, p: Vector2i): Boolean =
         contains(r, p.x, p.y)
 
-    fun contains(r: Rectangle, r1: Rectangle): Boolean =
+    fun contains(r: Vector4i, r1: Vector4i): Boolean =
         r1.x >= r.x &&
         r1.y >= r.y &&
         r1.x + r1.width <= r.x + r.width &&
@@ -179,7 +179,7 @@ object GeomUtils {
             else ->  -1
         }
 
-    fun setOutsideBoundary(r: Rectangle, side: Int, boundary: Int): Rectangle =
+    fun setOutsideBoundary(r: Vector4i, side: Int, boundary: Int): Vector4i =
         when (side) {
             LEFT_SIDE -> {
                 r.width += r.x - boundary
@@ -286,16 +286,14 @@ object GeomUtils {
         movePosition(position, d.vertical, distance, originUpperCorner)
     }
 
-    fun bitMaskIntersection(source: BitSet, sourceRect: Rectangle, intersectionRect: Rectangle, result: BitSet) {
+    fun bitMaskIntersection(source: BitSet, sourceRect: Vector4i, intersectionRect: Vector4i, result: BitSet) {
         result.clear()
         var y = 0
         var x = 0
         while (y < intersectionRect.height) {
             while (x < intersectionRect.width) {
-                result.set(
-                    getFlatArrayIndex(x, y, intersectionRect.width),
-                    source.get((intersectionRect.y + y) * sourceRect.width + intersectionRect.x + x)
-                )
+                result[getFlatArrayIndex(x, y, intersectionRect.width)] =
+                    source[(intersectionRect.y + y) * sourceRect.width + intersectionRect.x + x]
                 x++
             }
             y++
@@ -372,4 +370,5 @@ object GeomUtils {
         else colorOf(ints[0], ints[1], ints[2], ints[3])
     }
 
+    fun area(rect: Vector4i) = rect.width * rect.height
 }

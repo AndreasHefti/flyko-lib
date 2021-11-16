@@ -8,8 +8,8 @@ import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.BackBufferData
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.view.View
-import com.inari.util.geom.Rectangle
 import com.inari.util.geom.Vector4f
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
 class BackBufferAsset private constructor() : Asset() {
@@ -17,7 +17,7 @@ class BackBufferAsset private constructor() : Asset() {
     @JvmField internal var backBufferId: Int = -1
     @JvmField internal val data = BackBufferData()
 
-    var bounds: Rectangle
+    var bounds: Vector4i
         get() = data.bounds
         set(value) { data.bounds(value) }
     var clearColor: Vector4f

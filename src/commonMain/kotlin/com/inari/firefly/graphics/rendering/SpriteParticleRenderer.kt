@@ -7,7 +7,7 @@ import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.particle.EParticle
 import com.inari.firefly.graphics.particle.SpriteParticle
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 
 class SpriteParticleRenderer private constructor() : Renderer() {
 
@@ -15,7 +15,7 @@ class SpriteParticleRenderer private constructor() : Renderer() {
         entity.components.include(MATCHING_ASPECTS) &&
             entity[EParticle].rendererRef == index
 
-    override fun render(viewIndex: Int, layerIndex: Int, clip: Rectangle) {
+    override fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i) {
         val toRender = getIfNotEmpty(viewIndex, layerIndex) ?: return
 
         val graphics = FFContext.graphics

@@ -6,7 +6,7 @@ import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.SpriteData
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.TextureAsset
-import com.inari.util.geom.Rectangle
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
 class SpriteAsset private constructor() : Asset() {
@@ -20,7 +20,7 @@ class SpriteAsset private constructor() : Asset() {
             dependingRef = setIfNotInitialized(index, "TextureAsset")
             textureAssetRef = index
         } }
-    var textureRegion: Rectangle
+    var textureRegion: Vector4i
         get() = spriteData.region
         set(value) { spriteData.region(value) }
     var horizontalFlip: Boolean
