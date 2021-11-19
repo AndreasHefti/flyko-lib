@@ -3,6 +3,8 @@ package com.inari.firefly.composite
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_NAME
 import com.inari.firefly.asset.Asset
+import com.inari.firefly.control.Controller
+import com.inari.firefly.control.ControllerSystem
 import com.inari.firefly.control.task.Task
 import com.inari.firefly.control.trigger.Trigger
 import com.inari.firefly.control.trigger.TriggeredSystemComponent
@@ -51,6 +53,10 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
     fun setAttribute(name: String, value: String) { attributes[name] = value }
 
     @JvmField val withAsset = ComponentRefResolver(Asset) { index -> assetRefs.set(index) }
+    fun <A : Asset> withAsset(builder: SystemComponentSubType<Asset, A>, configure: (A.() -> Unit)): CompId {
+        return builder.build(configure)
+    }
+
     fun registerLoadedComponent(id: CompId, activatable: Boolean = false) {
         loadedComponents + id
         if (activatable)

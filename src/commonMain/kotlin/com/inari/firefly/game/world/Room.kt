@@ -28,15 +28,15 @@ class Room private constructor(): GenericComposite() {
     @JvmField internal var resumeTaskRef = -1
 
     @JvmField val withActivationScene = ComponentRefResolver(Scene) { activationSceneRef = it }
-    fun <A : Scene> withActivationScene(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
-        val result = cBuilder.build(configure)
+    fun  withActivationScene(configure: (Scene.() -> Unit)): CompId  {
+        val result = Scene.build(configure)
         activationSceneRef = result.instanceId
         return result
     }
 
     @JvmField val withDeactivationScene = ComponentRefResolver(Scene) { deactivationSceneRef = it }
-    fun <A : Scene> withDeactivationScene(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
-        val result = cBuilder.build(configure)
+    fun withDeactivationScene(configure: (Scene.() -> Unit)): CompId {
+        val result = Scene.build(configure)
         deactivationSceneRef = result.instanceId
         return result
     }

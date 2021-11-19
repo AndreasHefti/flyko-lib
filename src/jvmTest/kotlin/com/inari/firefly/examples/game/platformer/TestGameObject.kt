@@ -22,7 +22,7 @@ class TestGameObject : RoomObjectComposite() {
     override fun loadComposite() {
         spriteId = SpriteAsset.buildAndActivate {
             name = "objectSprite"
-            texture("playerTex")
+            texture("tileSetAtlas_bluTerrain_tileSetAsset")
             textureRegion(7 * 16, 1 * 16, 16, 16)
         }
     }

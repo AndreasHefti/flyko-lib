@@ -181,6 +181,17 @@ object FFContext {
         return this
     }
 
+    // **** EXISTS COMPONENT *****
+
+    fun exists(component: Component): Boolean = exists(component.componentId.componentType, component.index)
+    fun exists(cType: ComponentType<*>, index: Int): Boolean = mapper<Component>(cType).contains(index)
+    fun exists(cType: ComponentType<*>, indexed: Indexed): Boolean = mapper<Component>(cType).contains(indexed.index)
+    fun exists(id: CompId): Boolean = mapper<Component>(id).contains(id.instanceId)
+    fun exists(id: CompNameId): Boolean = mapper<Component>(id).contains(id.name)
+    fun exists(cType: ComponentType<*>, name: String): Boolean = mapper<Component>(cType).contains(name)
+    fun exists(cType: ComponentType<*>, named: Named): Boolean = mapper<Component>(cType).contains(named.name)
+    fun exists(singleton: SingletonComponent<*, *>): Boolean = mapper<Component>(singleton).contains(singleton.instance.index)
+
     // **** IS COMPONENT ACTIVATE *****
 
     fun isActive(component: Component): Boolean = isActive(component.componentId.componentType, component.index)

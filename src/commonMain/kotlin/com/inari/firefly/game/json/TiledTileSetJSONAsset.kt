@@ -12,7 +12,21 @@ import com.inari.firefly.graphics.TextureAsset
 import com.inari.util.Supplier
 import kotlin.jvm.JvmField
 
-class TiledJsonTileSetAsset private constructor() : Asset() {
+/**
+    TileType -> [name]_[material-type]_[tile-type]_[atlas-orientation]
+
+    name = String
+    material-type = String
+    tile-type = [type]:[size]:[tile-direction]:[tile-orientation]
+    atlas-orientation = [xpos]:[ypos]:[orientation]
+
+    type = quad | slope | circle | rhombus | spike
+    size = full [default] | half | quarter | quarterto
+    tile-direction = none [default] | nw = north-west | n = north | ne = north-east | e = east | se = south-east | s = south | sw = south-west | w = west
+    tile-orientation = none [default] | h = horizontal | v = vertical
+    orientation = none [default] | h = horizontal flip | v = vertical flip | hv = horizontal and vertical flip | va = vertical and horizontal flip
+ **/
+class TiledTileSetJSONAsset private constructor() : Asset() {
 
     private var tileSetId = NO_COMP_ID
     private var textureAssetId = NO_COMP_ID
@@ -46,7 +60,7 @@ class TiledJsonTileSetAsset private constructor() : Asset() {
         }
         if (textureAssetId == NO_COMP_ID) {
             textureAssetId = TextureAsset.build {
-                name = "texture_${this@TiledJsonTileSetAsset.name}"
+                name = "tileSetAtlas_${this@TiledTileSetJSONAsset.name}"
                 resourceName = atlasResource
             }
         }
@@ -56,38 +70,26 @@ class TiledJsonTileSetAsset private constructor() : Asset() {
         // create tile set
         tileSetId = TileSet.build {
             name = tileSetJson.name
-            texture(this@TiledJsonTileSetAsset.textureAssetId)
+            texture(this@TiledTileSetJSONAsset.textureAssetId)
 
             tileSetJson.tiles.forEach { tileJson ->
-//                TileType -> [name]_[material-type]_[tile-type]_[atlas-orientation]
-//
-//                name = String
-//                material-type = String
-//                tile-type = [type]:[size]:[tile-direction]:[tile-orientation]
-//                atlas-orientation = [xpos]:[ypos]:[orientation]
-//
-//                type = quad | slope | circle | rhombus | spike
-//                size = full [default] | half | quarter | quarterto
-//                tile-direction = none [default] | nw = north-west | n = north | ne = north-east | e = east | se = south-east | s = south | sw = south-west | w = west
-//                tile-orientation = none [default] | h = horizontal | v = vertical
-//                orientation = none [default] | h = horizontal flip | v = vertical flip | hv = horizontal and vertical flip | va = vertical and horizontal flip
 
-                val tile_params = tileJson.type.split("_")
+                val tileParams = tileJson.type.split("_")
                 val tileName = "${tileSetJson.name}_${tileJson.type}"
-                val tileMaterial = tile_params[0]
-                val tileTypeString = tile_params[1]
-                val atlasPropsString = tile_params[2]
-                val tile_type = tileTypeString.split(":")
+                val tileMaterial = tileParams[0]
+                val tileTypeString = tileParams[1]
+                val atlasPropsString = tileParams[2]
+                val tileType = tileTypeString.split(":")
                 val materialType = TileUtils.getTileMaterialType(tileMaterial)
-                val contactFormType = TileUtils.getTileContactFormType(tile_type[0])
-                val size = TileUtils.getTileSizeType(tile_type[1])
-                val tileDirection = if (tile_type.size > 2 )
-                    TileUtils.getTileDirection(tile_type[2])
+                val contactFormType = TileUtils.getTileContactFormType(tileType[0])
+                val size = TileUtils.getTileSizeType(tileType[1])
+                val tileDirection = if (tileType.size > 2 )
+                    TileUtils.getTileDirection(tileType[2])
                     else
                     TileDirection.NONE
 
-                val tileOrientation = if (tile_type.size > 3)
-                    TileUtils.getTileOrientation(tile_type[3])
+                val tileOrientation = if (tileType.size > 3)
+                    TileUtils.getTileOrientation(tileType[3])
                     else
                     TileOrientation.NONE
 
@@ -165,8 +167,8 @@ class TiledJsonTileSetAsset private constructor() : Asset() {
     }
 
     override fun componentType() = Companion
-    companion object : SystemComponentSubType<Asset, TiledJsonTileSetAsset>(Asset, TiledJsonTileSetAsset::class) {
-        override fun createEmpty() = TiledJsonTileSetAsset()
+    companion object : SystemComponentSubType<Asset, TiledTileSetJSONAsset>(Asset, TiledTileSetJSONAsset::class) {
+        override fun createEmpty() = TiledTileSetJSONAsset()
     }
 
 }

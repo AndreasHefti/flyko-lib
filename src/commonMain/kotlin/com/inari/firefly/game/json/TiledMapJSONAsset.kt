@@ -18,11 +18,10 @@ import com.inari.firefly.graphics.view.ViewSystem
 import com.inari.firefly.physics.contact.SimpleContactMap
 import com.inari.util.Supplier
 import com.inari.util.geom.GeomUtils.colorOf
-import com.inari.util.geom.GeomUtils.newVec4f
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
-class TiledJsonRoomAsset private constructor() : Asset() {
+class TiledMapJSONAsset private constructor() : Asset() {
 
     private var tileMapId = NO_COMP_ID
     private val tileSetAssetToCodeOffsetMapping = mutableMapOf<String, Int>()
@@ -54,20 +53,24 @@ class TiledJsonRoomAsset private constructor() : Asset() {
         val tileMapJson = resource.invoke()
 
         // create TiledTileSetAssets
-        val tilesets = tileMapJson.mappedProperties["tilesets"]?.stringValue?.split(",")
+        val tileSets = tileMapJson.mappedProperties["tilesets"]?.stringValue?.split(",")
             ?: throw RuntimeException("Missing tilesets definition")
 
         tileSetAssetToCodeOffsetMapping.clear()
-        tilesets.forEachIndexed() { index, tilsetString ->
+        tileSets.forEachIndexed() { index, tilsetString ->
             val tileSetProps = tilsetString.split(":")
             val tileSetName = tileSetProps[0]
             val tileSetAssetName = "${tileSetName}_tileSetAsset"
             val tilesetResource = tileSetProps[1]
 
-            val tileSetAssetId = TiledJsonTileSetAsset.build {
-                name = tileSetAssetName
-                resourceName = tilesetResource
-            }
+
+            if (FFContext.exists(Asset, tileSetAssetName))
+                FFContext.activate(Asset, tileSetAssetName)
+            else
+                TiledTileSetJSONAsset.buildAndActivate {
+                    name = tileSetAssetName
+                    resourceName = tilesetResource
+                }
 
             tileSetAssetToCodeOffsetMapping[tileSetName] = tileMapJson.tilesets[index].firstgid
         }
@@ -75,13 +78,13 @@ class TiledJsonRoomAsset private constructor() : Asset() {
         // create TileMap
         tileMapId = TileMap.build {
             name = tileMapJson.mappedProperties["name"]?.stringValue ?: super.name
-            view(this@TiledJsonRoomAsset.viewRef)
+            view(this@TiledMapJSONAsset.viewRef)
 
             tileMapJson.layers.forEach { layerJson ->
                 if (layerJson.type == "tilelayer")
-                    this@TiledJsonRoomAsset.loadTileLayer(this, tileMapJson, layerJson)
+                    this@TiledMapJSONAsset.loadTileLayer(this, tileMapJson, layerJson)
                 else if (layerJson.type == "objectgroup")
-                    this@TiledJsonRoomAsset.loadObjectLayer(this, tileMapJson, layerJson)
+                    this@TiledMapJSONAsset.loadObjectLayer(this, tileMapJson, layerJson)
             }
         }
     }
@@ -90,7 +93,7 @@ class TiledJsonRoomAsset private constructor() : Asset() {
 
         if (layerJson.mappedProperties.containsKey("addContactMap")) {
             val contactMap = SimpleContactMap.build {
-                view(this@TiledJsonRoomAsset.viewRef)
+                view(this@TiledMapJSONAsset.viewRef)
                 layer(layerJson.name)
             }
             tileMap.compositeIds + contactMap
@@ -103,7 +106,7 @@ class TiledJsonRoomAsset private constructor() : Asset() {
 
                 val composite = CompositeSystem.getCompositeBuilder<RoomObjectComposite>(typeName[1]).buildAndGet {
                     name = tiledObject.name
-                    view(this@TiledJsonRoomAsset.viewRef)
+                    view(this@TiledMapJSONAsset.viewRef)
                     layer(layerJson.name)
                     layerJson.properties.forEach { setAttribute(it.name, it.stringValue) }
                 }
@@ -115,7 +118,7 @@ class TiledJsonRoomAsset private constructor() : Asset() {
                 Entity.build {
                     name = tiledObject.name
                     withComponent(ETransform) {
-                        view(this@TiledJsonRoomAsset.viewRef)
+                        view(this@TiledMapJSONAsset.viewRef)
                         layer(layerJson.name)
                         position(tiledObject.x, tiledObject.y)
                         rotation = tiledObject.rotation
@@ -174,7 +177,7 @@ class TiledJsonRoomAsset private constructor() : Asset() {
             tileSetNames.forEach { tileSetName ->
                 withTileSet {
                     tileSetAsset("${tileSetName}_tileSetAsset")
-                    codeOffset = this@TiledJsonRoomAsset.tileSetAssetToCodeOffsetMapping[tileSetName] ?: 0
+                    codeOffset = this@TiledMapJSONAsset.tileSetAssetToCodeOffsetMapping[tileSetName] ?: 0
                 }
             }
         }
@@ -188,15 +191,15 @@ class TiledJsonRoomAsset private constructor() : Asset() {
         FFContext.delete(TileMap, tileMapId)
         // dispose all tile set assets
         tileSetAssetToCodeOffsetMapping.keys.forEach{ tileSetName ->
-            FFContext.delete(Asset, "${tileSetName}_tileSetAsset")
+            FFContext.deactivate(Asset, "${tileSetName}_tileSetAsset")
         }
         tileSetAssetToCodeOffsetMapping.clear()
         tileMapId = NO_COMP_ID
     }
 
     override fun componentType() = Companion
-    companion object : SystemComponentSubType<Asset, TiledJsonRoomAsset>(Asset, TiledJsonRoomAsset::class) {
-        override fun createEmpty() = TiledJsonRoomAsset()
+    companion object : SystemComponentSubType<Asset, TiledMapJSONAsset>(Asset, TiledMapJSONAsset::class) {
+        override fun createEmpty() = TiledMapJSONAsset()
     }
 
 }

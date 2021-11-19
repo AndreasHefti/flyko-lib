@@ -2,8 +2,6 @@ package com.inari.firefly.game.world.objects
 
 import com.inari.firefly.composite.Composite
 import com.inari.firefly.core.ComponentRefResolver
-import com.inari.firefly.game.json.TiledJsonRoomAsset
-import com.inari.firefly.game.json.TiledObject
 import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
 import kotlin.jvm.JvmField
