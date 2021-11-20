@@ -8,6 +8,7 @@ import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.composite.*
 import com.inari.firefly.control.scene.SceneSystem
+import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.FFSystem
 import com.inari.firefly.game.player.PlayerEvent
@@ -180,8 +181,21 @@ object WorldSystem : FFSystem {
         RoomEvent.send(RoomEventType.ROOM_DEACTIVATED, roomId)
     }
 
+    fun startRoom(px: Int, py: Int) = ComponentRefResolver(Room) {
+        val startGame: Call = { resumeRoom() }
+        // activate new room and player
+        FFContext.activate(Room, it)
+        val activeRoom = FFContext[Room, activeRoomId]
+        PlayerSystem.playerPosition(px, py)
+        PlayerSystem.activatePlayer()
+        pauseRoom()
 
-
+        // run play init scene if defined or start game directly
+        if (activeRoom.activationSceneRef >= 0)
+            SceneSystem.runScene(activeRoom.activationSceneRef, startGame)
+        else
+            startGame()
+    }
 
     private fun handleRoomChange(px: Int, py: Int, orientation: Orientation = Orientation.NONE) =
         handleRoomChange(nextRoomSupplier(px, py, orientation))
@@ -270,18 +284,11 @@ object WorldSystem : FFSystem {
             if (paused)
                 return@call
 
-            val px = (
-                 if (PlayerSystem.playerVelocity.v0 <= 0)
-                    ceil(PlayerSystem.playerPosition.x)
-                 else
-                     floor(PlayerSystem.playerPosition.x) - PlayerSystem.playerPivot.v0
-            ).toInt()
-            val py = (
-                if (PlayerSystem.playerVelocity.v1 <= 0)
-                    ceil(PlayerSystem.playerPosition.y)
-                else
-                    floor(PlayerSystem.playerPosition.y) - PlayerSystem.playerPivot.v1
-            ).toInt()
+            val px = floor(PlayerSystem.playerPosition.x) + PlayerSystem.playerPivot.v0
+            val py = floor(PlayerSystem.playerPosition.y) + PlayerSystem.playerPivot.v1
+
+            //println("${PlayerSystem.playerPosition.x} ${PlayerSystem.playerPosition.y}")
+            //println("$px $py")
 
             var orientation = Orientation.NONE
             if (px < roomX1) {
@@ -295,7 +302,7 @@ object WorldSystem : FFSystem {
             }
 
             if (orientation != Orientation.NONE)
-                handleRoomChange(px, py, orientation)
+                handleRoomChange(px.toInt(), py.toInt(), orientation)
         }
     }
 }

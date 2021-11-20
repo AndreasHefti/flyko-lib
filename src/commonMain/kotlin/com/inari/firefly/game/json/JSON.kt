@@ -5,6 +5,32 @@ import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.game.world.WorldOrientationType
 import kotlin.jvm.JvmField
 
+
+const val COMPOSITE_OBJECT_NAME_PREFIX = "Composite"
+const val ENTITY_COMPOSITE_OBJECT_NAME_PREFIX = "EComposite"
+const val TILE_SET_ASSET_NAME_SUFFIX = "_tileSetAsset"
+const val TILE_SET_ASSET_NAME_PREFIX = "tileSetAtlas_"
+
+const val PROP_NAME_NAME = "name"
+const val PROP_NAME_ATLAS = "atlas"
+const val PROP_NAME_LOAD_TASK = "loadTask"
+const val PROP_NAME_ACTIVATION_TASK = "activationTask"
+const val PROP_NAME_DEACTIVATION_TASK = "deactivationTask"
+const val PROP_NAME_DISPOSE_TASK = "disposeTask"
+const val PROP_NAME_ADD_CONTACT_MAP = "addContactMap"
+const val PROP_NAME_BLEND = "blend"
+const val PROP_NAME_RENDERER = "renderer"
+const val PROP_NAME_ANIMATION = "animation"
+const val FLAG_NAME_HORIZONTAL = "h"
+const val FLAG_NAME_VERTICAL = "v"
+const val PROP_NAME_WIDTH = "width"
+const val PROP_NAME_HEIGHT = "height"
+const val PROP_NAME_TILE_LAYER = "tilelayer"
+const val PROP_NAME_OBJECT_LAYER = "objectgroup"
+const val PROP_NAME_TILE_SETS = "tilesets"
+
+
+
 /** example-world.json
  *  {
  *      "name": "world1",

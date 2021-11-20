@@ -1,9 +1,6 @@
 package com.inari.firefly.game.json
 
-import com.inari.firefly.BlendMode
-import com.inari.firefly.FFContext
-import com.inari.firefly.NO_COMP_ID
-import com.inari.firefly.NO_NAME
+import com.inari.firefly.*
 import com.inari.firefly.asset.Asset
 import com.inari.firefly.asset.AssetSystem
 import com.inari.firefly.core.system.SystemComponentSubType
@@ -51,7 +48,7 @@ class TiledTileSetJSONAsset private constructor() : Asset() {
         val tileSetJson = resource.invoke()
 
         // create texture asset for the tile set if not exists and load it
-        val atlasResource = tileSetJson.mappedProperties["atlas"]?.stringValue ?: throw RuntimeException("Missing atlas texture resource")
+        val atlasResource = tileSetJson.mappedProperties[PROP_NAME_ATLAS]?.stringValue ?: throw RuntimeException("Missing atlas texture resource")
         AssetSystem.assets.forEach loop@ {  asset ->
             if (asset is TextureAsset && atlasResource == asset.resourceName) {
                 textureAssetId = asset.componentId
@@ -60,7 +57,7 @@ class TiledTileSetJSONAsset private constructor() : Asset() {
         }
         if (textureAssetId == NO_COMP_ID) {
             textureAssetId = TextureAsset.build {
-                name = "tileSetAtlas_${this@TiledTileSetJSONAsset.name}"
+                name = "${TILE_SET_ASSET_NAME_PREFIX}${this@TiledTileSetJSONAsset.name}"
                 resourceName = atlasResource
             }
         }
@@ -74,12 +71,12 @@ class TiledTileSetJSONAsset private constructor() : Asset() {
 
             tileSetJson.tiles.forEach { tileJson ->
 
-                val tileParams = tileJson.type.split("_")
+                val tileParams = tileJson.type.split(UNDERLINE)
                 val tileName = "${tileSetJson.name}_${tileJson.type}"
                 val tileMaterial = tileParams[0]
                 val tileTypeString = tileParams[1]
                 val atlasPropsString = tileParams[2]
-                val tileType = tileTypeString.split(":")
+                val tileType = tileTypeString.split(COLON)
                 val materialType = TileUtils.getTileMaterialType(tileMaterial)
                 val contactFormType = TileUtils.getTileContactFormType(tileType[0])
                 val size = TileUtils.getTileSizeType(tileType[1])
@@ -101,13 +98,13 @@ class TiledTileSetJSONAsset private constructor() : Asset() {
                     tileDimType
                 )
 
-                val atlasProps = atlasPropsString.split(":")
-                val tileTintColor = TileUtils.getColorFromString(tileJson.mappedProperties["blend"]?.stringValue ?: "")
+                val atlasProps = atlasPropsString.split(COLON)
+                val tileTintColor = TileUtils.getColorFromString(tileJson.mappedProperties[PROP_NAME_BLEND]?.stringValue ?: EMPTY_STRING)
 
                 withTile {
                     name = tileName
                     blendMode = try {
-                        BlendMode.valueOf(tileJson.mappedProperties["blend"]!!.stringValue)
+                        BlendMode.valueOf(tileJson.mappedProperties[PROP_NAME_BLEND]!!.stringValue)
                     } catch (e: Exception) {
                         null
                     }
@@ -126,16 +123,16 @@ class TiledTileSetJSONAsset private constructor() : Asset() {
                             atlasProps[1].toInt() * tileSetJson.tileheight,
                             tileSetJson.tilewidth,
                             tileSetJson.tileheight)
-                        hFlip = atlasProps.size > 2 && (atlasProps[2].contains("h"))
-                        vFlip = atlasProps.size > 2 && (atlasProps[2].contains("v"))
+                        hFlip = atlasProps.size > 2 && (atlasProps[2].contains(FLAG_NAME_HORIZONTAL))
+                        vFlip = atlasProps.size > 2 && (atlasProps[2].contains(FLAG_NAME_VERTICAL))
                     }
 
-                    if (tileJson.mappedProperties.contains("animation")) {
-                        val frames = tileJson.mappedProperties["animation"]!!.stringValue.split(",")
+                    if (tileJson.mappedProperties.contains(PROP_NAME_ANIMATION)) {
+                        val frames = tileJson.mappedProperties[PROP_NAME_ANIMATION]!!.stringValue.split(COMMA)
                         withAnimation {
                             frames.forEachIndexed { index, fString ->
-                                val timeSprite = fString.split("_")
-                                val spriteProps = timeSprite[1].split(":")
+                                val timeSprite = fString.split(UNDERLINE)
+                                val spriteProps = timeSprite[1].split(COLON)
                                 withFrame {
                                     interval = timeSprite[0].toLong()
                                     protoSprite {
@@ -145,8 +142,8 @@ class TiledTileSetJSONAsset private constructor() : Asset() {
                                             spriteProps[1].toInt() * tileSetJson.tileheight,
                                             tileSetJson.tilewidth,
                                             tileSetJson.tileheight)
-                                        hFlip = spriteProps.size > 2 && (spriteProps[2].contains("h"))
-                                        vFlip = spriteProps.size > 2 && (spriteProps[2].contains("v"))
+                                        hFlip = spriteProps.size > 2 && (spriteProps[2].contains(FLAG_NAME_HORIZONTAL))
+                                        vFlip = spriteProps.size > 2 && (spriteProps[2].contains(FLAG_NAME_VERTICAL))
                                     }
                                 }
                             }

@@ -1,9 +1,6 @@
 package com.inari.firefly.game.json
 
-import com.inari.firefly.BlendMode
-import com.inari.firefly.FFContext
-import com.inari.firefly.NO_COMP_ID
-import com.inari.firefly.NO_NAME
+import com.inari.firefly.*
 import com.inari.firefly.asset.Asset
 import com.inari.firefly.composite.CompositeSystem
 import com.inari.firefly.composite.EComposite
@@ -53,14 +50,14 @@ class TiledMapJSONAsset private constructor() : Asset() {
         val tileMapJson = resource.invoke()
 
         // create TiledTileSetAssets
-        val tileSets = tileMapJson.mappedProperties["tilesets"]?.stringValue?.split(",")
-            ?: throw RuntimeException("Missing tilesets definition")
+        val tileSets = tileMapJson.mappedProperties[PROP_NAME_TILE_SETS]?.stringValue?.split(COMMA)
+            ?: throw RuntimeException("Missing tile sets definition")
 
         tileSetAssetToCodeOffsetMapping.clear()
-        tileSets.forEachIndexed() { index, tilsetString ->
-            val tileSetProps = tilsetString.split(":")
+        tileSets.forEachIndexed() { index, tilesetString ->
+            val tileSetProps = tilesetString.split(COLON)
             val tileSetName = tileSetProps[0]
-            val tileSetAssetName = "${tileSetName}_tileSetAsset"
+            val tileSetAssetName = "${tileSetName}${TILE_SET_ASSET_NAME_SUFFIX}"
             val tilesetResource = tileSetProps[1]
 
 
@@ -77,13 +74,13 @@ class TiledMapJSONAsset private constructor() : Asset() {
 
         // create TileMap
         tileMapId = TileMap.build {
-            name = tileMapJson.mappedProperties["name"]?.stringValue ?: super.name
+            name = tileMapJson.mappedProperties[PROP_NAME_NAME]?.stringValue ?: super.name
             view(this@TiledMapJSONAsset.viewRef)
 
             tileMapJson.layers.forEach { layerJson ->
-                if (layerJson.type == "tilelayer")
+                if (layerJson.type == PROP_NAME_TILE_LAYER)
                     this@TiledMapJSONAsset.loadTileLayer(this, tileMapJson, layerJson)
-                else if (layerJson.type == "objectgroup")
+                else if (layerJson.type == PROP_NAME_OBJECT_LAYER)
                     this@TiledMapJSONAsset.loadObjectLayer(this, tileMapJson, layerJson)
             }
         }
@@ -91,7 +88,7 @@ class TiledMapJSONAsset private constructor() : Asset() {
 
     private fun loadObjectLayer(tileMap: TileMap, tileMapJson: TiledTileMap, layerJson: TiledLayer) {
 
-        if (layerJson.mappedProperties.containsKey("addContactMap")) {
+        if (layerJson.mappedProperties.containsKey(PROP_NAME_ADD_CONTACT_MAP)) {
             val contactMap = SimpleContactMap.build {
                 view(this@TiledMapJSONAsset.viewRef)
                 layer(layerJson.name)
@@ -101,8 +98,8 @@ class TiledMapJSONAsset private constructor() : Asset() {
 
         layerJson.objects!!.forEach { tiledObject ->
 
-            if (tiledObject.type.startsWith("Composite")) {
-                val typeName = tiledObject.type.split(":")
+            if (tiledObject.type.startsWith(COMPOSITE_OBJECT_NAME_PREFIX)) {
+                val typeName = tiledObject.type.split(COLON)
 
                 val composite = CompositeSystem.getCompositeBuilder<RoomObjectComposite>(typeName[1]).buildAndGet {
                     name = tiledObject.name
@@ -113,7 +110,7 @@ class TiledMapJSONAsset private constructor() : Asset() {
                 composite.systemLoad()
                 tileMap.compositeIds + composite.componentId
 
-            } else if (tiledObject.type.startsWith("EComposite")) {
+            } else if (tiledObject.type.startsWith(ENTITY_COMPOSITE_OBJECT_NAME_PREFIX)) {
 
                 Entity.build {
                     name = tiledObject.name
@@ -127,16 +124,16 @@ class TiledMapJSONAsset private constructor() : Asset() {
                         layerJson.properties.forEach {
                             setAttribute(it.name, it.stringValue)
                         }
-                        tiledObject.mappedProperties["loadTask"]?.also {
+                        tiledObject.mappedProperties[PROP_NAME_LOAD_TASK]?.also {
                             withLoadTask(it.stringValue)
                         }
-                        tiledObject.mappedProperties["activationTask"]?.also {
+                        tiledObject.mappedProperties[PROP_NAME_ACTIVATION_TASK]?.also {
                             withActivationTask(it.stringValue)
                         }
-                        tiledObject.mappedProperties["deactivationTask"]?.also {
+                        tiledObject.mappedProperties[PROP_NAME_DEACTIVATION_TASK]?.also {
                             withDeactivationTask(it.stringValue)
                         }
-                        tiledObject.mappedProperties["disposeTask"]?.also {
+                        tiledObject.mappedProperties[PROP_NAME_DISPOSE_TASK]?.also {
                             withDisposeTask(it.stringValue)
                         }
                     }
@@ -149,15 +146,15 @@ class TiledMapJSONAsset private constructor() : Asset() {
     }
 
     private fun loadTileLayer(tileMap: TileMap, tileMapJson: TiledTileMap, layerJson: TiledLayer) {
-        val layerTileSets = layerJson.mappedProperties["tilesets"]?.stringValue
-            ?: throw RuntimeException("Missing tilesets for layer")
+        val layerTileSets = layerJson.mappedProperties[PROP_NAME_TILE_SETS]?.stringValue
+            ?: throw RuntimeException("Missing tile sets for layer")
 
         tileMap.withLayer {
             position(layerJson.x + layerJson.offsetx, layerJson.y + layerJson.offsety)
             tileWidth = tileMapJson.tilewidth
             tileHeight = tileMapJson.tileheight
-            mapWidth = layerJson.mappedProperties["width"]?.intValue ?: tileMapJson.width
-            mapHeight = layerJson.mappedProperties["height"]?.intValue ?: tileMapJson.height
+            mapWidth = layerJson.mappedProperties[PROP_NAME_WIDTH]?.intValue ?: tileMapJson.width
+            mapHeight = layerJson.mappedProperties[PROP_NAME_HEIGHT]?.intValue ?: tileMapJson.height
             parallaxFactorX = layerJson.parallaxx - 1
             parallaxFactorY = layerJson.parallaxy - 1
             layer(layerJson.name)
@@ -167,16 +164,16 @@ class TiledMapJSONAsset private constructor() : Asset() {
                 tint = colorOf(layerJson.tintcolor)
             if (layerJson.opacity < 1.0f)
                 tint.a = layerJson.opacity
-            if ("blend" in layerJson.mappedProperties)
-                blend = BlendMode.valueOf(layerJson.mappedProperties["blend"]?.stringValue!!)
-            if ("renderer" in layerJson.mappedProperties)
-                renderer(layerJson.mappedProperties["renderer"]?.stringValue!!)
+            if (PROP_NAME_BLEND in layerJson.mappedProperties)
+                blend = BlendMode.valueOf(layerJson.mappedProperties[PROP_NAME_BLEND]?.stringValue!!)
+            if (PROP_NAME_RENDERER in layerJson.mappedProperties)
+                renderer(layerJson.mappedProperties[PROP_NAME_RENDERER]?.stringValue!!)
 
             // define tile sets for this map layer
-            val tileSetNames = layerTileSets.split(",")
+            val tileSetNames = layerTileSets.split(COMMA)
             tileSetNames.forEach { tileSetName ->
                 withTileSet {
-                    tileSetAsset("${tileSetName}_tileSetAsset")
+                    tileSetAsset("${tileSetName}${TILE_SET_ASSET_NAME_SUFFIX}")
                     codeOffset = this@TiledMapJSONAsset.tileSetAssetToCodeOffsetMapping[tileSetName] ?: 0
                 }
             }
@@ -191,7 +188,7 @@ class TiledMapJSONAsset private constructor() : Asset() {
         FFContext.delete(TileMap, tileMapId)
         // dispose all tile set assets
         tileSetAssetToCodeOffsetMapping.keys.forEach{ tileSetName ->
-            FFContext.deactivate(Asset, "${tileSetName}_tileSetAsset")
+            FFContext.deactivate(Asset, "${tileSetName}${TILE_SET_ASSET_NAME_SUFFIX}")
         }
         tileSetAssetToCodeOffsetMapping.clear()
         tileMapId = NO_COMP_ID

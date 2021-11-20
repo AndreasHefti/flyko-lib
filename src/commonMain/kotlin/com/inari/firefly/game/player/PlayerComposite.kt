@@ -32,10 +32,10 @@ class PlayerComposite private constructor(override var name: String = PLAYER_COM
         entityId = entity.componentId
         playerPosition = entity[ETransform].position
         playerPivot(entity[ETransform].pivot)
-        if (EMovement in entity.aspects)
-            playerVelocity = FFContext[EMovement, entityId].velocity
+        playerVelocity = if (EMovement in entity.aspects)
+            FFContext[EMovement, entityId].velocity
         else
-            playerVelocity = Vector2f(ZERO_FLOAT, ZERO_FLOAT)
+            Vector2f(ZERO_FLOAT, ZERO_FLOAT)
         // notify
         PlayerEvent.send(PlayerEventType.PLAYER_LOADED)
     }

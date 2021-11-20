@@ -19,6 +19,11 @@ const val ZERO_FLOAT = 0.0f
 const val SYSTEM_FONT_ASSET = "SYSTEM_FONT_ASSET"
 const val SYSTEM_FONT = "SYSTEM_FONT"
 
+const val UNDERLINE = "_"
+const val COLON = ":"
+const val EMPTY_STRING = ""
+const val COMMA = ","
+
 object Color {
     val BLACK = ImmutableVector4f(0.0f, 0.0f, 0.0f, 1.0f)
     val WHITE = ImmutableVector4f(1.0f, 1.0f, 1.0f, 1.0f)
