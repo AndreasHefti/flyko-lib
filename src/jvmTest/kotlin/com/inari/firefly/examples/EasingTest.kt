@@ -42,7 +42,7 @@ class EasingTest : DesktopApp() {
                         startValue = Vector2f(50f, 50f)
                         endValue = Vector2f(500f, 100f)
                         duration = 5000
-                        easing = Easing.Type.LINEAR
+                        easing = Easing.LINEAR
                     }
                 }
             }

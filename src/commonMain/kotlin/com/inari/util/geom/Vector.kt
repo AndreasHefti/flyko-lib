@@ -4,8 +4,8 @@ import com.inari.util.StringUtils
 import kotlin.jvm.JvmField
 
 class ImmutableVector2i constructor(
-    @JvmField val v0: Int = 0,
-    @JvmField val v1: Int = 0
+    @JvmField inline val v0: Int = 0,
+    @JvmField inline val v1: Int = 0
 ) {
     fun instance(): Vector2i = Vector2i(v0, v1)
     override fun equals(other: Any?): Boolean {
@@ -23,17 +23,17 @@ class ImmutableVector2i constructor(
     }
 }
 open class Vector2i constructor(
-    @JvmField var v0: Int = 0,
-    @JvmField var v1: Int = 0
+    @JvmField inline var v0: Int = 0,
+    @JvmField inline var v1: Int = 0
 ) {
 
     constructor(v0: Float, v1: Float) : this(v0.toInt(), v1.toInt())
     constructor(other: Vector2i) : this(other.v0, other.v1)
 
-    var x: Int
+    inline var x: Int
         get() = v0
         set(value) { v0 = value }
-    var y: Int
+    inline var y: Int
         get() = v1
         set(value) { v1 = value }
 
@@ -117,10 +117,10 @@ open class Vector2i constructor(
 }
 
 class ImmutableVector4i constructor(
-    @JvmField val v0: Int = 0,
-    @JvmField val v1: Int = 0,
-    @JvmField val v2: Int = 0,
-    @JvmField val v3: Int = 0
+    @JvmField inline val v0: Int = 0,
+    @JvmField inline val v1: Int = 0,
+    @JvmField inline val v2: Int = 0,
+    @JvmField inline val v3: Int = 0
 ) {
     fun instance(): Vector4i = Vector4i(v0, v1, v2, v3)
     override fun equals(other: Any?): Boolean {
@@ -145,18 +145,18 @@ class ImmutableVector4i constructor(
 open class Vector4i constructor(
     v0: Int = 0,
     v1: Int = 0,
-    @JvmField var v2: Int = 0,
-    @JvmField var v3: Int = 0
+    @JvmField inline var v2: Int = 0,
+    @JvmField inline var v3: Int = 0
 ) : Vector2i(v0, v1) {
 
     constructor(v0: Float, v1: Float, v2: Float, v3: Float) : this(v0.toInt(), v1.toInt(), v2.toInt(), v3.toInt())
     constructor(other: Vector4i) : this(other.v0, other.v1, other.v2, other.v3)
     constructor(other: Vector2i) : this(other.v0, other.v1)
 
-    var width: Int
+    inline var width: Int
         get() = v2
         set(value) { v2 = value }
-    var height: Int
+    inline var height: Int
         get() = v3
         set(value) { v3 = value }
 
@@ -255,13 +255,13 @@ open class Vector4i constructor(
 }
 
 class ImmutableVector2f constructor(
-    @JvmField val v0: Float = 0.0f,
-    @JvmField val v1: Float = 0.0f
+    @JvmField inline val v0: Float = 0.0f,
+    @JvmField inline val v1: Float = 0.0f
 ) {
-    val x: Float get() = v0
-    val y: Float get() = v1
-    val r: Float get() = v0
-    val g: Float get() = v1
+    inline val x: Float get() = v0
+    inline val y: Float get() = v1
+    inline val r: Float get() = v0
+    inline val g: Float get() = v1
     fun instance(): Vector2f = Vector2f(v0, v1)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -279,23 +279,23 @@ class ImmutableVector2f constructor(
     }
 }
 open class Vector2f constructor(
-    @JvmField var v0: Float = 0.0f,
-    @JvmField var v1: Float = 0.0f
+    @JvmField inline var v0: Float = 0.0f,
+    @JvmField inline var v1: Float = 0.0f
 ) {
 
     constructor(v0: Int, v1: Int) : this(v0.toFloat(), v1.toFloat())
     constructor(other: Vector2f) : this(other.v0, other.v1)
 
-    var x: Float
+    inline var x: Float
         get() = v0
         set(value) { v0 = value }
-    var y: Float
+    inline var y: Float
         get() = v1
         set(value) { v1 = value }
-    var r: Float
+    inline var r: Float
         get() = v0
         set(value) { v0 = value }
-    var g: Float
+    inline var g: Float
         get() = v1
         set(value) { v1 = value }
 
@@ -380,31 +380,31 @@ open class Vector2f constructor(
 }
 
 class ImmutableVector3f constructor(
-    @JvmField var v0: Float = 0.0f,
-    @JvmField var v1: Float = 0.0f,
-    @JvmField var v2: Float = 0.0f
+    @JvmField inline var v0: Float = 0.0f,
+    @JvmField inline var v1: Float = 0.0f,
+    @JvmField inline var v2: Float = 0.0f
 ) {
-    val x: Float get() = v0
-    val y: Float get() = v1
-    val r: Float get() = v0
-    val g: Float get() = v1
-    val z: Float get() = v2
-    val b: Float get() = v2
+    inline val x: Float get() = v0
+    inline val y: Float get() = v1
+    inline val r: Float get() = v0
+    inline val g: Float get() = v1
+    inline val z: Float get() = v2
+    inline val b: Float get() = v2
     fun instance(): Vector3f = Vector3f(v0, v1, v2)
 }
 open class Vector3f constructor(
     v0: Float = 0.0f,
     v1: Float = 0.0f,
-    @JvmField var v2: Float = 0.0f
+    @JvmField inline var v2: Float = 0.0f
 ) : Vector2f(v0, v1) {
 
     constructor(v0: Int = 1, v1: Int = 1, v2: Int = 1) : this(v0.toFloat(), v1.toFloat(), v2.toFloat())
     constructor(other: Vector3f) : this(other.v0, other.v1, other.v2)
 
-    var z: Float
+    inline var z: Float
         get() = v2
         set(value) { v2 = value }
-    var b: Float
+    inline var b: Float
         get() = v2
         set(value) { v2 = value }
 
@@ -477,18 +477,18 @@ open class Vector3f constructor(
 }
 
 class ImmutableVector4f constructor(
-    @JvmField val v0: Float = 0.0f,
-    @JvmField val v1: Float = 0.0f,
-    @JvmField val v2: Float = 0.0f,
-    @JvmField val v3: Float = 0.0f
+    @JvmField inline val v0: Float = 0.0f,
+    @JvmField inline val v1: Float = 0.0f,
+    @JvmField inline val v2: Float = 0.0f,
+    @JvmField inline val v3: Float = 0.0f
 ) {
-    val x: Float get() = v0
-    val y: Float get() = v1
-    val r: Float get() = v0
-    val g: Float get() = v1
-    val z: Float get() = v2
-    val b: Float get() = v2
-    val a: Float get() = v3
+    inline val x: Float get() = v0
+    inline val y: Float get() = v1
+    inline val r: Float get() = v0
+    inline val g: Float get() = v1
+    inline val z: Float get() = v2
+    inline val b: Float get() = v2
+    inline val a: Float get() = v3
     fun instance(): Vector4f = Vector4f(v0, v1, v2, v3)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -512,13 +512,13 @@ class Vector4f constructor(
     v0: Float = 0.0f,
     v1: Float = 0.0f,
     v2: Float = 0.0f,
-    @JvmField var v3: Float = 0.0f
+    @JvmField inline var v3: Float = 0.0f
 ) : Vector3f(v0, v1, v2) {
 
     constructor(v0: Int = 1, v1: Int = 1, v2: Int = 1, v3: Int) : this(v0.toFloat(), v1.toFloat(), v2.toFloat(), v3.toFloat())
     constructor(other: Vector4f) : this(other.v0, other.v1, other.v2, other.v3)
 
-    var a: Float
+    inline var a: Float
         get() = v3
         set(value) { v3 = value }
 

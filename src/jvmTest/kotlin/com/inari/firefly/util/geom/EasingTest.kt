@@ -2,6 +2,7 @@ package com.inari.firefly.util.geom
 
 import com.inari.util.StringUtils
 import com.inari.util.geom.Easing
+import com.inari.util.geom.EasingFunction
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,7 +18,7 @@ class EasingTest {
         val values = ArrayList<Float>()
         for (time in 0..9) {
             val t: Float = time.toFloat() / duration
-            values.add(startValue + changeInValue * Easing.Type.LINEAR(t))
+            values.add(startValue + changeInValue * Easing.LINEAR(t))
         }
 
         assertEquals(
@@ -38,7 +39,7 @@ class EasingTest {
         for (time in 0..9) {
             if (inverse) {
                 val t: Float = time.toFloat() / duration
-                values.add(startValue - changeInValue * Easing.Type.LINEAR(t))
+                values.add(startValue - changeInValue * Easing.LINEAR(t))
             }
         }
 
@@ -46,6 +47,35 @@ class EasingTest {
             "[5.0, 4.5, 4.0, 3.5, 3.0, 2.5, 2.0, 1.5, 1.0, 0.5]",
             values.toString()
         )
+    }
+
+    enum class EasingType constructor(val func: EasingFunction) {
+        LINEAR(Easing.LINEAR),
+        QUAD_IN(Easing.QUAD_IN),
+        QUAD_OUT(Easing.QUAD_OUT),
+        QUAD_IN_OUT(Easing.QUAD_IN_OUT),
+        CUBIC_IN(Easing.CUBIC_IN),
+        CUBIC_OUT(Easing.CUBIC_OUT),
+        CUBIC_IN_OUT(Easing.CUBIC_IN_OUT),
+        QRT_IN(Easing.QRT_IN),
+        QRT_OUT(Easing.QRT_OUT),
+        QRT_IN_OUT(Easing.QRT_IN_OUT),
+        QNT_IN(Easing.QNT_IN),
+        QNT_OUT(Easing.QNT_OUT),
+        QNT_IN_OUT(Easing.QNT_IN_OUT),
+        EXPO_IN(Easing.EXPO_IN),
+        EXPO_OUT(Easing.EXPO_OUT),
+        EXPO_IN_OUT(Easing.EXPO_IN_OUT),
+        SIN_IN(Easing.SIN_IN),
+        SIN_OUT(Easing.SIN_OUT),
+        SIN_IN_OUT(Easing.SIN_IN_OUT),
+        CIRC_IN(Easing.CIRC_IN),
+        CIRC_OUT(Easing.CIRC_OUT),
+        CIRC_IN_OUT(Easing.CIRC_IN_OUT),
+        BACK_IN(Easing.BACK_IN),
+        BACK_OUT(Easing.BACK_OUT),
+        BONCE_IN(Easing.BONCE_IN),
+        BONCE_OUT(Easing.BONCE_OUT)
     }
 
     @Test
@@ -56,10 +86,10 @@ class EasingTest {
         var changeInValue: Float  = endValue - startValue
 
         val values = ArrayList<CharSequence>()
-        for (easing in Easing.Type.values()) {
+        for (easing in EasingType.values()) {
             for (time in 0..9) {
                 val t: Float = time.toFloat() / duration.toFloat()
-                values.add(StringUtils.formatFloat(changeInValue * easing(t), 5))
+                values.add(StringUtils.formatFloat(changeInValue * easing.func(t), 5))
             }
         }
 //        assertEquals(
@@ -132,7 +162,7 @@ class EasingTest {
 
     @Test
     fun testLinear() {
-        val output = input.map { Easing.EasingFunctions.linear(it) }
+        val output = input.map { Easing.LINEAR(it) }
         kotlin.test.assertEquals(
             "[0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]",
             output.toString()
@@ -141,7 +171,7 @@ class EasingTest {
 
     @Test
     fun testPoly3In() {
-        val easingFunction = Easing.EasingFunctions.polyIn()
+        val easingFunction = Easing.polyIn(3.0)
         val output = input.map { StringUtils.formatFloat(easingFunction(it), 3) }
         kotlin.test.assertEquals(
             "[0.000, 0.001, 0.008, 0.027, 0.064, 0.125, 0.216, 0.343, 0.512, 0.729, 1.000]",
@@ -151,7 +181,7 @@ class EasingTest {
 
     @Test
     fun testPoly25In() {
-        val easingFunction = Easing.EasingFunctions.polyIn(2.5)
+        val easingFunction = Easing.polyIn(2.5)
         val output = input.map { StringUtils.formatFloat(easingFunction(it), 6) }
         kotlin.test.assertEquals(
             "[0.000000, 0.003162, 0.017889, 0.049295, 0.101193, 0.176777, 0.278855, 0.409963, 0.572433, 0.768433, 1.000000]",
@@ -161,8 +191,8 @@ class EasingTest {
 
     @Test
     fun testPoly3Out() {
-        val outF = Easing.EasingFunctions.polyOut()
-        val inF = Easing.EasingFunctions.polyIn()
+        val outF = Easing.polyOut(3.0)
+        val inF = Easing.polyIn(3.0)
         val output = input.map { StringUtils.formatFloat(outF(it), 3) }
         kotlin.test.assertEquals(
             "[0.000, 0.271, 0.488, 0.657, 0.784, 0.875, 0.936, 0.973, 0.992, 0.999, 1.000]",
@@ -178,7 +208,7 @@ class EasingTest {
 
     @Test
     fun testPoly3InOut() {
-        val easingFunction = Easing.EasingFunctions.polyInOut()
+        val easingFunction = Easing.polyInOut(3.0)
         val output = input.map { StringUtils.formatFloat(easingFunction(it), 3) }
         kotlin.test.assertEquals(
             "[0.000, 0.004, 0.032, 0.108, 0.256, 0.500, 0.744, 0.892, 0.968, 0.996, 1.000]",

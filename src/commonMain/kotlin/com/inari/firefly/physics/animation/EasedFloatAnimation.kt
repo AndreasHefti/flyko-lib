@@ -2,6 +2,7 @@ package com.inari.firefly.physics.animation
 
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.util.geom.Easing
+import com.inari.util.geom.EasingFunction
 import com.inari.util.geom.GeomUtils
 import kotlin.jvm.JvmField
 
@@ -9,7 +10,7 @@ class EasedFloatAnimation private constructor() : TypedAnimation<Float>() {
 
     @JvmField var startValue = 0f
     @JvmField var endValue = 0f
-    @JvmField var easing: Easing.EasingFunctions.EasingFunction = Easing.Type.LINEAR
+    @JvmField var easing: EasingFunction = Easing.LINEAR
 
     override fun update(timeStep: Float, data: AnimatedObjectData<Float>) {
         if (applyTimeStep(timeStep, data))

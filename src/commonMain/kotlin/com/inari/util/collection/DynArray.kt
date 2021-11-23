@@ -383,9 +383,8 @@ class DynArray<T> constructor(
         }
 
         private fun findNext() {
-            while (index < array.size && array[index] == null) {
+            while (index < array.size && array[index] == null)
                 index++
-            }
         }
     }
 

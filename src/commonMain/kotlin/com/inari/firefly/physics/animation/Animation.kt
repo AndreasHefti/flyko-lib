@@ -8,19 +8,16 @@ import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 import kotlin.reflect.KMutableProperty0
 
-typealias PropertyAccessor<T> = KMutableProperty0<T>
-typealias PropertyRefResolver<T> = (CompId) -> PropertyAccessor<T>
-
 abstract class Animation protected constructor() : SystemComponent(Animation::class.simpleName!!) {
 
     @JvmField var duration = 0L
 
-    fun update() = update(FFContext.timer.timeElapsed.toFloat() / duration)
+    inline fun update() = update(FFContext.timer.timeElapsed.toFloat() / duration)
     abstract fun register(data: AnimatedObjectData<*>)
     abstract fun dispose(data: AnimatedObjectData<*>)
     abstract fun update(timeStep: Float)
 
-    fun applyTimeStep(timeStep: Float, data: AnimatedObjectData<*>): Boolean {
+    inline fun applyTimeStep(timeStep: Float, data: AnimatedObjectData<*>): Boolean {
         data.normalizedTime += timeStep
         if (data.normalizedTime >= 1.0f) {
             data.normalizedTime = 0.0f

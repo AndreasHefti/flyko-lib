@@ -24,7 +24,7 @@ class PlayerEvent(override val eventType: EventType) : Event<PlayerEventListener
         private set
     var room: RoomKey = RoomKey()
 
-    override fun notify(listener: PlayerEventListener) = listener(this)
+    override inline fun notify(listener: PlayerEventListener) = listener(this)
 
     companion object : EventType("PlayerEvent") {
         private val playerEvent = PlayerEvent(this)

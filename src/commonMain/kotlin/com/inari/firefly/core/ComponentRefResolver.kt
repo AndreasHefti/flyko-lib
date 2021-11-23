@@ -12,7 +12,7 @@ import com.inari.util.indexed.Indexed
 
 class ComponentRefResolver<T : Component>(
     private val type: ComponentType<T>,
-    private val receiver: Consumer<Int>
+    private inline val receiver: Consumer<Int>
 ) {
 
     operator fun invoke(id: CompId) = receiver(id.instanceId)
@@ -28,7 +28,7 @@ class ComponentRefResolver<T : Component>(
 
 class ComponentIdResolver<T : Component>(
     private val type: ComponentType<T>,
-    private val receiver: Consumer<CompId>
+    private inline val receiver: Consumer<CompId>
 ) {
 
     operator fun invoke(id: CompId) = receiver(id)
@@ -42,7 +42,7 @@ class ComponentIdResolver<T : Component>(
 
 class ComponentRefFunction<T : Component, X>(
     private val type: ComponentType<T>,
-    private val receiver: (Int) -> X
+    private inline val receiver: (Int) -> X
 ) {
 
     operator fun invoke(id: CompId): X = receiver(id.instanceId)
@@ -58,7 +58,7 @@ class ComponentRefFunction<T : Component, X>(
 
 class ComponentRefPredicate<T : Component>(
     private val type: ComponentType<T>,
-    private val predicate: (Int) -> Boolean
+    private inline val predicate: (Int) -> Boolean
 ) {
 
     operator fun invoke(id: CompId): Boolean = predicate(id.instanceId)

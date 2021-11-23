@@ -124,10 +124,10 @@ interface ControllerInput : InputDevice {
 }
 
 class ORAdapter(
-    val a: InputDevice,
-    val b: InputDevice,
-    override val name: String = "OR",
-    override val window: Long = -1
+    inline val a: InputDevice,
+    inline val b: InputDevice,
+    override inline val name: String = "OR",
+    override inline val window: Long = -1
 ) : InputDevice {
     override val type: InputImpl = Companion
     private val pressedCodeMapping = BitSet()
@@ -139,7 +139,7 @@ class ORAdapter(
         if (pressed && pressedCodeMapping[buttonCode])
             return false
 
-        pressedCodeMapping.set(buttonCode, pressed)
+        pressedCodeMapping[buttonCode] = pressed
         return pressed
     }
     companion object : InputImpl {

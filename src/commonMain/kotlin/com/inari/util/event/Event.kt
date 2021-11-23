@@ -48,7 +48,7 @@ abstract class Event<L> protected constructor() {
      *
      * @param listener the listener to notify.
      */
-    protected abstract fun notify(listener: L)
+    protected abstract fun  notify(listener: L)
     internal fun _notify(listener: L) = notify(listener)
 
     /** This is called within the IEventDispatcher after the Event has passed all its listeners and can be restored.

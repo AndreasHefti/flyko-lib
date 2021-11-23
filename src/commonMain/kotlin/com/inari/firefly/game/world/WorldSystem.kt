@@ -20,7 +20,6 @@ import com.inari.util.Consumer
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.*
 import kotlin.jvm.JvmField
-import kotlin.math.ceil
 import kotlin.math.floor
 
 object WorldSystem : FFSystem {
@@ -284,25 +283,24 @@ object WorldSystem : FFSystem {
             if (paused)
                 return@call
 
-            val px = floor(PlayerSystem.playerPosition.x) + PlayerSystem.playerPivot.v0
-            val py = floor(PlayerSystem.playerPosition.y) + PlayerSystem.playerPivot.v1
-
-            //println("${PlayerSystem.playerPosition.x} ${PlayerSystem.playerPosition.y}")
-            //println("$px $py")
+            val px = floor(PlayerSystem.playerPosition.x).toInt()
+            val py = floor(PlayerSystem.playerPosition.y).toInt()
+            val ppx = px + PlayerSystem.playerPivot.x
+            val ppy = py + PlayerSystem.playerPivot.y
 
             var orientation = Orientation.NONE
-            if (px < roomX1) {
+            if (ppx < roomX1) {
                 orientation = Orientation.WEST
-            } else if (px > roomX2) {
+            } else if (ppx > roomX2) {
                 orientation = Orientation.EAST
-            } else if (py < roomY1) {
+            } else if (ppy < roomY1) {
                 orientation = Orientation.NORTH
-            } else if (py > roomY2) {
+            } else if (ppy > roomY2) {
                 orientation = Orientation.SOUTH
             }
 
             if (orientation != Orientation.NONE)
-                handleRoomChange(px.toInt(), py.toInt(), orientation)
+                handleRoomChange(px, py, orientation)
         }
     }
 }

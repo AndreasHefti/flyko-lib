@@ -13,6 +13,7 @@ import com.inari.util.geom.*
 import com.inari.util.indexed.Indexed
 import kotlin.jvm.JvmField
 import kotlin.reflect.KClass
+import kotlin.reflect.KMutableProperty0
 
 const val ZERO_INT = 0
 const val ZERO_FLOAT = 0.0f

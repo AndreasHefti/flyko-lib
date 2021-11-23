@@ -14,7 +14,9 @@ import com.inari.firefly.info.FrameRateInfo
 import com.inari.firefly.physics.animation.AnimationSystem
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.EasedFloatAnimation
+import com.inari.firefly.util.geom.EasingTest
 import com.inari.util.geom.Easing
+import com.inari.util.geom.EasingFunction
 
 fun main(args: Array<String>) {
     object : DesktopRunner("EasingTest2", 800, 900) {
@@ -26,12 +28,12 @@ fun main(args: Array<String>) {
             FFContext.loadSystem(EntitySystem)
             FFContext.loadSystem(AnimationSystem)
 
-            for ((index, easingType) in Easing.Type.values().withIndex()) {
+            for ((index, easingType) in EasingTest.EasingType.values().withIndex()) {
                 createEasingAnimation(easingType, index)
             }
         }
 
-        private fun createEasingAnimation(type: Easing.Type, position: Int) {
+        private fun createEasingAnimation(type: EasingTest.EasingType, position: Int) {
             val ypos = position.toFloat() * (20f + 10f) + 50f
 
             Entity.buildAndActivate {
@@ -63,7 +65,7 @@ fun main(args: Array<String>) {
                         inverseOnLoop = true
                         animatedProperty = ETransform.Property.POSITION_X
                         applyToNewActiveAnimation(EasedFloatAnimation) {
-                            easing = type
+                            easing = type.func
                             startValue = 100f
                             endValue = 400f
                             duration = 5000

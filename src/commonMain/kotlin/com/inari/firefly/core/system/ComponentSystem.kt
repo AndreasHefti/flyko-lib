@@ -50,10 +50,10 @@ interface ComponentSystem : FFSystem {
     }
 
     class ComponentMapImpl<C : NamedComponent>(
-        override val componentType: ComponentType<C>,
-        override val activationMapping: Boolean,
-        override  val nameMapping: Boolean,
-        private val listener: (C, ComponentMap.MapAction) -> Unit,
+        override inline val componentType: ComponentType<C>,
+        override inline val activationMapping: Boolean,
+        override inline  val nameMapping: Boolean,
+        private inline val listener: (C, ComponentMap.MapAction) -> Unit,
         dynArrayFunction: () -> DynArray<C>
     ) : ComponentMap<C> {
 
@@ -127,8 +127,8 @@ interface ComponentSystem : FFSystem {
             }
         }
 
-        override fun deleteAll(predicate: Predicate<C?>) =
-            _map.filter { predicate(it) }
+        override inline fun deleteAll(predicate: Predicate<C?>) =
+            map.filter { predicate(it) }
                 .forEach { comp -> delete(comp.index) }
 
         override fun idForName(name: String): CompId {
@@ -179,7 +179,7 @@ interface ComponentSystem : FFSystem {
                 nextIndex(predicate, from)
             }
         
-        override fun receiver(): Receiver<C> = { c -> add(c) }
+        override inline fun receiver(): Receiver<C> = { c -> add(c) }
 
         override fun forEach(expr: Consumer<C>) =
             map.forEach{ c -> expr(c) }
@@ -192,14 +192,14 @@ interface ComponentSystem : FFSystem {
             }
         }
 
-        override fun forEachIn(bag: DynIntArrayRO, expr: Consumer<C>) {
+        override inline fun forEachIn(bag: DynIntArrayRO, expr: Consumer<C>) {
             val i = bag.iterator()
             while (i.hasNext())
                 expr(map[i.next()]!!)
         }
 
         @Suppress("UNCHECKED_CAST")
-        override fun <CC : C> forEachSubtypeIn(bag: DynIntArrayRO, expr: Consumer<CC>) {
+        override inline fun <CC : C> forEachSubtypeIn(bag: DynIntArrayRO, expr: Consumer<CC>) {
             val i = bag.iterator()
             while (i.hasNext())
                 expr(map[i.next()] as CC)
@@ -216,7 +216,7 @@ interface ComponentSystem : FFSystem {
                 active.clear()
         }
 
-        private fun <CC : C> add(c: CC, alsoActivate: Boolean = false): CC {
+        fun <CC : C> add(c: CC, alsoActivate: Boolean = false): CC {
             _map[c.index] = c
             listener(c, ComponentMap.MapAction.CREATED)
             if (nameMapping && c.name !== NO_NAME)

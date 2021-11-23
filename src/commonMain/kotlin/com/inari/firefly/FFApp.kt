@@ -120,8 +120,9 @@ abstract class FFApp protected constructor(
         @JvmField internal val NO_VIRTUAL_VIEW_PORTS: DynArrayRO<ViewData> = DynArray.of()
     }
 
+    //@Suppress("OVERRIDE_BY_INLINE")
     class UpdateEvent(override val eventType: EventType) : Event<Call>() {
-        override fun notify(listener: Call) = listener()
+        override inline fun notify(listener: Call) = listener()
         companion object : EventType("UpdateEvent") {
             internal val updateEvent = UpdateEvent(this)
         }
@@ -136,7 +137,7 @@ abstract class FFApp protected constructor(
         var clip: Vector4i = Vector4i(0, 0, 0, 0)
             internal set
 
-        override fun notify(listener: Consumer<RenderEvent>) = listener(this)
+        override inline fun notify(listener: Consumer<RenderEvent>) = listener(this)
 
         companion object : EventType("RenderEvent") {
             internal val renderEvent = RenderEvent(this)
@@ -148,14 +149,14 @@ abstract class FFApp protected constructor(
         var viewIndex: Int = -1
             internal set
 
-        override fun notify(listener: Consumer<EffectRenderEvent>) = listener(this)
+        override inline fun notify(listener: Consumer<EffectRenderEvent>) = listener(this)
         companion object : EventType("EffectRenderEvent") {
             internal val effectRenderEvent = EffectRenderEvent(this)
         }
     }
 
     class PostRenderEvent(override val eventType: EventType) : Event<Call>() {
-        override fun notify(listener: Call) = listener()
+        override inline fun notify(listener: Call) = listener()
         companion object : EventType("PostRenderEvent") {
             internal val postRenderEvent = PostRenderEvent(this)
         }

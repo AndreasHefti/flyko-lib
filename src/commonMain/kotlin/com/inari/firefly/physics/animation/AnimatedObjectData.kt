@@ -3,15 +3,14 @@ package com.inari.firefly.physics.animation
 import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFContext
 import com.inari.firefly.core.ComponentRefResolver
-import com.inari.firefly.core.component.CompId
-import com.inari.firefly.core.component.ComponentDSL
+import com.inari.firefly.core.component.*
 import com.inari.firefly.core.system.SystemComponentBuilder
 import com.inari.util.Call
 import kotlin.jvm.JvmField
 import kotlin.reflect.KMutableProperty0
 
 @ComponentDSL
-class AnimatedObjectData<T>() {
+class AnimatedObjectData<T> {
 
     @JvmField internal var animationRef = -1
 
@@ -21,11 +20,14 @@ class AnimatedObjectData<T>() {
     @JvmField var resetOnFinish = true
     @JvmField var inversed = false
     @JvmField var callback: Call = DO_NOTHING
-    @JvmField var animatedProperty: PropertyRefResolver<T> = { _ -> throw IllegalStateException("NULL_FUNCTION") }
+    @JvmField var animatedProperty: PropertyRefResolver<T> = NULL_PROPERTY_REF_RESOLVER()
+    @JvmField var adapter: KMutableProperty0<T> = this::NULL_ADAPTER
 
-    lateinit var adapter: KMutableProperty0<T>
-        private set
-    internal fun init(compId: CompId) { adapter = animatedProperty(compId) }
+    var NULL_ADAPTER: T
+        get() = throw IllegalStateException("Adapter not set")
+        set(value) = throw IllegalStateException("Adapter not set")
+
+    internal inline fun init(compId: CompId) { adapter = animatedProperty(compId) }
 
     @JvmField val applyToAnimation = ComponentRefResolver(Animation) { animationRef = it }
     fun <A : Animation> applyToNewAnimation(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
@@ -39,6 +41,6 @@ class AnimatedObjectData<T>() {
         return result
     }
 
-    fun setProperty(v: T)  { adapter.set(v) }
-    fun getProperty(): T = adapter.get()
+    inline fun setProperty(v: T)  { adapter.set(v) }
+    inline fun getProperty(): T = adapter.get()
 }
