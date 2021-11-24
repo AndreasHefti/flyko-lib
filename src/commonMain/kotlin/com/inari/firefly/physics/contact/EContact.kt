@@ -26,7 +26,7 @@ class EContact private constructor() : EntityComponent(EContact::class.simpleNam
     @JvmField var bounds: Vector4i = Vector4i()
     var mask: BitMask = BitMask(width = 0, height = 0)
         set(value) {
-            mask.reset(value.region())
+            mask.reset(value.region)
             mask.or(value)
         }
     var material: Aspect  = UNDEFINED_MATERIAL

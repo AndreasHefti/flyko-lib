@@ -12,12 +12,12 @@ abstract class Animation protected constructor() : SystemComponent(Animation::cl
 
     @JvmField var duration = 0L
 
-    inline fun update() = update(FFContext.timer.timeElapsed.toFloat() / duration)
+    fun update() = update(FFContext.timer.timeElapsed.toFloat() / duration)
     abstract fun register(data: AnimatedObjectData<*>)
     abstract fun dispose(data: AnimatedObjectData<*>)
     abstract fun update(timeStep: Float)
 
-    inline fun applyTimeStep(timeStep: Float, data: AnimatedObjectData<*>): Boolean {
+    fun applyTimeStep(timeStep: Float, data: AnimatedObjectData<*>): Boolean {
         data.normalizedTime += timeStep
         if (data.normalizedTime >= 1.0f) {
             data.normalizedTime = 0.0f

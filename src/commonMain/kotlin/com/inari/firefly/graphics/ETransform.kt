@@ -5,13 +5,13 @@ import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.ZERO_INT
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.TransformData
+import com.inari.firefly.core.component.PropertyRefResolver
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
 import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewLayerAware
-import com.inari.firefly.physics.animation.PropertyRefResolver
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 

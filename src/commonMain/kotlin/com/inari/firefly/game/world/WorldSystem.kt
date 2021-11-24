@@ -71,20 +71,8 @@ object WorldSystem : FFSystem {
                 else -> DO_NOTHING
             }
             CompositeEventType.DELETED -> when (compositeAspect) {
-                World -> {
-                    forEachArea { area ->
-                        if (area.parentRef == id.instanceId)
-                            FFContext.delete(area)
-                    }
-                    worlds[id.index] = false
-                }
-                Area -> {
-                    forEachRoom { room ->
-                        if (room.parentRef == id.instanceId)
-                            FFContext.delete(room)
-                    }
-                    areas[id.index] = false
-                }
+                World -> worlds[id.index] = false
+                Area -> areas[id.index] = false
                 Room -> rooms[id.index] = false
                 else -> DO_NOTHING
             }
@@ -200,6 +188,9 @@ object WorldSystem : FFSystem {
         handleRoomChange(nextRoomSupplier(px, py, orientation))
 
     private fun handleRoomChange(nextRoomKey: RoomKey) {
+        if (nextRoomKey.roomId == NO_COMP_ID)
+            throw IllegalStateException("No Room found")
+
         pauseRoom()
         val activeRoom = FFContext[Room, activeRoomId]
         val startGame: Call = { resumeRoom() }
@@ -210,7 +201,7 @@ object WorldSystem : FFSystem {
             FFContext.deactivate(Room, activeRoomId)
 
             // activate new room and player
-            activateRoom(nextRoomKey.roomId)
+            FFContext.activate(Room, nextRoomKey.roomId)
             PlayerSystem.playerPosition(
                 nextRoomKey.playerPositionX,
                 nextRoomKey.playerPositionY)
@@ -300,7 +291,7 @@ object WorldSystem : FFSystem {
             }
 
             if (orientation != Orientation.NONE)
-                handleRoomChange(px, py, orientation)
+                handleRoomChange(ppx, ppy, orientation)
         }
     }
 }

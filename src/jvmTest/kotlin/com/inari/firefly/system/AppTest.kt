@@ -18,7 +18,7 @@ class AppTest {
 
     @Test
     fun updateRenderLoopTestWithJustBaseView() {
-        TestApp
+        TestApp.resetTimer()
         ViewSystem
         FFContext.registerListener(FFApp.RenderEvent, renderEventListener)
 

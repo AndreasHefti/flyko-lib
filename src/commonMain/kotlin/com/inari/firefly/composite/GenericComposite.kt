@@ -20,15 +20,6 @@ import kotlin.jvm.JvmField
 
 open class GenericComposite : Composite(), TriggeredSystemComponent {
 
-    var parentRef = -1
-        internal set
-    @JvmField val withParent = ComponentRefResolver(Composite) { index -> parentRef = index }
-
-    @JvmField var loadDependsOnParent = true
-    @JvmField var activationDependsOnParent = false
-    @JvmField var deactivateAlsoParent = false
-    @JvmField var disposeAlsoParent = false
-
     /** Task name or pipe '|' separated list of task names or NO_NAME for empty (null) */
     @JvmField var loadTasks = NO_NAME
     /** Task name or pipe '|' separated list of task names or NO_NAME for empty (null) */
@@ -123,10 +114,6 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
 
     override fun loadComposite() {
 
-        // if depends on parent and parent is defined load the parent first if not already loaded
-        if (loadDependsOnParent && parentRef >= 0)
-            FFContext.load(Composite, parentRef)
-
         // first load all registered assets
         FFContext.activateAll(Asset, assetRefs)
 
@@ -138,10 +125,6 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
     }
 
     override fun activateComposite() {
-
-        // if depends on parent and parent is defined activate the parent first if not already active
-        if (activationDependsOnParent && parentRef >= 0)
-            FFContext.activate(Composite, parentRef)
 
         // run additional activation tasks if defined
         if (activationTasks != NO_NAME)
@@ -163,10 +146,6 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
             deactivationTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
                 .forEach { FFContext.runTask(it, this.componentId) }
-
-        // if depends on parent and parent is defined deactivate the parent also
-        if (deactivateAlsoParent && parentRef >= 0)
-            FFContext.deactivate(Composite, parentRef)
     }
 
     override fun disposeComposite() {
@@ -181,10 +160,6 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         attributes.clear()
         loadedComponents.clear()
         activatableComponents.clear()
-
-        // if depends on parent and parent is defined dispose the parent also
-        if (disposeAlsoParent && parentRef >= 0)
-            FFContext.dispose(Composite, parentRef)
     }
 
     override fun dispose() {

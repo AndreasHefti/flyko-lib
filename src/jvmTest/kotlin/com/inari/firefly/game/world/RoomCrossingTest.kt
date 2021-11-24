@@ -38,11 +38,11 @@ class RoomCrossingTest {
             }
 
         val worldId = World.build {
-            name = "TestArea1"
+            name = "World1"
         }
         val areaId = Area.build {
             name = "TestArea1"
-            withParent(worldId)
+            parentName = "World1"
         }
 
         // room1  room2
@@ -58,13 +58,13 @@ class RoomCrossingTest {
 
         val roomId1 = Room.build {
             name = "Room1"
-            withParent(areaId)
+            parentName = "TestArea1"
             roomOrientation(0, 0, 100, 200)
             areaOrientation(0, 0, 1, 2)
         }
         val roomId2 = Room.build {
             name = "Room2"
-            withParent(areaId)
+            parentName = "TestArea1"
             roomOrientation(0, 0, 200, 200)
             areaOrientation(1, 1, 1, 2)
         }

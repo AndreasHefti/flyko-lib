@@ -127,6 +127,7 @@ interface ComponentSystem : FFSystem {
             }
         }
 
+        @Suppress("OVERRIDE_BY_INLINE")
         override inline fun deleteAll(predicate: Predicate<C?>) =
             map.filter { predicate(it) }
                 .forEach { comp -> delete(comp.index) }
@@ -178,7 +179,8 @@ interface ComponentSystem : FFSystem {
         override fun indexIterator(predicate: Predicate<C?>): IntFunction =  { from ->
                 nextIndex(predicate, from)
             }
-        
+
+        @Suppress("OVERRIDE_BY_INLINE")
         override inline fun receiver(): Receiver<C> = { c -> add(c) }
 
         override fun forEach(expr: Consumer<C>) =
@@ -192,13 +194,14 @@ interface ComponentSystem : FFSystem {
             }
         }
 
+        @Suppress("OVERRIDE_BY_INLINE")
         override inline fun forEachIn(bag: DynIntArrayRO, expr: Consumer<C>) {
             val i = bag.iterator()
             while (i.hasNext())
                 expr(map[i.next()]!!)
         }
 
-        @Suppress("UNCHECKED_CAST")
+        @Suppress("UNCHECKED_CAST", "OVERRIDE_BY_INLINE")
         override inline fun <CC : C> forEachSubtypeIn(bag: DynIntArrayRO, expr: Consumer<CC>) {
             val i = bag.iterator()
             while (i.hasNext())

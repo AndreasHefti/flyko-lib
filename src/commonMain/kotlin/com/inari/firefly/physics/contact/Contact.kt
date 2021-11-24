@@ -37,8 +37,7 @@ class Contact internal constructor() {
     fun hasContact(x: Int, y: Int): Boolean {
         if (GeomUtils.contains(intersection, x, y)) {
             if (!mask.isEmpty) {
-                val region = mask.region()
-                return mask.getBit(x - region.x, y - region.y)
+                return mask.getBit(x - mask.x, y - mask.y)
             }
             return true
         }

@@ -16,7 +16,7 @@ class ShaderData(
     @JvmField inline var shaderInit: ShaderInit = VOID_CONSUMER,
 ) {
 
-    inline fun reset() {
+    fun reset() {
         vertexShaderResourceName = NO_NAME
         vertexShaderProgram = NO_PROGRAM
         fragmentShaderResourceName = NO_NAME

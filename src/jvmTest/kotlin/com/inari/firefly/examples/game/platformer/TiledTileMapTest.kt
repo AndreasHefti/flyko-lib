@@ -15,6 +15,7 @@ import com.inari.firefly.game.player.movement.*
 import com.inari.firefly.game.tile.TileMapSystem
 import com.inari.firefly.game.tile.TileMaterialType
 import com.inari.firefly.game.json.TiledMapJSONAsset
+import com.inari.firefly.game.json.TiledTileMap
 import com.inari.firefly.game.player.PlayerComposite
 import com.inari.firefly.game.player.PlayerSystem
 import com.inari.firefly.game.world.*
@@ -65,6 +66,13 @@ fun initView() {
         withLayer { name = "Layer2" }
         withLayer { name = "Layer1" }
     }
+    // camera
+    val camId = SimpleCameraController.buildAndActivate {
+        name = "Player_Camera"
+        //pivot = PlayerSystem.playerPosition
+        snapToBounds(-100, -100, 840, 840)
+    }
+    FFContext[View, "testView"].withController(camId)
 }
 
 fun initPlayerTasks() {
@@ -129,12 +137,34 @@ fun initPlayerTasks() {
     }
 }
 
+fun initAreaTasks() {
+    SimpleTask.build {
+        name = "AreaActivationTask"
+        withOperation { id ->
+            println("activateArea -> $id")
+
+            val area = FFContext[Area, id]
+            WorldSystem.forEachRoom { room ->
+                if (room.parentName == area.name) {
+                    // load room tiled resource and create tile set asset for the room
+                    val tiledMapFile = room.getAttribute("tiledRoomResource")!!
+                    val res = FFContext.resourceService.loadJSONResource(tiledMapFile, TiledTileMap::class)
+                    TiledMapJSONAsset.build {
+                        name = "${room.name}_MapAsset"
+                        view("testView")
+                        withTiledTileMap(res)
+                    }
+                }
+            }
+        }
+    }
+}
+
 fun initRoomTasks() {
     SimpleTask.build {
         name = "RoomLoadTask"
         withOperation { id ->
             println("loadRoom -> $id")
-            PlayerSystem.withPlayerLoadTask("LoadPlayer")
         }
     }
 
@@ -143,28 +173,32 @@ fun initRoomTasks() {
         withOperation { id ->
             println("activate -> $id")
 
-            FFContext.activate(Asset, "mapAsset")
-            TileMapSystem.activateTileMap(FFContext[Asset, "mapAsset"].instanceId)
+            val roomName = FFContext[Room, id].name
 
-            // player
+            FFContext.load(Asset, "${roomName}_MapAsset")
+            TileMapSystem.activateTileMap(FFContext[Asset, "${roomName}_MapAsset"].instanceId)
             PlayerSystem.loadPlayer()
-            // camera
-            val camId = SimpleCameraController.buildAndActivate {
-                name = "Player_Camera"
-                pivot = PlayerSystem.playerPosition
-                snapToBounds(-100, -100, 840, 840)
-            }
-            FFContext[View, "testView"].withController(camId)
+
+            // connect player to camera
+            FFContext[SimpleCameraController, "Player_Camera"].pivot = PlayerSystem.playerPosition
         }
     }
 
     SimpleTask.build {
         name = "RoomDeactivationTask"
-        withOperation { id -> println("deactivate -> $id") }
+        withOperation { id ->
+            println("deactivate -> $id")
+
+            val roomName = FFContext[Room, id].name
+            TileMapSystem.deactivateTileMap(FFContext[Asset, "${roomName}_MapAsset"].instanceId)
+            FFContext.dispose(Asset, "${roomName}_MapAsset")
+        }
     }
     SimpleTask.build {
         name = "RoomDisposeTask"
         withOperation { id -> println("dispose -> $id") }
+
+
     }
 
     SimpleTask.build {
@@ -216,29 +250,43 @@ object TiledTileMapTest {
                 MovementSystem
                 ContactSystem
                 TestGameObject
+                WorldSystem
 
                 // game init
                 initControl()
                 initView()
+                initScenes()
+                // player
+                initPlayerTasks()
+                PlayerSystem.withPlayerLoadTask("LoadPlayer")
 
                 // area init
-                initPlayerTasks()
+                initAreaTasks()
                 initRoomTasks()
-                initScenes()
 
                 Area.build {
                     name = "TiledMapTestArea"
+                    withActivationTask("AreaActivationTask")
 
                     withRoom {
                         name = "Room1"
+                        parentName = "TiledMapTestArea"
                         areaOrientation(0, 0, 2, 2)
                         roomOrientation(0, 0, 20 * 16, 20 * 16)
-                        withAsset(TiledMapJSONAsset) {
-                            name = "mapAsset"
-                            resourceName = "tiles/map1.json"
-                            view("testView")
-                        }
-
+                        setAttribute("tiledRoomResource", "tiles/map1.json")
+                        withLoadTask("RoomLoadTask")
+                        withActivationTask("RoomActivationTask")
+                        withDeactivationTask("RoomDeactivationTask")
+                        withDisposeTask("RoomDisposeTask")
+                        withActivationScene("RoomActivationScene")
+                        withDeactivationScene("RoomDeactivationScene")
+                    }
+                    withRoom {
+                        name = "Room2"
+                        parentName = "TiledMapTestArea"
+                        areaOrientation(2, 0, 2, 2)
+                        roomOrientation(0, 0, 20 * 16, 20 * 16)
+                        setAttribute("tiledRoomResource", "tiles/map2.json")
                         withLoadTask("RoomLoadTask")
                         withActivationTask("RoomActivationTask")
                         withDeactivationTask("RoomDeactivationTask")
@@ -248,6 +296,10 @@ object TiledTileMapTest {
                     }
                 }
 
+                // activate area
+                FFContext.activate(Area, "TiledMapTestArea")
+
+                // start game in Room1
                 WorldSystem.startRoom(4 * 16, 4 * 16)("Room1")
             }
         }

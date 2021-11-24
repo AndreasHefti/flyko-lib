@@ -32,33 +32,8 @@ object CompositeSystem : ComponentSystem {
                 CREATED       ->    CompositeEvent.send(CompositeEventType.CREATED, composite.componentId, composite.componentType())
                 ACTIVATED     ->    activate(composite)
                 DEACTIVATED   ->    deactivate(composite)
-                DELETED       ->    CompositeEvent.send(CompositeEventType.DELETED,composite.componentId, composite.componentType())
+                DELETED       ->    delete(composite)
             } }
-    )
-
-    val loaderDispatcher = ComponentSystem.createLoaderDispatcher(
-        Composite,
-        ComponentRefResolver(Composite) {
-            with(systemComposites[it]) {
-                systemLoad()
-                CompositeEvent.send(
-                    CompositeEventType.LOADED,
-                    componentId,
-                    componentType()
-                )
-            }
-        },
-        ComponentRefPredicate(Composite) { systemComposites[it].loaded },
-        ComponentRefResolver(Composite) {
-            with(systemComposites[it]) {
-                systemDispose()
-                CompositeEvent.send(
-                    CompositeEventType.DISPOSED,
-                    componentId,
-                    componentType()
-                )
-            }
-        }
     )
 
     private val entityListener: EntityEventListener = object : EntityEventListener {
@@ -72,6 +47,30 @@ object CompositeSystem : ComponentSystem {
     init {
         FFContext.loadSystem(this)
         FFContext.registerListener(EntityEvent, entityListener)
+        ComponentSystem.createLoaderDispatcher(
+            Composite,
+            ComponentRefResolver(Composite) {
+                with(systemComposites[it]) {
+                    systemLoad()
+                    CompositeEvent.send(
+                        CompositeEventType.LOADED,
+                        componentId,
+                        componentType()
+                    )
+                }
+            },
+            ComponentRefPredicate(Composite) { systemComposites[it].loaded },
+            ComponentRefResolver(Composite) {
+                with(systemComposites[it]) {
+                    systemDispose()
+                    CompositeEvent.send(
+                        CompositeEventType.DISPOSED,
+                        componentId,
+                        componentType()
+                    )
+                }
+            }
+        )
     }
 
     private fun activate(composite: Composite) {
@@ -88,6 +87,19 @@ object CompositeSystem : ComponentSystem {
 
         CompositeEvent.send(
             CompositeEventType.DEACTIVATED,
+            composite.componentId,
+            composite.componentType())
+    }
+
+    private fun delete(composite: Composite) {
+        // delete all children first
+        systemComposites.forEach {
+            if (it.parentName == it.name)
+                FFContext.delete(it)
+        }
+
+        CompositeEvent.send(
+            CompositeEventType.DELETED,
             composite.componentId,
             composite.componentType())
     }

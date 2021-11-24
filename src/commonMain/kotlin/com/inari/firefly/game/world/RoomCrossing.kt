@@ -53,7 +53,7 @@ val DEFAULT_SECTION_BASED_ROOM_SUPPLIER: NextRoomSupplier = nextRoomSupplier@ { 
             // exit old room east way, enter new room on west
             Orientation.EAST -> {
                 newPx = - PlayerSystem.playerPivot.v0
-                newPy = sy * sHeight + sOffsetY
+                newPy = (sy * sHeight + sOffsetY) - PlayerSystem.playerPivot.v1
             }
             // exit old room south way, enter new room on north
             Orientation.SOUTH -> {

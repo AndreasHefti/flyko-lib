@@ -13,7 +13,11 @@ class Area private constructor() : GenericComposite() {
     @JvmField var orientationType: WorldOrientationType = WorldOrientationType.COUNT
     @JvmField val orientation: Vector4i = Vector4i()
 
-    fun withRoom(configure: (Room.() -> Unit)): CompId = Room.build(configure)
+    fun withRoom(configure: (Room.() -> Unit)): CompId {
+        val room = Room.buildAndGet(configure)
+        room.parentName = name
+        return room.componentId
+    }
 
     override fun componentType() = Companion
     companion object : SystemComponentSubType<Composite, Area>(Composite, Area::class) {

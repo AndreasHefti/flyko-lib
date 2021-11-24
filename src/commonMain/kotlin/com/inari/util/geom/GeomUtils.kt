@@ -2,11 +2,55 @@ package com.inari.util.geom
 
 
 import com.inari.util.collection.BitSet
-import com.inari.util.geom.Direction.*
 import kotlin.math.*
+import com.inari.util.geom.Direction.*
 
+enum class Orientation {
+    NONE,
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST
+}
 
-// TODO write tests
+/** Eight directions, build of four [Orientation], and a NONE constant
+ * containing also a horizontal and vertical enum value that divides the
+ * Direction into a horizontal and vertical part.
+ *
+ * Use this if you have a discrete direction with eight different directions,
+ * for example, for input, move, or other things.
+ */
+enum class Direction
+    /** Use this to create a new Direction with specified horizontal and vertical Orientation.
+     * @param horizontal horizontal [Orientation] of the new Direction
+     * @param vertical vertical [Orientation] of the new Direction
+     */
+    constructor(
+        /** The horizontal orientation NONE/EAST/WEST  */
+        val horizontal: Orientation,
+        /** The vertical orientation NONE/NORTH/SOUTH  */
+        val vertical: Orientation) {
+
+        /** No Direction with also Horizontal.NONE and Vertical.NONE  */
+        NONE(Orientation.NONE, Orientation.NONE),
+        /** North Direction with Horizontal.NONE and Vertical.UP  */
+        NORTH(Orientation.NONE, Orientation.NORTH),
+        /** North East Direction with Horizontal.RIGHT and Vertical.UP  */
+        NORTH_EAST(Orientation.EAST, Orientation.NORTH),
+        /** East Direction with Horizontal.RIGHT and Vertical.NONE  */
+        EAST(Orientation.EAST, Orientation.NONE),
+        /** South East Direction with Horizontal.RIGHT and Vertical.DOWN  */
+        SOUTH_EAST(Orientation.EAST, Orientation.SOUTH),
+        /** South Direction with Horizontal.NONE and Vertical.DOWN  */
+        SOUTH(Orientation.NONE, Orientation.SOUTH),
+        /** South West Direction with Horizontal.LEFT and Vertical.DOWN  */
+        SOUTH_WEST(Orientation.WEST, Orientation.SOUTH),
+        /** West Direction with Horizontal.LEFT and Vertical.NONE  */
+        WEST(Orientation.WEST, Orientation.NONE),
+        /** North West Direction with Horizontal.LEFT and Vertical.UP  */
+        NORTH_WEST(Orientation.WEST, Orientation.NORTH)
+}
+
 object GeomUtils {
 
     const val halfPi = PI / 2.0
@@ -22,6 +66,11 @@ object GeomUtils {
     const val BOTTOM_SIDE = 1 shl 3
     const val LEFT_SIDE = 1 shl 4
 
+    inline fun magnitude(v: Vector2i) = sqrt((v.v0 * v.v0 + v.v1 * v.v1).toFloat())
+    inline fun magnitude(v: Vector4i) = sqrt((v.v0 * v.v0 + v.v1 * v.v1 + v.v2 * v.v2 + v.v3 * v.v3).toFloat())
+    inline fun magnitude(v: Vector2f) = sqrt(v.v0 * v.v0 + v.v1 * v.v1)
+    inline fun magnitude(v: Vector3f) = sqrt(v.v0 * v.v0 + v.v1 * v.v1 + v.v2 * v.v2 )
+    inline fun magnitude(v: Vector4f) = sqrt(v.v0 * v.v0 + v.v1 * v.v1 + v.v2 * v.v2 + v.v3 * v.v3)
 
     inline fun lerp(v0: Int, v1: Int, t: Float): Int = ((1 - t) * v0 + t * v1).toInt()
     inline fun lerp(v0: Float, v1: Float, t: Float): Float = (1 - t) * v0 + t * v1
@@ -44,18 +93,6 @@ object GeomUtils {
         target.v2 = lerp(v0.v2, v1.v2, t)
         target.v3 = lerp(v0.v3, v1.v3, t)
     }
-
-    inline fun sqrtf(value: Float): Float =
-        sqrt(value.toDouble()).toFloat()
-
-    inline fun powf(v1: Float, v2: Float): Float =
-        v1.toDouble().pow(v2.toDouble()).toFloat()
-
-    inline fun sinf(value: Float): Float =
-        sin(value.toDouble()).toFloat()
-
-    inline fun cosf(value: Float): Float =
-        cos(value.toDouble()).toFloat()
 
     inline fun getDistance(p1: Vector2i, p2: Vector2i): Float {
         val dx = p2.x - p1.x

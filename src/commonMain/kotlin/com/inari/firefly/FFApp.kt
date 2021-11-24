@@ -120,7 +120,7 @@ abstract class FFApp protected constructor(
         @JvmField internal val NO_VIRTUAL_VIEW_PORTS: DynArrayRO<ViewData> = DynArray.of()
     }
 
-    //@Suppress("OVERRIDE_BY_INLINE")
+    @Suppress("OVERRIDE_BY_INLINE")
     class UpdateEvent(override val eventType: EventType) : Event<Call>() {
         override inline fun notify(listener: Call) = listener()
         companion object : EventType("UpdateEvent") {
@@ -128,6 +128,7 @@ abstract class FFApp protected constructor(
         }
     }
 
+    @Suppress("OVERRIDE_BY_INLINE")
     class RenderEvent(override val eventType: EventType) : Event<Consumer<RenderEvent>>() {
 
         var viewIndex: Int = -1
@@ -144,6 +145,7 @@ abstract class FFApp protected constructor(
         }
     }
 
+    @Suppress("OVERRIDE_BY_INLINE")
     class EffectRenderEvent(override val eventType: EventType) : Event<Consumer<EffectRenderEvent>>() {
 
         var viewIndex: Int = -1
@@ -155,6 +157,7 @@ abstract class FFApp protected constructor(
         }
     }
 
+    @Suppress("OVERRIDE_BY_INLINE")
     class PostRenderEvent(override val eventType: EventType) : Event<Call>() {
         override inline fun notify(listener: Call) = listener()
         companion object : EventType("PostRenderEvent") {

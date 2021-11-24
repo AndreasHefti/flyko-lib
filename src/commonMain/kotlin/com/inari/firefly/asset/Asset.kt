@@ -14,8 +14,8 @@ abstract class Asset protected constructor() : SystemComponent(Asset::class.simp
 
     override val instanceId: Int get() = instanceId(0)
 
-    inline internal fun activate() = load()
-    inline internal fun deactivate() = unload()
+    internal fun activate() = load()
+    internal fun deactivate() = unload()
 
     protected abstract fun load()
     protected abstract fun unload()

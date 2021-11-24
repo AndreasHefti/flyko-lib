@@ -1,6 +1,7 @@
 package com.inari.firefly.examples.game.platformer
 
 import com.inari.firefly.BlendMode
+import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.composite.Composite
 import com.inari.firefly.composite.CompositeSystem
@@ -47,11 +48,11 @@ class TestGameObject : RoomObjectComposite() {
     }
 
     override fun deactivateComposite() {
-        TODO("Not yet implemented")
+        FFContext.deactivate(entityId)
     }
 
     override fun disposeComposite() {
-        TODO("Not yet implemented")
+        FFContext.dispose(entityId)
     }
 
     override fun componentType() = Companion

@@ -10,6 +10,7 @@ class BxCondition private constructor() : BxNode() {
 
     @JvmField var condition: BxConditionOp = TRUE_CONDITION
 
+    @Suppress("OVERRIDE_BY_INLINE")
     override fun tick(entity: Entity, behavior: EBehavior): OpResult =
             when (condition(entity, behavior) ) {
                 true -> OpResult.SUCCESS

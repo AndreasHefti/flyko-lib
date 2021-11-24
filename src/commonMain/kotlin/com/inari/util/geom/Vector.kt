@@ -2,6 +2,7 @@ package com.inari.util.geom
 
 import com.inari.util.StringUtils
 import kotlin.jvm.JvmField
+import kotlin.math.sqrt
 
 class ImmutableVector2i constructor(
     @JvmField inline val v0: Int = 0,
@@ -16,6 +17,8 @@ class ImmutableVector2i constructor(
         if (v1 != other.v1) return false
         return true
     }
+
+    inline fun magnitude() = sqrt((v0 * v0 + v1 * v1).toFloat())
     override fun hashCode(): Int {
         var result = v0
         result = 31 * result + v1
@@ -36,6 +39,17 @@ open class Vector2i constructor(
     inline var y: Int
         get() = v1
         set(value) { v1 = value }
+
+    inline fun normalized(v: Vector2f) {
+        val m = GeomUtils.magnitude(this)
+        if (m == 0f) {
+            v.v0 = 0f
+            v.v1 = 0f
+        } else {
+            v.v0 = v0 / m
+            v.v1 = v1 / m
+        }
+    }
 
     operator fun invoke(v0: Int, v1: Int) {
         this.v0 = v0
@@ -134,6 +148,7 @@ class ImmutableVector4i constructor(
         return true
     }
 
+    inline fun magnitude() = sqrt((v0 * v0 + v1 * v1 + v2 * v2 + v3 * v3).toFloat())
     override fun hashCode(): Int {
         var result = v0
         result = 31 * result + v1
@@ -159,6 +174,21 @@ open class Vector4i constructor(
     inline var height: Int
         get() = v3
         set(value) { v3 = value }
+
+    inline fun normalized(v: Vector4f) {
+        val m = GeomUtils.magnitude(this)
+        if (m == 0f) {
+            v.v0 = 0f
+            v.v1 = 0f
+            v.v2 = 0f
+            v.v3 = 0f
+        } else {
+            v.v0 = v0 / m
+            v.v1 = v1 / m
+            v.v2 = v2 / m
+            v.v3 = v3 / m
+        }
+    }
 
     operator fun invoke(v0: Int, v1: Int, v2: Int, v3: Int) {
         super.invoke(v0, v1)
@@ -299,6 +329,17 @@ open class Vector2f constructor(
         get() = v1
         set(value) { v1 = value }
 
+    inline fun normalized(v: Vector2f) {
+        val m = GeomUtils.magnitude(this)
+        if (m == 0f) {
+            v.v0 = 0f
+            v.v1 = 0f
+        } else {
+            v.v0 = v0 / m
+            v.v1 = v1 / m
+        }
+    }
+
     operator fun invoke(v0: Float, v1: Float): Vector2f {
         this.v0 = v0
         this.v1 = v1
@@ -407,6 +448,19 @@ open class Vector3f constructor(
     inline var b: Float
         get() = v2
         set(value) { v2 = value }
+
+    inline fun normalized(v: Vector3f) {
+        val m = GeomUtils.magnitude(this)
+        if (m == 0f) {
+            v.v0 = 0f
+            v.v1 = 0f
+            v.v2 = 0f
+        } else {
+            v.v0 = v0 / m
+            v.v1 = v1 / m
+            v.v2 = v2 / m
+        }
+    }
 
     operator fun invoke(v0: Float, v1: Float, v2: Float) {
         super.invoke(v0, v1)
@@ -521,6 +575,21 @@ class Vector4f constructor(
     inline var a: Float
         get() = v3
         set(value) { v3 = value }
+
+    inline fun normalized(v: Vector4f) {
+        val m = GeomUtils.magnitude(this)
+        if (m == 0f) {
+            v.v0 = 0f
+            v.v1 = 0f
+            v.v2 = 0f
+            v.v3 = 0f
+        } else {
+            v.v0 = v0 / m
+            v.v1 = v1 / m
+            v.v2 = v2 / m
+            v.v3 = v3 / m
+        }
+    }
 
     operator fun invoke(v0: Float, v1: Float, v2: Float, v3: Float) {
         super.invoke(v0, v1, v2)

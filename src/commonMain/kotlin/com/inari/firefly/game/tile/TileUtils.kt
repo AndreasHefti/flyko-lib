@@ -68,7 +68,7 @@ object TileUtils {
 
     fun getTileContactFormType(typeString: String): TileContactFormType {
         return try {
-            TileContactFormType.valueOf(typeString.toUpperCase())
+            TileContactFormType.valueOf(typeString.uppercase())
         } catch (e: Exception) {
             if ("rect" == typeString)
                 TileContactFormType.RECTANGLE
@@ -79,7 +79,7 @@ object TileUtils {
 
     fun getTileSizeType(typeString: String): TileSizeType {
         try {
-            return TileSizeType.valueOf(typeString.toUpperCase())
+            return TileSizeType.valueOf(typeString.uppercase())
         } catch (e: Exception) {
             if (typeString == "quarterto")
                 return TileSizeType.QUARTER_TO
@@ -89,7 +89,7 @@ object TileUtils {
 
     fun getTileMaterialType(tileMaterial: String): TileMaterialType {
         try {
-            return TileMaterialType.valueOf(tileMaterial.toUpperCase())
+            return TileMaterialType.valueOf(tileMaterial.uppercase())
         } catch (e: Exception) {
             if (tileMaterial == "terrain")
                 return TileMaterialType.TERRAIN_SOLID
@@ -99,7 +99,7 @@ object TileUtils {
 
     fun getTileDirection(direction: String): TileDirection {
         return try {
-            TileDirection.valueOf(direction.toUpperCase())
+            TileDirection.valueOf(direction.uppercase())
         } catch (e: Exception) {
             when (direction) {
                 "nw", "NW" -> TileDirection.NORTH_WEST
@@ -117,7 +117,7 @@ object TileUtils {
 
     fun getTileOrientation(orientation: String): TileOrientation {
         return try {
-            TileOrientation.valueOf(orientation.toUpperCase())
+            TileOrientation.valueOf(orientation.uppercase())
         } catch (e: Exception) {
             when (orientation) {
                 "h", "H" -> TileOrientation.HORIZONTAL

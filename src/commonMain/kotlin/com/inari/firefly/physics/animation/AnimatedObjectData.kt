@@ -25,9 +25,9 @@ class AnimatedObjectData<T> {
 
     var NULL_ADAPTER: T
         get() = throw IllegalStateException("Adapter not set")
-        set(value) = throw IllegalStateException("Adapter not set")
+        set(_) = throw IllegalStateException("Adapter not set")
 
-    internal inline fun init(compId: CompId) { adapter = animatedProperty(compId) }
+    internal fun init(compId: CompId) { adapter = animatedProperty(compId) }
 
     @JvmField val applyToAnimation = ComponentRefResolver(Animation) { animationRef = it }
     fun <A : Animation> applyToNewAnimation(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
@@ -41,6 +41,6 @@ class AnimatedObjectData<T> {
         return result
     }
 
-    inline fun setProperty(v: T)  { adapter.set(v) }
-    inline fun getProperty(): T = adapter.get()
+    fun setProperty(v: T)  { adapter.set(v) }
+    fun getProperty(): T = adapter.get()
 }

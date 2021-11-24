@@ -34,7 +34,7 @@ class FontAsset : Asset() {
         set(value) {field = setIfNotInitialized(value, "lineSpace")}
     var defaultChar : Char
         get() = dChar.toChar()
-        set(value) {dChar = setIfNotInitialized(value.toInt(), "defaultChar")}
+        set(value) {dChar = setIfNotInitialized(value.code, "defaultChar")}
     var xOffset = 0
         set(value) {field = setIfNotInitialized(value, "xOffset")}
     var yOffset = 0
@@ -57,13 +57,13 @@ class FontAsset : Asset() {
                         y * charHeight + yOffset)
 
                 val charSpriteId = graphics.createSprite(tmpSpriteData)
-                charSpriteMap[charMap[y][x].toInt()] = charSpriteId
+                charSpriteMap[charMap[y][x].code] = charSpriteId
             }
         }
     }
 
     operator fun get(char: Char): Int {
-        val index = char.toInt()
+        val index = char.code
         return if (charSpriteMap.isEmpty(index))
             dChar
         else

@@ -3,6 +3,7 @@ package com.inari.util.geom
 import com.inari.util.StringUtils
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.GeomUtils.area
+import kotlin.jvm.JvmField
 
 class BitMask constructor(
     x: Int = 0,
@@ -11,7 +12,7 @@ class BitMask constructor(
     height: Int = 0
 ){
 
-    private val region = Vector4i()
+    @JvmField val region = Vector4i()
     private var bits: BitSet
 
     private val tmpRegion = Vector4i()
@@ -30,10 +31,10 @@ class BitMask constructor(
         tmpBits = BitSet(region.width + region.height)
     }
 
-    val x get() = region.x
-    val y get() = region.y
-    val width get() = region.width
-    val height get() = region.height
+    inline val x get() = region.x
+    inline val y get() = region.y
+    inline val width get() = region.width
+    inline val height get() = region.height
 
     val cardinality: Int
         get() = bits.cardinality
@@ -43,8 +44,6 @@ class BitMask constructor(
 
     fun nextSetBit(from: Int) = bits.nextSetBit(from)
 
-    fun region(): Vector4i =
-        region
     val isEmpty: Boolean get() =
         bits.isEmpty
 
@@ -56,7 +55,7 @@ class BitMask constructor(
         return this
     }
 
-    fun reset(region: Vector4i): BitMask {
+    inline fun reset(region: Vector4i): BitMask {
         reset(region.x, region.y, region.width, region.height)
         return this
     }
@@ -141,10 +140,10 @@ class BitMask constructor(
         return this
     }
 
-    fun setRegion(region: Vector4i, relativeToOrigin: Boolean): BitMask =
+    inline fun setRegion(region: Vector4i, relativeToOrigin: Boolean): BitMask =
         setRegion(region.x, region.y, region.width, region.height, relativeToOrigin)
 
-    fun setRegion(x: Int, y: Int, width: Int, height: Int): BitMask =
+    inline fun setRegion(x: Int, y: Int, width: Int, height: Int): BitMask =
         setRegion(x, y, width, height, true)
 
     fun setRegion(x: Int, y: Int, width: Int, height: Int, relativeToOrigin: Boolean): BitMask =
@@ -154,10 +153,10 @@ class BitMask constructor(
             setIntersectionRegion(x + region.x, y + region.y, width, height, true)
 
 
-    fun resetRegion(region: Vector4i, relativeToOrigin: Boolean): BitMask =
+    inline fun resetRegion(region: Vector4i, relativeToOrigin: Boolean): BitMask =
         resetRegion(region.x, region.y, region.width, region.height, relativeToOrigin)
 
-    fun resetRegion(x: Int, y: Int, width: Int, height: Int): BitMask =
+    inline fun resetRegion(x: Int, y: Int, width: Int, height: Int): BitMask =
         resetRegion(x, y, width, height, true)
 
     fun resetRegion(x: Int, y: Int, width: Int, height: Int, relativeToOrigin: Boolean): BitMask =
@@ -166,7 +165,7 @@ class BitMask constructor(
         else
             setIntersectionRegion(x + region.x, y + region.y, width, height, false)
 
-    fun setHalfSlopeRegion(direction: Direction): BitMask {
+    inline fun setHalfSlopeRegion(direction: Direction): BitMask {
         clearMask()
         for (y in 0 until region.height) {
             for (x in 0 until region.width) {
@@ -182,7 +181,7 @@ class BitMask constructor(
         return this
     }
 
-    fun setHorizontalQuarterSlopeRegion(direction: Direction): BitMask {
+    inline fun setHorizontalQuarterSlopeRegion(direction: Direction): BitMask {
         clearMask()
         for (y in 0 until region.height) {
             for (x in 0 until region.width) {
@@ -198,7 +197,7 @@ class BitMask constructor(
         return this
     }
 
-    fun setVerticalQuarterSlopeRegion(direction: Direction): BitMask {
+    inline fun setVerticalQuarterSlopeRegion(direction: Direction): BitMask {
         clearMask()
         for (y in 0 until region.height) {
             for (x in 0 until region.width) {
@@ -214,7 +213,7 @@ class BitMask constructor(
         return this
     }
 
-    fun setVerticalQuarterToSlopeRegion(direction: Direction): BitMask {
+    inline fun setVerticalQuarterToSlopeRegion(direction: Direction): BitMask {
         clearMask()
         for (y in 0 until region.height) {
             for (x in 0 until region.width) {
@@ -230,7 +229,7 @@ class BitMask constructor(
         return this
     }
 
-    fun setHorizontalQuarterToSlopeRegion(direction: Direction): BitMask {
+    inline fun setHorizontalQuarterToSlopeRegion(direction: Direction): BitMask {
         clearMask()
         for (y in 0 until region.height) {
             for (x in 0 until region.width) {

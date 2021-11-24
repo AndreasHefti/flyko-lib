@@ -8,7 +8,7 @@ class Action private constructor() : SystemComponent(Action::class.simpleName!!)
 
     @JvmField var call: ActionCall = { _, _, _, _ -> }
 
-    inline  fun invoke(
+     fun invoke(
             entity1: Int = -1,
             entity2: Int = -1,
             entity3: Int = -1,

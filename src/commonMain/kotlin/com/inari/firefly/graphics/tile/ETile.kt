@@ -5,10 +5,10 @@ import com.inari.firefly.FFContext
 import com.inari.firefly.TILE_ASPECT_GROUP
 import com.inari.firefly.asset.AssetInstanceRefResolver
 import com.inari.firefly.core.api.SpriteRenderable
+import com.inari.firefly.core.component.PropertyRefResolver
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
-import com.inari.firefly.physics.animation.PropertyRefResolver
 import com.inari.util.aspect.Aspects
 import com.inari.util.geom.Vector2i
 import com.inari.util.geom.Vector4f

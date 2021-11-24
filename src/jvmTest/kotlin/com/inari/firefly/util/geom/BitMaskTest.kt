@@ -234,7 +234,7 @@ class BitMaskTest {
     }
 
     @Test
-    fun testMoveRegion() {
+    fun testMoveregion() {
         val bitMask = BitMask(0, 0, 10, 10)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=10,height=10], bits=\n"
@@ -285,7 +285,7 @@ class BitMaskTest {
     }
 
     @Test
-    fun testSetResetRegion() {
+    fun testSetResetregion() {
         val bitMask = BitMask(5, 5, 10, 10)
 
         assertEquals(
@@ -679,7 +679,7 @@ class BitMaskTest {
     }
 
     @Test
-    fun testCreateIntersectionMaskWithRegion() {
+    fun testCreateIntersectionMaskWithregion() {
         val intersection = BitMask(0, 0)
         val region = Vector4i(0, 0, 8, 8)
         val mask = BitMask(0, 0, 8, 8)
@@ -738,8 +738,8 @@ class BitMaskTest {
 
         region.x = 4
         region.y = 4
-        mask.region().x = -4
-        mask.region().y = -4
+        mask.region.x = -4
+        mask.region.y = -4
         BitMask.createIntersectionMask(mask, region, intersection)
         assertEquals(
             "BitMask [region=[x=4,y=4,width=0,height=0], bits=\n" + "]",
@@ -760,8 +760,8 @@ class BitMaskTest {
 
         region.x = 10
         region.y = 10
-        mask.region().x = 10
-        mask.region().y = 10
+        mask.region.x = 10
+        mask.region.y = 10
         BitMask.createIntersectionMask(mask, region, intersection)
         assertEquals(
             "BitMask [region=[x=10,y=10,width=8,height=8], bits=\n" +
@@ -837,8 +837,8 @@ class BitMaskTest {
 
         region.x = 4
         region.y = 4
-        mask.region().x = -4
-        mask.region().y = -4
+        mask.region.x = -4
+        mask.region.y = -4
         BitMask.createIntersectionMask(mask, region, intersection, true)
         assertEquals(
             "BitMask [region=[x=8,y=8,width=0,height=0], bits=\n" + "]",
@@ -847,8 +847,8 @@ class BitMaskTest {
 
         region.x = 8
         region.y = 8
-        mask.region().x = -4
-        mask.region().y = -4
+        mask.region.x = -4
+        mask.region.y = -4
         BitMask.createIntersectionMask(mask, region, intersection, true)
         assertEquals(
             "BitMask [region=[x=12,y=12,width=0,height=0], bits=\n" + "]",
@@ -869,8 +869,8 @@ class BitMaskTest {
 
         region.x = 10
         region.y = 10
-        mask.region().x = 10
-        mask.region().y = 10
+        mask.region.x = 10
+        mask.region.y = 10
         BitMask.createIntersectionMask(mask, region, intersection, true)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
@@ -887,8 +887,8 @@ class BitMaskTest {
 
         region.x = -10
         region.y = -10
-        mask.region().x = -10
-        mask.region().y = -10
+        mask.region.x = -10
+        mask.region.y = -10
         BitMask.createIntersectionMask(mask, region, intersection, true)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
@@ -905,7 +905,7 @@ class BitMaskTest {
     }
 
     @Test
-    fun testCreateIntersectionMaskWithRegionWithIntersectionAdjustOnRegion() {
+    fun testCreateIntersectionMaskWithRegionWithIntersectionAdjustOnregion() {
         val intersection = BitMask(0, 0)
         val region = Vector4i(0, 0, 8, 8)
         val mask = BitMask(0, 0, 8, 8)
@@ -964,8 +964,8 @@ class BitMaskTest {
 
         region.x = 4
         region.y = 4
-        mask.region().x = -4
-        mask.region().y = -4
+        mask.region.x = -4
+        mask.region.y = -4
         BitMask.createIntersectionMask(region, mask, intersection, true)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=0,height=0], bits=\n" + "]",
@@ -974,8 +974,8 @@ class BitMaskTest {
 
         region.x = 8
         region.y = 8
-        mask.region().x = -4
-        mask.region().y = -4
+        mask.region.x = -4
+        mask.region.y = -4
         BitMask.createIntersectionMask(region, mask, intersection, true)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=0,height=0], bits=\n" + "]",
@@ -996,8 +996,8 @@ class BitMaskTest {
 
         region.x = 10
         region.y = 10
-        mask.region().x = 10
-        mask.region().y = 10
+        mask.region.x = 10
+        mask.region.y = 10
         BitMask.createIntersectionMask(region, mask, intersection, true)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
@@ -1014,8 +1014,8 @@ class BitMaskTest {
 
         region.x = -10
         region.y = -10
-        mask.region().x = -10
-        mask.region().y = -10
+        mask.region.x = -10
+        mask.region.y = -10
         BitMask.createIntersectionMask(region, mask, intersection, true)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
@@ -1033,7 +1033,7 @@ class BitMaskTest {
     }
 
     @Test
-    fun testCreateIntersectionMaskWithRegionWithOffsetOnRegion() {
+    fun testCreateIntersectionMaskWithRegionWithOffsetOnregion() {
         val intersection = BitMask(0, 0)
         val region = Vector4i(0, 0, 8, 8)
         val mask = BitMask(0, 0, 8, 8)
@@ -1086,8 +1086,8 @@ class BitMaskTest {
             intersection.toString()
         )
 
-        mask.region().x = -4
-        mask.region().y = -4
+        mask.region.x = -4
+        mask.region.y = -4
         BitMask.createIntersectionMask(mask, region, intersection, 4, 4, false)
         assertEquals(
             "BitMask [region=[x=4,y=4,width=0,height=0], bits=\n" + "]",
@@ -1106,8 +1106,8 @@ class BitMaskTest {
 
         region.x = 10
         region.y = 10
-        mask.region().x = 10
-        mask.region().y = 10
+        mask.region.x = 10
+        mask.region.y = 10
         BitMask.createIntersectionMask(mask, region, intersection, 0, 0, false)
         assertEquals(
             "BitMask [region=[x=10,y=10,width=8,height=8], bits=\n" +
@@ -1124,8 +1124,8 @@ class BitMaskTest {
 
         region.x = 0
         region.y = 0
-        mask.region().x = 0
-        mask.region().y = 0
+        mask.region.x = 0
+        mask.region.y = 0
         BitMask.createIntersectionMask(mask, region, intersection, 0, 0, true)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
@@ -1160,8 +1160,8 @@ class BitMaskTest {
             intersection.toString()
         )
 
-        mask.region().x = -4
-        mask.region().y = -4
+        mask.region.x = -4
+        mask.region.y = -4
         BitMask.createIntersectionMask(mask, region, intersection, 4, 4, true)
         assertEquals(
             "BitMask [region=[x=8,y=8,width=0,height=0], bits=\n" + "]",
@@ -1180,8 +1180,8 @@ class BitMaskTest {
 
         region.x = 10
         region.y = 10
-        mask.region().x = 10
-        mask.region().y = 10
+        mask.region.x = 10
+        mask.region.y = 10
         BitMask.createIntersectionMask(mask, region, intersection, 0, 0, true)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=8,height=8], bits=\n" +
@@ -1408,8 +1408,8 @@ class BitMaskTest {
             intersection.toString()
         )
 
-        mask2.region().x = -4
-        mask2.region().y = -4
+        mask2.region.x = -4
+        mask2.region.y = -4
         BitMask.createIntersectionMask(mask1, mask2, intersection)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=4,height=4], bits=\n" +
@@ -1420,8 +1420,8 @@ class BitMaskTest {
             intersection.toString()
         )
 
-        mask2.region().x = 4
-        mask2.region().y = 4
+        mask2.region.x = 4
+        mask2.region.y = 4
         BitMask.createIntersectionMask(mask1, mask2, intersection)
         assertEquals(
             "BitMask [region=[x=4,y=4,width=4,height=4], bits=\n" +
@@ -1432,18 +1432,18 @@ class BitMaskTest {
             intersection.toString()
         )
 
-        mask2.region().x = 4
-        mask2.region().y = 4
-        mask1.region().x = -4
-        mask1.region().y = -4
+        mask2.region.x = 4
+        mask2.region.y = 4
+        mask1.region.x = -4
+        mask1.region.y = -4
         BitMask.createIntersectionMask(mask1, mask2, intersection)
         assertEquals(
             "BitMask [region=[x=4,y=4,width=0,height=0], bits=\n" + "]",
             intersection.toString()
         )
 
-        mask2.region().x = 0
-        mask2.region().y = 0
+        mask2.region.x = 0
+        mask2.region.y = 0
         BitMask.createIntersectionMask(mask1, mask2, intersection)
         assertEquals(
             "BitMask [region=[x=0,y=0,width=4,height=4], bits=\n" +
@@ -1454,10 +1454,10 @@ class BitMaskTest {
             intersection.toString()
         )
 
-        mask2.region().x = 10
-        mask2.region().y = 10
-        mask1.region().x = 10
-        mask1.region().y = 10
+        mask2.region.x = 10
+        mask2.region.y = 10
+        mask1.region.x = 10
+        mask1.region.y = 10
         BitMask.createIntersectionMask(mask1, mask2, intersection)
         assertEquals(
             "BitMask [region=[x=10,y=10,width=8,height=8], bits=\n" +

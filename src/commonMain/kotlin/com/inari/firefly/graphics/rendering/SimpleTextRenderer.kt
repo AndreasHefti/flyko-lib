@@ -56,7 +56,7 @@ class SimpleTextRenderer private constructor() : Renderer() {
                     continue
                 }
 
-                textRenderable.spriteId = font.charSpriteMap[char.toInt()]
+                textRenderable.spriteId = font.charSpriteMap[char.code]
 
                 if (textRenderable.spriteId < 0) {
                     transformCollector.data.position.x += horizontalStep

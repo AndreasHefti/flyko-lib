@@ -43,7 +43,7 @@ class FireflyJsonAreaAsset private constructor() : Asset() {
 
         // create rooms meta data
         areaData.roomsData.forEach { roomData ->
-            val roomId = Room.build {
+            Room.build {
                 name = roomData.name
                 roomOrientationType = roomData.orientationType
                 roomOrientation(roomData.orientation)

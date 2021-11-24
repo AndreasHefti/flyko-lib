@@ -24,6 +24,7 @@ class PlayerEvent(override val eventType: EventType) : Event<PlayerEventListener
         private set
     var room: RoomKey = RoomKey()
 
+    @Suppress("OVERRIDE_BY_INLINE")
     override inline fun notify(listener: PlayerEventListener) = listener(this)
 
     companion object : EventType("PlayerEvent") {
