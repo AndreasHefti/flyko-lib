@@ -216,11 +216,11 @@ fun initScenes() {
         name = "RoomActivationScene"
         updateResolution = 1f
         withUpdate {
-            println("Room1ActivationScene Update")
+            println("RoomActivationScene Update")
             OpResult.SUCCESS
         }
         withCallback {
-            println("Room1ActivationScene Finished")
+            println("RoomActivationScene Finished")
         }
     }
 

@@ -409,4 +409,18 @@ object GeomUtils {
     }
 
     inline fun area(rect: Vector4i) = rect.width * rect.height
+
+    inline fun intoBoundary(v: Int, lower: Int, upper: Int): Int =
+        when {
+            (v < lower) -> lower
+            (v > upper) -> upper
+            else -> v
+        }
+
+    inline fun intoBoundary(v: Float, lower: Float, upper: Float): Float =
+        when {
+            (v < lower) -> lower
+            (v > upper) -> upper
+            else -> v
+        }
 }
