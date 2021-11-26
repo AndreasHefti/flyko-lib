@@ -2,10 +2,7 @@
 
 package com.inari.firefly.game.world
 
-import com.inari.firefly.DO_NOTHING
-import com.inari.firefly.FFApp
-import com.inari.firefly.FFContext
-import com.inari.firefly.NO_COMP_ID
+import com.inari.firefly.*
 import com.inari.firefly.composite.*
 import com.inari.firefly.control.scene.SceneSystem
 import com.inari.firefly.core.ComponentRefResolver
@@ -91,8 +88,8 @@ object WorldSystem : FFSystem {
     fun pauseRoom() {
         if (activeRoomId != NO_COMP_ID && !paused) {
             val room = FFContext[Room, activeRoomId]
-            if (room.pauseTaskRef >= 0)
-                FFContext.runTask(room.pauseTaskRef, room.componentId)
+            if (room.pauseTaskName != NO_NAME)
+                FFContext.runTask(room.pauseTaskName, room.componentId)
             paused = true
             RoomEvent.send(RoomEventType.ROOM_PAUSED, activeRoomId)
         }
@@ -101,8 +98,8 @@ object WorldSystem : FFSystem {
     fun resumeRoom() {
         if (activeRoomId != NO_COMP_ID && paused) {
             val room = FFContext[Room, activeRoomId]
-            if (room.resumeTaskRef >= 0)
-                FFContext.runTask(room.resumeTaskRef, room.componentId)
+            if (room.resumeTaskName != NO_NAME)
+                FFContext.runTask(room.resumeTaskName, room.componentId)
             paused = false
             RoomEvent.send(RoomEventType.ROOM_RESUMED, activeRoomId)
         }
@@ -178,8 +175,8 @@ object WorldSystem : FFSystem {
         pauseRoom()
 
         // run play init scene if defined or start game directly
-        if (activeRoom.activationSceneRef >= 0)
-            SceneSystem.runScene(activeRoom.activationSceneRef, startGame)
+        if (activeRoom.activationSceneName != NO_NAME)
+            SceneSystem.runScene(startGame)(activeRoom.activationSceneName)
         else
             startGame()
     }
@@ -209,14 +206,14 @@ object WorldSystem : FFSystem {
             pauseRoom()
 
             // run play init scene if defined or start game directly
-            if (activeRoom.activationSceneRef >= 0)
-                SceneSystem.runScene(activeRoom.activationSceneRef, startGame)
+            if (activeRoom.activationSceneName != NO_NAME)
+                SceneSystem.runScene(startGame)(activeRoom.activationSceneName)
             else
                 startGame()
         }
 
-        if (activeRoom.deactivationSceneRef >= 0)
-            SceneSystem.runScene(activeRoom.deactivationSceneRef, disposeGame)
+        if (activeRoom.deactivationSceneName != NO_NAME)
+            SceneSystem.runScene(disposeGame)(activeRoom.deactivationSceneName)
         else
             disposeGame()
     }

@@ -1,46 +1,46 @@
 {
-  "name": "area1",
+  "name": "TiledMapTestArea",
   "orientationType": "COUNT",
   "orientation": "1",
-  "onLoadTasks": "TestLoadTask",
-  "onActivationTasks": "TestActivationTask",
-  "onDeactivationTasks": "TestDeactivationTask",
-  "onDisposeTasks": "TestDisposeTask",
+  "onLoadTasks": "AreaLoadTask",
+  "onActivationTasks": "AreaActivationTask",
+  "onDeactivationTasks": "AreaDeactivationTask",
+  "onDisposeTasks": "AreaDisposeTask",
   "attributes": {
     "areaAttr1": "areaValue1",
     "areaAttr2": "areaValue2"
   },
   "roomsData": [
     {
-      "name": "room1",
-      "tiledMapResource": "room1Map.json",
-      "orientationType": "TILES",
-      "orientation": "0,0,40,20",
-      "onLoadTasks": "TestLoadTask",
-      "onActivationTasks": "TestActivationTask",
-      "onDeactivationTasks": "TestDeactivationTask",
-      "onDisposeTasks": "TestDisposeTask",
+      "name": "Room1",
+      "areaOrientationType": "SECTION",
+      "roomOrientationType": "PIXELS",
+      "areaOrientation": "0,0,2,2",
+      "roomOrientation": "0,0,320,320",
+      "onLoadTasks": "RoomLoadTask",
+      "onActivationTasks": "RoomActivationTask",
+      "onDeactivationTasks": "RoomDeactivationTask",
+      "onDisposeTasks": "RoomDisposeTask",
+      "activationScene": "RoomActivationScene",
+      "deactivationScene": "RoomDeactivationScene",
       "attributes": {
-        "roomMetaAttr1": "roomMetaValue1",
-        "roomMetaAttr2": "roomMetaValue2"
+        "tiledRoomResource": "tiles/map1.json"
       }
     },
     {
-      "name": "room2",
-      "tiledMapResource": "room1Map.json",
-      "orientationType": "PIXELS",
-      "orientation": "0,0,40,20",
-      "onLoadTasks": "TestLoadTask",
-      "onActivationTasks": "TestActivationTask",
-      "onDeactivationTasks": "TestDeactivationTask",
-      "onDisposeTasks": "TestDisposeTask",
-      "pauseTask": "TestRoomPauseTask",
-      "resumeTask": "TestRoomResumeTask",
-      "activationScene": "TestActivationScene",
-      "deactivationScene": "TestDeactivationScene",
+      "name": "Room2",
+      "areaOrientationType": "SECTION",
+      "roomOrientationType": "PIXELS",
+      "areaOrientation": "2,0,2,2",
+      "roomOrientation": "0,0,320,320",
+      "onLoadTasks": "RoomLoadTask",
+      "onActivationTasks": "RoomActivationTask",
+      "onDeactivationTasks": "RoomDeactivationTask",
+      "onDisposeTasks": "RoomDisposeTask",
+      "activationScene": "RoomActivationScene",
+      "deactivationScene": "RoomDeactivationScene",
       "attributes": {
-        "roomMetaAttr1": "roomMetaValue1",
-        "roomMetaAttr2": "roomMetaValue2"
+        "tiledRoomResource": "tiles/map2.json"
       }
     }
   ]

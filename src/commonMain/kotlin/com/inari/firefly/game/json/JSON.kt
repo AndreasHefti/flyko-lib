@@ -134,9 +134,8 @@ class AreaJson(
 )
 class RoomMetaJson(
     @JvmField val name: String,
-    @JvmField val tiledMapResource: String? = null,
-    @JvmField val orientationType: WorldOrientationType = WorldOrientationType.PIXELS,
-    @JvmField val orientation: String = "0,0,0,0",
+    @JvmField val roomOrientationType: WorldOrientationType = WorldOrientationType.PIXELS,
+    @JvmField val roomOrientation: String = "0,0,0,0",
     @JvmField val areaOrientationType: WorldOrientationType = WorldOrientationType.SECTION,
     @JvmField val areaOrientation: String = "0,0,0,0",
     @JvmField val onLoadTasks: String = NO_NAME,

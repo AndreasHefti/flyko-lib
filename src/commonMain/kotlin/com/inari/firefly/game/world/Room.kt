@@ -1,5 +1,7 @@
 package com.inari.firefly.game.world
 
+import com.inari.firefly.FFContext
+import com.inari.firefly.NO_NAME
 import com.inari.firefly.composite.Composite
 import com.inari.firefly.composite.CompositeSystem
 import com.inari.firefly.composite.GenericComposite
@@ -22,39 +24,47 @@ class Room private constructor(): GenericComposite() {
     @JvmField var areaOrientationType: WorldOrientationType = WorldOrientationType.SECTION
     @JvmField val areaOrientation: Vector4i = Vector4i()
 
-    @JvmField internal var activationSceneRef = -1
-    @JvmField internal var deactivationSceneRef = -1
-    @JvmField internal var pauseTaskRef = -1
-    @JvmField internal var resumeTaskRef = -1
+    @JvmField var activationSceneName = NO_NAME
+    @JvmField var deactivationSceneName = NO_NAME
+    @JvmField var pauseTaskName = NO_NAME
+    @JvmField var resumeTaskName = NO_NAME
 
-    @JvmField val withActivationScene = ComponentRefResolver(Scene) { activationSceneRef = it }
+    @JvmField val withActivationScene = ComponentRefResolver(Scene) {
+        activationSceneName = FFContext[Scene, it].name
+    }
     fun  withActivationScene(configure: (Scene.() -> Unit)): CompId  {
-        val result = Scene.build(configure)
-        activationSceneRef = result.instanceId
-        return result
+        val result = Scene.buildAndGet(configure)
+        activationSceneName = result.name
+        return result.componentId
     }
 
-    @JvmField val withDeactivationScene = ComponentRefResolver(Scene) { deactivationSceneRef = it }
+    @JvmField val withDeactivationScene = ComponentRefResolver(Scene) {
+        deactivationSceneName = FFContext[Scene, it].name
+    }
     fun withDeactivationScene(configure: (Scene.() -> Unit)): CompId {
-        val result = Scene.build(configure)
-        deactivationSceneRef = result.instanceId
-        return result
+        val result = Scene.buildAndGet(configure)
+        deactivationSceneName = result.name
+        return result.componentId
     }
 
-
-    @JvmField val withPauseTask = ComponentRefResolver(Scene) { pauseTaskRef = it }
+    @JvmField val withPauseTask = ComponentRefResolver(Scene) {
+        pauseTaskName = FFContext[Task, it].name
+    }
     fun <A : Task> withPauseTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
-        val result = cBuilder.build(configure)
-        pauseTaskRef = result.instanceId
-        return result
+        val result = cBuilder.buildAndGet(configure)
+        pauseTaskName = result.name
+        return result.componentId
     }
 
-    @JvmField val withResumeTask = ComponentRefResolver(Scene) { resumeTaskRef = it }
-    fun <A : Task> withResumeTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
-        val result = cBuilder.build(configure)
-        resumeTaskRef = result.instanceId
-        return result
+    @JvmField val withResumeTask = ComponentRefResolver(Scene) {
+        resumeTaskName = FFContext[Task, it].name
     }
+    fun <A : Task> withResumeTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
+        val result = cBuilder.buildAndGet(configure)
+        resumeTaskName = result.name
+        return result.componentId
+    }
+
 
     override fun componentType() = Companion
     companion object : SystemComponentSubType<Composite, Room>(Composite, Room::class) {

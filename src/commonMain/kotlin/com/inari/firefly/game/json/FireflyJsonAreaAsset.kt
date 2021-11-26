@@ -45,8 +45,10 @@ class FireflyJsonAreaAsset private constructor() : Asset() {
         areaData.roomsData.forEach { roomData ->
             Room.build {
                 name = roomData.name
-                roomOrientationType = roomData.orientationType
-                roomOrientation(roomData.orientation)
+                parentName = areaData.name
+                areaOrientationType = roomData.areaOrientationType
+                roomOrientationType = roomData.roomOrientationType
+                roomOrientation(roomData.roomOrientation)
                 areaOrientationType = roomData.areaOrientationType
                 areaOrientation(roomData.areaOrientation)
                 attributes.putAll(roomData.attributes)
@@ -56,14 +58,10 @@ class FireflyJsonAreaAsset private constructor() : Asset() {
                 deactivationTasks = roomData.onDeactivationTasks
                 disposeTasks = roomData.onDisposeTasks
 
-                if (roomData.pauseTask != NO_NAME)
-                    withPauseTask(roomData.pauseTask)
-                if (roomData.resumeTask != NO_NAME)
-                    withResumeTask(roomData.resumeTask)
-                if (roomData.activationScene != NO_NAME)
-                    withActivationScene(roomData.activationScene)
-                if (roomData.deactivationScene != NO_NAME)
-                    withDeactivationScene(roomData.deactivationScene)
+                pauseTaskName = roomData.pauseTask
+                resumeTaskName = roomData.resumeTask
+                activationSceneName = roomData.activationScene
+                deactivationSceneName = roomData.deactivationScene
             }
         }
     }

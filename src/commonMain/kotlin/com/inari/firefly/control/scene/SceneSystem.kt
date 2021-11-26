@@ -3,10 +3,12 @@ package com.inari.firefly.control.scene
 import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
+import com.inari.firefly.composite.Composite
 import com.inari.firefly.composite.CompositeEvent
 import com.inari.firefly.composite.CompositeEventListener
 import com.inari.firefly.composite.CompositeEventType
 import com.inari.firefly.control.task.TaskSystem
+import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.system.FFSystem
 import com.inari.util.Call
 import com.inari.util.OpResult
@@ -65,6 +67,14 @@ object SceneSystem : FFSystem {
     init {
         FFContext.registerListener(CompositeEvent, compositeListener)
         FFContext.registerListener(FFApp.UpdateEvent, updateListener)
+    }
+
+    fun runScene(callback: Call): ComponentRefResolver<Composite> {
+        return ComponentRefResolver(Scene) { index ->
+            val scene: Scene = FFContext[Scene, index]
+            scene.withCallback(callback)
+            FFContext.activate(Scene, index)
+        }
     }
 
     fun runScene(index: Int, callback: Call) {

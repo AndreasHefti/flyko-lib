@@ -11,6 +11,7 @@ import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.api.FFInput
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.game.collision.PlatformerCollisionResolver
+import com.inari.firefly.game.json.FireflyJsonAreaAsset
 import com.inari.firefly.game.player.movement.*
 import com.inari.firefly.game.tile.TileMapSystem
 import com.inari.firefly.game.tile.TileMaterialType
@@ -139,6 +140,13 @@ fun initPlayerTasks() {
 
 fun initAreaTasks() {
     SimpleTask.build {
+        name = "AreaLoadTask"
+        withOperation { id ->
+            println("loadArea -> $id")
+        }
+    }
+
+    SimpleTask.build {
         name = "AreaActivationTask"
         withOperation { id ->
             println("activateArea -> $id")
@@ -156,6 +164,20 @@ fun initAreaTasks() {
                     }
                 }
             }
+        }
+    }
+
+    SimpleTask.build {
+        name = "AreaDeactivationTask"
+        withOperation { id ->
+            println("deactivateArea -> $id")
+        }
+    }
+
+    SimpleTask.build {
+        name = "AreaDisposeTask"
+        withOperation { id ->
+            println("disposeArea -> $id")
         }
     }
 }
@@ -263,42 +285,15 @@ object TiledTileMapTest {
                 // area init
                 initAreaTasks()
                 initRoomTasks()
-
-                Area.build {
-                    name = "TiledMapTestArea"
-                    withActivationTask("AreaActivationTask")
-
-                    withRoom {
-                        name = "Room1"
-                        parentName = "TiledMapTestArea"
-                        areaOrientation(0, 0, 2, 2)
-                        roomOrientation(0, 0, 20 * 16, 20 * 16)
-                        setAttribute("tiledRoomResource", "tiles/map1.json")
-                        withLoadTask("RoomLoadTask")
-                        withActivationTask("RoomActivationTask")
-                        withDeactivationTask("RoomDeactivationTask")
-                        withDisposeTask("RoomDisposeTask")
-                        withActivationScene("RoomActivationScene")
-                        withDeactivationScene("RoomDeactivationScene")
-                    }
-                    withRoom {
-                        name = "Room2"
-                        parentName = "TiledMapTestArea"
-                        areaOrientation(2, 0, 2, 2)
-                        roomOrientation(0, 0, 20 * 16, 20 * 16)
-                        setAttribute("tiledRoomResource", "tiles/map2.json")
-                        withLoadTask("RoomLoadTask")
-                        withActivationTask("RoomActivationTask")
-                        withDeactivationTask("RoomDeactivationTask")
-                        withDisposeTask("RoomDisposeTask")
-                        withActivationScene("RoomActivationScene")
-                        withDeactivationScene("RoomDeactivationScene")
-                    }
+                val areaId = FireflyJsonAreaAsset.build {
+                    name = "TiledMapTestAreaAsset"
+                    resourceName = "tiles/testArea.json"
                 }
 
+                // load
+                FFContext.load(areaId)
                 // activate area
                 FFContext.activate(Area, "TiledMapTestArea")
-
                 // start game in Room1
                 WorldSystem.startRoom(4 * 16, 4 * 16)("Room1")
             }
