@@ -346,61 +346,95 @@ open class Vector2f constructor(
         return this
     }
 
+    fun set(v0: Float, v1: Float) {
+        this(v0,v1)
+    }
+
     operator fun invoke(v0: Int, v1: Int): Vector2f {
         this.v0 = v0.toFloat()
         this.v1 = v1.toFloat()
         return this
     }
 
-    operator fun invoke(v: Vector2f) {
-        this.v0 = v.v0
-        this.v1 = v.v1
+    fun set(v0: Int, v1: Int) {
+        this(v0,v1)
     }
 
-    operator fun invoke(v: ImmutableVector2f) {
+    operator fun invoke(v: Vector2f): Vector2f {
         this.v0 = v.v0
         this.v1 = v.v1
+        return this
     }
 
-    operator fun invoke(v: Vector2i) {
+    fun set(v: Vector2f) {
+        this(v)
+    }
+
+    operator fun invoke(v: ImmutableVector2f): Vector2f {
+        this.v0 = v.v0
+        this.v1 = v.v1
+        return this
+    }
+
+    fun set(v: ImmutableVector2f) {
+        this(v)
+    }
+
+    operator fun invoke(v: Vector2i): Vector2f {
         this.v0 = v.v0.toFloat()
         this.v1 = v.v1.toFloat()
+        return this
     }
 
-    open operator fun invoke(jsonString: String) {
+    fun set(v: Vector2i) {
+        this(v)
+    }
+
+    open operator fun invoke(jsonString: String): Vector2f {
         val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
         v0 = try { split[0].toFloat() } catch (e: Exception) { v0 }
         v1 = try { split[1].toFloat() } catch (e: Exception) { v1 }
+        return this
     }
 
-    operator fun plus(v: Vector2f) {
+    open fun set(jsonString: String) {
+        this(jsonString)
+    }
+
+    operator fun plus(v: Vector2f): Vector2f {
         this.v0 += v.v0
         this.v1 += v.v1
+        return this
     }
 
-    operator fun minus(v: Vector2f) {
+    operator fun minus(v: Vector2f): Vector2f {
         this.v0 -= v.v0
         this.v1 -= v.v1
+        return this
     }
 
-    operator fun times(v: Vector2f) {
+    operator fun times(v: Vector2f): Vector2f {
         this.v0 *= v.v0
         this.v1 *= v.v1
+        return this
     }
 
-    open operator fun times(dd: Float) {
+    open operator fun times(dd: Float): Vector2f {
         this.v0 *= dd
         this.v1 *= dd
+        return this
     }
 
-    operator fun div(v: Vector2f) {
+    operator fun div(v: Vector2f): Vector2f {
         this.v0 /= v.v0
         this.v1 /= v.v1
+        return this
     }
 
-    open operator fun div(dd: Float) {
+    open operator fun div(dd: Float): Vector2f {
         this.v0 /= dd
         this.v1 /= dd
+        return this
     }
 
     open fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1"
@@ -462,51 +496,72 @@ open class Vector3f constructor(
         }
     }
 
-    operator fun invoke(v0: Float, v1: Float, v2: Float) {
+    operator fun invoke(v0: Float, v1: Float, v2: Float): Vector3f {
         super.invoke(v0, v1)
         this.v2 = v2
+        return this
     }
 
-    operator fun invoke(v: Vector3f) {
+    fun set(v0: Float, v1: Float, v2: Float) {
+        this(v0, v1, v2)
+    }
+
+    operator fun invoke(v: Vector3f): Vector3f {
         super.invoke(v)
         this.v2 = v.v2
+        return this
     }
 
-    override operator fun invoke(jsonString: String) {
+    fun set(v: Vector3f) {
+        this(v)
+    }
+
+    override operator fun invoke(jsonString: String): Vector3f {
         val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
         v0 = try { split[0].toFloat() } catch (e: Exception) { v0 }
         v1 = try { split[1].toFloat() } catch (e: Exception) { v1 }
         v2 = try { split[2].toFloat() } catch (e: Exception) { v2 }
+        return this
     }
 
-    operator fun plus(v: Vector3f) {
+    override fun set(jsonString: String) {
+        this(jsonString)
+    }
+
+    operator fun plus(v: Vector3f): Vector3f {
         super.invoke(v)
         this.v2 += v.v2
+        return this
     }
 
-    operator fun minus(v: Vector3f) {
+    operator fun minus(v: Vector3f): Vector3f {
         super.invoke(v)
         this.v2 -= v.v2
+        return this
     }
 
-    operator fun times(v: Vector3f) {
+    operator fun times(v: Vector3f): Vector3f {
         super.invoke(v)
         this.v2 *= v.v2
+        return this
     }
 
-    override operator fun times(dd: Float) {
+    override operator fun times(dd: Float): Vector3f {
         super.times(dd)
         this.v2 *= dd
+        return this
     }
 
-    operator fun div(v: Vector3f) {
+    operator fun div(v: Vector3f): Vector3f {
         super.div(v)
         this.v2 /= v.v2
+        return this
     }
 
-    override operator fun div(dd: Float) {
+    override operator fun div(dd: Float): Vector3f {
         super.div(dd)
         this.v2 /= dd
+        return this
     }
 
     override fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1${StringUtils.VALUE_SEPARATOR}$v2"
@@ -529,6 +584,7 @@ open class Vector3f constructor(
         return result
     }
 }
+
 
 class ImmutableVector4f constructor(
     @JvmField inline val v0: Float = 0.0f,
@@ -591,52 +647,73 @@ class Vector4f constructor(
         }
     }
 
-    operator fun invoke(v0: Float, v1: Float, v2: Float, v3: Float) {
+    operator fun invoke(v0: Float, v1: Float, v2: Float, v3: Float): Vector4f {
         super.invoke(v0, v1, v2)
         this.v3 = v3
+        return this
     }
 
-    operator fun invoke(v: Vector4f) {
+    fun set(v0: Float, v1: Float, v2: Float, v3: Float) {
+        this(v0,v1,v2,v3)
+    }
+
+    operator fun invoke(v: Vector4f): Vector4f {
         super.invoke(v)
         this.v3 = v.v3
+        return this
     }
 
-    override operator fun invoke(jsonString: String) {
+    fun set(v: Vector4f) {
+        this(v)
+    }
+
+    override operator fun invoke(jsonString: String): Vector4f {
         val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
         v0 = try { split[0].toFloat() } catch (e: Exception) { v0 }
         v1 = try { split[1].toFloat() } catch (e: Exception) { v1 }
         v2 = try { split[2].toFloat() } catch (e: Exception) { v2 }
         v3 = try { split[3].toFloat() } catch (e: Exception) { v3 }
+        return this
     }
 
-    operator fun plus(v: Vector4f) {
+    override fun set(jsonString: String) {
+        this(jsonString)
+    }
+
+    operator fun plus(v: Vector4f): Vector4f {
         super.invoke(v)
         this.v3 += v.v3
+        return this
     }
 
-    operator fun minus(v: Vector4f) {
+    operator fun minus(v: Vector4f): Vector4f {
         super.invoke(v)
         this.v3 -= v.v3
+        return this
     }
 
-    operator fun times(v: Vector4f) {
+    operator fun times(v: Vector4f): Vector4f {
         super.invoke(v)
         this.v3 *= v.v3
+        return this
     }
 
-    override operator fun times(dd: Float) {
+    override operator fun times(dd: Float): Vector4f {
         super.times(dd)
         this.v3 *= dd
+        return this
     }
 
-    operator fun div(v: Vector4f) {
+    operator fun div(v: Vector4f): Vector4f {
         super.div(v)
         this.v3 /= v.v3
+        return this
     }
 
-    override operator fun div(dd: Float) {
+    override operator fun div(dd: Float): Vector4f {
         super.div(dd)
         this.v3 /= dd
+        return this
     }
 
     override fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1${StringUtils.VALUE_SEPARATOR}$v2${StringUtils.VALUE_SEPARATOR}$v3"

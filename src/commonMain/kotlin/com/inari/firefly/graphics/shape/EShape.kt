@@ -29,7 +29,7 @@ class EShape private constructor(): EntityComponent(EShape::class.simpleName!!) 
         set(value) { data.vertices = value }
     var color: Vector4f
         get() = data.color1
-        set(value) = data.color1(value)
+        set(value) = data.color1.set(value)
     var gradientColor1: Vector4f
         get() = data.color2!!
         set(value) {data.color2 = value}

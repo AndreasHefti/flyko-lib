@@ -25,10 +25,10 @@ class ETransform private constructor() : EntityComponent(ETransform::class.simpl
     val layer = ComponentRefResolver(Layer) { index-> layerRef = index }
     var position: Vector2f
         get() = data.position
-        set(value) = data.position(value)
+        set(value) = data.position.set(value)
     var pivot: Vector2f
         get() = data.pivot
-        set(value) = data.pivot(value)
+        set(value) = data.pivot.set(value)
     var scale: Vector2f
         get() = data.scale
         set(value) { data.scale(value) }
