@@ -37,9 +37,9 @@ class BezierSpline {
     }
 
     fun getAtNormalized(time: Float): Map.Entry<LongRange, BezierSplineSegment>? =
-        getAt((time * splineDuration).toLong())
+        getAtTime((time * splineDuration).toLong())
 
-    fun getAt(time: Long): Map.Entry<LongRange, BezierSplineSegment>? {
+    fun getAtTime(time: Long): Map.Entry<LongRange, BezierSplineSegment>? {
         return ranges.entries.find { entry -> entry.key.contains(time) }
     }
 
