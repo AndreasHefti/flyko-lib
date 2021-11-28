@@ -2,6 +2,7 @@ package com.inari.firefly.physics.animation
 
 import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFContext
+import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.*
 import com.inari.firefly.core.system.SystemComponentBuilder
@@ -27,7 +28,9 @@ class AnimatedObjectData<T> {
         get() = throw IllegalStateException("Adapter not set")
         set(_) = throw IllegalStateException("Adapter not set")
 
-    internal fun init(compId: CompId) { adapter = animatedProperty(compId) }
+    internal fun init(compId: CompId) {
+        adapter = animatedProperty(compId)
+    }
 
     @JvmField val applyToAnimation = ComponentRefResolver(Animation) { animationRef = it }
     fun <A : Animation> applyToNewAnimation(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {

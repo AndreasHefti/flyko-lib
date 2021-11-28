@@ -66,6 +66,7 @@ class ETransform private constructor() : EntityComponent(ETransform::class.simpl
             "rot=${data.rotation})"
     }
 
+    private var self = this
     object Property {
         val POSITION_X: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.position::x }
         val POSITION_Y: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.position::y }
@@ -74,6 +75,7 @@ class ETransform private constructor() : EntityComponent(ETransform::class.simpl
         val SCALE_Y: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data.scale::v1 }
         val SCALE: PropertyRefResolver<Vector2f> = { FFContext[Entity, it][ETransform]::scale }
         val ROTATION: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data::rotation }
+        val TRANSFORM: PropertyRefResolver<ETransform> = { FFContext[Entity, it][ETransform]::self }
     }
 
     override fun componentType() = Companion

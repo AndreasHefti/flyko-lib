@@ -444,7 +444,7 @@ open class Vector2f constructor(
         if (other == null) return false
         if (this::class != other::class) return false
         other as Vector2f
-        if (v0 != other.v0 && v1 != other.v1) return false
+        if (v0 != other.v0 || v1 != other.v1) return false
         return true
     }
     override fun hashCode(): Int {

@@ -3,10 +3,7 @@ package com.inari.util.geom
 
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Direction.*
-import kotlin.math.PI
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sqrt
+import kotlin.math.*
 
 enum class Orientation {
     NONE,
@@ -427,17 +424,13 @@ object GeomUtils {
             else -> v
         }
 
-    private val bcv0 = Vector2f()
-    private val bcv1 = Vector2f()
-    private val bcv2 = Vector2f()
-    private val bcv3 = Vector2f()
-    fun bezierCurvePoint(v0: Vector2f, v1: Vector2f, v2: Vector2f, v3: Vector2f, t: Float): Vector2f {
-        val u = 1f - t
-        val t2 = t * t
-        val u2 = u * u
-        val u3 = u2 * u
-        val t3 = t2 * t
-
-        return bcv0(v0) * u3 + bcv1(v1) * (3f * u2 * t) + bcv2(v2) * (3f * u * t2) + bcv3(v3) * t3
-    }
+    inline fun angleX(v: Vector2f) = atan2(v.y, v.x)
+    inline fun angleY(v: Vector2f) = atan2(v.x, v.y)
+    inline fun radToDeg(r: Float, invert: Boolean = false) =
+        if (invert)
+            -r * (180f / PI_F)
+        else
+            r * (180f / PI_F)
 }
+
+

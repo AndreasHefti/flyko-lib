@@ -378,16 +378,16 @@ actual object FFGraphics : GraphicsAPI {
         transformMatrix.idt()
 
         if (transform.hasScale) {
-            transformMatrix.translate(transform.pivot.x, transform.pivot.y, 0f)
+            transformMatrix.translate(transform.position.x + transform.pivot.x, transform.position.y + transform.pivot.y, 0f)
             transformMatrix.scale(transform.scale.v0, transform.scale.v1, 0f)
-            transformMatrix.translate(-transform.pivot.x, -transform.pivot.y, 0f)
+            transformMatrix.translate(-(transform.position.x + transform.pivot.x), -(transform.position.y + transform.pivot.y), 0f)
             spriteBatch.transformMatrix = transformMatrix
         }
 
         if (transform.hasRotation) {
-            transformMatrix.translate(transform.pivot.x, transform.pivot.y, 0f)
+            transformMatrix.translate(transform.position.x + transform.pivot.x, transform.position.y + transform.pivot.y, 0f)
             transformMatrix.rotate(0f, 0f, 1f, transform.rotation)
-            transformMatrix.translate(-transform.pivot.x, -transform.pivot.y, 0f)
+            transformMatrix.translate(-(transform.position.x + transform.pivot.x), -(transform.position.y + transform.pivot.y), 0f)
             spriteBatch.transformMatrix = transformMatrix
         }
 
