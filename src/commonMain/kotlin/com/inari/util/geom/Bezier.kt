@@ -1,8 +1,5 @@
 package com.inari.util.geom
 
-import com.inari.util.collection.DynArray
-import com.inari.util.collection.DynArrayRO
-import com.inari.util.collection.DynIntArray
 import kotlin.jvm.JvmField
 import kotlin.math.pow
 
@@ -16,32 +13,38 @@ class CubicBezierCurve(
 class BezierSplineSegment(
     @JvmField val duration: Long,
     @JvmField val curve: CubicBezierCurve
-)
+) {
+    constructor(duration: Long, p0: Vector2f, p1: Vector2f, p2: Vector2f, p3: Vector2f) :
+            this(duration, CubicBezierCurve(p0, p1, p2, p3))
+
+    var segmentTimeRange: NormalizedTimeRange = NormalizedTimeRange()
+        internal set
+}
 
 class BezierSpline {
 
     var splineDuration: Long = 0
         private set
-    private val curves = DynArray.of<BezierSplineSegment>(5, 5)
-    private val ranges = mutableMapOf<LongRange, BezierSplineSegment>()
+    private val curves = mutableListOf<BezierSplineSegment>()
 
     fun add(segment: BezierSplineSegment) {
-        if (curves.isEmpty) {
-            ranges[0L.rangeTo(segment.duration)] = segment
-        } else {
-            val lastSegment = curves.getLastNotNull()
-            ranges[lastSegment.duration.rangeTo(segment.duration)] = segment
-        }
-        curves + segment
+        curves.add(segment)
         splineDuration += segment.duration
+        calcRanges()
     }
 
-    fun getAtNormalized(time: Float): Map.Entry<LongRange, BezierSplineSegment>? =
-        getAtTime((time * splineDuration).toLong())
+    private fun calcRanges() {
 
-    fun getAtTime(time: Long): Map.Entry<LongRange, BezierSplineSegment>? {
-        return ranges.entries.find { entry -> entry.key.contains(time) }
+        var lastToNormalized = 0f
+        curves.forEach {
+            val from = lastToNormalized
+            lastToNormalized += 1f * it.duration /splineDuration
+            it.segmentTimeRange = NormalizedTimeRange(from, lastToNormalized)
+        }
     }
+
+    fun getAtNormalized(time: Float): BezierSplineSegment =
+        curves.find { it.segmentTimeRange.contains(time) } ?: throw RuntimeException("No BezierSplineSegment found for normalized time: $time")
 
 }
 

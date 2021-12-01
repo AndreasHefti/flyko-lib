@@ -3,6 +3,7 @@ package com.inari.util.geom
 
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Direction.*
+import kotlin.jvm.JvmField
 import kotlin.math.*
 
 enum class Orientation {
@@ -11,6 +12,13 @@ enum class Orientation {
     EAST,
     SOUTH,
     WEST
+}
+
+class NormalizedTimeRange(
+    @JvmField val from: Float = 0f,
+    @JvmField val to: Float = 1f,
+) {
+    fun contains(t: Float): Boolean = t in from..to
 }
 
 /** Eight directions, build of four [Orientation], and a NONE constant
@@ -431,6 +439,12 @@ object GeomUtils {
             -r * (180f / PI_F)
         else
             r * (180f / PI_F)
+
+    /**
+     * n' = v0+(v1−v0 / r1−r0)(n−r0)
+     */
+    inline fun transformRange(n: Float, r0: Float = 0f, r1: Float = 1f, v0: Float = 0f, v1: Float = 1f): Float =
+        v0 + ((v1 - v0) / (r1 - r0)) * (n - r0)
 }
 
 

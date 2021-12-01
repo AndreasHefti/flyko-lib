@@ -16,18 +16,15 @@ class BezierAnimation private constructor() : TypedAnimation<ETransform>() {
             if (data.inversed) {
                 val pos = bezierCurvePoint(curve, easing(data.normalizedTime), true)
                 transform.position(pos)
-                //transform.pivot(pos)
                 transform.rotation = GeomUtils.radToDeg(bezierCurveAngleX(curve, easing(data.normalizedTime), true))
             } else {
                 val pos = bezierCurvePoint(curve, easing(data.normalizedTime))
                 transform.position(pos)
-                //transform.pivot(pos)
                 transform.rotation = GeomUtils.radToDeg(bezierCurveAngleX(curve, easing(data.normalizedTime)))
             }
         else {
             if (data.resetOnFinish) {
                 transform.position(curve.p0)
-                //transform.pivot(curve.p0)
                 transform.rotation = 0f
             }
             dispose(data)
