@@ -1,9 +1,9 @@
 package com.inari.firefly.util.geom
 
 import com.inari.util.geom.GeomUtils
+import com.inari.util.geom.GeomUtils.bezierCurveAngleX
+import com.inari.util.geom.GeomUtils.bezierCurvePoint
 import com.inari.util.geom.Vector2f
-import com.inari.util.geom.bezierCurveAngleX
-import com.inari.util.geom.bezierCurvePoint
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

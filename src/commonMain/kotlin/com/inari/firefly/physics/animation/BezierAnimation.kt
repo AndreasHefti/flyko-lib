@@ -3,6 +3,8 @@ package com.inari.firefly.physics.animation
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.ETransform
 import com.inari.util.geom.*
+import com.inari.util.geom.GeomUtils.bezierCurveAngleX
+import com.inari.util.geom.GeomUtils.bezierCurvePoint
 import kotlin.jvm.JvmField
 
 class BezierAnimation private constructor() : TypedAnimation<ETransform>() {
