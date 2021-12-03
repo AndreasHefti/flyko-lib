@@ -17,6 +17,7 @@ class PlatformerHMoveController : Controller() {
 
     @JvmField var runVelocityStep = 10.0f
     @JvmField var stopVelocityStep = 20.0f
+    @JvmField var moveOnAir = true
 
     @JvmField var inputDevice: InputDevice = FFContext.input.getDefaultDevice()
     @JvmField var buttonLeft = ButtonType.LEFT
@@ -31,6 +32,9 @@ class PlatformerHMoveController : Controller() {
     }
 
     override fun update(componentId: CompId) {
+        if (!moveOnAir &&!playerMovement.onGround)
+            return
+
         if (inputDevice.buttonPressed(buttonLeft)) {
             with (playerMovement) {
                 val outRef = this@PlatformerHMoveController
