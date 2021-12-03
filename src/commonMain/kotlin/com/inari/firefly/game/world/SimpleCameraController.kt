@@ -16,30 +16,37 @@ import kotlin.math.floor
 
 class SimpleCameraController private constructor() : Controller() {
 
-    private val pos = Vector2f()
-    private lateinit var view: View
-
+    @JvmField var pixelPerfect = false
     @JvmField var pivot: Vector2f = Vector2f()
     @JvmField var snapToBounds: Vector4i = Vector4i()
     @JvmField var velocity: Float = 0.25f
 
+    private val pos = Vector2f()
+    private lateinit var view: View
+    private lateinit var viewChangeEvent: ViewChangeEvent
+
     fun adjust() {
         if (getPos(view.data.zoom, view.data.bounds, view.data.worldPosition)) {
-            view.data.worldPosition.x = floor(view.data.worldPosition.x.toDouble() + pos.x).toFloat()
-            view.data.worldPosition.y = floor(view.data.worldPosition.y.toDouble() + pos.y).toFloat()
-            ViewChangeEvent.send(view.componentId, ViewChangeEvent.Type.ORIENTATION)
+            view.data.worldPosition.x = floor(view.data.worldPosition.x + pos.x)
+            view.data.worldPosition.y = floor(view.data.worldPosition.y + pos.y)
+            FFContext.notify(viewChangeEvent)
         }
     }
 
     override fun init(componentId: CompId) {
         this.view = FFContext[componentId]
+        viewChangeEvent = ViewChangeEvent.of(view.componentId, ViewChangeEvent.Type.ORIENTATION, pixelPerfect)
     }
 
     override fun update(componentId: CompId) {
         if (getPos(view.data.zoom, view.data.bounds, view.data.worldPosition)) {
             view.data.worldPosition.x += pos.x * velocity
             view.data.worldPosition.y += pos.y * velocity
-            ViewChangeEvent.send(view.componentId, ViewChangeEvent.Type.ORIENTATION)
+            if (pixelPerfect) {
+                view.data.worldPosition.x = floor(view.data.worldPosition.x)
+                view.data.worldPosition.y = floor(view.data.worldPosition.y)
+            }
+            FFContext.notify(viewChangeEvent)
         }
     }
 
@@ -65,8 +72,8 @@ class SimpleCameraController private constructor() : Controller() {
 
         pos.x = pos.x.coerceAtMost(xMax)
         pos.y = pos.y.coerceAtMost(yMax)
-        pos.x = ceil(pos.x.toDouble() - worldPosition.x).toFloat()
-        pos.y = floor(pos.y.toDouble() - worldPosition.y).toFloat()
+        pos.x = ceil(pos.x - worldPosition.x)
+        pos.y = floor(pos.y - worldPosition.y)
 
         return pos.x != 0f || pos.y != 0f
     }

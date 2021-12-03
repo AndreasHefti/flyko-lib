@@ -72,6 +72,7 @@ fun initView() {
         name = "Player_Camera"
         //pivot = PlayerSystem.playerPosition
         snapToBounds(-100, -100, 840, 840)
+        pixelPerfect = false
     }
     FFContext[View, "testView"].withController(camId)
 }

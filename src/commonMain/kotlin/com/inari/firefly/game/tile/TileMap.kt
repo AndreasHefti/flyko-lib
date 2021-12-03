@@ -26,6 +26,7 @@ import com.inari.util.Consumer
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
+import kotlin.math.floor
 
 class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!!) {
 
@@ -40,7 +41,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
 
     private val parallaxListener: Consumer<ViewChangeEvent> = { event ->
         if (event.type == ViewChangeEvent.Type.ORIENTATION && event.id.instanceId == viewRef)
-            updateParallaxLayer()
+            updateParallaxLayer(event.pixelPerfect)
     }
 
     var view = ComponentRefResolver(View) { index -> viewRef = index }
@@ -253,14 +254,14 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         FFContext.delete(TileGrid, layer.tileGridId)
     }
 
-    private fun updateParallaxLayer() {
+    private fun updateParallaxLayer(pixelPerfect: Boolean) {
         val viewPos = FFContext[View, viewRef].worldPosition
 
         tileMapLayer.forEach { mapLayer ->
             if (mapLayer.parallaxFactorX != ZERO_FLOAT || mapLayer.parallaxFactorY != ZERO_FLOAT) {
                 FFContext[TileGrid, mapLayer.tileGridId].position(
-                    -viewPos.x * mapLayer.parallaxFactorX,
-                    -viewPos.y * mapLayer.parallaxFactorY)
+                    if (pixelPerfect) floor(-viewPos.x * mapLayer.parallaxFactorX) else -viewPos.x * mapLayer.parallaxFactorX,
+                    if (pixelPerfect) floor(-viewPos.y * mapLayer.parallaxFactorY) else -viewPos.y * mapLayer.parallaxFactorY)
             }
         }
     }
