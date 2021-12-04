@@ -34,19 +34,19 @@ actual object FFGraphics : GraphicsAPI {
     actual override fun disposeShader(shaderId: Int) {
     }
 
-    actual override fun createBackBuffer(data: BackBufferData): Int {
+    actual override fun createFrameBuffer(data: FrameBufferData): Int {
         TODO("Not yet implemented")
     }
 
-    actual override fun disposeBackBuffer(backBufferId: Int) {
+    actual override fun disposeFrameBuffer(frameBufferId: Int) {
         TODO("Not yet implemented")
     }
 
-    actual override fun startRendering(view: ViewData, clear: Boolean) {
+    actual override fun startViewportRendering(view: ViewData, clear: Boolean) {
         TODO("Not yet implemented")
     }
 
-    actual override fun startBackBufferRendering(backBufferId: Int, posX: Float, posY: Float, clear: Boolean) {
+    actual override fun startFrameBufferRendering(frameBufferId: Int, posX: Int, posY: Int, clear: Boolean) {
         TODO("Not yet implemented")
     }
 
@@ -74,11 +74,11 @@ actual object FFGraphics : GraphicsAPI {
         TODO("Not yet implemented")
     }
 
-    actual override fun endBackBufferRendering(backBufferId: Int) {
+    actual override fun endFrameBufferRendering(frameBufferId: Int) {
         TODO("Not yet implemented")
     }
 
-    actual override fun endRendering(view: ViewData) {
+    actual override fun endViewportRendering(view: ViewData) {
         TODO("Not yet implemented")
     }
 

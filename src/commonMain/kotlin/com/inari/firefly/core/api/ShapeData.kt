@@ -17,15 +17,15 @@ enum class ShapeType {
 }
 
 class ShapeData(
-    @JvmField inline var type: ShapeType = ShapeType.POINT,
-    @JvmField inline var vertices: FloatArray = floatArrayOf(),
-    @JvmField inline var segments: Int = -1,
-    @JvmField inline var color1: Vector4f = Vector4f(1f, 1f, 1f, 1f),
-    @JvmField inline var color2: Vector4f? = null,
-    @JvmField inline var color3: Vector4f? = null,
-    @JvmField inline var color4: Vector4f? = null,
-    @JvmField inline var blend: BlendMode = BlendMode.NONE,
-    @JvmField inline  var fill: Boolean = false
+    @JvmField internal var type: ShapeType = ShapeType.POINT,
+    @JvmField internal var vertices: FloatArray = floatArrayOf(),
+    @JvmField internal var segments: Int = -1,
+    @JvmField internal var color1: Vector4f = Vector4f(1f, 1f, 1f, 1f),
+    @JvmField internal var color2: Vector4f? = null,
+    @JvmField internal var color3: Vector4f? = null,
+    @JvmField internal var color4: Vector4f? = null,
+    @JvmField internal var blend: BlendMode = BlendMode.NONE,
+    @JvmField internal var fill: Boolean = false
 ) {
 
     fun reset() {

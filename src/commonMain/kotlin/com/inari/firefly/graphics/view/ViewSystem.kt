@@ -18,8 +18,10 @@ import kotlin.jvm.JvmField
 
 object ViewSystem : ComponentSystem {
 
-    override val supportedComponents: Aspects =
-        SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(View, Layer)
+    override val supportedComponents: Aspects = SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(
+        View,
+        Layer,
+        FrameBuffer)
 
     val views: ComponentMapRO<View>
         get() = systemViews
@@ -43,6 +45,18 @@ object ViewSystem : ComponentSystem {
         listener = { layer, action -> when (action) {
             CREATED       -> created(layer)
             DELETED       -> deleted(layer)
+            else -> DO_NOTHING
+        } }
+    )
+
+    val frameBuffers: ComponentMapRO<FrameBuffer>
+        get() = systemFrameBuffers
+    private val systemFrameBuffers: ComponentMap<FrameBuffer> = ComponentSystem.createComponentMapping(
+        FrameBuffer,
+        activationMapping = true,
+        listener = { fb, action -> when (action) {
+            ACTIVATED       -> fb.activate()
+            DEACTIVATED     -> fb.deactivate()
             else -> DO_NOTHING
         } }
     )
@@ -157,5 +171,7 @@ object ViewSystem : ComponentSystem {
             systemViews.delete(view.index)
         }
         systemLayers.clear()
+        systemFrameBuffers.forEachActive { it.deactivate() }
+        systemFrameBuffers.clear()
     }
 }

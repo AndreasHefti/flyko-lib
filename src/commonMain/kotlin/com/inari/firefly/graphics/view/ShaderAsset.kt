@@ -1,4 +1,4 @@
-package com.inari.firefly.graphics.effect
+package com.inari.firefly.graphics.view
 
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_NAME
@@ -24,8 +24,7 @@ class ShaderAsset private constructor() : Asset() {
     var fragShaderProgram: String
         get() = shaderData.fragmentShaderProgram
         set(value) { shaderData.fragmentShaderProgram = iSetIfNotInitialized(value, "fragShaderProgram") }
-    var shaderInit: ShaderInit
-        get() = shaderInit
+    var shaderInit: ShaderInit = {}
         set(value) { shaderData.shaderInit = iSetIfNotInitialized(value, "shaderInit") }
 
     override fun instanceId(index: Int): Int = shaderId

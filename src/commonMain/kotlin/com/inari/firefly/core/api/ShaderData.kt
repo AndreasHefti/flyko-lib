@@ -9,11 +9,11 @@ import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
 class ShaderData(
-    @JvmField inline var vertexShaderResourceName: String = NO_NAME,
-    @JvmField inline var vertexShaderProgram: String = NO_PROGRAM,
-    @JvmField inline var fragmentShaderResourceName: String = NO_NAME,
-    @JvmField inline var fragmentShaderProgram: String = NO_PROGRAM,
-    @JvmField inline var shaderInit: ShaderInit = VOID_CONSUMER,
+    @JvmField internal var vertexShaderResourceName: String = NO_NAME,
+    @JvmField internal var vertexShaderProgram: String = NO_PROGRAM,
+    @JvmField internal var fragmentShaderResourceName: String = NO_NAME,
+    @JvmField internal var fragmentShaderProgram: String = NO_PROGRAM,
+    @JvmField internal var shaderInit: ShaderInit = VOID_CONSUMER,
 ) {
 
     fun reset() {

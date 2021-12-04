@@ -1,14 +1,11 @@
 package com.inari.firefly.graphics.text
 
 import com.inari.firefly.BlendMode
-import com.inari.firefly.FFContext
 import com.inari.firefly.asset.Asset
-import com.inari.firefly.asset.AssetInstanceRefResolver
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
-import com.inari.firefly.graphics.effect.ShaderAsset
 import com.inari.firefly.graphics.rendering.Renderer
 import com.inari.firefly.graphics.rendering.SimpleTextRenderer
 import com.inari.util.geom.Vector4f

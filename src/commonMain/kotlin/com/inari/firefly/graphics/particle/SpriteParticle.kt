@@ -1,10 +1,8 @@
 package com.inari.firefly.graphics.particle
 
 import com.inari.firefly.BlendMode
-import com.inari.firefly.FFContext
 import com.inari.firefly.asset.AssetInstanceRefResolver
 import com.inari.firefly.core.api.SpriteRenderable
-import com.inari.firefly.graphics.effect.ShaderAsset
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 

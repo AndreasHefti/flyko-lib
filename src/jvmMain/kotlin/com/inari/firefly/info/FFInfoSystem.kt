@@ -29,9 +29,9 @@ object FFInfoSystem : FFSystem {
     private val graphics = FFContext.graphics
 
     private val postRenderListener: Call = {
-            graphics.startRendering( ViewSystem.baseView.data, false )
+            graphics.startViewportRendering( ViewSystem.baseView.data, false )
             renderSystemInfoDisplay()
-            graphics.endRendering( ViewSystem.baseView.data )
+            graphics.endViewportRendering( ViewSystem.baseView.data )
             graphics.flush(FFApp.NO_VIRTUAL_VIEW_PORTS)
     }
 

@@ -6,13 +6,13 @@ import com.inari.util.IntFunction
 import kotlin.jvm.JvmField
 
 class TextureData(
-    @JvmField var resourceName: String = NO_NAME,
-    @JvmField var isMipmap: Boolean = false,
-    @JvmField var wrapS: Int = -1,
-    @JvmField var wrapT: Int = -1,
-    @JvmField var minFilter: Int = -1,
-    @JvmField var magFilter: Int = -1,
-    @JvmField var colorConverter: IntFunction = NULL_INT_FUNCTION
+    @JvmField internal var resourceName: String = NO_NAME,
+    @JvmField internal var isMipmap: Boolean = false,
+    @JvmField internal var wrapS: Int = -1,
+    @JvmField internal var wrapT: Int = -1,
+    @JvmField internal var minFilter: Int = -1,
+    @JvmField internal var magFilter: Int = -1,
+    @JvmField internal var colorConverter: IntFunction = NULL_INT_FUNCTION
 ) {
 
     fun reset() {

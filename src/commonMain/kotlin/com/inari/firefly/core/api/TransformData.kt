@@ -5,10 +5,10 @@ import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 
 class TransformData constructor(
-    @JvmField val position: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT),
-    @JvmField val pivot: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT),
-    @JvmField val scale: Vector2f = Vector2f(1.0f, 1.0f),
-    @JvmField var rotation: Float = ZERO_FLOAT
+    @JvmField internal val position: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT),
+    @JvmField internal val pivot: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT),
+    @JvmField internal val scale: Vector2f = Vector2f(1.0f, 1.0f),
+    @JvmField internal var rotation: Float = ZERO_FLOAT
 ) {
     val hasRotation: Boolean get() = rotation != 0f
     val hasScale: Boolean get() = scale.v0 != 1.0f || scale.v1 != 1.0f

@@ -68,23 +68,23 @@ object GraphicsMock : GraphicsAPI {
         _loadedAssets.remove(shaderId)
     }
 
-    override fun createBackBuffer(data: BackBufferData): Int {
+    override fun createFrameBuffer(data: FrameBufferData): Int {
         return _loadedAssets.add("back-buffer: $data")
     }
 
-    override fun disposeBackBuffer(backBufferId: Int) {
-        _loadedAssets.remove(backBufferId)
+    override fun disposeFrameBuffer(frameBufferId: Int) {
+        _loadedAssets.remove(frameBufferId)
     }
 
     override fun setActiveShader(shaderId: Int) {
         TODO("Not yet implemented")
     }
 
-    override fun startRendering(view: ViewData, clear: Boolean) {
+    override fun startViewportRendering(view: ViewData, clear: Boolean) {
         _log.add("startRendering::$view")
     }
 
-    override fun startBackBufferRendering(backBufferId: Int, posX: Float, posY: Float, clear: Boolean) {
+    override fun startFrameBufferRendering(frameBufferId: Int, posX: Int, posY: Int, clear: Boolean) {
         TODO("Not yet implemented")
     }
 
@@ -117,11 +117,11 @@ object GraphicsMock : GraphicsAPI {
         _log.add("renderShape:: $data : $transform  offset: $xOffset $yOffset")
     }
 
-    override fun endBackBufferRendering(backBufferId: Int) {
+    override fun endFrameBufferRendering(frameBufferId: Int) {
         TODO("Not yet implemented")
     }
 
-    override fun endRendering(view: ViewData) {
+    override fun endViewportRendering(view: ViewData) {
         _log.add("endRendering::$view")
     }
 

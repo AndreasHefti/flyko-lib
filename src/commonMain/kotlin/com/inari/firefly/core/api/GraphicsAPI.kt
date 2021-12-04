@@ -67,20 +67,20 @@ interface GraphicsAPI {
      */
     fun disposeShader(shaderId: Int)
 
-    /** This is called from firefly API whenever a back-buffer is created and a low-level FBO (for example)
-     * id needed to represent this back buffer.
+    /** This is called from firefly API whenever a framebuffer is created and a low-level FBO (for example)
+     * id needed to represent this frame buffer.
      *
-     * @param data [BackBufferData] defining all properties for the low-level representation (FBO)
-     * @return A instance identifier of the low-level back-buffer representation
+     * @param data [FrameBufferData] defining all properties for the low-level representation (FBO)
+     * @return A instance identifier of the low-level frame buffer representation
      */
-    fun createBackBuffer(data: BackBufferData): Int
+    fun createFrameBuffer(data: FrameBufferData): Int
 
-    /** This is called by the firefly API whenever a given and loaded back-buffer is disposed.
-     * This shall release all low-level API representation data for the back-buffer (FBO for example)
+    /** This is called by the firefly API whenever a given and loaded frame-buffer is disposed.
+     * This shall release all low-level API representation data for the frame-buffer (FBO for example)
      *
-     * @param backBufferId The instance identifier of the low-level back-buffer representation
+     * @param frameBufferId The instance identifier of the low-level frame-buffer representation
      */
-    fun disposeBackBuffer(backBufferId: Int)
+    fun disposeFrameBuffer(frameBufferId: Int)
 
     /** Set the active sprite rendering shader. Note that the shader program must have been created before with createShader.
      * @param shaderId The instance identifier of the shader.
@@ -93,17 +93,17 @@ interface GraphicsAPI {
      * @param view the [ViewData] that is starting to be rendered
      * @param clear indicates whether the [ViewData] should be cleared with the vies clear-color before rendering or not
      */
-    fun startRendering(view: ViewData, clear: Boolean)
+    fun startViewportRendering(view: ViewData, clear: Boolean)
 
-    /** This is called form the firefly API before rendering to a given back-buffer (FBO) and must
-     * prepare all the stuff needed to render the that back-buffer on following renderXXX calls.
+    /** This is called form the firefly API before rendering to a given frame-buffer (FBO) and must
+     * prepare all the stuff needed to render the that frame-buffer on following renderXXX calls.
      *
-     * @param backBufferId the instance id of the previous created [BackBufferData] that is starting to be rendered
-     * @param posX the world (rendering) position of the back-buffers upper left corner
-     * @param posY the world (rendering) position of the back-buffers upper left corner
-     * @param clear indicates whether the back-buffer should be cleared with the vies clear-color before rendering or not
+     * @param frameBufferId the instance id of the previous created [FrameBufferData] that is starting to be rendered
+     * @param posX the world (rendering) position of the frame-buffers upper left corner
+     * @param posY the world (rendering) position of the frame-buffers upper left corner
+     * @param clear indicates whether the frame-buffer should be cleared with the vies clear-color before rendering or not
      */
-    fun startBackBufferRendering(backBufferId: Int, posX: Float, posY: Float, clear: Boolean)
+    fun startFrameBufferRendering(frameBufferId: Int, posX: Int, posY: Int, clear: Boolean)
 
     /** This is called form the firefly API to render a created sprite on specified position to the actual [ViewData]
      *
@@ -155,18 +155,18 @@ interface GraphicsAPI {
      */
     fun renderShape(data: ShapeData, transform: TransformData, xOffset: Float, yOffset: Float)
 
-    /** This is called form the firefly API to notify the end of rendering for a specified back-buffer.
-     * The graphics context shall unbind the current back-buffer and bind the actual [ViewData] again
+    /** This is called form the firefly API to notify the end of rendering for a specified frame-buffer.
+     * The graphics context shall unbind the current frame-buffer and bind the actual [ViewData] again
      * for further rendering.
      *
-     * @param backBufferId the instance id of the previous created [BackBufferData] that is starting to be rendered
+     * @param frameBufferId the instance id of the previous created [FrameBufferData] that is starting to be rendered
      */
-    fun endBackBufferRendering(backBufferId: Int)
+    fun endFrameBufferRendering(frameBufferId: Int)
 
     /** This is called form the firefly API to notify the end of rendering for a specified [ViewData].
      * @param view [ViewData] that is ending to be rendered
      */
-    fun endRendering(view: ViewData)
+    fun endViewportRendering(view: ViewData)
 
     fun flush(virtualViews: DynArrayRO<ViewData>)
 

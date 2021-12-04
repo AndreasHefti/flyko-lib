@@ -8,12 +8,8 @@ import com.inari.firefly.core.component.PropertyRefResolver
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
-import com.inari.firefly.graphics.ETransform
-import com.inari.firefly.graphics.effect.ShaderAsset
-import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
-import kotlin.reflect.KClass
 
 class ESprite private constructor() : EntityComponent(ESprite::class.simpleName!!) {
 

@@ -1,25 +1,24 @@
-package com.inari.firefly.graphics.effect
+package com.inari.firefly.graphics.view
 
 import com.inari.firefly.BlendMode
 import com.inari.firefly.FFContext
-import com.inari.firefly.asset.Asset
 import com.inari.firefly.asset.AssetInstanceRefResolver
-import com.inari.firefly.core.ComponentRefResolver
-import com.inari.firefly.core.api.BackBufferData
-import com.inari.firefly.core.system.SystemComponentSubType
-import com.inari.firefly.graphics.view.View
+import com.inari.firefly.core.api.FrameBufferData
+import com.inari.firefly.core.system.SystemComponent
+import com.inari.firefly.core.system.SystemComponentSingleType
 import com.inari.util.geom.Vector4f
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
-class BackBufferAsset private constructor() : Asset() {
+class FrameBuffer private constructor() : SystemComponent(FrameBuffer::class.simpleName!!) {
 
-    @JvmField internal var backBufferId: Int = -1
-    @JvmField internal val data = BackBufferData()
+    @JvmField internal var bufferId: Int = -1
+    @JvmField internal val data = FrameBufferData()
 
     var bounds: Vector4i
         get() = data.bounds
         set(value) { data.bounds(value) }
+    @JvmField var clear: Boolean = true
     var clearColor: Vector4f
         get() = data.clearColor
         set(value) { data.clearColor(value) }
@@ -32,7 +31,6 @@ class BackBufferAsset private constructor() : Asset() {
     @JvmField val shader = AssetInstanceRefResolver(
         { instanceId -> data.shaderRef = instanceId },
         { data.shaderRef })
-    @JvmField val view = ComponentRefResolver(View) { index-> data.viewportRef = index }
     var zoom: Float
         get() = data.zoom
         set(value) { data.zoom = value }
@@ -40,25 +38,23 @@ class BackBufferAsset private constructor() : Asset() {
         get() = data.fboScale
         set(value) { data.fboScale = value }
 
-    override fun instanceId(index: Int): Int = backBufferId
-
-    override fun load() {
-        if (backBufferId >= 0)
+    internal fun activate() {
+        if (bufferId >= 0)
             return
 
-        backBufferId = FFContext.graphics.createBackBuffer(data)
+        bufferId = FFContext.graphics.createFrameBuffer(data)
     }
 
-    override fun unload() {
-        if (backBufferId < 0)
+    internal fun deactivate() {
+        if (bufferId < 0)
             return
 
-        FFContext.graphics.disposeBackBuffer(backBufferId)
-        backBufferId = -1
+        FFContext.graphics.disposeFrameBuffer(bufferId)
+        bufferId = -1
     }
 
     override fun componentType() = Companion
-    companion object : SystemComponentSubType<Asset, BackBufferAsset>(Asset, BackBufferAsset::class) {
-        override fun createEmpty() = BackBufferAsset()
+    companion object : SystemComponentSingleType<FrameBuffer>(FrameBuffer::class) {
+        override fun createEmpty() = FrameBuffer()
     }
 }

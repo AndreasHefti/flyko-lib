@@ -9,7 +9,7 @@ import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.TextureAsset
-import com.inari.firefly.graphics.effect.ShaderAsset
+import com.inari.firefly.graphics.view.ShaderAsset
 import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.view.View
 

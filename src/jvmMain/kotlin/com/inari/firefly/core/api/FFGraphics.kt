@@ -209,15 +209,15 @@ actual object FFGraphics : GraphicsAPI {
         shaders.remove(shaderId)?.dispose()
     }
 
-    actual override fun createBackBuffer(data: BackBufferData): Int {
+    actual override fun createFrameBuffer(data: FrameBufferData): Int {
         return backBuffers.add(BackBufferFBO(data))
     }
 
-    actual override fun disposeBackBuffer(backBufferId: Int) {
-        backBuffers.remove(backBufferId)?.dispose()
+    actual override fun disposeFrameBuffer(frameBufferId: Int) {
+        backBuffers.remove(frameBufferId)?.dispose()
     }
 
-    actual override fun startRendering(view: ViewData, clear: Boolean) {
+    actual override fun startViewportRendering(view: ViewData, clear: Boolean) {
         if (activeBackBufferId >= 0)
             throw IllegalStateException("Back-buffer rendering is on")
         if (activeViewportId >= 0)
@@ -229,16 +229,16 @@ actual object FFGraphics : GraphicsAPI {
         spriteBatch.begin()
     }
 
-    actual override fun startBackBufferRendering(backBufferId: Int, posX: Float, posY: Float, clear: Boolean) {
+    actual override fun startFrameBufferRendering(frameBufferId: Int, posX: Int, posY: Int, clear: Boolean) {
         if (activeBackBufferId >= 0)
             throw IllegalStateException("Back-buffer rendering is on")
         if (activeViewportId >= 0)
             throw IllegalStateException("Viewport rendering is on")
 
-        val backBuffer = backBuffers[backBufferId]
+        val backBuffer = backBuffers[frameBufferId]
         if (backBuffer != null) {
             backBuffer.activate(posX, posY, clear)
-            activeBackBufferId = backBufferId
+            activeBackBufferId = frameBufferId
         }
         spriteBatch.begin()
     }
@@ -545,7 +545,7 @@ actual object FFGraphics : GraphicsAPI {
         shapeRenderer.identity()
     }
 
-    actual override fun endBackBufferRendering(backBufferId: Int) {
+    actual override fun endFrameBufferRendering(frameBufferId: Int) {
         if (activeBackBufferId < 0)
             throw IllegalStateException("No back-buffer rendering active")
 
@@ -554,46 +554,57 @@ actual object FFGraphics : GraphicsAPI {
         activeBackBufferId = -1
     }
 
-    actual override fun endRendering(view: ViewData) {
+    actual override fun endViewportRendering(view: ViewData) {
         if (activeViewportId < 0)
             throw IllegalStateException("No viewport rendering active")
         if (view.index != activeViewportId)
             throw IllegalStateException("Other viewport rendering id active")
 
-        val activeViewport = viewports[activeViewportId]
-        // first render all back-buffers of this view to the viewport
-        var i = 0
-        while (i < backBuffers.capacity) {
-            val backBuffer = backBuffers[i++] ?: continue
-            if (backBuffer.data.viewportRef != activeViewportId) continue
-
-            setColorAndBlendMode(backBuffer.data.tintColor, backBuffer.data.blendMode)
-            setActiveShader(backBuffer.data.shaderRef)
-            spriteBatch.draw(
-                backBuffer.fboTexture,
-                backBuffer.data.bounds.x.toFloat(), backBuffer.data.bounds.y.toFloat(),
-                backBuffer.data.bounds.width.toFloat(), backBuffer.data.bounds.height.toFloat()
-            )
-        }
-
         // flush the batch and deactivate the viewport
         spriteBatch.flush()
         if (!view.isBase )
-            activeViewport?.deactivate()
+            viewports[activeViewportId]?.deactivate()
         spriteBatch.end()
         activeViewportId = -1
     }
 
     actual override fun flush(virtualViews: DynArrayRO<ViewData>) {
         if (!virtualViews.isEmpty) {
-            baseViewport?.activate(spriteBatch, shapeRenderer, baseView!!, true)
-            spriteBatch.begin()
-
             var i = 0
             while (i < virtualViews.capacity) {
                 val virtualView = virtualViews[i++] ?: continue
                 val viewport = viewports[virtualView.index] ?: continue
                 val bounds = virtualView.bounds
+
+//                if (!virtualView.backBuffers.isEmpty) {
+//                    // fist render all back-buffers of a virtual view port to it
+//                    // get and bind the active viewport to render the back-buffers to it
+//                    viewport.frameBuffer?.begin()
+//                    spriteBatch.begin()
+//                    // render all back-buffers of this view to the viewport
+//                    var i = 0
+//                    while (i < backBuffers.capacity) {
+//                        val backBuffer = backBuffers[i++] ?: continue
+//                        if (backBuffer.data.viewportRef != activeViewportId) continue
+//
+//                        setColorAndBlendMode(backBuffer.data.tintColor, backBuffer.data.blendMode)
+//                        setActiveShader(backBuffer.data.shaderRef)
+//                        spriteBatch.draw(
+//                            backBuffer.fboTexture,
+//                            backBuffer.data.bounds.x.toFloat(), backBuffer.data.bounds.y.toFloat(),
+//                            backBuffer.data.bounds.width.toFloat(), backBuffer.data.bounds.height.toFloat()
+//                        )
+//                    }
+//                    // end back buffer to virtual view port rendering
+//                    viewport.deactivate()
+//                    spriteBatch.flush()
+//                    spriteBatch.end()
+//                }
+
+                // then activate the base view port and render the virtual viewport to it
+                baseViewport?.activate(spriteBatch, shapeRenderer, baseView!!, true)
+                spriteBatch.begin()
+
                 setColorAndBlendMode(virtualView.tintColor, virtualView.blendMode)
                 setActiveShader(virtualView.shaderRef)
 
@@ -731,7 +742,7 @@ actual object FFGraphics : GraphicsAPI {
         }
     }
 
-    private class BackBufferFBO(val data: BackBufferData) {
+    private class BackBufferFBO(val data: FrameBufferData) {
 
         val camera = OrthographicCamera(
             data.bounds.width.toFloat(),
@@ -745,7 +756,7 @@ actual object FFGraphics : GraphicsAPI {
         )
         val fboTexture = TextureRegion(frameBuffer.colorBufferTexture)
 
-        fun activate(posX: Float, posY: Float, clear: Boolean) {
+        fun activate(posX: Int, posY: Int, clear: Boolean) {
             fboTexture.flip(false, false)
 
             val zoom = data.zoom

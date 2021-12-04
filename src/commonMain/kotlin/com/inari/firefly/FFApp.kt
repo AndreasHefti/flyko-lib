@@ -1,7 +1,6 @@
 package com.inari.firefly
 
 
-import com.inari.firefly.FFApp.EffectRenderEvent.Companion.effectRenderEvent
 import com.inari.firefly.FFApp.PostRenderEvent.Companion.postRenderEvent
 import com.inari.firefly.FFApp.RenderEvent.Companion.renderEvent
 import com.inari.firefly.FFApp.UpdateEvent.Companion.updateEvent
@@ -48,25 +47,24 @@ abstract class FFApp protected constructor(
     }
 
     fun render() {
-            val size = ViewSystem.privateActiveViewPorts.size
-            if (size > 0) {
-                var i = 0
-                while (i < size) {
-                    ViewSystem.privateActiveViewPorts[i++]?.apply {
-                        render(this)
-                    }
-                }
+        if (!ViewSystem.frameBuffers.isEmpty)
+            renderFrameBuffer()
 
-                graphics.flush(ViewSystem.privateActiveViewPorts)
-            } else {
-                render(ViewSystem.baseView.data)
-                graphics.flush(NO_VIRTUAL_VIEW_PORTS)
-            }
+        renderEvent.frameBufferId = -1
+        val size = ViewSystem.privateActiveViewPorts.size
+        if (size > 0) {
+            ViewSystem.privateActiveViewPorts.forEach { renderViewport(it) }
+            graphics.flush(ViewSystem.privateActiveViewPorts)
+        } else {
+            renderViewport(ViewSystem.baseView.data)
+            graphics.flush(NO_VIRTUAL_VIEW_PORTS)
+        }
 
-            FFContext.notify(postRenderEvent)
+        FFContext.notify(postRenderEvent)
     }
 
-    private fun render(view: ViewData) {
+    private fun renderViewport(view: ViewData) {
+
         renderEvent.viewIndex = view.index
         renderEvent.layerIndex = 0
         renderEvent.clip(
@@ -77,7 +75,7 @@ abstract class FFApp protected constructor(
         )
 
         // view rendering
-        graphics.startRendering(view, true)
+        graphics.startViewportRendering(view, true)
         ViewSystem.privateLayersOfView[view.index]?.apply {
             if (isEmpty)
                 FFContext.notify(renderEvent)
@@ -94,12 +92,19 @@ abstract class FFApp protected constructor(
                 }
             }
         }
+        graphics.endViewportRendering(view)
+    }
 
-        // effect rendering
-        effectRenderEvent.viewIndex = view.index
-        FFContext.notify(effectRenderEvent)
-
-        graphics.endRendering(view)
+    private fun renderFrameBuffer() {
+        renderEvent.viewIndex = -1
+        renderEvent.layerIndex = -1
+        ViewSystem.frameBuffers.forEachActive { frameBuffer ->
+            graphics.startFrameBufferRendering(frameBuffer.bufferId, frameBuffer.bounds.x, frameBuffer.bounds.y, frameBuffer.clear)
+            renderEvent.clip(frameBuffer.bounds)
+            renderEvent.frameBufferId = frameBuffer.bufferId
+            FFContext.notify(renderEvent)
+            graphics.endFrameBufferRendering(frameBuffer.bufferId)
+        }
     }
 
     companion object {
@@ -137,23 +142,13 @@ abstract class FFApp protected constructor(
             internal set
         var clip: Vector4i = Vector4i(0, 0, 0, 0)
             internal set
+        var frameBufferId: Int = -1
+            internal set
 
         override inline fun notify(listener: Consumer<RenderEvent>) = listener(this)
 
         companion object : EventType("RenderEvent") {
             internal val renderEvent = RenderEvent(this)
-        }
-    }
-
-    @Suppress("OVERRIDE_BY_INLINE")
-    class EffectRenderEvent(override val eventType: EventType) : Event<Consumer<EffectRenderEvent>>() {
-
-        var viewIndex: Int = -1
-            internal set
-
-        override inline fun notify(listener: Consumer<EffectRenderEvent>) = listener(this)
-        companion object : EventType("EffectRenderEvent") {
-            internal val effectRenderEvent = EffectRenderEvent(this)
         }
     }
 
