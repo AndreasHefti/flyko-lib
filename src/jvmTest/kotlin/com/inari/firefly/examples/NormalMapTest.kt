@@ -1,8 +1,6 @@
 package com.inari.firefly.examples
 
-import com.inari.firefly.BlendMode
-import com.inari.firefly.Color
-import com.inari.firefly.DesktopRunner
+import com.inari.firefly.*
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.TextureAsset
@@ -11,69 +9,67 @@ import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.sprite.SpriteAsset
 import com.inari.firefly.graphics.view.FrameBuffer
 import com.inari.firefly.graphics.view.View
+import com.inari.firefly.graphics.view.ViewSystem
+import com.inari.util.geom.Vector2f
+import com.inari.util.geom.Vector2i
+import com.inari.util.geom.Vector3f
+import com.inari.util.geom.Vector4f
 
+// With thanks to https://github.com/mattdesl/lwjgl-basics/wiki/ShaderLesson6
 object NormalMapTest {
+
+    const val DEFAULT_LIGHT_Z =  0.075f
+    val LIGHT_COLOR = Vector4f(1f, 1f, 1f, 1f)
+    val AMBIENT_COLOR = Vector4f(0.6f, 0.6f, 1f, 0.5f)
+    val FALLOFF = Vector3f(.4f, 20f, 20f)
 
     @JvmStatic
     fun main(args: Array<String>) {
         object : DesktopRunner("NormalMapTest", 400, 400) {
             override fun init() {
-                TextureAsset.buildAndActivate {
+                val texId = TextureAsset.buildAndActivate {
                     name = "TextureAsset"
                     resourceName = "firefly/normalMapTest.png"
                 }
 
-                val texId = SpriteAsset.buildAndActivate {
+                SpriteAsset.buildAndActivate {
                     name = "Sprite"
                     texture("TextureAsset")
                     textureRegion(0, 0, 16, 16)
                 }
-                val normalSpriteId = SpriteAsset.buildAndActivate {
-                    name = "Normal"
-                    texture("TextureAsset")
-                    textureRegion(16, 0, 16, 16)
-                }
 
-                val backBufferId = FrameBuffer.buildAndActivate {
-                    name = "BackBuffer"
-                    bounds(0, 0, 16, 16)
-                    //view("View1")
-                }
-
+                val pos = Vector3f( 0.0f, 0.0f, DEFAULT_LIGHT_Z)
                 val shaderId = ShaderAsset.buildAndActivate {
                     name = "NormalShader"
                     fragShaderResource = "firefly/normalFragShader.glsl"
                     shaderInit =  { adapter ->
-                        //adapter.bindTexture("normal_texture", FFContext[SpriteAsset, normalSpriteId].instanceId)
-                        adapter.bindBackBuffer("normal_texture", backBufferId.instanceId)
+                        adapter.bindTexture("normal_texture", FFContext[TextureAsset, texId].instanceId)
+                        adapter.setUniformVec2("Resolution", Vector2f(FFContext.graphics.screenWidth, FFContext.graphics.screenHeight))
+                        adapter.setUniformColorVec4("LightColor", LIGHT_COLOR)
+                        adapter.setUniformColorVec4("AmbientColor", AMBIENT_COLOR)
+                        adapter.setUniformVec3("Falloff", FALLOFF)
+                        adapter.setUniformVec3( "LightPos", pos)
                     }
                 }
 
                 val viewId = View.buildAndActivate {
                     name = "View1"
-                    bounds(100, 100, 100, 100)
-                    clearColor = Color.BLACK.instance()
-                    blendMode = BlendMode.NONE
-                    tintColor(1f,1f,1f,1f)          // this is the v_color
+                    bounds(10, 10, 16, 16)
                     shader(shaderId)
+                    blendMode = BlendMode.NONE
+                    tintColor(1f, 1f, 1f, 1f)
                 }
 
-
-
-
-
-                Entity.buildAndActivate {
-                    withComponent(ETransform) {
-                        position(0, 0)
-                        view(viewId)
+                val update = FFContext.timer.createUpdateScheduler(20f)
+                FFContext.registerListener(FFApp.UpdateEvent) {
+                    if (update.needsUpdate()) {
+                        pos(
+                            FFContext.input.xpos.toFloat() / FFContext.graphics.screenWidth,
+                            1f - FFContext.input.ypos.toFloat() / FFContext.graphics.screenHeight)
                     }
-                    withComponent(ESprite) {
-                        sprite("Sprite")
-                    }
-
                 }
 
-
+                ViewSystem.baseView.zoom = .2f
             }
         }
     }

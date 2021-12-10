@@ -576,33 +576,9 @@ actual object FFGraphics : GraphicsAPI {
                 val viewport = viewports[virtualView.index] ?: continue
                 val bounds = virtualView.bounds
 
-//                if (!virtualView.backBuffers.isEmpty) {
-//                    // fist render all back-buffers of a virtual view port to it
-//                    // get and bind the active viewport to render the back-buffers to it
-//                    viewport.frameBuffer?.begin()
-//                    spriteBatch.begin()
-//                    // render all back-buffers of this view to the viewport
-//                    var i = 0
-//                    while (i < backBuffers.capacity) {
-//                        val backBuffer = backBuffers[i++] ?: continue
-//                        if (backBuffer.data.viewportRef != activeViewportId) continue
-//
-//                        setColorAndBlendMode(backBuffer.data.tintColor, backBuffer.data.blendMode)
-//                        setActiveShader(backBuffer.data.shaderRef)
-//                        spriteBatch.draw(
-//                            backBuffer.fboTexture,
-//                            backBuffer.data.bounds.x.toFloat(), backBuffer.data.bounds.y.toFloat(),
-//                            backBuffer.data.bounds.width.toFloat(), backBuffer.data.bounds.height.toFloat()
-//                        )
-//                    }
-//                    // end back buffer to virtual view port rendering
-//                    viewport.deactivate()
-//                    spriteBatch.flush()
-//                    spriteBatch.end()
-//                }
-
                 // then activate the base view port and render the virtual viewport to it
                 baseViewport?.activate(spriteBatch, shapeRenderer, baseView!!, true)
+
                 spriteBatch.begin()
 
                 setColorAndBlendMode(virtualView.tintColor, virtualView.blendMode)
@@ -831,6 +807,10 @@ actual object FFGraphics : GraphicsAPI {
             program.setUniformf(bindingName, position.x, position.y)
         override fun setUniformVec2(bindingName: String, position: Vector2i) =
             program.setUniformf(bindingName, position.x.toFloat(), position.y.toFloat())
+        override fun setUniformVec3(bindingName: String, v: Vector3f) {
+            program.setUniformf(bindingName, v.v0, v.v1, v.v2)
+        }
+
         override fun setUniformColorVec4(bindingName: String, color: Vector4f) =
             program.setUniformf(bindingName, color.r, color.g, color.b, color.a)
 
