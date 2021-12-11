@@ -10,6 +10,7 @@ import com.inari.firefly.core.api.InputDevice.Companion.ACTION_TYPED
 import com.inari.firefly.core.api.InputDevice.Companion.VOID_INPUT_DEVICE
 import com.inari.util.Call
 import com.inari.util.collection.DynIntArray
+import okio.ByteString.Companion.toByteString
 import org.lwjgl.glfw.GLFW
 import java.lang.IllegalArgumentException
 import java.nio.ByteBuffer
@@ -151,6 +152,7 @@ actual object FFInput : InputAPI {
 
     class GLFWControllerInput(override val window: Long) : ControllerInput {
 
+        @JvmField val updateScheduler = FFContext.timer.createUpdateScheduler(30f)
         override val name: String = "Basic Controller Input"
         override val type: InputImpl = Companion
         override var slot: Int = -1
@@ -202,6 +204,12 @@ actual object FFInput : InputAPI {
         override fun buttonPressed(button: ButtonType): Boolean {
             if (currentController == NO_CONTROLLER ||!GLFW.glfwJoystickPresent(currentController.id))
                     return false
+
+            if (updateScheduler.needsUpdate()) {
+                buttons = GLFW.glfwGetJoystickButtons(currentController.id)!!
+                axis = GLFW.glfwGetJoystickAxes(currentController.id)!!
+                hats = GLFW.glfwGetJoystickHats(currentController.id)!!
+            }
 
             val buttonCode = button.ordinal
             if (!hatCodeMapping.isEmpty(buttonCode) && hats!!.capacity() > 0) {

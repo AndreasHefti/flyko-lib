@@ -68,8 +68,7 @@ object InariIntro {
         FFContext.input.setKeyCallback { _, _, _ -> dispose() }
         FFContext.input.setMouseButtonCallback { _, _ -> dispose() }
         val controllerInput = FFContext.input.createDevice<FFInput.GLFWControllerInput>(
-                "ControllerInput",
-            FFInput.GLFWControllerInput, -1)
+                "ControllerInput", FFInput.GLFWControllerInput)
         controllerInput.mapButtonInput(ButtonType.BUTTON_A, GLFW.GLFW_GAMEPAD_BUTTON_A)
         controllerInput.mapButtonInput(ButtonType.BUTTON_B, GLFW.GLFW_GAMEPAD_BUTTON_B)
         controllerInput.mapButtonInput(ButtonType.BUTTON_X, GLFW.GLFW_GAMEPAD_BUTTON_X)

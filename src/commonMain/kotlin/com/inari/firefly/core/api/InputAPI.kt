@@ -2,6 +2,7 @@ package com.inari.firefly.core.api
 
 import com.inari.firefly.NO_NAME
 import com.inari.util.collection.BitSet
+import kotlin.jvm.JvmField
 
 typealias KeyCallback = (Int, Int, Int) -> Unit // key, scancode, action
 typealias MouseCallback = (Int, Int) -> Unit    // button, action
