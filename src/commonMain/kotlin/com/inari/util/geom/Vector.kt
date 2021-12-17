@@ -190,7 +190,7 @@ class Vector4i constructor(
         }
     }
 
-    final operator fun invoke(v0: Int, v1: Int, v2: Int, v3: Int) {
+    operator fun invoke(v0: Int, v1: Int, v2: Int, v3: Int) {
         super.invoke(v0, v1)
         this.v2 = v2
         this.v3 = v3

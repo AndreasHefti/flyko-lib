@@ -8,9 +8,6 @@ import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSingleType
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.entity.Entity
-import com.inari.firefly.game.VOID_LOOS_GROUND_CALLBACK
-import com.inari.firefly.game.VOID_ON_SLOPE_CALLBACK
-import com.inari.firefly.game.VOID_TOUCH_GROUND_CALLBACK
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.physics.contact.*
 import com.inari.firefly.physics.movement.EMovement
@@ -29,6 +26,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
     private val fullContactCallbacks = DynArray.of<CollisionCallback>()
     private var terrainContactConstraintRef = -1
 
+    @JvmField var groundContactOffset = 2
     @JvmField var touchGroundCallback = VOID_TOUCH_GROUND_CALLBACK
     @JvmField var looseGroundContactCallback = VOID_LOOS_GROUND_CALLBACK
     @JvmField var onSlopeCallback = VOID_ON_SLOPE_CALLBACK
@@ -104,11 +102,12 @@ class PlatformerCollisionResolver : CollisionResolver()  {
     override fun resolve(entity: Entity, contact: EContact, contactScan: ContactScan) {
 
         val terrainContact = contactScan[terrainContactConstraintRef]
-        if (terrainContact.hasAnyContact()) {
-            val transform = entity[ETransform]
-            val movement = entity[EMovement]
-            resolveTerrainContact(terrainContact, entity, transform, movement)
-        }
+        val movement = entity[EMovement]
+        val prefGround = movement.onGround
+        movement.onGround = false
+
+        if (terrainContact.hasAnyContact())
+            resolveTerrainContact(terrainContact, entity, movement, prefGround)
 
         if (fullContactConstraintRef >= 0) {
             val fullContact = contactScan[fullContactConstraintRef]
@@ -125,10 +124,9 @@ class PlatformerCollisionResolver : CollisionResolver()  {
         }
     }
 
-    private fun resolveTerrainContact(contacts: Contacts, entity: Entity, transform: ETransform, movement: EMovement) {
+    private fun resolveTerrainContact(contacts: Contacts, entity: Entity, movement: EMovement, prefGround: Boolean) {
 
-        val prefGround = movement.onGround
-
+        val transform = entity[ETransform]
         takeFullLedgeScans(contacts)
         resolveVertically(contacts, entity, transform, movement)
         resolveHorizontally(contacts, entity, transform, movement)
@@ -169,7 +167,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
                 onSlopeCallback(entity.index, contactSensorB1.cardinality - contactSensorB3.cardinality, contacts)
             }
         } else if (bmax > gapSouth && movement.velocity.v1 >= ZERO_FLOAT) {
-            //println("adjust ground: ${bmax - gapSouth} : ${movement.velocity.dy}")
+            //println("adjust ground: ${bmax - gapSouth} : ${movement.velocity.v1 }")
             transform.move(dy = -(bmax - gapSouth))
             transform.position.y = ceil(transform.position.y)
             movement.velocity.v1 = ZERO_FLOAT
@@ -190,6 +188,8 @@ class PlatformerCollisionResolver : CollisionResolver()  {
             ContactSystem.updateContacts(entity.componentId)
             takeFullLedgeScans(contacts)
         }
+
+        //println("contactSensorGround.cardinality ${contactSensorGround.cardinality}")
 
         movement.onGround =
             setOnGround || contactSensorGround.cardinality > 0
@@ -239,6 +239,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
         contactSensorR3.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
         contactSensorGround.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
 
+
         tmax = max(contactSensorT1.cardinality, max(contactSensorT2.cardinality, contactSensorT3.cardinality))
         bmax = max(contactSensorB1.cardinality, max(contactSensorB2.cardinality, contactSensorB3.cardinality))
         lmax = max(contactSensorL1.cardinality, max(contactSensorL2.cardinality, contactSensorL3.cardinality))
@@ -269,7 +270,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
         contactSensorR2.reset(constraint.width - scanLength, y2, scanLength, 1)
         contactSensorR3.reset(constraint.width - scanLength, y3, scanLength, 1)
 
-        contactSensorGround.reset(x1, constraint.height - gapSouth, constraint.width - 4, 1)
+        contactSensorGround.reset(groundContactOffset, constraint.height - gapSouth, constraint.width - 2 * groundContactOffset, 1)
     }
 
     override fun componentType() = Companion

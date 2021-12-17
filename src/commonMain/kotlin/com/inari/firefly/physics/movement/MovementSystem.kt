@@ -3,6 +3,7 @@ package com.inari.firefly.physics.movement
 import com.inari.firefly.FFApp.UpdateEvent
 import com.inari.firefly.FFContext
 import com.inari.firefly.ZERO_FLOAT
+import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.entity.Entity
