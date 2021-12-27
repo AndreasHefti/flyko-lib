@@ -8,7 +8,8 @@ abstract class DesktopRunner (
     width: Int,
     height: Int,
     resizable: Boolean = true,
-    vsync: Boolean = true
+    vsync: Boolean = true,
+    icon: String? = null
 ) {
 
     private lateinit var desktopApp: DesktopApp
@@ -19,6 +20,8 @@ abstract class DesktopRunner (
             config.setResizable(resizable)
             config.setWindowedMode(width, height)
             config.useVsync(vsync)
+            if (icon != null)
+                config.setWindowIcon(icon)
             desktopApp = object : DesktopApp() {
                 override val title = appTitle
                 override fun init() = this@DesktopRunner.init()
