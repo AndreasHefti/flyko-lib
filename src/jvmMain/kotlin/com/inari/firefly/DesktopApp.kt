@@ -73,7 +73,7 @@ abstract class DesktopApp : ApplicationAdapter() {
         }
     }
 
-    protected fun fitBaseViewportToScreen(width: Int, height: Int, baseWidth: Int, baseHeight: Int, centerCamera: Boolean) {
+    fun fitBaseViewportToScreen(width: Int, height: Int, baseWidth: Int, baseHeight: Int, centerCamera: Boolean) {
         if (width <= 0 || height <= 0)
             return
 
@@ -98,7 +98,7 @@ abstract class DesktopApp : ApplicationAdapter() {
         }
     }
 
-    protected fun addExitKeyTrigger(key: Int) {
+    fun addExitKeyTrigger(key: Int) {
         TriggerSystem
         UpdateEventTrigger.build {
             call = {
