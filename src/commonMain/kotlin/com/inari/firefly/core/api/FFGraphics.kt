@@ -1,6 +1,8 @@
 package com.inari.firefly.core.api
 
+import com.inari.firefly.BlendMode
 import com.inari.util.collection.DynArrayRO
+import com.inari.util.geom.Vector4f
 import com.inari.util.geom.Vector4i
 
 /** This defines the low level API-Interface for all graphical functions used by the firefly API.
@@ -96,7 +98,7 @@ expect object FFGraphics {
      * @param frameBufferId the instance id of the previous created [FrameBufferData] that is starting to be rendered
      * @param posX the world (rendering) position of the frame-buffers upper left corner
      * @param posY the world (rendering) position of the frame-buffers upper left corner
-     * @param clear indicates whether the frame-buffer should be cleared with the vies clear-color before rendering or not
+     * @param clear indicates whether the frame-buffer should be cleared with the view clear-color before rendering or not
      */
     fun startFrameBufferRendering(frameBufferId: Int, posX: Int, posY: Int, clear: Boolean)
 
@@ -104,6 +106,26 @@ expect object FFGraphics {
      * @param shaderId The instance identifier of the shader.
      */
     fun setActiveShader(shaderId: Int)
+
+    /** This is called form the firefly API to render a created texture on specified position to the actual [ViewData]
+     *
+     * @param textureId the texture identifier
+     * @param posX the x-axis offset
+     * @param posY the y-axis offset
+     * @param tintColor the tint color for alpha blending. Default is Vector4f(1f, 1f, 1f, 1f)
+     * @param blendMode the blend mode. Default is BlendMode.NONE
+     */
+    fun renderTexture(
+        textureId: Int,
+        posX: Float,
+        posY: Float,
+        scaleX: Float = 1f,
+        scaleY: Float = 1f,
+        rotation: Float = 0f,
+        flipX: Boolean = false,
+        flipY: Boolean = false,
+        tintColor: Vector4f = Vector4f(1f, 1f, 1f, 1f),
+        blendMode: BlendMode = BlendMode.NONE)
 
     /** This is called form the firefly API to render a created sprite on specified position to the actual [ViewData]
      *

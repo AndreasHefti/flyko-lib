@@ -1,6 +1,8 @@
 package com.inari.firefly.core.api
 
+import com.inari.firefly.BlendMode
 import com.inari.util.collection.DynArrayRO
+import com.inari.util.geom.Vector4f
 import com.inari.util.geom.Vector4i
 
 actual object FFGraphics : GraphicsAPI {
@@ -47,6 +49,21 @@ actual object FFGraphics : GraphicsAPI {
     }
 
     actual override fun startFrameBufferRendering(frameBufferId: Int, posX: Int, posY: Int, clear: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    actual override fun renderTexture(
+        textureId: Int,
+        posX: Float,
+        posY: Float,
+        scaleX: Float,
+        scaleY: Float,
+        rotation: Float,
+        flipX: Boolean,
+        flipY: Boolean,
+        tintColor: Vector4f,
+        blendMode: BlendMode
+    ) {
         TODO("Not yet implemented")
     }
 

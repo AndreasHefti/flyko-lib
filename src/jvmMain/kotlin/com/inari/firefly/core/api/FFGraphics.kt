@@ -270,6 +270,32 @@ actual object FFGraphics : GraphicsAPI {
         activeShapeShaderId = shaderId
     }
 
+
+    actual override fun renderTexture(
+        textureId: Int,
+        posX: Float,
+        posY: Float,
+        scaleX: Float,
+        scaleY: Float,
+        rotation: Float,
+        flipX: Boolean,
+        flipY: Boolean,
+        tintColor: Vector4f,
+        blendMode: BlendMode) {
+
+        val texture = textures[textureId] ?: return
+        setColorAndBlendMode(tintColor, blendMode)
+        spriteBatch.draw(
+            texture,
+            posX, posY,
+            posX, posY,
+            texture.width.toFloat(), texture.height.toFloat(),
+            scaleX, scaleY, rotation,
+            0, 0, texture.width, texture.height,
+            flipX, flipY
+        )
+    }
+
     actual override fun renderSprite(renderableSprite: SpriteRenderable, xOffset: Float, yOffset: Float) {
         setColorAndBlendMode(renderableSprite.tintColor, renderableSprite.blendMode)
         val sprite = sprites[renderableSprite.spriteId]

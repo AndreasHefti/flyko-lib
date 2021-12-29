@@ -7,6 +7,7 @@ import com.inari.firefly.graphics.view.ViewEvent.Type.*
 import com.inari.util.Consumer
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
+import com.inari.util.geom.Vector4f
 import com.inari.util.geom.Vector4i
 
 object GraphicsMock : GraphicsAPI {
@@ -86,6 +87,21 @@ object GraphicsMock : GraphicsAPI {
 
     override fun startFrameBufferRendering(frameBufferId: Int, posX: Int, posY: Int, clear: Boolean) {
         TODO("Not yet implemented")
+    }
+
+    override fun renderTexture(
+        textureId: Int,
+        posX: Float,
+        posY: Float,
+        scaleX: Float,
+        scaleY: Float,
+        rotation: Float,
+        flipX: Boolean,
+        flipY: Boolean,
+        tintColor: Vector4f,
+        blendMode: BlendMode
+    ) {
+        _log.add("renderTexture::Sprite($textureId)")
     }
 
     override fun renderSprite(renderableSprite: SpriteRenderable, xOffset: Float, yOffset: Float) {
