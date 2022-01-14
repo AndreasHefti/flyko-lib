@@ -16,17 +16,19 @@ class FullTileGridRenderer private constructor() : Renderer() {
         entity.components.include(MATCHING_ASPECTS)
 
     override fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i) {
-        val tileGrid = TileGridSystem[viewIndex, layerIndex] ?: return
+        val tileGridList = TileGridSystem[viewIndex, layerIndex] ?: return
 
-        if (tileGrid.rendererRef < 0 || tileGrid.rendererRef == index) {
-            val graphics = FFContext.graphics
-            val iterator = tileGrid.tileGridIterator(clip)
-            while (iterator.hasNext()) {
-                val entity = EntitySystem.entities[iterator.next()]
+        tileGridList.forEach {  tileGrid ->
+            if (tileGrid.rendererRef < 0 || tileGrid.rendererRef == index) {
+                val graphics = FFContext.graphics
+                val iterator = tileGrid.tileGridIterator(clip)
+                while (iterator.hasNext()) {
+                    val entity = EntitySystem.entities[iterator.next()]
 
-                transformCollector(entity[ETransform].data)
-                transformCollector + iterator.worldPosition
-                graphics.renderSprite(entity[ETile].spriteRenderable, transformCollector.data)
+                    transformCollector(entity[ETransform].data)
+                    transformCollector + iterator.worldPosition
+                    graphics.renderSprite(entity[ETile].spriteRenderable, transformCollector.data)
+                }
             }
         }
     }

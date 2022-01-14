@@ -60,7 +60,7 @@ class TiledMapJSONAsset private constructor() : Asset() {
             val tileSetAssetName = "${tileSetName}${TILE_SET_ASSET_NAME_SUFFIX}"
             val tilesetResource = tileSetProps[1]
 
-
+            // activate existing tileset asset or create new one and activate
             if (FFContext.exists(Asset, tileSetAssetName))
                 FFContext.activate(Asset, tileSetAssetName)
             else

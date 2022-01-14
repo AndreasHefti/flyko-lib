@@ -16,16 +16,18 @@ class SimpleTileGridRenderer private constructor() : Renderer() {
         false
 
     override fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i) {
-        val tileGrid = TileGridSystem[viewIndex, layerIndex] ?: return
-        if (tileGrid.rendererRef < 0 || tileGrid.rendererRef == index) {
-            val graphics = FFContext.graphics
-            val iterator = tileGrid.tileGridIterator(clip)
-            while (iterator.hasNext()) {
-                graphics.renderSprite(
-                    EntitySystem.entities[iterator.next()][ETile].spriteRenderable,
-                    iterator.worldXPos,
-                    iterator.worldYPos
-                )
+        val tileGridList = TileGridSystem[viewIndex, layerIndex] ?: return
+        tileGridList.forEach {  tileGrid ->
+            if (tileGrid.rendererRef < 0 || tileGrid.rendererRef == index) {
+                val graphics = FFContext.graphics
+                val iterator = tileGrid.tileGridIterator(clip)
+                while (iterator.hasNext()) {
+                    graphics.renderSprite(
+                        EntitySystem.entities[iterator.next()][ETile].spriteRenderable,
+                        iterator.worldXPos,
+                        iterator.worldYPos
+                    )
+                }
             }
         }
     }

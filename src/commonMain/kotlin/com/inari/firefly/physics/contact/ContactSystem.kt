@@ -231,25 +231,29 @@ object ContactSystem : ComponentSystem {
     }
 
     private fun scanTileContacts(entity: Entity, transform: ETransform, layerRef: Int, c: Contacts) {
-        if (!TileGridSystem.exists(transform.viewRef, layerRef))
+        if (!TileGridSystem.existsAny(transform.viewRef, layerRef))
             return
 
-        val iterator = TileGridSystem[transform.viewRef, layerRef]
-            ?.tileGridIterator(c.worldBounds) ?: return
+        val tileGrids = TileGridSystem[transform.viewRef, layerRef] ?: return
 
-        while (iterator.hasNext()) {
-            val otherEntityRef = iterator.next()
-            if (entity.index == otherEntityRef)
-                continue
+        tileGrids.forEach {
+            val iterator = it.tileGridIterator(c.worldBounds) ?: return
+            while (iterator.hasNext()) {
+                val otherEntityRef = iterator.next()
+                if (entity.index == otherEntityRef)
+                    continue
 
-            val otherEntity = EntitySystem[otherEntityRef]
-            if (EContact !in otherEntity.aspects)
-                continue
+                val otherEntity = EntitySystem[otherEntityRef]
+                if (EContact !in otherEntity.aspects)
+                    continue
 
-            val otherTransform = otherEntity[ETransform]
-            scanContact(c, otherEntity,
-                iterator.worldPosition.x + otherTransform.position.x,
-                iterator.worldPosition.y + otherTransform.position.y)
+                val otherTransform = otherEntity[ETransform]
+                scanContact(
+                    c, otherEntity,
+                    iterator.worldPosition.x + otherTransform.position.x,
+                    iterator.worldPosition.y + otherTransform.position.y
+                )
+            }
         }
     }
 

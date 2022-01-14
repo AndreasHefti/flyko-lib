@@ -4,6 +4,7 @@ import com.inari.firefly.BlendMode
 import com.inari.firefly.FFContext
 import com.inari.firefly.TILE_ASPECT_GROUP
 import com.inari.firefly.asset.AssetInstanceRefResolver
+import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.SpriteRenderable
 import com.inari.firefly.core.component.PropertyRefResolver
 import com.inari.firefly.entity.Entity
@@ -17,6 +18,7 @@ import kotlin.jvm.JvmField
 class ETile private constructor () : EntityComponent(ETile::class.simpleName!!) {
 
     @JvmField internal val spriteRenderable = SpriteRenderable()
+    @JvmField internal var tileGridRef = -1
 
     @Suppress("SetterBackingFieldAssignment")
     var aspects: Aspects = TILE_ASPECT_GROUP.createAspects()
@@ -34,6 +36,7 @@ class ETile private constructor () : EntityComponent(ETile::class.simpleName!!) 
         get() = spriteRenderable.tintColor
         set(value) { spriteRenderable.tintColor(value) }
     val position: Vector2i = Vector2i()
+    val tileGrid = ComponentRefResolver(TileGrid) { tileGridRef = it }
 
     override fun reset() {
         spriteRenderable.reset()

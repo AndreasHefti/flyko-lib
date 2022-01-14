@@ -70,7 +70,6 @@ class TiledTileSetJSONAsset private constructor() : Asset() {
             texture(this@TiledTileSetJSONAsset.textureAssetId)
 
             tileSetJson.tiles.forEach { tileJson ->
-
                 val tileParams = tileJson.type.split(UNDERLINE)
                 val tileName = "${tileSetJson.name}_${tileJson.type}"
                 val tileMaterial = tileParams[0]
@@ -82,12 +81,12 @@ class TiledTileSetJSONAsset private constructor() : Asset() {
                 val size = TileUtils.getTileSizeType(tileType[1])
                 val tileDirection = if (tileType.size > 2 )
                     TileUtils.getTileDirection(tileType[2])
-                    else
+                else
                     TileDirection.NONE
 
                 val tileOrientation = if (tileType.size > 3)
                     TileUtils.getTileOrientation(tileType[3])
-                    else
+                else
                     TileOrientation.NONE
 
                 val contactBitMask = TileMapSystem.createTileContactBitMask(
@@ -161,7 +160,8 @@ class TiledTileSetJSONAsset private constructor() : Asset() {
         FFContext.delete(tileSetId)
         tileSetId = NO_COMP_ID
         textureAssetId = NO_COMP_ID
-    }
+
+                    }
 
     override fun componentType() = Companion
     companion object : SystemComponentSubType<Asset, TiledTileSetJSONAsset>(Asset, TiledTileSetJSONAsset::class) {
