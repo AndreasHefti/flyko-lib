@@ -4,6 +4,7 @@ import com.inari.util.StringUtils
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.GeomUtils.area
 import kotlin.jvm.JvmField
+import kotlin.math.pow
 
 class BitMask constructor(
     x: Int = 0,
@@ -140,6 +141,13 @@ class BitMask constructor(
         return this
     }
 
+    fun setRegion(circle: Vector3i, relativeToOrigin: Boolean): BitMask {
+        return if (relativeToOrigin)
+            setIntersectionRegion(0, 0, circle.x.toFloat(), circle.y.toFloat(), circle.radius.toFloat(), true)
+        else
+            setIntersectionRegion(region.x, region.y, circle.x.toFloat(), circle.y.toFloat(), circle.radius.toFloat(), true)
+    }
+
     inline fun setRegion(region: Vector4i, relativeToOrigin: Boolean): BitMask =
         setRegion(region.x, region.y, region.width, region.height, relativeToOrigin)
 
@@ -151,7 +159,6 @@ class BitMask constructor(
             setIntersectionRegion(x, y, width, height, true)
         else
             setIntersectionRegion(x + region.x, y + region.y, width, height, true)
-
 
     inline fun resetRegion(region: Vector4i, relativeToOrigin: Boolean): BitMask =
         resetRegion(region.x, region.y, region.width, region.height, relativeToOrigin)
@@ -245,10 +252,18 @@ class BitMask constructor(
         return this
     }
 
+    private fun setIntersectionRegion(xOffset: Int, yOffset: Int, centerX: Float, centerY: Float, radius: Float, set: Boolean): BitMask {
+        for (y in 0 until height)
+            for (x in 0 until width)
+                // (x - center_x)² + (y - center_y)² < radius²
+                if ((x + xOffset - centerX).pow(2) + (y + yOffset - centerY).pow(2) < radius.pow(2))
+                    bits[y * region.width + x] = set
+        return this
+    }
 
-    private fun setIntersectionRegion(xoffset: Int, yoffset: Int, width: Int, height: Int, set: Boolean): BitMask {
-        tmpRegion.x = xoffset
-        tmpRegion.y = yoffset
+    private fun setIntersectionRegion(xOffset: Int, yOffset: Int, width: Int, height: Int, set: Boolean): BitMask {
+        tmpRegion.x = xOffset
+        tmpRegion.y = yOffset
         tmpRegion.width = width
         tmpRegion.height = height
         GeomUtils.intersection(region, tmpRegion, intersection)

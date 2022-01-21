@@ -3,6 +3,7 @@ package com.inari.firefly.util.geom
 
 import com.inari.util.geom.BitMask
 import com.inari.util.geom.Direction
+import com.inari.util.geom.Vector3i
 import com.inari.util.geom.Vector4i
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -2394,6 +2395,100 @@ class BitMaskTest {
                     "1\n" +
                     "1]",
             bitmask2.toString())
+    }
+
+    @Test
+    fun testCircleIntersection() {
+        val circle = Vector3i(0, 0, 5)
+        val bitmask = BitMask(0, 0, 15, 15)
+
+        bitmask.setRegion(circle, false)
+
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=15,height=15], bits=\n" +
+                    "111110000000000\n" +
+                    "111110000000000\n" +
+                    "111110000000000\n" +
+                    "111100000000000\n" +
+                    "111000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000]",
+            bitmask.toString())
+
+        bitmask.clearMask()
+        circle.x = 4
+        circle.y = 4
+
+        bitmask.setRegion(circle, false)
+
+        assertEquals(
+            "BitMask [region=[x=0,y=0,width=15,height=15], bits=\n" +
+                    "001111100000000\n" +
+                    "011111110000000\n" +
+                    "111111111000000\n" +
+                    "111111111000000\n" +
+                    "111111111000000\n" +
+                    "111111111000000\n" +
+                    "111111111000000\n" +
+                    "011111110000000\n" +
+                    "001111100000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000]",
+            bitmask.toString())
+
+        bitmask.clearMask()
+        bitmask.region(4, 4)
+        bitmask.setRegion(circle, false)
+        assertEquals(
+            "BitMask [region=[x=4,y=4,width=15,height=15], bits=\n" +
+                    "111110000000000\n" +
+                    "111110000000000\n" +
+                    "111110000000000\n" +
+                    "111100000000000\n" +
+                    "111000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000]",
+            bitmask.toString())
+        bitmask.clearMask()
+        bitmask.setRegion(circle, true)
+        assertEquals(
+            "BitMask [region=[x=4,y=4,width=15,height=15], bits=\n" +
+                    "001111100000000\n" +
+                    "011111110000000\n" +
+                    "111111111000000\n" +
+                    "111111111000000\n" +
+                    "111111111000000\n" +
+                    "111111111000000\n" +
+                    "111111111000000\n" +
+                    "011111110000000\n" +
+                    "001111100000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000\n" +
+                    "000000000000000]",
+            bitmask.toString())
     }
 
 }

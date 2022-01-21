@@ -341,7 +341,7 @@ class DynArray<T> constructor(
     }
 
     private fun ensureCapacity(index: Int) {
-        if (this === EMPTY_ARRAY)
+        if (this === NULL_ARRAY)
             throw RuntimeException("EMPTY_ARRAY is immutable")
 
         if (index < array.size)
@@ -392,7 +392,8 @@ class DynArray<T> constructor(
 
     companion object {
 
-        @JvmField val EMPTY_ARRAY: DynArray<Any> = of(-1, -1)
+        @JvmField val NULL_ARRAY: DynArrayRO<Any> = of(-1, -1)
+        inline fun <reified T> nullArray() : DynArray<T> = NULL_ARRAY as DynArray<T>
 
         inline fun <reified T> of(): DynArray<T> {
             return DynArray(50, 20) { size -> arrayOfNulls<T?>(size) }

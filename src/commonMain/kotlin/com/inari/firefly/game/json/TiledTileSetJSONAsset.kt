@@ -98,15 +98,12 @@ class TiledTileSetJSONAsset private constructor() : Asset() {
                 )
 
                 val atlasProps = atlasPropsString.split(COLON)
-                val tileTintColor = TileUtils.getColorFromString(tileJson.mappedProperties[PROP_NAME_BLEND]?.stringValue ?: EMPTY_STRING)
+                val tileTintColor = TileUtils.getColorFromString(tileJson.mappedProperties[PROP_NAME_TINT]?.stringValue ?: EMPTY_STRING)
+                val blend = BlendMode.valueOf(tileJson.mappedProperties[PROP_NAME_BLEND]?.stringValue ?: BlendMode.NONE.name)
 
                 withTile {
                     name = tileName
-                    blendMode = try {
-                        BlendMode.valueOf(tileJson.mappedProperties[PROP_NAME_BLEND]!!.stringValue)
-                    } catch (e: Exception) {
-                        null
-                    }
+                    blendMode = blend
                     tintColor = tileTintColor
                     material = materialType
                     contactType = contactFormType

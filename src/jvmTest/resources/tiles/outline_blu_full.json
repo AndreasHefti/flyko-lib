@@ -1,4 +1,12 @@
 { "columns":10,
+ "editorsettings":
+    {
+     "export":
+        {
+         "format":"json",
+         "target":"..\/tiles\/full_tileset_16.json"
+        }
+    },
  "image":"outline_blu_16_16_full.png",
  "imageheight":64,
  "imagewidth":160,
@@ -12,7 +20,7 @@
         }],
  "spacing":0,
  "tilecount":40,
- "tiledversion":"1.7.1",
+ "tiledversion":"1.7.2",
  "tileheight":16,
  "tiles":[
         {
@@ -143,7 +151,7 @@
                  "type":"string",
                  "value":"200_1:0,200_1:0:h,200_1:0:hv,200_1:0:v"
                 }],
-         "type":"brackground_quad:full_1:0"
+         "type":"terrain_quad:full_1:0"
         }, 
         {
          "id":31,

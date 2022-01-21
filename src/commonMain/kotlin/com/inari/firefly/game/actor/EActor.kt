@@ -49,14 +49,14 @@ class EActor private constructor () : EntityComponent(EActor::class.simpleName!!
                 val entity = EntitySystem[entityId]
                 val actor = entity[EActor]
                 if (actor.encounterContactConstraintRef < 0) false
-                else !entity[EContact].contactScan[actor.encounterContactConstraintRef].hasAnyContact()
+                else !entity[EContact].contactScans.hasAnyContactForConstraint(actor.encounterContactConstraintRef)
         }
 
         @JvmField val ANY_HIT_CONDITION: IntPredicate =  { entityId ->
                 val entity = EntitySystem[entityId]
                 val actor = entity[EActor]
                 if (actor.hitContactConstraintRef < 0) false
-                else !entity[EContact].contactScan[actor.hitContactConstraintRef].hasAnyContact()
+                else !entity[EContact].contactScans.hasAnyContactForConstraint(actor.hitContactConstraintRef)
         }
 
         override fun createEmpty() = EActor()

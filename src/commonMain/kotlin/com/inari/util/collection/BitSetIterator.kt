@@ -2,6 +2,7 @@ package com.inari.util.collection
 
 import com.inari.util.IntIterator
 
+
 class BitSetIterator(val bitset: BitSet) : IntIterator {
 
     private var index = bitset.nextSetBit(0)

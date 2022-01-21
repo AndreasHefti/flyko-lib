@@ -29,11 +29,12 @@ class TestGameObject : RoomObjectComposite() {
     }
 
     override fun activateComposite() {
+
         entityId = Entity.buildAndActivate {
             withComponent(ETransform) {
                 view(this@TestGameObject.viewRef)
                 layer(this@TestGameObject.layerRef)
-                position(4 * 16, 12 * 16)
+                position(this@TestGameObject.position)
             }
             withComponent(ESprite) {
                 sprite(this@TestGameObject.spriteId)

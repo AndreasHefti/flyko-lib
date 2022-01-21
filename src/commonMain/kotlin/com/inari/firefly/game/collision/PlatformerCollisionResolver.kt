@@ -71,7 +71,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
     fun withFullContactCallback(
         material: Aspect = UNDEFINED_MATERIAL,
         contact: Aspect = UNDEFINED_CONTACT_TYPE,
-        callback: Predicate<Contacts>) {
+        callback: Predicate<FullContactScan>) {
         fullContactCallbacks.add(CollisionCallback(material, contact, callback))
     }
 
@@ -99,9 +99,9 @@ class PlatformerCollisionResolver : CollisionResolver()  {
         return result.componentId
     }
 
-    override fun resolve(entity: Entity, contact: EContact, contactScan: ContactScan) {
+    override fun resolve(entity: Entity, contact: EContact, contactScan: ContactScans) {
 
-        val terrainContact = contactScan[terrainContactConstraintRef]
+        val terrainContact = contactScan.getFullScan(terrainContactConstraintRef)!!
         val movement = entity[EMovement]
         val prefGround = movement.onGround
         movement.onGround = false
@@ -110,7 +110,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
             resolveTerrainContact(terrainContact, entity, movement, prefGround)
 
         if (fullContactConstraintRef >= 0) {
-            val fullContact = contactScan[fullContactConstraintRef]
+            val fullContact = contactScan.getFullScan(fullContactConstraintRef)!!
 
             // process callbacks first if available
             // stop processing on first callback returns true
@@ -118,13 +118,13 @@ class PlatformerCollisionResolver : CollisionResolver()  {
                 fullContactCallbacks.forEach {
                     if (fullContact.hasMaterialContact(it.material) && it.callback(fullContact))
                         return
-                    if (fullContact.hasContact(it.contact) && it.callback(fullContact))
+                    if (fullContact.hasContactOfType(it.contact) && it.callback(fullContact))
                         return
                 }
         }
     }
 
-    private fun resolveTerrainContact(contacts: Contacts, entity: Entity, movement: EMovement, prefGround: Boolean) {
+    private fun resolveTerrainContact(contacts: FullContactScan, entity: Entity, movement: EMovement, prefGround: Boolean) {
 
         val transform = entity[ETransform]
         takeFullLedgeScans(contacts)
@@ -137,7 +137,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
             looseGroundContactCallback(entity.index)
     }
 
-    private fun resolveVertically(contacts: Contacts, entity: Entity, transform: ETransform, movement: EMovement) {
+    private fun resolveVertically(contacts: FullContactScan, entity: Entity, transform: ETransform, movement: EMovement) {
         var refresh = false
         var setOnGround = false
         val onSlope = contactSensorB1.cardinality != 0 &&
@@ -199,7 +199,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
         //println("onGround ${movement.onGround}")
     }
 
-    private fun resolveHorizontally(contacts: Contacts, entity: Entity, transform: ETransform, movement: EMovement) {
+    private fun resolveHorizontally(contacts: FullContactScan, entity: Entity, transform: ETransform, movement: EMovement) {
         var refresh = false
 
         if (lmax > 0) {
@@ -224,7 +224,7 @@ class PlatformerCollisionResolver : CollisionResolver()  {
         }
     }
 
-    private fun takeFullLedgeScans(contacts: Contacts) {
+    private fun takeFullLedgeScans(contacts: FullContactScan) {
         contactSensorT1.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
         contactSensorT2.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
         contactSensorT3.clearMask().or(contacts.contactMask, contacts.contactMask.x, contacts.contactMask.y)
@@ -248,29 +248,29 @@ class PlatformerCollisionResolver : CollisionResolver()  {
 
     private fun initTerrainContact() {
         val constraint = ContactSystem.constraints[terrainContactConstraintRef]
-        x2 = constraint.width / 2
-        x3 = constraint.width - 3
-        y2 = (constraint.height - gapSouth) / 2
-        y3 = constraint.height - gapSouth - 3
+        x2 = constraint.bounds.width / 2
+        x3 = constraint.bounds.width - 3
+        y2 = (constraint.bounds.height - gapSouth) / 2
+        y3 = constraint.bounds.height - gapSouth - 3
 
 
         contactSensorT1.reset(x1, 0, 1, scanLength)
         contactSensorT2.reset(x2, 0, 1, scanLength)
         contactSensorT3.reset(x3, 0, 1, scanLength)
 
-        contactSensorB1.reset(x1, constraint.height - bScanLength, 1, bScanLength)
-        contactSensorB2.reset(x2, constraint.height - bScanLength, 1, bScanLength)
-        contactSensorB3.reset(x3, constraint.height - bScanLength, 1, bScanLength)
+        contactSensorB1.reset(x1, constraint.bounds.height - bScanLength, 1, bScanLength)
+        contactSensorB2.reset(x2, constraint.bounds.height - bScanLength, 1, bScanLength)
+        contactSensorB3.reset(x3, constraint.bounds.height - bScanLength, 1, bScanLength)
 
         contactSensorL1.reset(0, y1, scanLength, 1)
         contactSensorL2.reset(0, y2, scanLength, 1)
         contactSensorL3.reset(0, y3, scanLength, 1)
 
-        contactSensorR1.reset(constraint.width - scanLength, y1, scanLength, 1)
-        contactSensorR2.reset(constraint.width - scanLength, y2, scanLength, 1)
-        contactSensorR3.reset(constraint.width - scanLength, y3, scanLength, 1)
+        contactSensorR1.reset(constraint.bounds.width - scanLength, y1, scanLength, 1)
+        contactSensorR2.reset(constraint.bounds.width - scanLength, y2, scanLength, 1)
+        contactSensorR3.reset(constraint.bounds.width - scanLength, y3, scanLength, 1)
 
-        contactSensorGround.reset(groundContactOffset, constraint.height - gapSouth, constraint.width - 2 * groundContactOffset, 1)
+        contactSensorGround.reset(groundContactOffset, constraint.bounds.height - gapSouth, constraint.bounds.width - 2 * groundContactOffset, 1)
     }
 
     override fun componentType() = Companion

@@ -76,40 +76,47 @@ open class Vector2i constructor(
         this.v1 = v.v1.toInt()
     }
 
-    open operator fun invoke(jsonString: String) {
+    open operator fun invoke(jsonString: String) : Vector2i {
         val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
         v0 = try { split[0].toInt() } catch (e: Exception) { v0 }
         v1 = try { split[1].toInt() } catch (e: Exception) { v1 }
+        return this
     }
 
-    operator fun plus(v: Vector2i) {
+    operator fun plus(v: Vector2i) : Vector2i {
         this.v0 += v.v0
         this.v1 += v.v1
+        return this
     }
 
-    operator fun minus(v: Vector2i) {
+    operator fun minus(v: Vector2i) : Vector2i {
         this.v0 -= v.v0
         this.v1 -= v.v1
+        return this
     }
 
-    operator fun times(v: Vector2i) {
+    operator fun times(v: Vector2i) : Vector2i {
         this.v0 *= v.v0
         this.v1 *= v.v1
+        return this
     }
 
-    open operator fun times(dd: Int) {
+    open operator fun times(dd: Int) : Vector2i {
         this.v0 *= dd
         this.v1 *= dd
+        return this
     }
 
-    operator fun div(v: Vector2i) {
+    operator fun div(v: Vector2i) : Vector2i {
         this.v0 /= v.v0
         this.v1 /= v.v1
+        return this
     }
 
-    open operator fun div(dd: Int) {
+    open operator fun div(dd: Int) : Vector2i {
         this.v0 /= dd
         this.v1 /= dd
+        return this
     }
 
     open fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1"
@@ -129,6 +136,128 @@ open class Vector2i constructor(
         return result
     }
 }
+
+class ImmutableVector3i constructor(
+    @JvmField inline var v0: Int = 0,
+    @JvmField inline var v1: Int = 0,
+    @JvmField inline var v2: Int = 0
+) {
+    inline val x: Int get() = v0
+    inline val y: Int get() = v1
+    inline val radius: Int get() = v2
+    fun instance(): Vector3i = Vector3i(v0, v1, v2)
+}
+
+open class Vector3i constructor(
+    v0: Int = 0,
+    v1: Int = 0,
+    @JvmField inline var v2: Int = 0
+) : Vector2i(v0, v1) {
+
+    constructor(other: Vector3i) : this(other.v0, other.v1, other.v2)
+
+    inline var radius: Int
+        get() = v2
+        set(value) { v2 = value }
+
+    inline fun normalized(v: Vector3f) {
+        val m = GeomUtils.magnitude(this)
+        if (m == 0f) {
+            v.v0 = 0f
+            v.v1 = 0f
+            v.v2 = 0f
+        } else {
+            v.v0 = v0 / m
+            v.v1 = v1 / m
+            v.v2 = v2 / m
+        }
+    }
+
+    operator fun invoke(v0: Int, v1: Int, v2: Int): Vector3i {
+        super.invoke(v0, v1)
+        this.v2 = v2
+        return this
+    }
+
+    fun set(v0: Int, v1: Int, v2: Int) {
+        this(v0, v1, v2)
+    }
+
+    operator fun invoke(v: Vector3i): Vector3i {
+        super.invoke(v)
+        this.v2 = v.v2
+        return this
+    }
+
+    fun set(v: Vector3i) {
+        this(v)
+    }
+
+    override operator fun invoke(jsonString: String): Vector3i {
+        val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
+        v0 = try { split[0].toInt() } catch (e: Exception) { v0 }
+        v1 = try { split[1].toInt() } catch (e: Exception) { v1 }
+        v2 = try { split[2].toInt() } catch (e: Exception) { v2 }
+        return this
+    }
+
+    operator fun plus(v: Vector3i): Vector3i {
+        super.invoke(v)
+        this.v2 += v.v2
+        return this
+    }
+
+    operator fun minus(v: Vector3i): Vector3i {
+        super.invoke(v)
+        this.v2 -= v.v2
+        return this
+    }
+
+    operator fun times(v: Vector3i): Vector3i {
+        super.invoke(v)
+        this.v2 *= v.v2
+        return this
+    }
+
+    override operator fun times(dd: Int): Vector3i {
+        super.times(dd)
+        this.v2 *= dd
+        return this
+    }
+
+    operator fun div(v: Vector3i): Vector3i {
+        super.div(v)
+        this.v2 /= v.v2
+        return this
+    }
+
+    override operator fun div(dd: Int): Vector3i {
+        super.div(dd)
+        this.v2 /= dd
+        return this
+    }
+
+    override fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1${StringUtils.VALUE_SEPARATOR}$v2"
+    override fun toString(): String = "[x=$v0${StringUtils.VALUE_SEPARATOR}y=$v1${StringUtils.VALUE_SEPARATOR}r=$v2]"
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        if (!super.equals(other)) return false
+
+        other as Vector3i
+
+        if (v2 != other.v2) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + v2.hashCode()
+        return result
+    }
+}
+
 
 class ImmutableVector4i constructor(
     @JvmField inline val v0: Int = 0,
@@ -160,9 +289,9 @@ class ImmutableVector4i constructor(
 class Vector4i constructor(
     v0: Int = 0,
     v1: Int = 0,
-    @JvmField inline var v2: Int = 0,
+    v2: Int = 0,
     @JvmField inline var v3: Int = 0
-) : Vector2i(v0, v1) {
+) : Vector3i(v0, v1, v2) {
 
     constructor(v0: Float, v1: Float, v2: Float, v3: Float) : this(v0.toInt(), v1.toInt(), v2.toInt(), v3.toInt())
     constructor(other: Vector4i) : this(other.v0, other.v1, other.v2, other.v3)
@@ -220,48 +349,55 @@ class Vector4i constructor(
         this.v3 = v.v3.toInt()
     }
 
-    override operator fun invoke(jsonString: String) {
+    override operator fun invoke(jsonString: String) : Vector4i {
         val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
         v0 = try { split[0].toInt() } catch (e: Exception) { v0 }
         v1 = try { split[1].toInt() } catch (e: Exception) { v1 }
         v2 = try { split[2].toInt() } catch (e: Exception) { v2 }
         v3 = try { split[3].toInt() } catch (e: Exception) { v3 }
+        return this
     }
 
-    operator fun plus(v: Vector4i) {
+    operator fun plus(v: Vector4i) : Vector4i {
         super.plus(v)
         this.v2 += v.v2
         this.v3 += v.v3
+        return this
     }
 
-    operator fun minus(v: Vector4i) {
+    operator fun minus(v: Vector4i) : Vector4i {
         super.minus(v)
         this.v2 -= v.v2
         this.v3 -= v.v3
+        return this
     }
 
-    operator fun times(v: Vector4i) {
+    operator fun times(v: Vector4i) : Vector4i {
         super.times(v)
         this.v2 *= v.v2
         this.v3 *= v.v3
+        return this
     }
 
-    override operator fun times(dd: Int) {
+    override operator fun times(dd: Int) : Vector4i {
         super.times(dd)
         this.v2 *= dd
         this.v3 *= dd
+        return this
     }
 
-    operator fun div(v: Vector4i) {
+    operator fun div(v: Vector4i) : Vector4i {
         super.div(v)
         this.v2 /= v.v2
         this.v3 /= v.v3
+        return this
     }
 
-    override operator fun div(dd: Int) {
+    override operator fun div(dd: Int) : Vector4i {
         super.div(dd)
         this.v2 /= dd
         this.v3 /= dd
+        return this
     }
 
     override fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1${StringUtils.VALUE_SEPARATOR}$v2${StringUtils.VALUE_SEPARATOR}$v3"
@@ -482,6 +618,9 @@ open class Vector3f constructor(
     inline var b: Float
         get() = v2
         set(value) { v2 = value }
+    inline var radius: Float
+        get() = v2
+        set(value) { v2 = value }
 
     inline fun normalized(v: Vector3f) {
         val m = GeomUtils.magnitude(this)
@@ -629,6 +768,12 @@ class Vector4f constructor(
     constructor(other: Vector4f) : this(other.v0, other.v1, other.v2, other.v3)
 
     inline var a: Float
+        get() = v3
+        set(value) { v3 = value }
+    inline var width: Float
+        get() = v2
+        set(value) { v2 = value }
+    inline var height: Float
         get() = v3
         set(value) { v3 = value }
 

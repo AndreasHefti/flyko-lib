@@ -18,10 +18,7 @@ actual object  FFResourceService : ResourceServiceAPI {
     private val JSONMapper = Moshi
         .Builder()
         .addLast(KotlinJsonAdapterFactory())
-        .build();
-//    private val JSONMapper = GsonBuilder().
-//        .registerModule(KotlinModule())
-//        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .build()
 
     actual override fun loadTextResource(resourceName: String, encryption: String?): String {
         if (encryption != null) {

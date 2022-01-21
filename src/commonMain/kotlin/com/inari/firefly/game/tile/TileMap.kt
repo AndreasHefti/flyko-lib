@@ -31,8 +31,8 @@ import kotlin.math.floor
 class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!!) {
 
     @JvmField internal var viewRef = -1
-    private val tileMapLayer = DynArray.of<MapLayer>(5, 5)
-    private val tileDecorations = DynArray.of<MapLayer>(10, 50)
+    private val tileMapData = DynArray.of<TileMapData>(5, 5)
+    private val tileDecorations = DynArray.of<TileMapData>(10, 50)
     @JvmField internal val compositeIds = DynArray.of<CompId>(10, 10)
 
     private var loaded = false
@@ -45,10 +45,10 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
     }
 
     var view = ComponentRefResolver(View) { index -> viewRef = index }
-    val withLayer: (MapLayer.() -> Unit) -> Unit = { configure ->
-        val instance = MapLayer()
+    val withLayer: (TileMapData.() -> Unit) -> Unit = { configure ->
+        val instance = TileMapData()
         instance.also(configure)
-        tileMapLayer[instance.layerRef] = instance
+        tileMapData[instance.layerRef] = instance
     }
 
     val withDecoration: (TileDecoration.() -> Unit) -> Unit = { configure ->
@@ -62,8 +62,8 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
             return
 
         // load all involved assets (texture assets, tile set assets)
-        tileMapLayer.forEach { layer ->
-            layer.tileSetMapping.forEach { tileMap ->
+        tileMapData.forEach {
+            it.tileSetMapping.forEach { tileMap ->
                 FFContext.activate(Asset, tileMap.tileSetAssetRef)
             }
         }
@@ -80,10 +80,12 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         if (!loaded)
             load()
 
-        tileMapLayer.forEach { layer ->
-            activateTileSetForLayer(layer)
-            buildTileGrid(layer)
-            if (layer.parallaxFactorX >= 0f || layer.parallaxFactorY >= 0f)
+        tileMapData.forEach { data ->
+            buildTileGrid(data)
+            activateTileSetForLayer(data)
+            fillTileGrid(data)
+            buildTileGrid(data)
+            if (data.parallaxFactorX >= 0f || data.parallaxFactorY >= 0f)
                 parallax = true
         }
 
@@ -107,9 +109,9 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         if (!compositeIds.isEmpty)
             FFContext.deactivateAll(compositeIds)
 
-        tileMapLayer.forEach { layer ->
-            deleteTileGrid(layer)
-            deactivateTileSetsForLayer(layer)
+        tileMapData.forEach { data ->
+            deleteTileGrid(data)
+            deactivateTileSetsForLayer(data)
         }
 
         active = false
@@ -123,8 +125,8 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
             deactivate()
 
         // disposes all involved assets
-        tileMapLayer.forEach { layer ->
-            layer.tileSetMapping.forEach { tileMap ->
+        tileMapData.forEach {
+            it.tileSetMapping.forEach { tileMap ->
                 FFContext.deactivate(Asset, tileMap.tileSetAssetRef)
             }
         }
@@ -143,11 +145,11 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         getTileEntityRef(code, viewLayer.layerIndex)
 
     fun getTileEntityRef(code: Int, layerRef: Int = 0): Int =
-        tileMapLayer[layerRef]?.activeEntityRefs?.get(code) ?: -1
+        tileMapData[layerRef]?.activeEntityRefs?.get(code) ?: -1
 
-    private fun activateTileSetForLayer(layer: MapLayer) {
+    private fun activateTileSetForLayer(data: TileMapData) {
 
-        layer.tileSetMapping.forEach { mapping ->
+        data.tileSetMapping.forEach { mapping ->
             val tileSetId = FFContext[Asset, mapping.tileSetAssetRef].instanceId
             var codeIndex = mapping.codeOffset
             val tileSet = FFContext[TileSet, tileSetId]
@@ -166,17 +168,18 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
                     throw IllegalStateException("Missing sprite id for tile: ${tile.name} in TileSet: ${tileSet.name}")
 
                 val entityId = Entity.buildAndActivate {
-                    name = "tile_${tile.name}_view:${this@TileMap.viewRef}_layer:${layer.layerRef}"
+                    name = "tile_${tile.name}_view:${this@TileMap.viewRef}_layer:${data.layerRef}"
 
                     withComponent(ETransform) {
                         view(this@TileMap.viewRef)
-                        layer(layer.layerRef)
+                        layer(data.layerRef)
                     }
 
                     withComponent(ETile) {
                         sprite.instanceId = spriteId
-                        tint = tile.tintColor ?: layer.tint
-                        blend = tile.blendMode ?: layer.blend
+                        tint = tile.tintColor ?: data.tint
+                        blend = tile.blendMode ?: data.blend
+                        tileGrid(data.tileGridId)
                     }
 
                     withComponent(EMultiplier) {}
@@ -207,33 +210,35 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
                         }
                     }
                 }
-                layer.activeEntityRefs[codeIndex] = entityId.instanceId
+                data.activeEntityRefs[codeIndex] = entityId.instanceId
                 codeIndex++
             }
         }
     }
 
-    private fun buildTileGrid(layer: MapLayer) {
-        layer.tileGridId = TileGrid.buildAndActivate {
-            name = "tilegrid_${this@TileMap.name}_${layer.layerRef}"
+    private fun buildTileGrid(data: TileMapData) {
+        data.tileGridId = TileGrid.buildAndActivate {
+            name = "tilegrid_${this@TileMap.name}_${data.layerRef}"
             view(this@TileMap.viewRef)
-            layer(layer.layerRef)
-            if (layer.rendererRef >= 0)
-                renderer(layer.rendererRef)
-            gridWidth = layer.mapWidth
-            gridHeight = layer.mapHeight
-            cellWidth = layer.tileWidth
-            cellHeight = layer.tileHeight
-            position(layer.position)
-            spherical = layer.spherical
+            layer(data.layerRef)
+            if (data.rendererRef >= 0)
+                renderer(data.rendererRef)
+            gridWidth = data.mapWidth
+            gridHeight = data.mapHeight
+            cellWidth = data.tileWidth
+            cellHeight = data.tileHeight
+            position(data.position)
+            spherical = data.spherical
         }
+    }
 
-        val tileGrid = FFContext[TileGrid, layer.tileGridId]
-        val codeIterator = layer.mapCodes.iterator()
+    private fun fillTileGrid(data: TileMapData) {
+        val tileGrid = FFContext[TileGrid, data.tileGridId]
+        val codeIterator = data.mapCodes.iterator()
         var x = 0
         var y = 0
         while (codeIterator.hasNext()) {
-            tileGrid[x, y] = layer.activeEntityRefs[codeIterator.nextInt()]
+            tileGrid[x, y] = data.activeEntityRefs[codeIterator.nextInt()]
             x++
             if (x >= tileGrid.gridWidth) {
                 y++
@@ -242,22 +247,22 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
         }
     }
 
-    private fun deactivateTileSetsForLayer(layer: MapLayer) {
-        val iterator = layer.activeEntityRefs.iterator()
+    private fun deactivateTileSetsForLayer(data: TileMapData) {
+        val iterator = data.activeEntityRefs.iterator()
         while (iterator.hasNext())
             FFContext.delete(Entity, iterator.nextInt())
 
-        layer.activeEntityRefs.clear()
+        data.activeEntityRefs.clear()
     }
 
-    private fun deleteTileGrid(layer: MapLayer) {
-        FFContext.delete(TileGrid, layer.tileGridId)
+    private fun deleteTileGrid(data: TileMapData) {
+        FFContext.delete(TileGrid, data.tileGridId)
     }
 
     private fun updateParallaxLayer(pixelPerfect: Boolean) {
         val viewPos = FFContext[View, viewRef].worldPosition
 
-        tileMapLayer.forEach { mapLayer ->
+        tileMapData.forEach { mapLayer ->
             if (mapLayer.parallaxFactorX != ZERO_FLOAT || mapLayer.parallaxFactorY != ZERO_FLOAT) {
                 FFContext[TileGrid, mapLayer.tileGridId].position(
                     if (pixelPerfect) floor(-viewPos.x * mapLayer.parallaxFactorX) else -viewPos.x * mapLayer.parallaxFactorX,
@@ -282,7 +287,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
     }
 
     @ComponentDSL
-    class MapLayer {
+    class TileMapData {
 
         @JvmField internal val activeEntityRefs = DynIntArray(100, -1, 100)
         @JvmField internal val tileSetMapping = DynArray.of<TileSetAssetMapping>(5, 5)

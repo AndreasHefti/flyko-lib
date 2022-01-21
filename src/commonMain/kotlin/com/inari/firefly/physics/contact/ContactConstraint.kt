@@ -16,18 +16,12 @@ class ContactConstraint private constructor() : SystemComponent(ContactConstrain
     @JvmField val layer = ComponentRefResolver(Layer) { index->
         layerRef = setIfNotInitialized(index, "Layer")
     }
-    @JvmField var bounds: Vector4i = Vector4i()
+    @JvmField var fullScan = false
+    @JvmField var isCircle = false
+    @JvmField val bounds: Vector4i = Vector4i()
     @JvmField val materialFilter: Aspects = MATERIAL_ASPECT_GROUP.createAspects()
     @JvmField val typeFilter: Aspects = CONTACT_TYPE_ASPECT_GROUP.createAspects()
 
-    val width: Int
-        get() = bounds.width
-    val height: Int
-        get() = bounds.height
-    val pivotX: Int
-        get() = bounds.x
-    val pivotY: Int
-        get() = bounds.y
     val isFiltering: Boolean
         get() = !materialFilter.isEmpty
 

@@ -30,7 +30,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
     @JvmField var verticalContactSensorThreshold = 10
     @JvmField var touchGroundCallback: IntConsumer = EMPTY_INT_CONSUMER
     @JvmField var looseGroundContactCallback: IntConsumer = EMPTY_INT_CONSUMER
-    @JvmField var onSlopeCallback: (Int, Int, Contacts) -> Unit = { _, _, _ -> }
+    @JvmField var onSlopeCallback: (Int, Int, FullContactScan) -> Unit = { _, _, _ -> }
 
     private var verticalScanLineThreshold = -1
     private var horizontalScanLineThreshold = -1
@@ -47,7 +47,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
     fun withFullContactCallback(
         material: Aspect = UNDEFINED_MATERIAL,
         contact: Aspect = UNDEFINED_CONTACT_TYPE,
-        callback: Predicate<Contacts>) {
+        callback: Predicate<FullContactScan>) {
         fullContactCallbacks.add(CollisionCallback(material, contact, callback))
     }
 
@@ -60,8 +60,8 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
 
         val result = builder.buildAndGet(configure)
         sensorMatrix = CollisionSensorMatrix(
-            result.width - gapWest - gapEast,
-            result.height - gapNorth - gapSouth,
+            result.bounds.width - gapWest - gapEast,
+            result.bounds.height - gapNorth - gapSouth,
             gapNorth,
             gapEast,
             gapSouth,
@@ -80,8 +80,8 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
 
         val result = ContactSystem.constraints[constraintName]
         sensorMatrix = CollisionSensorMatrix(
-            result.width - gapWest - gapEast,
-            result.height - gapNorth - gapSouth,
+            result.bounds.width - gapWest - gapEast,
+            result.bounds.height - gapNorth - gapSouth,
             gapNorth,
             gapEast,
             gapSouth,
@@ -100,8 +100,8 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
 
         val result = ContactSystem.constraints[constraintRefId]
         sensorMatrix = CollisionSensorMatrix(
-            result.width - gapWest - gapEast,
-            result.height - gapNorth - gapSouth,
+            result.bounds.width - gapWest - gapEast,
+            result.bounds.height - gapNorth - gapSouth,
             gapNorth,
             gapEast,
             gapSouth,
@@ -113,8 +113,8 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
 
 
 
-    override fun resolve(entity: Entity, contact: EContact, contactScan: ContactScan) {
-        val terrainContact = contactScan[solidContactAreaRef]
+    override fun resolve(entity: Entity, contact: EContact, contactScan: ContactScans) {
+        val terrainContact = contactScan.getFullScan(solidContactAreaRef)!!
         if (terrainContact.hasAnyContact()) {
             val transform = entity[ETransform]
             val movement = entity[EMovement]
@@ -122,7 +122,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
         }
 
         if (fullContactConstraintRef >= 0) {
-            val fullContact = contactScan[fullContactConstraintRef]
+            val fullContact = contactScan.getFullScan(fullContactConstraintRef)!!
 
             // process callbacks first if available
             // stop processing on first callback returns true
@@ -130,13 +130,13 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
                 fullContactCallbacks.forEach {
                     if (fullContact.hasMaterialContact(it.material) && it.callback(fullContact))
                         return
-                    if (fullContact.hasContact(it.contact) && it.callback(fullContact))
+                    if (fullContact.hasContactOfType(it.contact) && it.callback(fullContact))
                         return
                 }
         }
     }
 
-    private fun resolveTerrainContact(contacts: Contacts, entity: Entity, transform: ETransform, movement: EMovement) {
+    private fun resolveTerrainContact(contacts: FullContactScan, entity: Entity, transform: ETransform, movement: EMovement) {
         //println("movement: ${movement.velocity}")
         //println("$sensorMatrix")
 
@@ -156,7 +156,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
 
     private var refresh = false
     private var setOnGround = false
-    private fun resolveVertically(contacts: Contacts, movement: EMovement, transform: ETransform, entity: Entity) {
+    private fun resolveVertically(contacts: FullContactScan, movement: EMovement, transform: ETransform, entity: Entity) {
         refresh = false
         setOnGround = false
         if (contacts.hasAnyContact()) {
@@ -180,7 +180,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
                     refresh = true
                 }
             } else {
-                val slopeContact = contacts.hasContact(slopeAspects)
+                val slopeContact = contacts.hasContactOfType(slopeAspects)
                 val d1 = getAdjustDistance(sensorMatrix.distances[5].v1, verticalContactSensorThreshold, sensorMatrix.gapSouth)
                 val d2 = getAdjustDistance(sensorMatrix.distances[6].v1, verticalContactSensorThreshold, sensorMatrix.gapSouth)
                 val d3 = getAdjustDistance(sensorMatrix.distances[7].v1, verticalContactSensorThreshold, sensorMatrix.gapSouth)
@@ -255,7 +255,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
         }
     }
 
-    private fun resolveHorizontally(entity: Entity, contacts: Contacts, movement: EMovement, transform: ETransform, ) {
+    private fun resolveHorizontally(entity: Entity, contacts: FullContactScan, movement: EMovement, transform: ETransform, ) {
         var refresh = false
         if (movement.velocity.v0 > ZERO_FLOAT) {
             if (sensorMatrix.contactSensorLineRight.cardinality > verticalScanLineThreshold || sensorMatrix.distances[2].v0 != 0) {
@@ -266,7 +266,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
                     transform.move(dx = minDistRight)
                     transform.position.x = ceil(transform.position.x)
                     refresh = true
-                } else if (!contacts.hasContact(slopeAspects) && !movement.onGround && sensorMatrix.distances[7].v0 > -3 && sensorMatrix.distances[7].v0 < 0) {
+                } else if (!contacts.hasContactOfType(slopeAspects) && !movement.onGround && sensorMatrix.distances[7].v0 > -3 && sensorMatrix.distances[7].v0 < 0) {
                     transform.move(dx = sensorMatrix.distances[7].v0)
                     transform.position.x = ceil(transform.position.x)
                     refresh = true
@@ -282,7 +282,7 @@ class PlatformerMatrixCollisionResolver : CollisionResolver() {
                     transform.move(dx = -minDistLeft)
                     transform.position.x = floor(transform.position.x)
                     refresh = true
-                } else if (!contacts.hasContact(slopeAspects) && !movement.onGround && sensorMatrix.distances[5].v0 > -3 && sensorMatrix.distances[5].v0 <= 0) {
+                } else if (!contacts.hasContactOfType(slopeAspects) && !movement.onGround && sensorMatrix.distances[5].v0 > -3 && sensorMatrix.distances[5].v0 <= 0) {
                     transform.move(dx = -sensorMatrix.distances[5].v0)
                     if (sensorMatrix.distances[5].v0 == 0)
                         transform.position.x = ceil(transform.position.x)

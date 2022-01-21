@@ -128,6 +128,58 @@ object GeomUtils {
             r2Bottom <= r1.y)
     }
 
+    /** Circle with circle intersection.
+     *  Vector3i contains (x,y,radius)
+     */
+    inline fun intersectCircle(circle1: Vector3i, circle2: Vector3i): Boolean {
+        val dx = (circle1.x + circle1.radius) - (circle2.x + circle2.radius)
+        val dy = (circle1.y + circle1.radius) - (circle2.y + circle2.radius)
+        return sqrt((dx * dx + dy * dy).toDouble()) < circle1.radius + circle2.radius
+    }
+
+    /** Circle with circle intersection.
+     *  Vector3f contains (x,y,radius)
+     */
+    inline fun intersectCircle(circle1: Vector3f, circle2: Vector3f): Boolean {
+        val dx = (circle1.x + circle1.radius) - (circle2.x + circle2.radius)
+        val dy = (circle1.y + circle1.radius) - (circle2.y + circle2.radius)
+        return sqrt((dx * dx + dy * dy).toDouble()) < circle1.radius + circle2.radius
+    }
+
+    /** Circle with rectangle intersection.
+     *  Vector3i : (x,y,radius)
+     *  Vector4i : (x,y,width, height)
+     */
+    inline fun intersectCircle(circle: Vector3i, rect: Vector4i): Boolean {
+        val dx = abs(circle.x - rect.x) - rect.width / 2
+        val dy = abs(circle.y - rect.y) - rect.height / 2
+
+        if (dx > circle.radius || dy > circle.radius)
+            return false
+
+        return if (dx <= 0 || dy <= 0)
+            true
+        else
+            dx * dx + dy * dy <= circle.radius * circle.radius
+    }
+
+    /** Circle with rectangle intersection.
+     *  Vector3i : (x,y,radius)
+     *  Vector4i : (x,y,width, height)
+     */
+    inline fun intersectCircle(circle: Vector3f, rect: Vector4f): Boolean {
+        val dx = abs(circle.x - rect.x) - rect.width / 2
+        val dy = abs(circle.y - rect.y) - rect.height / 2
+
+        if (dx > circle.radius || dy > circle.radius)
+            return false
+
+        return if (dx <= 0 || dy <= 0)
+            true
+        else
+            dx * dx + dy * dy <= circle.radius * circle.radius
+    }
+
     inline fun getIntersectionCode(r: Vector4i, r1: Vector4i): Int {
         val ax1 = r.x
         val ay1 = r.y

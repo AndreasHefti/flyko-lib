@@ -18,13 +18,13 @@ import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.MoveEvent
 import com.inari.util.Consumer
 import com.inari.util.Named
-import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.Aspects
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.*
 import com.inari.util.geom.GeomUtils.area
 import com.inari.util.indexed.Indexed
 import kotlin.jvm.JvmField
+import kotlin.math.ceil
 import kotlin.math.floor
 
 
@@ -59,20 +59,25 @@ object ContactSystem : ComponentSystem {
         updateContactMaps(moveEvent.entities)
     }
 
+    // Contains all entity ids that has contact scans defined and are active
+    // They are all processed during one contact scan cycle. A contact scan is triggered by a move event
+    private val entitiesWithScan = BitSet()
     private val entityActivationListener: EntityEventListener = object: EntityEventListener {
         override fun entityActivated(entity: Entity) {
             contactMapViewLayer[entity[ETransform]]?.add(entity)
+            if (entity[EContact].contactScans.hasAnyScan)
+                entitiesWithScan[entity.index] = true
         }
         override fun entityDeactivated(entity: Entity) {
             contactMapViewLayer[entity[ETransform]]?.remove(entity)
+            if (entity[EContact].contactScans.hasAnyScan)
+                entitiesWithScan[entity.index] = false
         }
         override fun match(aspects: Aspects): Boolean =
             EContact in aspects &&
-                    ETransform in aspects &&
-                    ETile !in aspects
+            ETransform in aspects &&
+            ETile !in aspects
     }
-
-
 
     init {
         FFContext.registerListener(ViewEvent, viewListener)
@@ -80,15 +85,15 @@ object ContactSystem : ComponentSystem {
         FFContext.registerListener(MoveEvent, moveListener)
     }
 
-    fun createContacts(constraint: ContactConstraint): Contacts =
+    fun createContacts(constraint: ContactConstraint): FullContactScan =
         createContacts(constraint.index)
 
-    fun createContacts(constraint: CompId): Contacts =
+    fun createContacts(constraint: CompId): FullContactScan =
         createContacts(constraint.instanceId)
 
-    fun createContacts(constraint: Int): Contacts =
+    fun createContacts(constraint: Int): FullContactScan =
         if (constraint in constraints)
-            Contacts(constraint)
+            FullContactScan(constraint)
         else
             throw IllegalArgumentException("No ContactConstraint found for id: $constraint")
 
@@ -96,7 +101,7 @@ object ContactSystem : ComponentSystem {
     fun updateContacts(entityId: Int) {
         val entity = EntitySystem[entityId]
         val contacts = entity[EContact]
-        if (contacts.contactScan.contacts.isEmpty)
+        if (!contacts.contactScans.hasAnyScan)
             return
 
         scanContacts(entity, contacts)
@@ -109,7 +114,7 @@ object ContactSystem : ComponentSystem {
     fun updateContacts(entityName: String) {
         val entity = EntitySystem[entityName]
         val contacts = entity[EContact]
-        if (contacts.contactScan.contacts.isEmpty)
+        if (!contacts.contactScans.hasAnyScan)
             return
 
         scanContacts(entity, contacts)
@@ -123,48 +128,13 @@ object ContactSystem : ComponentSystem {
         val entity = EntitySystem[entityId]
         val contacts = entity[EContact]
         val contactConstraint = constraints[constraintName]
-        val constraint = contacts.contactScan.contacts[contactConstraint.index] ?: return
+        val scan = contacts.contactScans.scans[contactConstraint.index] ?: return
 
-        updateContacts(entity, constraint)
+        updateContacts(entity, scan)
     }
 
-    fun updateContacts(indexed: Indexed, constraintName: String) {
-        updateContacts(indexed.index, constraintName)
-    }
-
-    fun updateContacts(entityName: String, constraintName: String) {
-        val entity = EntitySystem[entityName]
-        val contacts = entity[EContact]
-        val contactConstraint = constraints[constraintName]
-        val constraint = contacts.contactScan.contacts[contactConstraint.index] ?: return
-
-        updateContacts(entity, constraint)
-    }
-
-    fun updateContacts(entityName: Named, constraintName: String) {
-        updateContacts(entityName.name, constraintName)
-    }
-
-    fun updateContacts(entityId: Int, contacts: Contacts) {
-        updateContacts(EntitySystem[entityId], contacts)
-    }
-
-    fun updateContacts(indexed: Indexed, contacts: Contacts) {
-        updateContacts(indexed.index, contacts)
-    }
-
-    fun updateContacts(entityName: String, contacts: Contacts) {
-        updateContacts(EntitySystem[entityName], contacts)
-    }
-
-    fun updateContacts(entityName: Named, contacts: Contacts) {
-        updateContacts(entityName.name, contacts)
-    }
-
-    private val tmpEntityKeyMap = BitSet()
     private fun updateContactMaps(entities: BitSet) {
         // first we have to update all moved entities within the registered ContactMap's
-        tmpEntityKeyMap.clear()
         var i = entities.nextSetBit(0)
         while (i >= 0) {
             val entity = EntitySystem[i]
@@ -172,7 +142,6 @@ object ContactSystem : ComponentSystem {
             if (EContact !in entity.aspects)
                 continue
 
-            tmpEntityKeyMap.set(entity.index)
             contactMapViewLayer[entity[ETransform]]?.update(entity)
         }
 
@@ -181,20 +150,20 @@ object ContactSystem : ComponentSystem {
     }
 
     private fun updateContacts() {
-        var i = tmpEntityKeyMap.nextSetBit(0)
+        var i = entitiesWithScan.nextSetBit(0)
         while (i >= 0) {
             val entity = EntitySystem[i]
-            i = tmpEntityKeyMap.nextSetBit(i + 1)
+            i = entitiesWithScan.nextSetBit(i + 1)
             val contacts = entity[EContact]
-            if (contacts.contactScan.contacts.isEmpty)
+            if (!contacts.contactScans.hasAnyScan)
                 continue
 
             scanContacts(entity, contacts)
 
             if (contacts.collisionResolverRef >= 0)
-                collisionResolver[contacts.collisionResolverRef].resolve(entity, contacts, contacts.contactScan)
+                collisionResolver[contacts.collisionResolverRef].resolve(entity, contacts, contacts.contactScans)
 
-            if (contacts.notifyContacts && contacts.contactScan.hasAnyContact()) {
+            if (contacts.notifyContacts && contacts.contactScans.hasAnyContact()) {
                 ContactEvent.contactEvent.entityId = entity.index
                 FFContext.notify(ContactEvent.contactEvent)
             }
@@ -203,16 +172,19 @@ object ContactSystem : ComponentSystem {
         }
     }
 
-    private fun scanContacts(entity: Entity, contacts: EContact) {
+    private fun scanContacts(entity: Entity, contactsComp: EContact) {
         var i = 0
-        while (i < contacts.contactScan.contacts.capacity) {
-            val c = contacts.contactScan.contacts[i++] ?: continue
+        while (i < contactsComp.contactScans.scans.capacity) {
+            val c = contactsComp.contactScans.scans[i++] ?: continue
             updateContacts(entity, c)
         }
     }
 
-    private fun updateContacts(entity: Entity, c: Contacts) {
-        val constraint = constraints[c.constraintRef]
+    private val normalizedContactBounds = Vector4i()
+    private val worldBounds = Vector4i()
+    private val worldTempPos = Vector2f()
+    private fun updateContacts(entity: Entity, contactScan: FullContactScan) {
+        val constraint = contactScan.constraint
         val transform = entity[ETransform]
         val movement = entity[EMovement]
 
@@ -220,24 +192,29 @@ object ContactSystem : ComponentSystem {
         if (layerRef < 0)
             layerRef = transform.layerRef
 
-        c.update(
-            constraint.bounds,
-            getWorldPos(entity, transform),
-            movement.velocity
+        contactScan.clear()
+        normalizedContactBounds.width = constraint.bounds.width
+        normalizedContactBounds.height = constraint.bounds.height
+        val position = getWorldPos(entity, transform);
+        worldBounds(
+            (if (movement.velocity.v0 > 0) ceil(position.x.toDouble()).toInt() else floor(position.x.toDouble()).toInt()) + constraint.bounds.x,
+            (if (movement.velocity.v1 > 0) ceil(position.y.toDouble()).toInt() else floor(position.y.toDouble()).toInt()) + constraint.bounds.y,
+            constraint.bounds.width,
+            constraint.bounds.height
         )
 
-        scanTileContacts(entity, transform, layerRef, c)
-        scanSpriteContacts(entity, transform, layerRef, c)
+        scanTileContacts(entity, transform, layerRef, contactScan)
+        scanSpriteContacts(entity, transform, layerRef, contactScan)
     }
 
-    private fun scanTileContacts(entity: Entity, transform: ETransform, layerRef: Int, c: Contacts) {
+    private fun scanTileContacts(entity: Entity, transform: ETransform, layerRef: Int, contactScan: FullContactScan) {
         if (!TileGridSystem.existsAny(transform.viewRef, layerRef))
             return
 
         val tileGrids = TileGridSystem[transform.viewRef, layerRef] ?: return
 
         tileGrids.forEach {
-            val iterator = it.tileGridIterator(c.worldBounds) ?: return
+            val iterator = it.tileGridIterator(worldBounds)
             while (iterator.hasNext()) {
                 val otherEntityRef = iterator.next()
                 if (entity.index == otherEntityRef)
@@ -248,97 +225,25 @@ object ContactSystem : ComponentSystem {
                     continue
 
                 val otherTransform = otherEntity[ETransform]
-                scanContact(
-                    c, otherEntity,
+                worldTempPos(
                     iterator.worldPosition.x + otherTransform.position.x,
-                    iterator.worldPosition.y + otherTransform.position.y
-                )
+                    iterator.worldPosition.y + otherTransform.position.y)
+                contactScan.scanFullContact(worldBounds, normalizedContactBounds, otherEntity, worldTempPos)
             }
         }
     }
 
-    private fun scanSpriteContacts(entity: Entity, transform: ETransform, layerRef: Int, c: Contacts) {
+    private fun scanSpriteContacts(entity: Entity, transform: ETransform, layerRef: Int, contactScan: FullContactScan) {
         if (!contactMapViewLayer.contains(transform.viewRef, layerRef))
             return
 
-        val iterator = contactMapViewLayer[transform.viewRef, layerRef]!![c.worldBounds, entity]
+        val iterator = contactMapViewLayer[transform.viewRef, layerRef]!![worldBounds, entity]
         while (iterator.hasNext()) {
             val otherEntity = EntitySystem[iterator.next()]
             val otherWorldPos = getWorldPos(otherEntity, otherEntity[ETransform])
-            scanContact(c, otherEntity, otherWorldPos.x, otherWorldPos.y)
+            contactScan.scanFullContact(worldBounds, normalizedContactBounds, otherEntity, otherWorldPos)
         }
-
     }
-
-    private val checkPivot = Vector4i()
-    private fun scanContact(c: Contacts, otherEntity: Entity, x: Float, y: Float) {
-        val otherContact = otherEntity[EContact]
-        val constraint = constraints[c.constraintRef]
-
-        if (!constraint.match(otherContact))
-            return
-
-        val contact = ContactsPool.createContact(
-            otherEntity.index,
-            otherContact.material,
-            otherContact.contactType,
-            (floor(x.toDouble()) + otherContact.bounds.x).toInt(),
-            (floor(y.toDouble()) + otherContact.bounds.y).toInt(),
-            otherContact.bounds.width,
-            otherContact.bounds.height
-        )
-
-        GeomUtils.intersection(
-            c.worldBounds,
-            contact.bounds,
-            contact.intersection
-        )
-
-        if (area(contact.intersection) <= 0) {
-            ContactsPool.disposeContact(contact)
-            return
-        }
-
-        // normalize the intersection to origin of coordinate system
-        contact.intersection.x -= c.worldBounds.x
-        contact.intersection.y -= c.worldBounds.y
-
-        if (otherContact.mask.isEmpty) {
-            addContact(c, contact)
-            return
-        }
-
-        checkPivot.x = c.worldBounds.x - contact.bounds.x
-        checkPivot.y = c.worldBounds.y - contact.bounds.y
-        checkPivot.width = c.worldBounds.width
-        checkPivot.height = c.worldBounds.height
-
-        if (BitMask.createIntersectionMask(checkPivot, otherContact.mask, contact.mask, true)) {
-            addContact(c, contact)
-            return
-        }
-
-        ContactsPool.disposeContact(contact)
-    }
-
-    private fun addContact(c: Contacts, contact: Contact) {
-        if (!GeomUtils.intersect( contact.intersection, c.normalizedContactBounds))
-            return
-
-        if (!contact.mask.isEmpty)
-            c.intersectionMask.or(contact.mask)
-        else
-            c.intersectionMask.setRegion(contact.intersection, true)
-
-        if (contact.contact !== UNDEFINED_CONTACT_TYPE)
-            c.contactTypes + contact.contact
-
-        if (contact.material != UNDEFINED_MATERIAL)
-            c.materialTypes + contact.material
-
-        c.contacts.add(contact)
-    }
-
 
     override fun clearSystem() {
         contactMaps.clear()
@@ -350,38 +255,23 @@ object ContactSystem : ComponentSystem {
         private val CONTACTS_POOL = ArrayDeque<Contact>()
 
         internal fun disposeContact(contact: Contact) {
-            contact.entity = -1
+            contact.entityId = -1
             contact.intersectionMask.clearMask()
             contact.worldBounds(0, 0, 0, 0)
-            contact.contact = UNDEFINED_CONTACT_TYPE
-            contact.material = UNDEFINED_MATERIAL
+            contact.contactType = UNDEFINED_CONTACT_TYPE
+            contact.materialType = UNDEFINED_MATERIAL
             contact.intersectionBounds(0, 0, 0, 0)
 
             CONTACTS_POOL.add(contact)
         }
 
-        internal fun createContact(entityId: Int, materialType: Aspect, contactType: Aspect, x: Int, y: Int, width: Int, height: Int): Contact {
-            val contact = getContactFromPool()
-
-            contact.entity = entityId
-            contact.contact = contactType
-            contact.material = materialType
-            contact.worldBounds.x = x
-            contact.worldBounds.y = y
-            contact.worldBounds.width = width
-            contact.worldBounds.height = height
-
-            return contact
-        }
-
-        private fun getContactFromPool(): Contact =
+        internal fun getContactFromPool(): Contact =
             if (CONTACTS_POOL.isEmpty())
                 Contact()
             else
                 CONTACTS_POOL.removeFirst()
     }
 
-    private val worldTempPos = Vector2f()
     private fun getWorldPos(entity: Entity, transform: ETransform): Vector2f {
         return if (EChild in entity.aspects) {
             addTransformPos(entity[EChild].int_parent)
@@ -396,5 +286,4 @@ object ContactSystem : ComponentSystem {
         if (EChild in parentEntity.aspects)
             addTransformPos(parentEntity[EChild].int_parent)
     }
-
 }

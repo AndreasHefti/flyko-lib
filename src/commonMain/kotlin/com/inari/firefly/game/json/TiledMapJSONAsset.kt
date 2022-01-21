@@ -105,7 +105,10 @@ class TiledMapJSONAsset private constructor() : Asset() {
                     name = tiledObject.name
                     view(this@TiledMapJSONAsset.viewRef)
                     layer(layerJson.name)
+                    position(tiledObject.x, tiledObject.y)
+                    setAttribute("rotation", tiledObject.rotation.toString())
                     layerJson.properties.forEach { setAttribute(it.name, it.stringValue) }
+
                 }
                 composite.systemLoad()
                 tileMap.compositeIds + composite.componentId
