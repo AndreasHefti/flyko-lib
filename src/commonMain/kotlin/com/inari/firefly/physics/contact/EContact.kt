@@ -39,16 +39,22 @@ class EContact private constructor() : EntityComponent(EContact::class.simpleNam
             else throw IllegalArgumentException()
 
     @JvmField val withConstraint = ComponentRefResolver(ContactConstraint) { id ->
-        contactScans.registerFullScan(FullContactScan(id))
+        if (ContactSystem.constraints[id].fullScan)
+            contactScans.registerScan(FullContactScan(id))
+        else
+            contactScans.registerScan(SimpleContactScan(id))
     }
     @JvmField val removeConstraint = ComponentRefResolver(ContactConstraint) { id: Int ->
-        contactScans.removeFullScan(id)
+        contactScans.removeScan(id)
     }
 
     fun withConstraint(builder: SystemComponentSingleType<ContactConstraint>, configure: (ContactConstraint.() -> Unit)): CompId {
-        val id = builder.build(configure)
-        contactScans.registerFullScan(FullContactScan(id.instanceId))
-        return id
+        val constraint = builder.buildAndGet(configure)
+        if (constraint.fullScan)
+            contactScans.registerScan(FullContactScan(constraint.index))
+        else
+            contactScans.registerScan(SimpleContactScan(constraint.index))
+        return constraint.componentId
     }
 
     fun <A : CollisionResolver> withResolver(builder: SystemComponentSubType<CollisionResolver, A>, configure: (A.() -> Unit)): CompId {

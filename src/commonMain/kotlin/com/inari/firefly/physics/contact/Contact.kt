@@ -7,6 +7,7 @@ import com.inari.firefly.entity.Entity
 import com.inari.util.aspect.Aspect
 import com.inari.util.geom.BitMask
 import com.inari.util.geom.GeomUtils
+import com.inari.util.geom.Vector3i
 import com.inari.util.geom.Vector4i
 import com.inari.util.indexed.Indexed
 import kotlin.jvm.JvmField
@@ -16,6 +17,8 @@ class Contact internal constructor() {
 
     var entityId = -1
         internal set
+    var isCircle = false
+    val worldCircle = Vector3i()
     val worldBounds = Vector4i()
     val intersectionBounds = Vector4i()
     val intersectionMask = BitMask(width = 0, height = 0)

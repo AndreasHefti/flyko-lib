@@ -180,10 +180,9 @@ object ContactSystem : ComponentSystem {
         }
     }
 
-    private val normalizedContactBounds = Vector4i()
     private val worldBounds = Vector4i()
     private val worldTempPos = Vector2f()
-    private fun updateContacts(entity: Entity, contactScan: FullContactScan) {
+    private fun updateContacts(entity: Entity, contactScan: ContactScan) {
         val constraint = contactScan.constraint
         val transform = entity[ETransform]
         val movement = entity[EMovement]
@@ -193,21 +192,24 @@ object ContactSystem : ComponentSystem {
             layerRef = transform.layerRef
 
         contactScan.clear()
-        normalizedContactBounds.width = constraint.bounds.width
-        normalizedContactBounds.height = constraint.bounds.height
         val position = getWorldPos(entity, transform);
         worldBounds(
             (if (movement.velocity.v0 > 0) ceil(position.x.toDouble()).toInt() else floor(position.x.toDouble()).toInt()) + constraint.bounds.x,
             (if (movement.velocity.v1 > 0) ceil(position.y.toDouble()).toInt() else floor(position.y.toDouble()).toInt()) + constraint.bounds.y,
-            constraint.bounds.width,
-            constraint.bounds.height
         )
+        if (constraint.isCircle) {
+            worldBounds.radius = constraint.bounds.radius
+            worldBounds.v3 = 0
+        } else {
+            worldBounds.width = constraint.bounds.width
+            worldBounds.height = constraint.bounds.height
+        }
 
         scanTileContacts(entity, transform, layerRef, contactScan)
         scanSpriteContacts(entity, transform, layerRef, contactScan)
     }
 
-    private fun scanTileContacts(entity: Entity, transform: ETransform, layerRef: Int, contactScan: FullContactScan) {
+    private fun scanTileContacts(entity: Entity, transform: ETransform, layerRef: Int, contactScan: ContactScan) {
         if (!TileGridSystem.existsAny(transform.viewRef, layerRef))
             return
 
@@ -228,12 +230,12 @@ object ContactSystem : ComponentSystem {
                 worldTempPos(
                     iterator.worldPosition.x + otherTransform.position.x,
                     iterator.worldPosition.y + otherTransform.position.y)
-                contactScan.scanFullContact(worldBounds, normalizedContactBounds, otherEntity, worldTempPos)
+                contactScan.scanFullContact(worldBounds, otherEntity, worldTempPos)
             }
         }
     }
 
-    private fun scanSpriteContacts(entity: Entity, transform: ETransform, layerRef: Int, contactScan: FullContactScan) {
+    private fun scanSpriteContacts(entity: Entity, transform: ETransform, layerRef: Int, contactScan: ContactScan) {
         if (!contactMapViewLayer.contains(transform.viewRef, layerRef))
             return
 
@@ -241,7 +243,7 @@ object ContactSystem : ComponentSystem {
         while (iterator.hasNext()) {
             val otherEntity = EntitySystem[iterator.next()]
             val otherWorldPos = getWorldPos(otherEntity, otherEntity[ETransform])
-            contactScan.scanFullContact(worldBounds, normalizedContactBounds, otherEntity, otherWorldPos)
+            contactScan.scanFullContact(worldBounds, otherEntity, otherWorldPos)
         }
     }
 

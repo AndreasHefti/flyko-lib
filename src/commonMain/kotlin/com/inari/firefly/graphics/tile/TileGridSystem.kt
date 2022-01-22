@@ -92,7 +92,9 @@ object TileGridSystem : ComponentSystem {
     private fun removeEntity(entity: Entity) {
         val tile = entity[ETile]
         val tileGrid = if (tile.tileGridRef >= 0)
-            grids[tile.tileGridRef]
+            if (grids.contains(tile.tileGridRef))
+                grids[tile.tileGridRef]
+            else return
         else
             this[entity[ETransform]]?.get(0) ?: return
 

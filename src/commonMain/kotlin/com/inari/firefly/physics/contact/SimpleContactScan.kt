@@ -20,20 +20,17 @@ class SimpleContactScan  internal constructor(
     @JvmField internal val worldBounds = Vector4i()
     @JvmField internal val entities = DynIntArray(1, -1, 1)
 
-    override val hasAnyContact: Boolean
-        get() = !entities.isEmpty
+    override fun hasAnyContact() = !entities.isEmpty
+
+    override fun hasContactOfType(type: Aspect): Boolean {
+        TODO("Not yet implemented")
+    }
 
     fun getContactEntityIterator(): IntIterator = null!!
-
-
-    override fun hasContactType(contactTypeAspect: Aspect): Boolean {
-        TODO("Go through entities and check contact types ")
-    }
 
     private val otherWorldBounds = Vector4i()
     override fun scanFullContact(
         worldBounds: Vector4i,
-        normalizedContactBounds: Vector4i,
         otherEntity: Entity,
         otherWorldPos: Vector2f
     ) {

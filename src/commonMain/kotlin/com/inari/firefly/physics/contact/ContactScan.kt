@@ -8,12 +8,13 @@ import com.inari.util.geom.Vector4i
 interface ContactScan {
 
     val constraint: ContactConstraint
-    val hasAnyContact: Boolean
+    fun hasAnyContact(): Boolean
+    fun hasContactOfType(type: Aspect): Boolean
+    fun scanFullContact(
+        worldBounds: Vector4i,
+        otherEntity: Entity,
+        otherWorldPos: Vector2f)
 
-    //fun getContactEntityIterator() : IntIterator
-    fun hasContactType(contactTypeAspect: Aspect): Boolean
-
-    fun scanFullContact(worldBounds: Vector4i, normalizedContactBounds: Vector4i, otherEntity: Entity, otherWorldPos: Vector2f)
     fun clear()
 
 }

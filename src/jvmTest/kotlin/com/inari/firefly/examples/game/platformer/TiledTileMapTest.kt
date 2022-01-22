@@ -120,9 +120,11 @@ fun initPlayerTasks() {
                 }
                 withComponent(EContact) {
                     val fullContactId = withConstraint(ContactConstraint) {
+                        fullScan = true
                         bounds(3, 1, 9, 14)
                     }
                     val terrainContactsId = withConstraint(ContactConstraint) {
+                        fullScan = true
                         bounds(4, 1, 8, 19)
                         materialFilter + TileMaterialType.TERRAIN_SOLID
                     }

@@ -18,6 +18,7 @@ import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.rendering.Renderer
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGrid
+import com.inari.firefly.graphics.tile.TileGridSystem
 import com.inari.firefly.graphics.view.ViewChangeEvent
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.TimelineIntAnimation
@@ -84,7 +85,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
             buildTileGrid(data)
             activateTileSetForLayer(data)
             fillTileGrid(data)
-            buildTileGrid(data)
+
             if (data.parallaxFactorX >= 0f || data.parallaxFactorY >= 0f)
                 parallax = true
         }
@@ -113,6 +114,8 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
             deleteTileGrid(data)
             deactivateTileSetsForLayer(data)
         }
+
+        TileGridSystem
 
         active = false
     }
