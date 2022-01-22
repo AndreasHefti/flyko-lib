@@ -17,11 +17,11 @@ class Contact internal constructor() {
 
     var entityId = -1
         internal set
-    var isCircle = false
-    val worldCircle = Vector3i()
-    val worldBounds = Vector4i()
-    val intersectionBounds = Vector4i()
-    val intersectionMask = BitMask(width = 0, height = 0)
+    @JvmField var isCircle = false
+    @JvmField val worldCircle = Vector3i()
+    @JvmField val worldBounds = Vector4i()
+    @JvmField val intersectionBounds = Vector4i()
+    @JvmField val intersectionMask = BitMask(width = 0, height = 0)
     var contactType = UNDEFINED_CONTACT_TYPE
         internal set
     var materialType = UNDEFINED_MATERIAL

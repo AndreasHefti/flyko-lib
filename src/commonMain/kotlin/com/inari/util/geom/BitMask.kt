@@ -393,6 +393,28 @@ class BitMask constructor(
             return intersection
         }
 
+        fun createIntersectionMask(region: Vector4i, circle: Vector3i, bitmask: BitMask, result: BitMask, adjustResult: Boolean): Boolean {
+            val intersection = createIntersectionMask(bitmask, region, circle, result)
+
+            if (adjustResult) {
+                result.region.x -= circle.x
+                result.region.y -= circle.y
+            }
+
+            return intersection
+        }
+
+        fun createIntersectionMask(bitmask: BitMask, region: Vector4i, circle: Vector3i, result: BitMask): Boolean {
+            result.clearMask()
+
+            GeomUtils.intersection(bitmask.region, region, result.region)
+            if (area(result.region) <= 0)
+                return false
+
+            result.setRegion(circle, true)
+            return !result.bits.isEmpty
+        }
+
         fun createIntersectionMask(region: Vector4i, bitmask: BitMask, result: BitMask, adjustResult: Boolean): Boolean {
             val intersection = createIntersectionMask(bitmask, region, result)
 
@@ -408,18 +430,15 @@ class BitMask constructor(
             result.clearMask()
 
             GeomUtils.intersection(bitmask.region, region, result.region)
-            if (area(result.region) <= 0) {
+            if (area(result.region) <= 0)
                 return false
-            }
 
             val x1 = result.region.x - bitmask.region.x
             val y1 = result.region.y - bitmask.region.y
 
-            for (y in 0 until result.region.height) {
-                for (x in 0 until result.region.width) {
+            for (y in 0 until result.region.height)
+                for (x in 0 until result.region.width)
                     result.bits[y * result.region.width + x] = bitmask.bits[(y + y1) * bitmask.region.width + (x + x1)]
-                }
-            }
 
             return !result.bits.isEmpty
         }

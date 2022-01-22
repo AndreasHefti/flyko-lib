@@ -4,7 +4,6 @@ import com.inari.firefly.CONTACT_TYPE_ASPECT_GROUP
 import com.inari.firefly.MATERIAL_ASPECT_GROUP
 import com.inari.firefly.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.UNDEFINED_MATERIAL
-import com.inari.firefly.entity.Entity
 import com.inari.firefly.physics.contact.Contact.Companion.NO_CONTACT
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.Aspects
@@ -12,7 +11,6 @@ import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
 import com.inari.util.geom.*
 import kotlin.jvm.JvmField
-import kotlin.math.floor
 
 
 class FullContactScan internal constructor(
@@ -161,112 +159,71 @@ class FullContactScan internal constructor(
         intersectionMask.clearMask()
     }
 
-    override fun scanFullContact(worldBounds: Vector4i, otherEntity: Entity, otherWorldPos: Vector2f) {
-        val otherContact = otherEntity[EContact]
-
-        if (!constraint.match(otherContact))
+    override fun scanFullContact(
+        originWorldContact: ContactBounds,
+        otherWorldContact: ContactBounds,
+        otherContactDef: EContact,
+        otherEntityId: Int
+    ) {
+        if (!constraint.match(otherContactDef))
             return
 
+        // first check if there is any contact with ordinary shapes
+        if (!SimpleContactScan.scanContact(originWorldContact, otherWorldContact))
+            return
+
+        // we have contact, create full contact scan
         val contact = ContactSystem.ContactsPool.getContactFromPool()
-        contact.entityId = otherEntity.index
-        contact.contactType = otherContact.contactType
-        contact.materialType = otherContact.material
-        contact.worldBounds.x = (floor(otherWorldPos.x.toDouble()) + otherContact.bounds.x).toInt()
-        contact.worldBounds.y = (floor(otherWorldPos.y.toDouble()) + otherContact.bounds.y).toInt()
-        contact.worldBounds.width = otherContact.bounds.width
-        contact.worldBounds.height = otherContact.bounds.height
-
-        if (otherContact.isCircle)
-            scanOtherCircle(worldBounds, contact, otherContact)
+        contact.entityId = otherEntityId
+        contact.contactType = otherContactDef.contactType
+        contact.materialType = otherContactDef.material
+        contact.worldBounds(otherWorldContact.bounds)
+        contact.isCircle = otherContactDef.isCircle
+        if (otherContactDef.isCircle)
+            contact.worldCircle(otherWorldContact.circle!!)
         else
-            scanOtherRectangle(worldBounds, contact, otherContact)
-    }
+            contact.worldCircle(0, 0, 0)
 
-    private fun scanOtherCircle(
-        worldBounds: Vector4i,
-        contact: Contact,
-        otherContact: EContact
-    ) {
-        if (constraint.isCircle && !GeomUtils.intersectCircle(contact.worldBounds as Vector3i, worldBounds as Vector3i)) {
-            ContactSystem.ContactsPool.disposeContact(contact)
-            return
-        } else if (!GeomUtils.intersectCircle(contact.worldBounds as Vector3i, worldBounds)) {
-            ContactSystem.ContactsPool.disposeContact(contact)
-            return
-        }
-
-        // aproximated rectangle for circle
-        circleToAproximatedRect(contact.worldBounds)
-        // if this constraint is also a cirlce, do the same
-        if (constraint.isCircle)
-            circleToAproximatedRect(worldBounds)
-
+        // create intersection clip of origin and other on world ref
         GeomUtils.intersection(
-            worldBounds,
+            originWorldContact.bounds,
             contact.worldBounds,
             contact.intersectionBounds
         )
 
-        if (!scan(contact, otherContact.mask, worldBounds))
-            ContactSystem.ContactsPool.disposeContact(contact)
-    }
+        // and now normalize the intersection clip to origin of coordinate system
+        contact.intersectionBounds.x -= originWorldContact.bounds.x
+        contact.intersectionBounds.y -= originWorldContact.bounds.y
 
-    private fun scanOtherRectangle(
-        worldBounds: Vector4i,
-        contact: Contact,
-        otherContact: EContact
-    ) {
-        if (constraint.isCircle &&!GeomUtils.intersectCircle(contact.worldBounds as Vector3i, worldBounds as Vector3i)) {
-            ContactSystem.ContactsPool.disposeContact(contact)
-            return
-        }
-
-        if (constraint.isCircle)
-            circleToAproximatedRect(worldBounds)
-
-        // take the rectangular intersection area and store it in contact.intersectionBounds
-        GeomUtils.intersection(
-            worldBounds,
-            contact.worldBounds,
-            contact.intersectionBounds
-        )
-
-        // if we don't have any rectangular intersection skip
-        if (GeomUtils.area(contact.intersectionBounds) <= 0) {
-            ContactSystem.ContactsPool.disposeContact(contact)
-            return
-        }
-
-        if (!scan(contact, otherContact.mask, worldBounds))
-            ContactSystem.ContactsPool.disposeContact(contact)
-    }
-
-    private fun circleToAproximatedRect(bounds: Vector4i) {
-        val cwh = (bounds.radius * 1.9f).toInt()
-        bounds.x = bounds.x - bounds.radius
-        bounds.y = bounds.y - bounds.radius
-        bounds.width = cwh
-        bounds.height = cwh
-    }
-
-
-    private val checkPivot = Vector4i()
-    internal fun scan(contact: Contact, otherBitMask: BitMask, worldBounds: Vector4i): Boolean {
-        // normalize the intersection to origin of coordinate system
-        contact.intersectionBounds.x -= worldBounds.x
-        contact.intersectionBounds.y -= worldBounds.y
-
-        if (otherBitMask.isEmpty) {
+        // if there is no bitmask defined for the other entity contact bounds
+        // just add the contact and contact shape of the other entity to the scan
+        if (!otherWorldContact.hasBitmask) {
             addFullContact(contact)
-            return true
+            return
         }
 
-        checkPivot.x = worldBounds.x - contact.worldBounds.x
-        checkPivot.y = worldBounds.y - contact.worldBounds.y
-        checkPivot.width = worldBounds.width
-        checkPivot.height = worldBounds.height
+        // scan with with bitmask
+        if (!scanBitmask(contact, otherWorldContact.bitmask!!, originWorldContact.bounds))
+            ContactSystem.ContactsPool.disposeContact(contact)
 
-        if (BitMask.createIntersectionMask(checkPivot, otherBitMask, contact.intersectionMask, true)) {
+    }
+    private val clipBounds = Vector4i()
+    internal fun scanBitmask(contact: Contact, otherBitMask: BitMask, worldBounds: Vector4i): Boolean {
+
+        // if there is a bitmask defined by the other entity contact bounds
+        // we have to scan the origin bounds defined by the constraint with
+        // the given bitmask region.
+
+        // TODO what if this is a circle?
+        // normalized clip bounds
+        clipBounds.x = worldBounds.x - contact.worldBounds.x
+        clipBounds.y = worldBounds.y - contact.worldBounds.y
+        clipBounds.width = worldBounds.width
+        clipBounds.height = worldBounds.height
+
+        // create clipped intersection bitmask stored in contact.intersectionMask
+        // and if there is any contact point add the contact
+        if (BitMask.createIntersectionMask(clipBounds, otherBitMask, contact.intersectionMask, true)) {
             addFullContact(contact)
             return true
         }
@@ -275,8 +232,11 @@ class FullContactScan internal constructor(
     }
 
     private fun addFullContact(contact: Contact) {
+        // apply contact to overall scan intersection mask
         if (!contact.intersectionMask.isEmpty)
             intersectionMask.or(contact.intersectionMask)
+        else if (contact.isCircle)
+            intersectionMask.setRegion(contact.intersectionBounds as Vector3i, true)
         else
             intersectionMask.setRegion(contact.intersectionBounds, true)
 

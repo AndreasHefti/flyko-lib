@@ -21,7 +21,6 @@ import com.inari.util.Named
 import com.inari.util.aspect.Aspects
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.*
-import com.inari.util.geom.GeomUtils.area
 import com.inari.util.indexed.Indexed
 import kotlin.jvm.JvmField
 import kotlin.math.ceil
@@ -180,8 +179,8 @@ object ContactSystem : ComponentSystem {
         }
     }
 
-    private val worldBounds = Vector4i()
-    private val worldTempPos = Vector2f()
+    private val originWorldBounds = ContactBounds(circle = Vector3i())
+    private val otherWorldBounds = ContactBounds(circle = Vector3i())
     private fun updateContacts(entity: Entity, contactScan: ContactScan) {
         val constraint = contactScan.constraint
         val transform = entity[ETransform]
@@ -192,31 +191,37 @@ object ContactSystem : ComponentSystem {
             layerRef = transform.layerRef
 
         contactScan.clear()
-        val position = getWorldPos(entity, transform);
-        worldBounds(
+
+        // apply bounds of the contact shape within world coordinate system
+        val position = getWorldPos(entity, transform)
+        originWorldBounds.bounds(
             (if (movement.velocity.v0 > 0) ceil(position.x.toDouble()).toInt() else floor(position.x.toDouble()).toInt()) + constraint.bounds.x,
             (if (movement.velocity.v1 > 0) ceil(position.y.toDouble()).toInt() else floor(position.y.toDouble()).toInt()) + constraint.bounds.y,
         )
         if (constraint.isCircle) {
-            worldBounds.radius = constraint.bounds.radius
-            worldBounds.v3 = 0
+            originWorldBounds.circle!!.x = originWorldBounds.bounds.x
+            originWorldBounds.circle.y = originWorldBounds.bounds.y
+            originWorldBounds.circle.radius = constraint.bounds.radius
+            originWorldBounds.bounds.x = originWorldBounds.bounds.x - constraint.bounds.radius
+            originWorldBounds.bounds.y = originWorldBounds.bounds.y - constraint.bounds.radius
         } else {
-            worldBounds.width = constraint.bounds.width
-            worldBounds.height = constraint.bounds.height
+            originWorldBounds.bounds.width = constraint.bounds.width
+            originWorldBounds.bounds.height = constraint.bounds.height
         }
 
-        scanTileContacts(entity, transform, layerRef, contactScan)
-        scanSpriteContacts(entity, transform, layerRef, contactScan)
+        scanTileContacts(entity, transform.viewRef, layerRef, contactScan)
+        scanSpriteContacts(entity, transform.viewRef, layerRef, contactScan)
     }
 
-    private fun scanTileContacts(entity: Entity, transform: ETransform, layerRef: Int, contactScan: ContactScan) {
-        if (!TileGridSystem.existsAny(transform.viewRef, layerRef))
+    private val tempPos = Vector2f()
+    private fun scanTileContacts(entity: Entity, viewRef: Int, layerRef: Int, contactScan: ContactScan) {
+        if (!TileGridSystem.existsAny(viewRef, layerRef))
             return
 
-        val tileGrids = TileGridSystem[transform.viewRef, layerRef] ?: return
+        val tileGrids = TileGridSystem[viewRef, layerRef] ?: return
 
         tileGrids.forEach {
-            val iterator = it.tileGridIterator(worldBounds)
+            val iterator = it.tileGridIterator(originWorldBounds.bounds)
             while (iterator.hasNext()) {
                 val otherEntityRef = iterator.next()
                 if (entity.index == otherEntityRef)
@@ -227,30 +232,91 @@ object ContactSystem : ComponentSystem {
                     continue
 
                 val otherTransform = otherEntity[ETransform]
-                worldTempPos(
+                val otherContact = otherEntity[EContact]
+
+                //apply bounds of the other contact shape within world coordinate system
+                tempPos(
                     iterator.worldPosition.x + otherTransform.position.x,
-                    iterator.worldPosition.y + otherTransform.position.y)
-                contactScan.scanFullContact(worldBounds, otherEntity, worldTempPos)
+                    iterator.worldPosition.y + otherTransform.position.y
+                )
+                applyContactBounds(otherWorldBounds, otherContact, tempPos.x, tempPos.y)
+                contactScan.scanFullContact(originWorldBounds, otherWorldBounds, otherContact, otherEntity.index)
             }
         }
     }
 
-    private fun scanSpriteContacts(entity: Entity, transform: ETransform, layerRef: Int, contactScan: ContactScan) {
-        if (!contactMapViewLayer.contains(transform.viewRef, layerRef))
+    private fun scanSpriteContacts(entity: Entity, viewRef: Int, layerRef: Int, contactScan: ContactScan) {
+        if (!contactMapViewLayer.contains(viewRef, layerRef))
             return
 
-        val iterator = contactMapViewLayer[transform.viewRef, layerRef]!![worldBounds, entity]
+        val iterator = contactMapViewLayer[viewRef, layerRef]!![originWorldBounds.bounds, entity]
         while (iterator.hasNext()) {
             val otherEntity = EntitySystem[iterator.next()]
+            val otherContact = otherEntity[EContact]
             val otherWorldPos = getWorldPos(otherEntity, otherEntity[ETransform])
-            contactScan.scanFullContact(worldBounds, otherEntity, otherWorldPos)
+
+            if (EMultiplier in otherEntity.aspects) {
+                val multiplier = otherEntity[EMultiplier]
+                val iterator = multiplier.positions.iterator()
+                while (iterator.hasNext()) {
+                    applyContactBounds(
+                        otherWorldBounds,
+                        otherContact,
+                        otherWorldPos.x + iterator.next(),
+                        otherWorldPos.y + iterator.next())
+                    contactScan.scanFullContact(originWorldBounds, otherWorldBounds, otherContact, otherEntity.index)
+                }
+            } else {
+                applyContactBounds(otherWorldBounds, otherContact, otherWorldPos.x, otherWorldPos.y)
+                contactScan.scanFullContact(originWorldBounds, otherWorldBounds, otherContact, otherEntity.index)
+            }
         }
+    }
+
+    private fun applyContactBounds(
+        contactBounds: ContactBounds,
+        contactDef: EContact,
+        worldPosX: Float,
+        worldPosY: Float
+    ) {
+        if (contactDef.isCircle)
+            contactBounds.applyCircle(
+                floor(worldPosX).toInt() + contactDef.bounds.x,
+                floor(worldPosY).toInt() + contactDef.bounds.y,
+                contactDef.bounds.radius
+            )
+        else
+            contactBounds.applyRectangle(
+                floor(worldPosX).toInt() + contactDef.bounds.x,
+                floor(worldPosY).toInt() + contactDef.bounds.y,
+                contactDef.bounds.width,
+                contactDef.bounds.height
+            )
+        if (!contactDef.mask.isEmpty)
+            contactBounds.applyBitMask(contactDef.mask)
+        else
+            contactBounds.resetBitmask()
     }
 
     override fun clearSystem() {
         contactMaps.clear()
         constraints.clear()
         collisionResolver.clear()
+    }
+
+    private fun getWorldPos(entity: Entity, transform: ETransform): Vector2f {
+        return if (EChild in entity.aspects) {
+            addTransformPos(entity[EChild].int_parent)
+            tempPos
+        } else
+            transform.position
+    }
+
+    private fun addTransformPos(parent: Int) {
+        val parentEntity = Entity[parent]
+        tempPos + parentEntity[ETransform].position
+        if (EChild in parentEntity.aspects)
+            addTransformPos(parentEntity[EChild].int_parent)
     }
 
     internal object ContactsPool {
@@ -274,18 +340,4 @@ object ContactSystem : ComponentSystem {
                 CONTACTS_POOL.removeFirst()
     }
 
-    private fun getWorldPos(entity: Entity, transform: ETransform): Vector2f {
-        return if (EChild in entity.aspects) {
-            addTransformPos(entity[EChild].int_parent)
-            worldTempPos
-        } else
-            transform.position
-    }
-
-    private fun addTransformPos(parent: Int) {
-        val parentEntity = Entity[parent]
-        worldTempPos + parentEntity[ETransform].position
-        if (EChild in parentEntity.aspects)
-            addTransformPos(parentEntity[EChild].int_parent)
-    }
 }
