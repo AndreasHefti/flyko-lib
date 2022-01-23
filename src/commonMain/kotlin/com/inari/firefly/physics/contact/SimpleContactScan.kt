@@ -9,7 +9,7 @@ import com.inari.util.IntIterator
 
 class SimpleContactScan  internal constructor(
     @JvmField internal var constraintRef: Int
-) : ContactScan {
+) : ContactScan() {
 
     override val constraint = ContactSystem.constraints[constraintRef]
     @JvmField internal val normalizedContactBounds = Vector4i()
@@ -31,11 +31,6 @@ class SimpleContactScan  internal constructor(
         if (!constraint.match(otherContactDef))
             return
 
-// TODO this should be done by the System
-//        otherWorldBounds(
-//            (floor(otherWorldPos.x.toDouble()) + otherContact.bounds.x).toInt(),
-//            (floor(otherWorldPos.x.toDouble()) + otherContact.bounds.x).toInt())
-
         if (scanContact(originWorldContact,otherWorldContact ))
             entities.add(otherEntityId)
     }
@@ -45,7 +40,7 @@ class SimpleContactScan  internal constructor(
     }
 
     companion object {
-        fun scanContact(originWorldContact: ContactBounds, otherWorldContact: ContactBounds): Boolean =
+        internal fun scanContact(originWorldContact: ContactBounds, otherWorldContact: ContactBounds): Boolean =
             if (originWorldContact.isCircle) {
                 if (otherWorldContact.isCircle)
                     // both are circles

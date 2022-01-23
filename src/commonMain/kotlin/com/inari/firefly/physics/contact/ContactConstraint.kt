@@ -36,37 +36,3 @@ class ContactConstraint private constructor() : SystemComponent(ContactConstrain
         override fun createEmpty() = ContactConstraint()
     }
 }
-
-// TODO better handling of empty circle and BitMask plus clear function
-// TODO check if this also can be used for EContact and ContactConstraint
-class ContactBounds (
-    @JvmField val bounds: Vector4i = Vector4i(),
-    @JvmField val circle: Vector3i? = null,
-) {
-    var bitmask: BitMask? = null
-        internal set
-    val isCircle get() = circle != null && circle.radius > 0
-    val hasBitmask get() = bitmask != null && !bitmask!!.isEmpty
-
-    fun applyRectangle(x: Int, y: Int, w: Int, h: Int) = bounds(x, y, w, h)
-    fun applyRectangle(rect: Vector4i) = bounds(rect)
-
-    fun applyCircle(x: Int, y: Int, r: Int) {
-        // create rectangle bounds for circle too
-        val length = r * 2
-        bounds(x - r, y - r, length, length)
-        circle!!(x, y, r)
-    }
-    fun applyCircle(rect: Vector3i) {
-        // create rectangle bounds for circle too
-        val length = rect.radius * 2
-        bounds(rect.x - rect.radius, rect.y - rect.radius, length, length)
-        circle!!(rect)
-    }
-    fun applyBitMask(bitmask: BitMask) {
-        this.bitmask = bitmask
-    }
-    fun resetBitmask() {
-        this.bitmask = null
-    }
-}

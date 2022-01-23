@@ -318,26 +318,57 @@ object ContactSystem : ComponentSystem {
         if (EChild in parentEntity.aspects)
             addTransformPos(parentEntity[EChild].int_parent)
     }
+}
 
-    internal object ContactsPool {
-        private val CONTACTS_POOL = ArrayDeque<Contact>()
+internal class ContactBounds (
+    @JvmField val bounds: Vector4i = Vector4i(),
+    @JvmField val circle: Vector3i? = null,
+) {
+    var bitmask: BitMask? = null
+        internal set
+    val isCircle get() = circle != null && circle.radius > 0
+    val hasBitmask get() = bitmask != null && !bitmask!!.isEmpty
 
-        internal fun disposeContact(contact: Contact) {
-            contact.entityId = -1
-            contact.intersectionMask.clearMask()
-            contact.worldBounds(0, 0, 0, 0)
-            contact.contactType = UNDEFINED_CONTACT_TYPE
-            contact.materialType = UNDEFINED_MATERIAL
-            contact.intersectionBounds(0, 0, 0, 0)
+    fun applyRectangle(x: Int, y: Int, w: Int, h: Int) = bounds(x, y, w, h)
+    fun applyRectangle(rect: Vector4i) = bounds(rect)
 
-            CONTACTS_POOL.add(contact)
-        }
+    fun applyCircle(x: Int, y: Int, r: Int) {
+        // create rectangle bounds for circle too
+        val length = r * 2
+        bounds(x - r, y - r, length, length)
+        circle!!(x, y, r)
+    }
+    fun applyCircle(rect: Vector3i) {
+        // create rectangle bounds for circle too
+        val length = rect.radius * 2
+        bounds(rect.x - rect.radius, rect.y - rect.radius, length, length)
+        circle!!(rect)
+    }
+    fun applyBitMask(bitmask: BitMask) {
+        this.bitmask = bitmask
+    }
+    fun resetBitmask() {
+        this.bitmask = null
+    }
+}
 
-        internal fun getContactFromPool(): Contact =
-            if (CONTACTS_POOL.isEmpty())
-                Contact()
-            else
-                CONTACTS_POOL.removeFirst()
+internal object ContactsPool {
+    private val CONTACTS_POOL = ArrayDeque<Contact>()
+
+    internal fun disposeContact(contact: Contact) {
+        contact.entityId = -1
+        contact.intersectionMask.clearMask()
+        contact.worldBounds(0, 0, 0, 0)
+        contact.contactType = UNDEFINED_CONTACT_TYPE
+        contact.materialType = UNDEFINED_MATERIAL
+        contact.intersectionBounds(0, 0, 0, 0)
+
+        CONTACTS_POOL.add(contact)
     }
 
+    internal fun getContactFromPool(): Contact =
+        if (CONTACTS_POOL.isEmpty())
+            Contact()
+        else
+            CONTACTS_POOL.removeFirst()
 }

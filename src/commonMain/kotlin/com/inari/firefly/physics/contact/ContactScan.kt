@@ -2,16 +2,16 @@ package com.inari.firefly.physics.contact
 
 import com.inari.util.aspect.Aspect
 
-interface ContactScan {
+abstract class ContactScan {
 
-    val constraint: ContactConstraint
-    fun hasAnyContact(): Boolean
-    fun hasContactOfType(type: Aspect): Boolean
-    fun scanFullContact(
+    abstract val constraint: ContactConstraint
+    abstract fun hasAnyContact(): Boolean
+    abstract fun hasContactOfType(type: Aspect): Boolean
+    internal abstract fun scanFullContact(
         originWorldContact: ContactBounds,
         otherWorldContact: ContactBounds,
         otherContactDef: EContact,
         otherEntityId: Int)
 
-    fun clear()
+    abstract fun clear()
 }

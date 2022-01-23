@@ -15,7 +15,7 @@ import kotlin.jvm.JvmField
 
 class FullContactScan internal constructor(
     @JvmField internal var constraintRef: Int
-) : ContactScan {
+) : ContactScan() {
 
     override val constraint = ContactSystem.constraints[constraintRef]
     @JvmField internal val contactTypes = CONTACT_TYPE_ASPECT_GROUP.createAspects()
@@ -151,7 +151,7 @@ class FullContactScan internal constructor(
         var i = 0
         while (i < contacts.capacity) {
             val contact = contacts[i++] ?: continue
-            ContactSystem.ContactsPool.disposeContact(contact)
+            ContactsPool.disposeContact(contact)
         }
         contacts.clear()
         contactTypes.clear()
@@ -173,7 +173,7 @@ class FullContactScan internal constructor(
             return
 
         // we have contact, create full contact scan
-        val contact = ContactSystem.ContactsPool.getContactFromPool()
+        val contact = ContactsPool.getContactFromPool()
         contact.entityId = otherEntityId
         contact.contactType = otherContactDef.contactType
         contact.materialType = otherContactDef.material
@@ -204,7 +204,7 @@ class FullContactScan internal constructor(
 
         // scan with with bitmask
         if (!scanBitmask(contact, otherWorldContact.bitmask!!, originWorldContact.bounds))
-            ContactSystem.ContactsPool.disposeContact(contact)
+            ContactsPool.disposeContact(contact)
 
     }
     private val clipBounds = Vector4i()
