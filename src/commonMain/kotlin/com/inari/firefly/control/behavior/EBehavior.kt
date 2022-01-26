@@ -2,12 +2,12 @@ package com.inari.firefly.control.behavior
 
 import com.inari.firefly.FFContext
 import com.inari.firefly.INFINITE_SCHEDULER
-import com.inari.firefly.control.behavior.BehaviorSystem.BEHAVIOR_STATE_ASPECT_GROUP
+import com.inari.firefly.control.BEHAVIOR_STATE_ASPECT_GROUP
+import com.inari.firefly.control.OpResult
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.api.FFTimer
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
-import com.inari.util.OpResult
 import com.inari.util.aspect.Aspects
 import kotlin.jvm.JvmField
 

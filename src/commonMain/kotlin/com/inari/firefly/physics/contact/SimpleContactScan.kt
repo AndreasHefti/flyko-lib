@@ -23,8 +23,8 @@ class SimpleContactScan  internal constructor(
     fun getContactEntityIterator(): IntIterator = null!!
 
     override fun scanFullContact(
-        originWorldContact: ContactBounds,
-        otherWorldContact: ContactBounds,
+        originWorldContact: SystemContactBounds,
+        otherWorldContact: SystemContactBounds,
         otherContactDef: EContact,
         otherEntityId: Int
     ) {
@@ -40,7 +40,7 @@ class SimpleContactScan  internal constructor(
     }
 
     companion object {
-        internal fun scanContact(originWorldContact: ContactBounds, otherWorldContact: ContactBounds): Boolean =
+        internal fun scanContact(originWorldContact: SystemContactBounds, otherWorldContact: SystemContactBounds): Boolean =
             if (originWorldContact.isCircle) {
                 if (otherWorldContact.isCircle)
                     // both are circles

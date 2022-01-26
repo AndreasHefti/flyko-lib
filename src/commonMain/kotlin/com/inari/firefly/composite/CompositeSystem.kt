@@ -1,6 +1,7 @@
 package com.inari.firefly.composite
 
 import com.inari.firefly.FFContext
+import com.inari.firefly.control.task.TaskSystem
 
 import com.inari.firefly.core.ComponentRefPredicate
 import com.inari.firefly.core.ComponentRefResolver
@@ -106,22 +107,22 @@ object CompositeSystem : ComponentSystem {
 
     private fun loadEntityComposite(entity: Entity) = with(entity[EComposite]) {
         if (loadTaskRef >= 0)
-            FFContext.runTask(loadTaskRef, entity.componentId)
+            TaskSystem.runTask(loadTaskRef, entity.componentId)
     }
 
     private fun activateEntityComposite(entity: Entity) = with(entity[EComposite]) {
         if (activationTaskRef >= 0)
-            FFContext.runTask(activationTaskRef, entity.componentId)
+            TaskSystem.runTask(activationTaskRef, entity.componentId)
     }
 
     private fun deactivateEntityComposite(entity: Entity) = with(entity[EComposite]) {
         if (deactivationTaskRef >= 0)
-            FFContext.runTask(deactivationTaskRef, entity.componentId)
+            TaskSystem.runTask(deactivationTaskRef, entity.componentId)
     }
 
     private fun disposeEntityComposite(entity: Entity) = with(entity[EComposite]) {
         if (disposeTaskRef >= 0)
-            FFContext.runTask(disposeTaskRef, entity.componentId)
+            TaskSystem.runTask(disposeTaskRef, entity.componentId)
     }
 
     fun <C : Composite> getCompositeBuilder(name: String): SystemComponentBuilder<C> {

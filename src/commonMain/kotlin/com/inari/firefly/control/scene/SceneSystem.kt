@@ -7,11 +7,11 @@ import com.inari.firefly.composite.Composite
 import com.inari.firefly.composite.CompositeEvent
 import com.inari.firefly.composite.CompositeEventListener
 import com.inari.firefly.composite.CompositeEventType
+import com.inari.firefly.control.OpResult
 import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.system.FFSystem
 import com.inari.util.Call
-import com.inari.util.OpResult
 import com.inari.util.collection.BitSet
 
 object SceneSystem : FFSystem {
@@ -25,7 +25,7 @@ object SceneSystem : FFSystem {
                     activeScenes.set(id.index, true)
                     val scene = Scene[id.index]
                     if (scene.activateTaskRef >= 0)
-                        FFContext.runTask(scene.activateTaskRef, scene.componentId)
+                        TaskSystem.runTask(scene.activateTaskRef, scene.componentId)
                 }
                 else -> DO_NOTHING
             }
@@ -34,7 +34,7 @@ object SceneSystem : FFSystem {
                     activeScenes.set(id.index, false)
                     val scene = Scene[id.index]
                     if (scene.deactivateTaskRef >= 0)
-                        FFContext.runTask(scene.deactivateTaskRef, scene.componentId)
+                        TaskSystem.runTask(scene.deactivateTaskRef, scene.componentId)
                     scene.callback()
                     if (scene.removeAfterRun)
                         FFContext.delete(scene)

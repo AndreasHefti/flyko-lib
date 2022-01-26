@@ -1,7 +1,10 @@
 package com.inari.firefly.control.task
 
-import com.inari.firefly.EMPTY_COMPONENT_TASK_OPERATION
 import com.inari.firefly.VOID_CONSUMER
+import com.inari.firefly.control.ComponentTaskOperation
+import com.inari.firefly.control.EMPTY_COMPONENT_TASK_OPERATION
+import com.inari.firefly.control.OpResult
+import com.inari.firefly.control.TaskCallback
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.util.*

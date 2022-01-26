@@ -21,13 +21,9 @@ class EContact private constructor() : EntityComponent(EContact::class.simpleNam
     @JvmField internal val contactScans = ContactScans()
     @JvmField var notifyContacts = false
     @JvmField val withCollisionResolver = ComponentRefResolver(CollisionResolver) { index -> collisionResolverRef = index }
-    @JvmField var isCircle = false
-    @JvmField var bounds: Vector4i = Vector4i()
-    var mask: BitMask = BitMask(width = 0, height = 0)
-        set(value) {
-            mask.reset(value.region)
-            mask.or(value)
-        }
+    @JvmField val contactBounds = ContactBounds()
+    val isCircle get() = contactBounds.isCircle
+    val hasContactMask get() = contactBounds.hasContactMask
     var material: Aspect  = UNDEFINED_MATERIAL
         set(value) =
             if (MATERIAL_ASPECT_GROUP.typeCheck(value)) field = value
@@ -67,8 +63,9 @@ class EContact private constructor() : EntityComponent(EContact::class.simpleNam
 
     override fun reset() {
         collisionResolverRef = -1
-        bounds(0, 0, 0, 0)
-        mask.clearMask()
+        contactBounds.clear()
+        //bounds(0, 0, 0, 0)
+        //mask.clearMask()
         material = UNDEFINED_MATERIAL
         contactType = UNDEFINED_CONTACT_TYPE
         contactScans.clear()

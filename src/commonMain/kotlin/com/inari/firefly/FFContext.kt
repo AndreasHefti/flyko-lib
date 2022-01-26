@@ -1,18 +1,14 @@
 package com.inari.firefly
 
 import com.inari.firefly.asset.AssetSystem
-import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.core.api.*
 import com.inari.firefly.core.component.*
 import com.inari.firefly.core.system.*
 import com.inari.firefly.entity.EntityComponent
 import com.inari.firefly.entity.EntityComponentType
 import com.inari.firefly.entity.EntitySystem
-import com.inari.firefly.game.world.World
-import com.inari.firefly.game.world.WorldSystem
 import com.inari.util.Consumer
 import com.inari.util.Named
-import com.inari.util.OpResult
 import com.inari.util.Predicate
 import com.inari.util.aspect.Aspect
 import com.inari.util.collection.BitSet
@@ -378,25 +374,6 @@ object FFContext {
         }
         return null
     }
-
-    fun runTask(
-        name: String,
-        compId1: CompId = NO_COMP_ID,
-        compId2: CompId = NO_COMP_ID,
-        compId3: CompId = NO_COMP_ID): OpResult = TaskSystem.tasks[name](compId1, compId2, compId3)
-
-    fun runTask(
-        taskId: CompId,
-        compId1: CompId = NO_COMP_ID,
-        compId2: CompId = NO_COMP_ID,
-        compId3: CompId = NO_COMP_ID): OpResult = TaskSystem.tasks[taskId](compId1, compId2, compId3)
-
-    fun runTask(
-        taskIndex: Int,
-        compId1: CompId = NO_COMP_ID,
-        compId2: CompId = NO_COMP_ID,
-        compId3: CompId = NO_COMP_ID): OpResult = TaskSystem.tasks[taskIndex](compId1, compId2, compId3)
-
 
     fun loadShaderProgram(resource: String): String {
         val shaderProgram = resourceService.loadTextResource(resource)

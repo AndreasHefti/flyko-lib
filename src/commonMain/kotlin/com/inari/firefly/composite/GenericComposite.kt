@@ -6,6 +6,7 @@ import com.inari.firefly.asset.Asset
 import com.inari.firefly.control.Controller
 import com.inari.firefly.control.ControllerSystem
 import com.inari.firefly.control.task.Task
+import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.control.trigger.Trigger
 import com.inari.firefly.control.trigger.TriggeredSystemComponent
 import com.inari.firefly.core.ComponentRefResolver
@@ -121,7 +122,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (loadTasks != NO_NAME)
             loadTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
-                .forEach { FFContext.runTask(it, this.componentId) }
+                .forEach { TaskSystem.runTask(it, this.componentId) }
     }
 
     override fun activateComposite() {
@@ -130,7 +131,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (activationTasks != NO_NAME)
             activationTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
-                .forEach { FFContext.runTask(it, this.componentId) }
+                .forEach { TaskSystem.runTask(it, this.componentId) }
 
         // activate all registered components
         FFContext.activateAll(activatableComponents)
@@ -145,7 +146,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (deactivationTasks != NO_NAME)
             deactivationTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
-                .forEach { FFContext.runTask(it, this.componentId) }
+                .forEach { TaskSystem.runTask(it, this.componentId) }
     }
 
     override fun disposeComposite() {
@@ -154,7 +155,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (disposeTasks != NO_NAME)
             disposeTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
-                .forEach { FFContext.runTask(it, this.componentId) }
+                .forEach { TaskSystem.runTask(it, this.componentId) }
 
         // clear data
         attributes.clear()

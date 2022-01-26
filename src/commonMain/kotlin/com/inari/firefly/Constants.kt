@@ -69,6 +69,7 @@ const val BASE_VIEW: String = "[[BASE_VIEW]]"
     override val indexedTypeName: String = NO_NAME
 }
 
+
 @JvmField val VOID_INT_CONSUMER: IntConsumer = { _ -> }
 @JvmField val INT_FUNCTION_IDENTITY: IntFunction = { i -> i }
 @JvmField val INT_FUNCTION_NULL: IntFunction = { _ -> 0 }
@@ -88,11 +89,8 @@ const val BASE_VIEW: String = "[[BASE_VIEW]]"
 @JvmField val INFINITE_SCHEDULER: FFTimer.Scheduler = object : FFTimer.Scheduler {
     override fun needsUpdate(): Boolean = true
 }
-@JvmField val EMPTY_INT_OPERATION: IntOperation = { OpResult.SUCCESS  }
 @JvmField val TRUE_INT_PREDICATE: IntPredicate =  { true }
 @JvmField val FALSE_INT_PREDICATE: IntPredicate = { false }
-@JvmField val EMPTY_TASK_OPERATION: TaskOperation =  { OpResult.SUCCESS }
-@JvmField val EMPTY_COMPONENT_TASK_OPERATION: ComponentTaskOperation = { _, _, _  -> OpResult.SUCCESS }
 
 enum class BlendMode constructor(val source: Int, val dest: Int) {
     /** No blending. Disables blending  */

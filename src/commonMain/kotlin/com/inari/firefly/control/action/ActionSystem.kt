@@ -9,7 +9,9 @@ import com.inari.firefly.core.system.SystemComponent
 import com.inari.util.aspect.Aspects
 import kotlin.jvm.JvmField
 
-typealias ActionCall = (Int, Int, Int, Int) -> Unit
+
+
+/** The action system to create and maintain actions of all kind */
 object ActionSystem : ComponentSystem {
 
     override val supportedComponents: Aspects =

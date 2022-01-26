@@ -8,8 +8,8 @@ abstract class ContactScan {
     abstract fun hasAnyContact(): Boolean
     abstract fun hasContactOfType(type: Aspect): Boolean
     internal abstract fun scanFullContact(
-        originWorldContact: ContactBounds,
-        otherWorldContact: ContactBounds,
+        originWorldContact: SystemContactBounds,
+        otherWorldContact: SystemContactBounds,
         otherContactDef: EContact,
         otherEntityId: Int)
 

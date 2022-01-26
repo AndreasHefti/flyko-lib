@@ -5,6 +5,7 @@ import com.inari.firefly.DesktopRunner
 import com.inari.firefly.FFContext
 import com.inari.firefly.asset.Asset
 import com.inari.firefly.control.EControl
+import com.inari.firefly.control.OpResult
 import com.inari.firefly.control.scene.Scene
 import com.inari.firefly.control.task.SimpleTask
 import com.inari.firefly.core.api.ButtonType
@@ -31,7 +32,6 @@ import com.inari.firefly.physics.contact.ContactSystem
 import com.inari.firefly.physics.contact.EContact
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.MovementSystem
-import com.inari.util.OpResult
 import org.lwjgl.glfw.GLFW
 
 

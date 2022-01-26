@@ -1,45 +1,29 @@
 package com.inari.util
 
 import com.inari.firefly.core.component.CompId
+import kotlin.jvm.JvmField
 
 interface Named {
     val name: String
 }
 
-enum class OpResult {
-    SUCCESS,
-    RUNNING,
-    FAILED
-}
-
-typealias Consumer<C> = (C) -> Unit
-typealias Operation<C> = (C) -> OpResult
-typealias UpdateOperation = () -> OpResult
-typealias TaskOperation = () -> OpResult
-typealias TaskCallback = (OpResult) -> Any
-typealias ComponentTaskOperation = (CompId, CompId, CompId) -> OpResult
 typealias Call = () -> Unit
+typealias Consumer<C> = (C) -> Unit
 typealias Supplier<C> = () -> C
 typealias Receiver<C> = (C) -> C
 typealias Predicate<C> = (C) -> Boolean
-
 typealias IntFunction = (Int) -> Int
-typealias IntOperation = (Int) -> OpResult
 typealias IntSupplier = () -> Int
 typealias IntConsumer = (Int) -> Unit
 typealias IntPredicate = (Int) -> Boolean
-
 typealias ComponentIdFunction = (CompId) -> CompId
-typealias ComponentIdOperation = (CompId) -> OpResult
 typealias ComponentIdSupplier = () -> CompId
 typealias ComponentIdConsumer = (CompId) -> Unit
 
 /** Use this on types that can be disposed  */
 interface Disposable {
-
     /** Dispose the instance  */
     fun dispose()
-
 }
 
 interface Loadable {
@@ -50,7 +34,6 @@ interface Loadable {
  * clear object(s) but do not have to know the exact subType of the object(s)
  */
 interface Clearable {
-
     /** Clears the instance  */
     fun clear()
 }

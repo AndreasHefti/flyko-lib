@@ -41,7 +41,7 @@ class TestGameObject : RoomObjectComposite() {
                 blend = BlendMode.NORMAL_ALPHA
             }
             withComponent(EContact) {
-                bounds(0, 0, 16, 16)
+                contactBounds(0, 0, 16, 16)
                 contactType = TileContactFormType.QUAD
                 material = TileMaterialType.TERRAIN_SOLID
             }

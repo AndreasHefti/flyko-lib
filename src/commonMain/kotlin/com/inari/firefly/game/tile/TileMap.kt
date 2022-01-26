@@ -190,12 +190,12 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
                     if (tile.hasContactComp) {
                         withComponent(EContact) {
                             if (tile.contactType !== UNDEFINED_CONTACT_TYPE) {
-                                bounds(0,0,
+                                contactBounds(0,0,
                                     tile.protoSprite.textureBounds.width,
                                     tile.protoSprite.textureBounds.height)
                                 contactType = tile.contactType
                                 material = tile.material
-                                mask = tile.contactMask ?: mask
+                                contactBounds(tile.contactMask)
                             }
                             material = tile.material
                         }

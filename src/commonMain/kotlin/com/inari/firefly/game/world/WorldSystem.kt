@@ -5,6 +5,7 @@ package com.inari.firefly.game.world
 import com.inari.firefly.*
 import com.inari.firefly.composite.*
 import com.inari.firefly.control.scene.SceneSystem
+import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.FFSystem
@@ -89,7 +90,7 @@ object WorldSystem : FFSystem {
         if (activeRoomId != NO_COMP_ID && !paused) {
             val room = FFContext[Room, activeRoomId]
             if (room.pauseTaskName != NO_NAME)
-                FFContext.runTask(room.pauseTaskName, room.componentId)
+                TaskSystem.runTask(room.pauseTaskName, room.componentId)
             paused = true
             RoomEvent.send(RoomEventType.ROOM_PAUSED, activeRoomId)
         }
@@ -99,7 +100,7 @@ object WorldSystem : FFSystem {
         if (activeRoomId != NO_COMP_ID && paused) {
             val room = FFContext[Room, activeRoomId]
             if (room.resumeTaskName != NO_NAME)
-                FFContext.runTask(room.resumeTaskName, room.componentId)
+                TaskSystem.runTask(room.resumeTaskName, room.componentId)
             paused = false
             RoomEvent.send(RoomEventType.ROOM_RESUMED, activeRoomId)
         }

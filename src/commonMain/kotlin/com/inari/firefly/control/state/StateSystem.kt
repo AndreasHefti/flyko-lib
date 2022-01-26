@@ -82,12 +82,12 @@ object StateSystem : ComponentSystem {
 
     private fun doStateChange(workflow: Workflow, stateChange: StateChange) {
         if (stateChange.disposeStateTaskRef != -1)
-            FFContext.runTask(stateChange.disposeStateTaskRef, workflow.componentId)
+            TaskSystem.runTask(stateChange.disposeStateTaskRef, workflow.componentId)
 
         workflow.currentState = stateChange.toState
 
         if (stateChange.initStateTaskRef != -1)
-            FFContext.runTask(stateChange.initStateTaskRef, workflow.componentId)
+            TaskSystem.runTask(stateChange.initStateTaskRef, workflow.componentId)
 
         if (stateChange.toState !== NO_STATE)
             WorkflowEvent.send(

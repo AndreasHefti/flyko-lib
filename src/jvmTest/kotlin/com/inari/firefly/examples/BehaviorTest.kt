@@ -3,9 +3,10 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.inari.firefly.BlendMode
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.FFContext
+import com.inari.firefly.control.ACTION_DONE_CONDITION
+import com.inari.firefly.control.BEHAVIOR_STATE_ASPECT_GROUP
+import com.inari.firefly.control.OpResult
 import com.inari.firefly.control.behavior.*
-import com.inari.firefly.control.behavior.BehaviorSystem.ACTION_DONE_CONDITION
-import com.inari.firefly.control.behavior.BehaviorSystem.BEHAVIOR_STATE_ASPECT_GROUP
 import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.entity.Entity
@@ -17,7 +18,6 @@ import com.inari.firefly.info.FFInfoSystem
 import com.inari.firefly.info.FrameRateInfo
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.MovementSystem
-import com.inari.util.OpResult
 import com.inari.util.aspect.Aspect
 import kotlin.random.Random
 

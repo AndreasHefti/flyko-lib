@@ -160,8 +160,8 @@ class FullContactScan internal constructor(
     }
 
     override fun scanFullContact(
-        originWorldContact: ContactBounds,
-        otherWorldContact: ContactBounds,
+        originWorldContact: SystemContactBounds,
+        otherWorldContact: SystemContactBounds,
         otherContactDef: EContact,
         otherEntityId: Int
     ) {

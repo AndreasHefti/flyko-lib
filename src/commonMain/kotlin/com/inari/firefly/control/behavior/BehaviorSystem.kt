@@ -2,6 +2,9 @@ package com.inari.firefly.control.behavior
 
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
+import com.inari.firefly.control.BxConditionOp
+import com.inari.firefly.control.BxOp
+import com.inari.firefly.control.OpResult
 import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
@@ -9,7 +12,6 @@ import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityEvent
 import com.inari.firefly.entity.EntityEventListener
 import com.inari.firefly.entity.EntitySystem
-import com.inari.util.OpResult
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.Aspects
 import com.inari.util.aspect.IndexedAspectType
@@ -17,36 +19,12 @@ import com.inari.util.collection.BitSet
 import com.inari.util.collection.BitSetIterator
 import kotlin.jvm.JvmField
 
-typealias BxOp = (Entity, EBehavior) -> OpResult
-typealias BxConditionOp = (Entity, EBehavior) -> Boolean
-
 object BehaviorSystem : ComponentSystem {
-
-    @JvmField val BEHAVIOR_STATE_ASPECT_GROUP = IndexedAspectType("BEHAVIOR_STATE_ASPECT_GROUP")
-    @JvmField val UNDEFINED_BEHAVIOR_STATE: Aspect = BEHAVIOR_STATE_ASPECT_GROUP.createAspect("UNDEFINED_BEHAVIOR_STATE")
-
-    @JvmField val TRUE_CONDITION: BxConditionOp = { _, _ -> true }
-    @JvmField val FALSE_CONDITION: BxConditionOp = { _, _ -> false }
-    @JvmField val NOT: (BxConditionOp) -> BxConditionOp = {
-        c -> { entity, bx -> ! c(entity, bx) }
-    }
-    @JvmField val AND: (BxConditionOp, BxConditionOp) -> BxConditionOp = {
-        c1, c2 -> { entity, bx -> c1(entity, bx) && c2(entity, bx) }
-    }
-    @JvmField val OR: (BxConditionOp, BxConditionOp) -> BxConditionOp = {
-        c1, c2 -> { entity, bx -> c1(entity, bx) || c2(entity, bx) }
-    }
-    @JvmField val ACTION_DONE_CONDITION =  { aspect: Aspect -> {
-        _ : Entity, behavior: EBehavior -> aspect in behavior.actionsDone }
-    }
-    @JvmField val SUCCESS_ACTION: BxOp = { _, _ -> OpResult.SUCCESS }
-    @JvmField val FAIL_ACTION: BxOp = { _, _ -> OpResult.FAILED }
-
 
     override val supportedComponents: Aspects =
             SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(BxNode)
 
-    val actions: ComponentMapRO<BxNode>
+    val nodes: ComponentMapRO<BxNode>
         get() = systemNodes
     @JvmField internal val systemNodes = ComponentSystem.createComponentMapping(
             BxNode

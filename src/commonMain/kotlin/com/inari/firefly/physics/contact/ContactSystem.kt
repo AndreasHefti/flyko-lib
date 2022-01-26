@@ -179,8 +179,8 @@ object ContactSystem : ComponentSystem {
         }
     }
 
-    private val originWorldBounds = ContactBounds(circle = Vector3i())
-    private val otherWorldBounds = ContactBounds(circle = Vector3i())
+    private val originWorldBounds = SystemContactBounds(circle = Vector3i())
+    private val otherWorldBounds = SystemContactBounds(circle = Vector3i())
     private fun updateContacts(entity: Entity, contactScan: ContactScan) {
         val constraint = contactScan.constraint
         val transform = entity[ETransform]
@@ -257,13 +257,13 @@ object ContactSystem : ComponentSystem {
 
             if (EMultiplier in otherEntity.aspects) {
                 val multiplier = otherEntity[EMultiplier]
-                val iterator = multiplier.positions.iterator()
-                while (iterator.hasNext()) {
+                val iterator2 = multiplier.positions.iterator()
+                while (iterator2.hasNext()) {
                     applyContactBounds(
                         otherWorldBounds,
                         otherContact,
-                        otherWorldPos.x + iterator.next(),
-                        otherWorldPos.y + iterator.next())
+                        otherWorldPos.x + iterator2.next(),
+                        otherWorldPos.y + iterator2.next())
                     contactScan.scanFullContact(originWorldBounds, otherWorldBounds, otherContact, otherEntity.index)
                 }
             } else {
@@ -274,26 +274,26 @@ object ContactSystem : ComponentSystem {
     }
 
     private fun applyContactBounds(
-        contactBounds: ContactBounds,
+        contactBounds: SystemContactBounds,
         contactDef: EContact,
         worldPosX: Float,
         worldPosY: Float
     ) {
         if (contactDef.isCircle)
             contactBounds.applyCircle(
-                floor(worldPosX).toInt() + contactDef.bounds.x,
-                floor(worldPosY).toInt() + contactDef.bounds.y,
-                contactDef.bounds.radius
+                floor(worldPosX).toInt() + contactDef.contactBounds.bounds.x,
+                floor(worldPosY).toInt() + contactDef.contactBounds.bounds.y,
+                contactDef.contactBounds.bounds.radius
             )
         else
             contactBounds.applyRectangle(
-                floor(worldPosX).toInt() + contactDef.bounds.x,
-                floor(worldPosY).toInt() + contactDef.bounds.y,
-                contactDef.bounds.width,
-                contactDef.bounds.height
+                floor(worldPosX).toInt() + contactDef.contactBounds.bounds.x,
+                floor(worldPosY).toInt() + contactDef.contactBounds.bounds.y,
+                contactDef.contactBounds.bounds.width,
+                contactDef.contactBounds.bounds.height
             )
-        if (!contactDef.mask.isEmpty)
-            contactBounds.applyBitMask(contactDef.mask)
+        if (contactDef.hasContactMask)
+            contactBounds.applyBitMask(contactDef.contactBounds.bitmask!!)
         else
             contactBounds.resetBitmask()
     }
@@ -320,7 +320,45 @@ object ContactSystem : ComponentSystem {
     }
 }
 
-internal class ContactBounds (
+class ContactBounds {
+
+    @JvmField val bounds: Vector4i = Vector4i()
+    @JvmField  var bitmask: BitMask? = null
+
+    val isEmpty: Boolean get() = bounds.x == 0 && bounds.y == 0 && bounds.width == 0 && bounds.height == 0 && bitmask == null
+    val isCircle: Boolean get() = bounds.height == 0
+    val hasContactMask: Boolean get() = bitmask != null
+
+    operator fun invoke(circle: Vector3i) {
+        bitmask = null
+        bounds(circle.x, circle.y, circle.radius, 0)
+    }
+    operator fun invoke(cx: Int, cy: Int, radius: Int) {
+        bitmask = null
+        bounds(cx, cy, radius, 0)
+    }
+    operator fun invoke(rectangle: Vector4i) {
+        bitmask = null
+        bounds(rectangle)
+    }
+    operator fun invoke(rx: Int, ry: Int, width: Int, height: Int) {
+        bitmask = null
+        bounds(rx, ry, width, height)
+    }
+    operator fun invoke(mask: BitMask?) {
+        if (mask != null)
+            bounds(mask.region)
+        bitmask = mask
+    }
+
+    fun clear() {
+        bounds(0, 0, 0, 0)
+        bitmask = null
+    }
+
+}
+
+internal class SystemContactBounds (
     @JvmField val bounds: Vector4i = Vector4i(),
     @JvmField val circle: Vector3i? = null,
 ) {
