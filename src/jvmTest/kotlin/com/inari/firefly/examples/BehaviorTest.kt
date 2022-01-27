@@ -3,10 +3,9 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.inari.firefly.BlendMode
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.FFContext
-import com.inari.firefly.control.ACTION_DONE_CONDITION
 import com.inari.firefly.control.BEHAVIOR_STATE_ASPECT_GROUP
 import com.inari.firefly.control.OpResult
-import com.inari.firefly.control.behavior.*
+import com.inari.firefly.control.ai.behavior.*
 import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.entity.Entity
@@ -44,19 +43,16 @@ class BehaviorTest : DesktopApp() {
             name = "Root"
             node(BxParallel) {
                 name = "parallel"
-                successThreshold = 2
+                successThreshold = 1
                 node(BxSequence) {
                     name = "X"
-                    node(BxSelection) {
-                        name = "right"
-                        node(BxCondition) {
-                            name = "GoRight done?"
-                            condition = ACTION_DONE_CONDITION(goRightState)
-                        }
-                        node(BxAction) {
-                            name="GoRight"
-                            state = goRightState
-                            tickOp = { entity, _ ->
+                    node(BxAction) {
+                        name="GoRight"
+                        state = goRightState
+                        tickOp = { entity, bx ->
+                            if (goRightState in bx.actionsDone)
+                                OpResult.SUCCESS
+                            else {
                                 val mov = entity[EMovement]
                                 if (mov.velocityX <= 0f)
                                     mov.velocityX = Random.nextInt(1, 5).toFloat()
@@ -74,10 +70,8 @@ class BehaviorTest : DesktopApp() {
                             val mov = entityId[EMovement]
                             if (mov.velocityX >= 0f)
                                 mov.velocityX = Random.nextInt(-5, -1).toFloat()
-                            if (entityId[ETransform].position.x < 10f) {
-                                bx.actionsDone - goRightState
+                            if (entityId[ETransform].position.x < 10f)
                                 OpResult.SUCCESS
-                            }
                             else
                                 OpResult.RUNNING
                         }
@@ -85,16 +79,13 @@ class BehaviorTest : DesktopApp() {
                 }
                 node(BxSequence) {
                     name = "Y"
-                    node(BxSelection) {
-                        name = "down"
-                        node(BxCondition) {
-                            name = "GoDown done?"
-                            condition = ACTION_DONE_CONDITION(goDownState)
-                        }
-                        node(BxAction) {
-                            name="GoDown"
-                            state = goDownState
-                            tickOp = { entityId, _ ->
+                    node(BxAction) {
+                        name="GoDown"
+                        state = goDownState
+                        tickOp = { entityId, bx ->
+                            if (goDownState in bx.actionsDone)
+                                OpResult.SUCCESS
+                            else {
                                 val mov = entityId[EMovement]
                                 if (mov.velocityY <= 0f)
                                     mov.velocityY = Random.nextInt(1, 5).toFloat()
@@ -112,10 +103,8 @@ class BehaviorTest : DesktopApp() {
                             val mov = entityId[EMovement]
                             if (mov.velocityY >= 0f)
                                 mov.velocityY = Random.nextInt(-5, -1).toFloat()
-                            if (entityId[ETransform].position.y < 10) {
-                                bx.actionsDone - goDownState
+                            if (entityId[ETransform].position.y < 10)
                                 OpResult.SUCCESS
-                            }
                             else
                                 OpResult.RUNNING
                         }

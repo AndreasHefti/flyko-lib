@@ -1,8 +1,6 @@
-package com.inari.firefly.control.state
+package com.inari.firefly.control.ai.state
 
 import com.inari.firefly.*
-import com.inari.firefly.control.scene.Scene
-import com.inari.firefly.control.scene.SceneSystem
 import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.core.api.FFTimer
 import com.inari.firefly.core.component.ComponentMap.MapAction.*

@@ -1,4 +1,4 @@
-package com.inari.firefly.control.behavior
+package com.inari.firefly.control.ai.behavior
 
 import com.inari.firefly.control.*
 import com.inari.firefly.core.system.SystemComponentSubType
@@ -8,7 +8,7 @@ import kotlin.jvm.JvmField
 
 class BxAction private constructor() : BxNode() {
 
-    @JvmField var tickOp: BxOp = SUCCESS_ACTION
+    @JvmField var tickOp: BxOp = SUCCESS_BX_OPERATION
     var state: Aspect = UNDEFINED_BEHAVIOR_STATE
         set(value) =
             if (BEHAVIOR_STATE_ASPECT_GROUP.typeCheck(value)) field = value

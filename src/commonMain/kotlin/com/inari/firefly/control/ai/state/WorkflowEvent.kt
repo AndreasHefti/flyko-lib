@@ -1,4 +1,4 @@
-package com.inari.firefly.control.state
+package com.inari.firefly.control.ai.state
 
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_COMP_ID

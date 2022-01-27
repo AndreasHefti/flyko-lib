@@ -1,9 +1,8 @@
 package com.inari.firefly.behavior
 
-import com.inari.firefly.FFContext
 import com.inari.firefly.TestApp
-import com.inari.firefly.control.FALSE_CONDITION
-import com.inari.firefly.control.behavior.*
+import com.inari.firefly.control.FALSE_BX_CONDITION
+import com.inari.firefly.control.ai.behavior.*
 import com.inari.firefly.control.task.SimpleTask
 import com.inari.firefly.control.task.TaskSystem
 import kotlin.test.BeforeTest
@@ -32,7 +31,7 @@ class BehaviorTreeTest {
                 name = "Second Sele ction"
                 node(BxCondition) {
                     name ="Condition 1"
-                    condition = FALSE_CONDITION
+                    condition = FALSE_BX_CONDITION
                 }
                 node(BxAction) {
                     name = "First Task"

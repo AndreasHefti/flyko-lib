@@ -1,16 +1,8 @@
-package com.inari.firefly.control.state
+package com.inari.firefly.control.ai.state
 
-import com.inari.firefly.FALSE_SUPPLIER
 import com.inari.firefly.NO_STATE
-import com.inari.firefly.control.task.Task
-import com.inari.firefly.core.ComponentRefResolver
-import com.inari.firefly.core.component.ArrayAccessor
-import com.inari.firefly.core.component.CompId
-import com.inari.firefly.core.component.ComponentType
 import com.inari.firefly.core.system.SystemComponent
-import com.inari.firefly.core.system.SystemComponentBuilder
 import com.inari.firefly.core.system.SystemComponentSingleType
-import com.inari.firefly.graphics.particle.Particle
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
 import kotlin.jvm.JvmField

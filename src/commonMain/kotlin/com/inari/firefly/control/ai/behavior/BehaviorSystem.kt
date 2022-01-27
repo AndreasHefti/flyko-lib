@@ -1,9 +1,7 @@
-package com.inari.firefly.control.behavior
+package com.inari.firefly.control.ai.behavior
 
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
-import com.inari.firefly.control.BxConditionOp
-import com.inari.firefly.control.BxOp
 import com.inari.firefly.control.OpResult
 import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
@@ -12,9 +10,7 @@ import com.inari.firefly.entity.Entity
 import com.inari.firefly.entity.EntityEvent
 import com.inari.firefly.entity.EntityEventListener
 import com.inari.firefly.entity.EntitySystem
-import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.Aspects
-import com.inari.util.aspect.IndexedAspectType
 import com.inari.util.collection.BitSet
 import com.inari.util.collection.BitSetIterator
 import kotlin.jvm.JvmField

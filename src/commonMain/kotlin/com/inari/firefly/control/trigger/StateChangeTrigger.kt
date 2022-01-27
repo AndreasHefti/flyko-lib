@@ -2,13 +2,11 @@ package com.inari.firefly.control.trigger
 
 import com.inari.firefly.FFContext
 import com.inari.firefly.NO_NAME
-import com.inari.firefly.NULL_CALL
-import com.inari.firefly.control.state.Workflow
-import com.inari.firefly.control.state.WorkflowEvent
+import com.inari.firefly.control.ai.state.Workflow
+import com.inari.firefly.control.ai.state.WorkflowEvent
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.graphics.rendering.Renderer
-import com.inari.util.Call
 import com.inari.util.Consumer
 import kotlin.jvm.JvmField
 

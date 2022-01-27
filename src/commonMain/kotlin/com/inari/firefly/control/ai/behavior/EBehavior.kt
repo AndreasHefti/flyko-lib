@@ -1,4 +1,4 @@
-package com.inari.firefly.control.behavior
+package com.inari.firefly.control.ai.behavior
 
 import com.inari.firefly.FFContext
 import com.inari.firefly.INFINITE_SCHEDULER

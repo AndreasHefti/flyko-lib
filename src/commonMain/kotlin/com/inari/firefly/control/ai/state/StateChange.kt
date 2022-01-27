@@ -1,4 +1,4 @@
-package com.inari.firefly.control.state
+package com.inari.firefly.control.ai.state
 
 import com.inari.firefly.FALSE_SUPPLIER
 import com.inari.firefly.NO_NAME
