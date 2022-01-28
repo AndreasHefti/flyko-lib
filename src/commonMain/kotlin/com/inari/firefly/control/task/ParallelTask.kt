@@ -6,10 +6,10 @@ import com.inari.util.*
 
 class ParallelTask private constructor() : Task() {
 
-    private var action: EntityAction = EMPTY_ENTITY_ACTION
+    private var action: EntityActionCall = EMPTY_ENTITY_ACTION_CALL
     private val callback: TaskCallback = EMPTY_TASK_CALLBACK
 
-    fun withOperation(op: EntityAction) {
+    fun withOperation(op: EntityActionCall) {
         action = op
     }
     fun withSimpleOperation(op: Call) {

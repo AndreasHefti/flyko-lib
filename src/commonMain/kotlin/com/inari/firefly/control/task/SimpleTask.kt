@@ -1,16 +1,16 @@
 package com.inari.firefly.control.task
 
 import com.inari.firefly.FFContext
-import com.inari.firefly.control.EMPTY_ENTITY_ACTION
-import com.inari.firefly.control.EntityAction
+import com.inari.firefly.control.EMPTY_ENTITY_ACTION_CALL
+import com.inari.firefly.control.EntityActionCall
 import com.inari.firefly.control.OpResult
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.util.*
 
 class SimpleTask private constructor() : Task() {
 
-    private var action: EntityAction = EMPTY_ENTITY_ACTION
-    fun withOperation(op: EntityAction) {
+    private var action: EntityActionCall = EMPTY_ENTITY_ACTION_CALL
+    fun withOperation(op: EntityActionCall) {
         action = op
     }
     fun withOperation(op: IntConsumer) {

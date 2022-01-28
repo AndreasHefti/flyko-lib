@@ -6,9 +6,7 @@ import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.composite.Composite
 import com.inari.firefly.composite.CompositeSystem
 import com.inari.firefly.composite.GenericComposite
-import com.inari.firefly.control.EMPTY_ENTITY_ACTION
 import com.inari.firefly.control.EMPTY_UPDATE_OPERATION
-import com.inari.firefly.control.EntityAction
 import com.inari.firefly.control.UpdateOperation
 import com.inari.firefly.control.task.Task
 import com.inari.firefly.core.ComponentRefResolver
@@ -17,7 +15,6 @@ import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponentBuilder
 import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.util.Call
-import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
 
 class Scene private constructor() : GenericComposite() {
@@ -41,7 +38,7 @@ class Scene private constructor() : GenericComposite() {
         this.update = update
     }
 
-    @JvmField val withActivateTask = ComponentRefResolver(Task) { index -> activateTaskRef = index }
+    @JvmField val withActivateTask = ComponentRefResolver(Task) { activateTaskRef = it }
     fun <A : Task> withActivateTask(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
         activateTaskRef = result.instanceId

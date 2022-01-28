@@ -3,6 +3,7 @@ package com.inari.firefly.control.ai.behavior
 import com.inari.firefly.FFApp
 import com.inari.firefly.FFContext
 import com.inari.firefly.control.OpResult
+import com.inari.firefly.control.action.EntityActionSystem
 import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
@@ -38,6 +39,7 @@ object BehaviorSystem : ComponentSystem {
     private val entityIds = BitSet()
 
     init {
+        EntityActionSystem
         FFContext.registerListener(FFApp.UpdateEvent, this::update)
         FFContext.registerListener(EntityEvent, entityActivationListener)
         FFContext.loadSystem(this)

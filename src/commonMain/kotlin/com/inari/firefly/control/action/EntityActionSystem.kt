@@ -8,7 +8,7 @@ import com.inari.util.aspect.Aspects
 
 
 /** The action system to create and maintain actions of all kind */
-object EventActionSystem : ComponentSystem {
+object EntityActionSystem : ComponentSystem {
 
     override val supportedComponents: Aspects =
             SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(EntityAction)

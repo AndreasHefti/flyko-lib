@@ -41,7 +41,7 @@ class BehaviorTest : DesktopApp() {
                     name = "X"
                     node(BxAction) {
                         name="GoRight"
-                        action = { entityId, _, _ ->
+                        withEntityAction { entityId, _, _ ->
                             val entity = EntitySystem[entityId]
                             val mov = entity[EMovement]
                             if (mov.velocityX < 0)
@@ -55,7 +55,7 @@ class BehaviorTest : DesktopApp() {
                     }
                     node(BxAction) {
                         name="GoLeft"
-                        action = { entityId, _, _ ->
+                        withEntityAction { entityId, _, _ ->
                             val entity = EntitySystem[entityId]
                             val mov = entity[EMovement]
                             if (mov.velocityX > 0)
@@ -72,7 +72,7 @@ class BehaviorTest : DesktopApp() {
                     name = "Y"
                     node(BxAction) {
                         name="GoDown"
-                        action = { entityId, _, _ ->
+                        withEntityAction { entityId, _, _ ->
                             val entity = EntitySystem[entityId]
                             val mov = entity[EMovement]
                             if (mov.velocityY < 0)
@@ -86,7 +86,7 @@ class BehaviorTest : DesktopApp() {
                     }
                     node(BxAction) {
                         name="GoUp"
-                        action = { entityId, _, _ ->
+                        withEntityAction { entityId, _, _ ->
                             val entity = EntitySystem[entityId]
                             val mov = entity[EMovement]
                             if (mov.velocityY > 0)
@@ -102,7 +102,7 @@ class BehaviorTest : DesktopApp() {
             }
         }
 
-        val vert = floatArrayOf(0f, 0f, 3f, 3f)
+        val vert = floatArrayOf(0f, 0f, 10f, 20f)
         for (i in 1..10000) {
             Entity.buildAndActivate {
                 withComponent(ETransform) {
@@ -124,7 +124,7 @@ class BehaviorTest : DesktopApp() {
                 withComponent(EBehavior) {
                     behaviorTree("Root")
                     repeat = true
-                    updateResolution = 5f
+                    updateResolution =  30f
                 }
             }
         }

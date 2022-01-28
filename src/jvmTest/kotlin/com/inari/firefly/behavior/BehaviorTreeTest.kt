@@ -35,7 +35,7 @@ class BehaviorTreeTest {
                 }
                 node(BxAction) {
                     name = "First Task"
-                    action = { entityId,_,_ -> TaskSystem.runTask("Task_Name", entityId) }
+                    withEntityAction { entityId,_,_ -> TaskSystem.runTask("Task_Name", entityId) }
                 }
                 node(BxSequence) {
                     name = ""
