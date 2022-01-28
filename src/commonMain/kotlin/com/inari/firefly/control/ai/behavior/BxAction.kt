@@ -8,18 +8,9 @@ import kotlin.jvm.JvmField
 
 class BxAction private constructor() : BxNode() {
 
-    @JvmField var tickOp: BxOp = SUCCESS_BX_OPERATION
-    var state: Aspect = UNDEFINED_BEHAVIOR_STATE
-        set(value) =
-            if (BEHAVIOR_STATE_ASPECT_GROUP.typeCheck(value)) field = value
-            else throw IllegalArgumentException()
+    @JvmField var action: EntityAction = EMPTY_ENTITY_ACTION
 
-    override fun tick(entity: Entity, behavior: EBehavior): OpResult {
-        val result = tickOp(entity, behavior)
-        if (result === OpResult.SUCCESS)
-            behavior.actionsDone + state
-        return result
-    }
+    override fun tick(entityId: Int): OpResult = action(entityId)
 
     override fun componentType() = Companion
     companion object : SystemComponentSubType<BxNode, BxAction>(BxNode, BxAction::class) {

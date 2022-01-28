@@ -122,7 +122,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (loadTasks != NO_NAME)
             loadTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
-                .forEach { TaskSystem.runTask(it, this.componentId) }
+                .forEach { TaskSystem.runTask(it, this.index) }
     }
 
     override fun activateComposite() {
@@ -131,7 +131,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (activationTasks != NO_NAME)
             activationTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
-                .forEach { TaskSystem.runTask(it, this.componentId) }
+                .forEach { TaskSystem.runTask(it, this.index) }
 
         // activate all registered components
         FFContext.activateAll(activatableComponents)
@@ -146,7 +146,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (deactivationTasks != NO_NAME)
             deactivationTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
-                .forEach { TaskSystem.runTask(it, this.componentId) }
+                .forEach { TaskSystem.runTask(it, this.index) }
     }
 
     override fun disposeComposite() {
@@ -155,7 +155,7 @@ open class GenericComposite : Composite(), TriggeredSystemComponent {
         if (disposeTasks != NO_NAME)
             disposeTasks
                 .split(StringUtils.LIST_VALUE_SEPARATOR)
-                .forEach { TaskSystem.runTask(it, this.componentId) }
+                .forEach { TaskSystem.runTask(it, this.index) }
 
         // clear data
         attributes.clear()

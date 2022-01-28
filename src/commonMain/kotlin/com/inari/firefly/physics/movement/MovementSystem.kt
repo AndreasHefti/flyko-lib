@@ -62,14 +62,15 @@ object MovementSystem : ComponentSystem {
             if (!movement.active || !movement.scheduler.needsUpdate())
                 continue
 
+            val dtEntity = deltaTimeInSeconds * (60 / movement.scheduler.resolution)
             val movementIntegrator = if (movement.integratorRef < 0)
                 defaultIntegrator
             else
                 integrator[movement.integratorRef]
             val transform = entity[ETransform]
-            movementIntegrator.integrate(movement, transform, deltaTimeInSeconds)
+            movementIntegrator.integrate(movement, transform, dtEntity)
             if (movement.velocity.v0 != ZERO_FLOAT || movement.velocity.v1 != ZERO_FLOAT) {
-                movementIntegrator.step(movement, transform, deltaTimeInSeconds)
+                movementIntegrator.step(movement, transform, dtEntity)
                 MoveEvent.moveEvent.entities.set(entity.index)
             }
         }

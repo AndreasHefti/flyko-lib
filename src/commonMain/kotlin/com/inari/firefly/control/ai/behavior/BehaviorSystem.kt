@@ -46,7 +46,6 @@ object BehaviorSystem : ComponentSystem {
     fun reset(entityId: Int) {
         val behavior = EntitySystem[entityId][EBehavior]
         behavior.treeState = OpResult.SUCCESS
-        behavior.actionsDone.clear()
     }
 
     internal fun update() {
@@ -67,7 +66,7 @@ object BehaviorSystem : ComponentSystem {
                 else
                     reset(entityId)
 
-            behavior.treeState = systemNodes[behavior.treeRef].tick(entity, behavior)
+            behavior.treeState = systemNodes[behavior.treeRef].tick(entityId)
 
     }
 

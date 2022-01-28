@@ -10,7 +10,7 @@ class BxParallel private constructor() : BxBranch() {
 
     @JvmField var successThreshold: Int = 0
 
-    override fun tick(entity: Entity, behavior: EBehavior): OpResult {
+    override fun tick(entityId: Int): OpResult {
         val threshold = if (successThreshold > children.size)
                 children.size
             else
@@ -20,7 +20,7 @@ class BxParallel private constructor() : BxBranch() {
         var failuresCount = 0
         var i = 0
         loop@ while (i < children.capacity) {
-            when(children[i++]?.tick(entity, behavior) ?: continue@loop) {
+            when(children[i++]?.tick(entityId) ?: continue@loop) {
                 OpResult.RUNNING -> DO_NOTHING
                 OpResult.SUCCESS -> successCount++
                 OpResult.FAILED -> failuresCount++

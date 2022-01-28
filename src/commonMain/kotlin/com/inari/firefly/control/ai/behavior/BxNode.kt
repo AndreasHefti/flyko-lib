@@ -7,7 +7,7 @@ import com.inari.firefly.entity.Entity
 
 abstract class BxNode protected constructor() : SystemComponent(BxNode::class.simpleName!!) {
 
-    abstract fun tick(entity: Entity, behavior: EBehavior): OpResult
+    abstract fun tick(entityId: Int): OpResult
 
     companion object : SystemComponentType<BxNode>(BxNode::class)
 }

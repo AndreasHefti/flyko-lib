@@ -7,10 +7,10 @@ import com.inari.firefly.entity.Entity
 
 class BxSequence private constructor() : BxBranch() {
 
-    override fun tick(entity: Entity, behavior: EBehavior): OpResult {
+    override fun tick(entityId: Int): OpResult {
         var i = 0
         loop@ while (i < children.capacity) {
-            when(children[i++]?.tick(entity, behavior) ?: continue@loop) {
+            when(children[i++]?.tick(entityId) ?: continue@loop) {
                 OpResult.RUNNING -> return OpResult.RUNNING
                 OpResult.FAILED -> return OpResult.FAILED
                 OpResult.SUCCESS -> DO_NOTHING

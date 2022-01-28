@@ -27,7 +27,7 @@ object Easing {
     @JvmField val EXPO_OUT = this::expoOut
     @JvmField val EXPO_IN_OUT = this::expoInOut
     @JvmField val SIN_IN = this::sinIn
-    @JvmField val SIN_OUT = this::sinIn
+    @JvmField val SIN_OUT = this::sinOut
     @JvmField val SIN_IN_OUT = this::sinInOut
     @JvmField val CIRC_IN = this::circIn
     @JvmField val CIRC_OUT = this::circOut

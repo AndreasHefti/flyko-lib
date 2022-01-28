@@ -107,22 +107,22 @@ object CompositeSystem : ComponentSystem {
 
     private fun loadEntityComposite(entity: Entity) = with(entity[EComposite]) {
         if (loadTaskRef >= 0)
-            TaskSystem.runTask(loadTaskRef, entity.componentId)
+            TaskSystem.runTask(loadTaskRef, entity.index)
     }
 
     private fun activateEntityComposite(entity: Entity) = with(entity[EComposite]) {
         if (activationTaskRef >= 0)
-            TaskSystem.runTask(activationTaskRef, entity.componentId)
+            TaskSystem.runTask(activationTaskRef, entity.index)
     }
 
     private fun deactivateEntityComposite(entity: Entity) = with(entity[EComposite]) {
         if (deactivationTaskRef >= 0)
-            TaskSystem.runTask(deactivationTaskRef, entity.componentId)
+            TaskSystem.runTask(deactivationTaskRef, entity.index)
     }
 
     private fun disposeEntityComposite(entity: Entity) = with(entity[EComposite]) {
         if (disposeTaskRef >= 0)
-            TaskSystem.runTask(disposeTaskRef, entity.componentId)
+            TaskSystem.runTask(disposeTaskRef, entity.index)
     }
 
     fun <C : Composite> getCompositeBuilder(name: String): SystemComponentBuilder<C> {

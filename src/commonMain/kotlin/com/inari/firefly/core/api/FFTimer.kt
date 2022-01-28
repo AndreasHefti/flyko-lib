@@ -43,10 +43,11 @@ object FFTimer : TimerAPI() {
     }
 
     interface Scheduler {
+        val resolution: Float
         fun needsUpdate(): Boolean
     }
 
-    class UpdateScheduler internal constructor(resolution: Float) : Scheduler {
+    class UpdateScheduler internal constructor(override val resolution: Float) : Scheduler {
         private val delayMillis: Long = (1000 / resolution).toLong()
         private var lastUpdate: Long = -1
         var tick: Long = 0

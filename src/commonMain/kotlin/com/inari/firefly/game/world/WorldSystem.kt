@@ -90,7 +90,7 @@ object WorldSystem : FFSystem {
         if (activeRoomId != NO_COMP_ID && !paused) {
             val room = FFContext[Room, activeRoomId]
             if (room.pauseTaskName != NO_NAME)
-                TaskSystem.runTask(room.pauseTaskName, room.componentId)
+                TaskSystem.runTask(room.pauseTaskName, room.index)
             paused = true
             RoomEvent.send(RoomEventType.ROOM_PAUSED, activeRoomId)
         }
@@ -100,7 +100,7 @@ object WorldSystem : FFSystem {
         if (activeRoomId != NO_COMP_ID && paused) {
             val room = FFContext[Room, activeRoomId]
             if (room.resumeTaskName != NO_NAME)
-                TaskSystem.runTask(room.resumeTaskName, room.componentId)
+                TaskSystem.runTask(room.resumeTaskName, room.index)
             paused = false
             RoomEvent.send(RoomEventType.ROOM_RESUMED, activeRoomId)
         }

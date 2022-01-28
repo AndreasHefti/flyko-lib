@@ -3,7 +3,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.inari.firefly.BlendMode
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.FFContext
-import com.inari.firefly.control.BEHAVIOR_STATE_ASPECT_GROUP
 import com.inari.firefly.control.OpResult
 import com.inari.firefly.control.ai.behavior.*
 import com.inari.firefly.control.task.TaskSystem
@@ -17,7 +16,6 @@ import com.inari.firefly.info.FFInfoSystem
 import com.inari.firefly.info.FrameRateInfo
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.MovementSystem
-import com.inari.util.aspect.Aspect
 import kotlin.random.Random
 
 class BehaviorTest : DesktopApp() {
@@ -34,11 +32,6 @@ class BehaviorTest : DesktopApp() {
         FFContext.loadSystem(TaskSystem)
         MovementSystem
 
-        val goRightState: Aspect = BEHAVIOR_STATE_ASPECT_GROUP.createAspect("goRight")
-        val goLeftState: Aspect = BEHAVIOR_STATE_ASPECT_GROUP.createAspect("goLeft")
-        val goDownState: Aspect = BEHAVIOR_STATE_ASPECT_GROUP.createAspect("goDown")
-        val goUpState: Aspect = BEHAVIOR_STATE_ASPECT_GROUP.createAspect("goUp")
-
         BxSequence.build {
             name = "Root"
             node(BxParallel) {
@@ -48,31 +41,29 @@ class BehaviorTest : DesktopApp() {
                     name = "X"
                     node(BxAction) {
                         name="GoRight"
-                        state = goRightState
-                        tickOp = { entity, bx ->
-                            if (goRightState in bx.actionsDone)
+                        action = { entityId, _, _ ->
+                            val entity = EntitySystem[entityId]
+                            val mov = entity[EMovement]
+                            if (mov.velocityX < 0)
                                 OpResult.SUCCESS
-                            else {
-                                val mov = entity[EMovement]
-                                if (mov.velocityX <= 0f)
-                                    mov.velocityX = Random.nextInt(1, 5).toFloat()
-                                if (entity[ETransform].position.x < 800f)
-                                    OpResult.RUNNING
-                                else
-                                    OpResult.SUCCESS
-                            }
+                            else if (entity[ETransform].position.x > 800f || mov.velocityX == 0.0f) {
+                                mov.velocityX = Random.nextInt(-150, -50).toFloat()
+                                OpResult.SUCCESS
+                            } else
+                                OpResult.RUNNING
                         }
                     }
                     node(BxAction) {
                         name="GoLeft"
-                        state = goLeftState
-                        tickOp = { entityId, bx ->
-                            val mov = entityId[EMovement]
-                            if (mov.velocityX >= 0f)
-                                mov.velocityX = Random.nextInt(-5, -1).toFloat()
-                            if (entityId[ETransform].position.x < 10f)
+                        action = { entityId, _, _ ->
+                            val entity = EntitySystem[entityId]
+                            val mov = entity[EMovement]
+                            if (mov.velocityX > 0)
                                 OpResult.SUCCESS
-                            else
+                            else if (entity[ETransform].position.x < 10f) {
+                                mov.velocityX = Random.nextInt(50, 150).toFloat()
+                                OpResult.SUCCESS
+                            } else
                                 OpResult.RUNNING
                         }
                     }
@@ -81,31 +72,29 @@ class BehaviorTest : DesktopApp() {
                     name = "Y"
                     node(BxAction) {
                         name="GoDown"
-                        state = goDownState
-                        tickOp = { entityId, bx ->
-                            if (goDownState in bx.actionsDone)
+                        action = { entityId, _, _ ->
+                            val entity = EntitySystem[entityId]
+                            val mov = entity[EMovement]
+                            if (mov.velocityY < 0)
                                 OpResult.SUCCESS
-                            else {
-                                val mov = entityId[EMovement]
-                                if (mov.velocityY <= 0f)
-                                    mov.velocityY = Random.nextInt(1, 5).toFloat()
-                                if (entityId[ETransform].position.y < 600)
-                                    OpResult.RUNNING
-                                else
-                                    OpResult.SUCCESS
-                            }
+                            else if (entity[ETransform].position.y > 600f || mov.velocityY == 0.0f) {
+                                mov.velocityY = Random.nextInt(-150, -50).toFloat()
+                                OpResult.SUCCESS
+                            } else
+                                OpResult.RUNNING
                         }
                     }
                     node(BxAction) {
                         name="GoUp"
-                        state = goUpState
-                        tickOp = { entityId, bx ->
-                            val mov = entityId[EMovement]
-                            if (mov.velocityY >= 0f)
-                                mov.velocityY = Random.nextInt(-5, -1).toFloat()
-                            if (entityId[ETransform].position.y < 10)
+                        action = { entityId, _, _ ->
+                            val entity = EntitySystem[entityId]
+                            val mov = entity[EMovement]
+                            if (mov.velocityY > 0)
                                 OpResult.SUCCESS
-                            else
+                            else if (entity[ETransform].position.y < 10f) {
+                                mov.velocityY = Random.nextInt(50, 150).toFloat()
+                                OpResult.SUCCESS
+                            } else
                                 OpResult.RUNNING
                         }
                     }
@@ -130,12 +119,12 @@ class BehaviorTest : DesktopApp() {
                 }
                 withComponent(EMovement) {
                     velocityX = 0f
-                    updateResolution = 30f
+                    updateResolution = 100f
                 }
                 withComponent(EBehavior) {
                     behaviorTree("Root")
                     repeat = true
-                    updateResolution = 30f
+                    updateResolution = 5f
                 }
             }
         }
@@ -147,6 +136,7 @@ class BehaviorTest : DesktopApp() {
                 val config = Lwjgl3ApplicationConfiguration()
                 config.setResizable(true)
                 config.setWindowedMode(800, 600)
+                config.useVsync(true)
                 Lwjgl3Application(BehaviorTest(), config)
             } catch (t: Throwable) {
                 t.printStackTrace()

@@ -8,6 +8,7 @@ import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.component.ComponentMapRO
 import com.inari.firefly.core.system.ComponentSystem
 import com.inari.firefly.core.system.SystemComponent
+import com.inari.firefly.entity.Entity
 import com.inari.util.aspect.Aspects
 
 object TaskSystem : ComponentSystem {
@@ -27,21 +28,21 @@ object TaskSystem : ComponentSystem {
 
     fun runTask(
         name: String,
-        compId1: CompId = NO_COMP_ID,
-        compId2: CompId = NO_COMP_ID,
-        compId3: CompId = NO_COMP_ID): OpResult = TaskSystem.tasks[name](compId1, compId2, compId3)
+        compId1: Int = -1,
+        compId2: Int = -1,
+        compId3: Int = -1): OpResult = TaskSystem.tasks[name](compId1, compId2, compId3)
 
     fun runTask(
         taskId: CompId,
-        compId1: CompId = NO_COMP_ID,
-        compId2: CompId = NO_COMP_ID,
-        compId3: CompId = NO_COMP_ID): OpResult = TaskSystem.tasks[taskId](compId1, compId2, compId3)
+        compId1: Int = -1,
+        compId2: Int = -1,
+        compId3: Int = -1): OpResult = TaskSystem.tasks[taskId](compId1, compId2, compId3)
 
     fun runTask(
         taskIndex: Int,
-        compId1: CompId = NO_COMP_ID,
-        compId2: CompId = NO_COMP_ID,
-        compId3: CompId = NO_COMP_ID): OpResult = TaskSystem.tasks[taskIndex](compId1, compId2, compId3)
+        compId1: Int = -1,
+        compId2: Int = -1,
+        compId3: Int = -1): OpResult = TaskSystem.tasks[taskIndex](compId1, compId2, compId3)
 
     override fun clearSystem() {
         _tasks.clear()

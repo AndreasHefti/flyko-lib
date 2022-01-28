@@ -87,6 +87,7 @@ const val BASE_VIEW: String = "[[BASE_VIEW]]"
 @JvmField val VOID_CONSUMER: Consumer<Any> = { _ -> }
 
 @JvmField val INFINITE_SCHEDULER: FFTimer.Scheduler = object : FFTimer.Scheduler {
+    override val resolution: Float = 60f
     override fun needsUpdate(): Boolean = true
 }
 @JvmField val TRUE_INT_PREDICATE: IntPredicate =  { true }

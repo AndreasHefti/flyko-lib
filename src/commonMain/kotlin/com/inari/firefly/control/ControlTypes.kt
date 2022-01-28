@@ -1,10 +1,6 @@
 package com.inari.firefly.control
 
-import com.inari.firefly.control.ai.behavior.EBehavior
 import com.inari.firefly.core.component.CompId
-import com.inari.firefly.entity.Entity
-import com.inari.util.aspect.Aspect
-import com.inari.util.aspect.IndexedAspectType
 import kotlin.jvm.JvmField
 
 enum class OpResult {
@@ -13,20 +9,16 @@ enum class OpResult {
     FAILED
 }
 
-typealias EntityAction = (Int, Int, Int, Int) -> OpResult
-
-typealias Operation<C> = (C) -> OpResult
+typealias ValueOperation<C> = (C) -> OpResult
 typealias UpdateOperation = () -> OpResult
-typealias TaskOperation = () -> OpResult
-typealias TaskCallback = (OpResult) -> Any
-typealias ComponentTaskOperation = (CompId, CompId, CompId) -> OpResult
-typealias IntOperation = (Int) -> OpResult
-typealias ComponentIdOperation = (CompId) -> OpResult
 
-@JvmField val EMPTY_ENTITY_ACTION_CALL: EntityAction = { _,_,_,_ -> OpResult.SUCCESS }
-@JvmField val EMPTY_INT_OPERATION: IntOperation = { OpResult.SUCCESS  }
-@JvmField val EMPTY_TASK_OPERATION: TaskOperation =  { OpResult.SUCCESS }
-@JvmField val EMPTY_COMPONENT_TASK_OPERATION: ComponentTaskOperation = { _, _, _  -> OpResult.SUCCESS }
+/** An action that can have up to three component identifiers as input.
+ *  Usually the first component input is the actual entity id and the other are defined by a
+ *  concrete EntityAction implementation */
+typealias EntityAction = (Int, Int, Int) -> OpResult
+operator fun EntityAction.invoke() = this(-1, -1, -1)
+operator fun EntityAction.invoke(entityId: Int) = this(entityId, -1, -1)
+operator fun EntityAction.invoke(entityId1: Int, entityId2: Int) = this(entityId1, entityId2, -1)
 
 /** A condition that takes an entity id as an input */
 typealias EntityCondition = (Int) -> Boolean
@@ -37,22 +29,12 @@ fun EntityCondition.or(otherCondition: EntityCondition): EntityCondition = { id 
     this(id) || otherCondition(id)
 }
 
-typealias BxOp = (Entity, EBehavior) -> OpResult
-typealias BxConditionOp = (Entity, EBehavior) -> Boolean
-fun BxConditionOp.and(otherCondition: BxConditionOp): BxConditionOp = {
-        entity, bx -> this(entity, bx) && otherCondition(entity, bx)
-}
-fun BxConditionOp.or(otherCondition: BxConditionOp): BxConditionOp = {
-        entity, bx -> this(entity, bx) && otherCondition(entity, bx)
-}
-fun BxConditionOp.not(): BxConditionOp = {
-        entity, bx -> !this(entity, bx)
-}
+typealias TaskCallback = (CompId, OpResult) -> Any
+@JvmField val EMPTY_TASK_CALLBACK: TaskCallback = { _,_ -> }
 
-@JvmField val BEHAVIOR_STATE_ASPECT_GROUP = IndexedAspectType("BEHAVIOR_STATE_ASPECT_GROUP")
-@JvmField val UNDEFINED_BEHAVIOR_STATE: Aspect = BEHAVIOR_STATE_ASPECT_GROUP.createAspect("UNDEFINED_BEHAVIOR_STATE")
+@JvmField val EMPTY_UPDATE_OPERATION: UpdateOperation = { OpResult.SUCCESS }
+@JvmField val EMPTY_ENTITY_ACTION: EntityAction = { _,_,_ -> OpResult.SUCCESS }
+@JvmField val TRUE_ENTITY_CONDITION: EntityCondition = { true }
+@JvmField val FALSE_ENTITY_CONDITION: EntityCondition = { true }
 
-@JvmField val TRUE_BX_CONDITION: BxConditionOp = { _, _ -> true }
-@JvmField val FALSE_BX_CONDITION: BxConditionOp = { _, _ -> false }
-@JvmField val SUCCESS_BX_OPERATION: BxOp = { _, _ -> OpResult.SUCCESS }
-@JvmField val FAIL_BX_OPERATION: BxOp = { _, _ -> OpResult.FAILED }
+

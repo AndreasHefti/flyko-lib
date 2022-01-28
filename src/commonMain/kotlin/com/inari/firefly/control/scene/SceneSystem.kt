@@ -8,6 +8,7 @@ import com.inari.firefly.composite.CompositeEvent
 import com.inari.firefly.composite.CompositeEventListener
 import com.inari.firefly.composite.CompositeEventType
 import com.inari.firefly.control.OpResult
+import com.inari.firefly.control.invoke
 import com.inari.firefly.control.task.TaskSystem
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.system.FFSystem
@@ -25,7 +26,7 @@ object SceneSystem : FFSystem {
                     activeScenes.set(id.index, true)
                     val scene = Scene[id.index]
                     if (scene.activateTaskRef >= 0)
-                        TaskSystem.runTask(scene.activateTaskRef, scene.componentId)
+                        TaskSystem.runTask(scene.activateTaskRef, scene.index)
                 }
                 else -> DO_NOTHING
             }
@@ -34,7 +35,7 @@ object SceneSystem : FFSystem {
                     activeScenes.set(id.index, false)
                     val scene = Scene[id.index]
                     if (scene.deactivateTaskRef >= 0)
-                        TaskSystem.runTask(scene.deactivateTaskRef, scene.componentId)
+                        TaskSystem.runTask(scene.deactivateTaskRef, scene.index)
                     scene.callback()
                     if (scene.removeAfterRun)
                         FFContext.delete(scene)

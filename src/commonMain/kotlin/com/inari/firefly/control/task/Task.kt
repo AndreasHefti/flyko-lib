@@ -14,16 +14,13 @@ abstract class Task protected constructor() : SystemComponent(Task::class.simple
 
     @JvmField var removeAfterRun: Boolean = false
 
-    abstract operator fun invoke(
-        compId1: CompId,
-        compId2: CompId = NO_COMP_ID,
-        compId3: CompId = NO_COMP_ID): OpResult
+    abstract operator fun invoke(compId1: Int = -1, compId2: Int = -1, compId3: Int = -1): OpResult
 
     fun <A : Trigger> withTrigger(
         cBuilder: SystemComponentBuilder<A>,
-        compId1: CompId,
-        compId2: CompId = NO_COMP_ID,
-        compId3: CompId = NO_COMP_ID,
+        compId1: Int = -1,
+        compId2: Int = -1,
+        compId3: Int = -1,
         configure: (A.() -> Unit)): A  {
 
         val result = super.withTrigger(cBuilder, configure)
