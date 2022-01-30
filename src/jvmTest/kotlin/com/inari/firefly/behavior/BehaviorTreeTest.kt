@@ -2,6 +2,7 @@ package com.inari.firefly.behavior
 
 import com.inari.firefly.FALSE_INT_PREDICATE
 import com.inari.firefly.TestApp
+import com.inari.firefly.control.FALSE_OP
 import com.inari.firefly.control.ai.behavior.*
 import com.inari.firefly.control.task.SimpleTask
 import com.inari.firefly.control.task.TaskSystem
@@ -31,11 +32,11 @@ class BehaviorTreeTest {
                 name = "Second Sele ction"
                 node(BxCondition) {
                     name ="Condition 1"
-                    condition = FALSE_INT_PREDICATE
+                    condition = FALSE_OP
                 }
                 node(BxAction) {
                     name = "First Task"
-                    withEntityAction { entityId,_,_ -> TaskSystem.runTask("Task_Name", entityId) }
+                    actionOperation =  { entityId,_,_ -> TaskSystem.runTask("Task_Name", entityId) }
                 }
                 node(BxSequence) {
                     name = ""

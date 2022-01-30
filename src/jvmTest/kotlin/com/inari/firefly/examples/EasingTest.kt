@@ -38,7 +38,7 @@ class EasingTest : DesktopApp() {
                     looping = true
                     inverseOnLoop = true
                     animatedProperty = ETransform.Property.POSITION
-                    applyToNewActiveAnimation(EasedPositionAnimation) {
+                    withActiveAnimation(EasedPositionAnimation) {
                         startValue = Vector2f(50f, 50f)
                         endValue = Vector2f(500f, 100f)
                         duration = 5000

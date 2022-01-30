@@ -6,14 +6,14 @@ import com.inari.util.*
 
 class ParallelTask private constructor() : Task() {
 
-    private var action: EntityActionCall = EMPTY_ENTITY_ACTION_CALL
+    private var operation: ActionOperation = EMPTY_OP
     private val callback: TaskCallback = EMPTY_TASK_CALLBACK
 
-    fun withOperation(op: EntityActionCall) {
-        action = op
+    fun withOperation(op: ActionOperation) {
+        operation = op
     }
     fun withSimpleOperation(op: Call) {
-        action = { _, _, _ ->
+        operation = { _, _, _ ->
             op()
             OpResult.SUCCESS
         }
@@ -22,11 +22,11 @@ class ParallelTask private constructor() : Task() {
     override fun invoke(compId1: Int, compId2: Int, compId3: Int): OpResult {
         startParallelTask(
             name,
-            { action(compId1, compId2, compId3) },
+            { operation(compId1, compId2, compId3) },
             { _, r -> if (r)
-                callback(this.componentId, OpResult.SUCCESS)
+                callback(this.componentId.index, OpResult.SUCCESS)
             else
-                callback(this.componentId, OpResult.FAILED) }
+                callback(this.componentId.index, OpResult.FAILED) }
         )
         return OpResult.RUNNING
     }

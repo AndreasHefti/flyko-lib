@@ -2,7 +2,6 @@ package com.inari.firefly.physics.animation
 
 import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.FFContext
-import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.firefly.core.component.*
 import com.inari.firefly.core.system.SystemComponentBuilder
@@ -32,14 +31,14 @@ class AnimatedObjectData<T> {
         adapter = animatedProperty(compId)
     }
 
-    @JvmField val applyToAnimation = ComponentRefResolver(Animation) { animationRef = it }
-    fun <A : Animation> applyToNewAnimation(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
+    @JvmField val withAnimation = ComponentRefResolver(Animation) { animationRef = it }
+    fun <A : Animation> withAnimation(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
         val result = cBuilder.build(configure)
         animationRef = result.instanceId
         return result
     }
-    fun <A : Animation> applyToNewActiveAnimation(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
-        val result = applyToNewAnimation(cBuilder, configure)
+    fun <A : Animation> withActiveAnimation(cBuilder: SystemComponentBuilder<A>, configure: (A.() -> Unit)): CompId {
+        val result = withAnimation(cBuilder, configure)
         FFContext.activate(result)
         return result
     }

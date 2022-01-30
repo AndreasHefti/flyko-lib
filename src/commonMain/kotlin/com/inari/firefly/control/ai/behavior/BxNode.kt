@@ -3,7 +3,6 @@ package com.inari.firefly.control.ai.behavior
 import com.inari.firefly.control.OpResult
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentType
-import com.inari.firefly.entity.Entity
 
 abstract class BxNode protected constructor() : SystemComponent(BxNode::class.simpleName!!) {
 

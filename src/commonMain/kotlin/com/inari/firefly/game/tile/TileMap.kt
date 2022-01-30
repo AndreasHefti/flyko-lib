@@ -206,7 +206,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
                             withAnimated<Int> {
                                 animatedProperty = ETile.Property.SPRITE_REFERENCE
                                 looping = true
-                                applyToNewActiveAnimation(TimelineIntAnimation) {
+                                withActiveAnimation(TimelineIntAnimation) {
                                     timeline = tile.animationData!!.frames.toArray()
                                 }
                             }

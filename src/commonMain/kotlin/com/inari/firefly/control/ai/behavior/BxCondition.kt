@@ -8,7 +8,7 @@ import kotlin.jvm.JvmField
 
 class BxCondition private constructor() : BxNode() {
 
-    @JvmField var condition: EntityCondition = TRUE_ENTITY_CONDITION
+    @JvmField var condition: ConditionOperation = TRUE_OP
 
     override fun tick(entityId: Int): OpResult =
             when (condition(entityId) ) {

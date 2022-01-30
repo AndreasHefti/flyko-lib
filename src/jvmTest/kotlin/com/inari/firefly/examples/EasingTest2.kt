@@ -15,8 +15,6 @@ import com.inari.firefly.physics.animation.AnimationSystem
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.EasedFloatAnimation
 import com.inari.firefly.util.geom.EasingTest
-import com.inari.util.geom.Easing
-import com.inari.util.geom.EasingFunction
 
 fun main(args: Array<String>) {
     object : DesktopRunner("EasingTest2", 800, 900) {
@@ -64,7 +62,7 @@ fun main(args: Array<String>) {
                         looping = true
                         inverseOnLoop = true
                         animatedProperty = ETransform.Property.POSITION_X
-                        applyToNewActiveAnimation(EasedFloatAnimation) {
+                        withActiveAnimation(EasedFloatAnimation) {
                             easing = type.func
                             startValue = 100f
                             endValue = 400f

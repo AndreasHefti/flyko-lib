@@ -55,7 +55,7 @@ object InariIntro {
                 withAnimated<Float> {
                     animatedProperty = ESprite.Property.TINT_ALPHA
                     resetOnFinish = false
-                    animationId = applyToNewActiveAnimation(EasedFloatAnimation) {
+                    animationId = withActiveAnimation(EasedFloatAnimation) {
                         easing = Easing.LINEAR
                         startValue = 0f
                         endValue = 1f

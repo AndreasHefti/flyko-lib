@@ -11,7 +11,6 @@ import com.inari.firefly.graphics.sprite.SpriteAsset
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.EasedFloatAnimation
 import com.inari.util.geom.Easing
-import com.inari.util.geom.Vector2f
 
 object RotationTest {
 
@@ -35,7 +34,7 @@ object RotationTest {
                             looping = true
                             inverseOnLoop = true
                             animatedProperty = ETransform.Property.ROTATION
-                            applyToNewActiveAnimation(EasedFloatAnimation) {
+                            withActiveAnimation(EasedFloatAnimation) {
                                 startValue = 0f
                                 endValue = -90f
                                 duration = 5000
@@ -46,7 +45,7 @@ object RotationTest {
                             looping = true
                             inverseOnLoop = true
                             animatedProperty = ETransform.Property.SCALE_X
-                            applyToNewActiveAnimation(EasedFloatAnimation) {
+                            withActiveAnimation(EasedFloatAnimation) {
                                 startValue = 1f
                                 endValue = 2f
                                 duration = 5000
@@ -81,7 +80,7 @@ object RotationTest {
                             looping = true
                             inverseOnLoop = true
                             animatedProperty = ETransform.Property.ROTATION
-                            applyToNewActiveAnimation(EasedFloatAnimation) {
+                            withActiveAnimation(EasedFloatAnimation) {
                                 startValue = 0f
                                 endValue = -90f
                                 duration = 5000

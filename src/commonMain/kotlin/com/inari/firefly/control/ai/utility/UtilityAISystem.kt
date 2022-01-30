@@ -1,5 +1,120 @@
 package com.inari.firefly.control.ai.utility
 
-//https://pdf.sciencedirectassets.com/280203/1-s2.0-S1877050919X00125/1-s2.0-S187705091931141X/main.pdf?X-Amz-Security-Token=IQoJb3JpZ2luX2VjEG4aCXVzLWVhc3QtMSJGMEQCIGXBsrWwUEsV5sXMGygFStWY966w2H%2BJMNuDPufWRbl1AiBRcipXN%2Fmv%2BJiO2HFCxZGYHypTAyf7vhS6MV7uq3j3YiqDBAiW%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAQaDDA1OTAwMzU0Njg2NSIMAFsYf%2FU8eGIGxXQLKtcDs6fnE%2Be97Wy8V1kdQqHM2eFXEQyUctAKRSJaAZ5iiYyB0ApwSg2wl3u1u%2B1WOkrOncjRUkl%2FFCb8k2ACBJ0tlebCnBoXYGtIRC6mUdfKESmoXdVUghpEZZFWscLAhsZACqlz1vjVhVpIUeX26wab9w2JVz0Q92wIBGZ5o2Ao5Yr6cWk78beAqJs6TU4qNq4wve7%2FdCsQlNd6L%2BxSqX5MFUK4LTXKVlkDC3e70XKoQzVIoJXZ28Z0PDpFsvfqvZ4zlNdIOSDe7iqTyMhMzPe8qgEzdkLc4Gk1Z6eh09S5%2BiquF%2BwpUw14p3KetjbpiNbUdmPEDGx8hTjtjwgf35ZBEW87VRjiZyDl7wswebfFINNaw7fQwPx%2BzQpoytXEGdM0fwHAakpyqO7a%2Brnklr1rbSE7J8cpnJu0%2F%2FJGqK%2BIHJiQaX8QAo7fnMpFaGmvOXP14WJvqsrf5Rm4CgVu7S0O1NJIvyhQDrtl41wploafpMzHyusT7%2FuebQwH%2BYm9pk%2BkMdxe6grvpfcHZj8d%2FtWMt8dSH7Foaukr7oDRy%2FHsrzAG0JtcJZCFRfRtInEFakL%2Fg9bznDMcv%2B6nk%2B8WREOSfI9tZJXwQjswDyzQKrPAHU7dxbvG9ex0MIPQwY8GOqYBZUXDbkTXCdtoDIu8gwC18%2FuKWsAbM2U7X6koBUh8fPEXPj6%2F4xiPeF9XR7DajFvGcgTGxvuZhbqi2HtvM0p04ZmU8YkdscaR2uJuCQJwTNDm7YFnRZbQAidr0w5WY8TEUgzB%2BeGBtEfxP%2Fp5RM%2B2RAAmD24V7kS8D6PmxpR%2FRGpT1AQficdi2pBAUNCnpzd1h45u0via%2Fb3kew8uxzSqAII5WB0eSQ%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20220125T220905Z&X-Amz-SignedHeaders=host&X-Amz-Expires=300&X-Amz-Credential=ASIAQ3PHCVTY6ZLVM5O4%2F20220125%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b03d0e4e84692f4da7b561f8358090d012101f43ae2b335448d6b02f0a30957e&hash=beab656f6b1665001f831d59d6574b7a95897ea3a9afcc8d86873feba27040c3&host=68042c943591013ac2b2430a89b270f6af2c76d8dfd086a07176afe7c76c2c61&pii=S187705091931141X&tid=spdf-40d5b63a-fd1e-4828-a8dc-82eae3ce442e&sid=940391c2810b764230599aa3fbf30b1a5082gxrqb&type=client
-object UtilityAISystem {
+import com.inari.firefly.FFApp
+import com.inari.firefly.FFContext
+import com.inari.firefly.control.OpResult
+import com.inari.firefly.core.component.ComponentMapRO
+import com.inari.firefly.core.system.ComponentSystem
+import com.inari.firefly.core.system.SystemComponent
+import com.inari.firefly.entity.Entity
+import com.inari.firefly.entity.EntityEvent
+import com.inari.firefly.entity.EntityEventListener
+import com.inari.firefly.entity.EntitySystem
+import com.inari.util.aspect.Aspects
+import com.inari.util.collection.BitSet
+import com.inari.util.collection.BitSetIterator
+
+object UtilityAISystem : ComponentSystem {
+
+    override val supportedComponents: Aspects = SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(
+        Consideration,
+        Intention,
+        UtilityAIAction
+    )
+
+    val considerations: ComponentMapRO<Consideration>
+        get() = systemConsiderations
+    private val systemConsiderations = ComponentSystem.createComponentMapping(
+        Consideration,
+        nameMapping = true
+    )
+
+    val intentions: ComponentMapRO<Intention>
+    get() = systemIntention
+    private val systemIntention = ComponentSystem.createComponentMapping(
+        Intention,
+        nameMapping = true
+    )
+
+    val actions: ComponentMapRO<UtilityAIAction>
+        get() = systemActions
+    private val systemActions = ComponentSystem.createComponentMapping(
+        UtilityAIAction,
+        nameMapping = true
+    )
+
+    private val entityIds = BitSet()
+    private val entityActivationListener: EntityEventListener = object : EntityEventListener {
+        override fun entityActivated(entity: Entity) =
+            entityIds.set(entity.index)
+        override fun entityDeactivated(entity: Entity) =
+            entityIds.clear(entity.index)
+        override fun match(aspects: Aspects): Boolean =
+            aspects.contains(EUtilityAI)
+    }
+
+    init {
+        FFContext.loadSystem(this)
+        FFContext.registerListener(FFApp.UpdateEvent, this::update)
+        FFContext.registerListener(EntityEvent, entityActivationListener)
+    }
+
+    internal fun update() {
+        val iterator = BitSetIterator(entityIds)
+        while (iterator.hasNext())
+            tick(iterator.next())
+    }
+
+    internal fun tick(entityId: Int) {
+        val entity = EntitySystem[entityId]
+        val utility = entity[EUtilityAI]
+        if (!utility.scheduler.needsUpdate())
+            return
+
+        if (utility.runningActionRef >= 0) {
+            val action = systemActions[utility.runningActionRef]
+            val result = action.actionOperation(entityId, action.operationArg2, action.operationArg3)
+            if (result != OpResult.RUNNING)
+                utility.runningActionRef = -1
+        }
+
+        if (utility.runningActionRef < 0) {
+            // TODO find next action by intention
+            var maxUtilityValue = 0f
+            var id = -1
+            var intIndex = utility.intentions.nextSetBit(0)
+            while (intIndex >= 0) {
+                val uv = intentions[intIndex].getUtilityValue(entityId)
+                if (uv > maxUtilityValue) {
+                    maxUtilityValue = uv
+                    id = intIndex
+                }
+                intIndex = utility.intentions.nextSetBit(intIndex)
+            }
+            if (intIndex >= 0 && maxUtilityValue >= utility.intentionThreshold) {
+                // get best fitting action for the previous found intention
+                val intention = intentions[id]
+                id = -1
+                maxUtilityValue = 0f
+                intIndex = utility.actions.nextSetBit(0)
+                while (intIndex >= 0) {
+                    val uv = actions[intIndex].getUtilityValue(entityId, intention.index)
+                    if (uv > maxUtilityValue) {
+                        maxUtilityValue = uv
+                        id = intIndex
+                    }
+                }
+                if (id >= 0 && maxUtilityValue >= utility.actionThreshold)
+                    utility.runningActionRef = id
+            }
+        }
+
+    }
+
+    override fun clearSystem() {
+        systemConsiderations.clear()
+        systemIntention.clear()
+        systemActions.clear()
+    }
+
 }

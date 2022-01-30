@@ -6,7 +6,7 @@ import com.inari.firefly.DO_NOTHING
 import com.inari.firefly.composite.Composite
 import com.inari.firefly.composite.CompositeSystem
 import com.inari.firefly.composite.GenericComposite
-import com.inari.firefly.control.EMPTY_UPDATE_OPERATION
+import com.inari.firefly.control.EMPTY_UPDATE_OP
 import com.inari.firefly.control.UpdateOperation
 import com.inari.firefly.control.task.Task
 import com.inari.firefly.core.ComponentRefResolver
@@ -22,12 +22,12 @@ class Scene private constructor() : GenericComposite() {
     @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
     @JvmField internal var activateTaskRef = -1
     @JvmField internal var deactivateTaskRef = -1
-    @JvmField internal var update: UpdateOperation = EMPTY_UPDATE_OPERATION
+    @JvmField internal var update: UpdateOperation = EMPTY_UPDATE_OP
     @JvmField internal var callback: Call = DO_NOTHING
     @JvmField var removeAfterRun: Boolean = false
 
     var updateResolution: Float
-        get() = throw UnsupportedOperationException()
+        get() = scheduler.resolution
         set(value) { scheduler = FFContext.timer.createUpdateScheduler(value) }
 
     fun withCallback(callback: Call) {

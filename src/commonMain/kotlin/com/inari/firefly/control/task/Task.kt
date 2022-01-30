@@ -1,10 +1,8 @@
 package com.inari.firefly.control.task
 
-import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.control.OpResult
 import com.inari.firefly.control.trigger.Trigger
 import com.inari.firefly.control.trigger.TriggeredSystemComponent
-import com.inari.firefly.core.component.CompId
 import com.inari.firefly.core.system.SystemComponent
 import com.inari.firefly.core.system.SystemComponentBuilder
 import com.inari.firefly.core.system.SystemComponentType

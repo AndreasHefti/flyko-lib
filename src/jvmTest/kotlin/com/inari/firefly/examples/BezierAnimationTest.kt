@@ -46,7 +46,7 @@ object BezierAnimationTest {
                             looping = true
                             inverseOnLoop = true
                             animatedProperty = ETransform.Property.TRANSFORM
-                            applyToNewActiveAnimation(BezierAnimation) {
+                            withActiveAnimation(BezierAnimation) {
                                 curve = bCurve
                                 duration = 5000
                                 easing = Easing.QUAD_IN_OUT
@@ -87,7 +87,7 @@ object BezierAnimationTest {
                             looping = true
                             inverseOnLoop = true
                             animatedProperty = ETransform.Property.TRANSFORM
-                            applyToNewActiveAnimation(BezierAnimation) {
+                            withActiveAnimation(BezierAnimation) {
                                 curve = bCurve
                                 duration = 5000
                                 easing = Easing.QUAD_IN_OUT
@@ -153,7 +153,7 @@ object BezierAnimationTest {
                                 looping = true
                                 inverseOnLoop = true
                                 animatedProperty = ETransform.Property.TRANSFORM
-                                applyToNewActiveAnimation(BezierSplineAnimation) {
+                                withActiveAnimation(BezierSplineAnimation) {
                                     spline = bezierSpline
                                 }
                             }

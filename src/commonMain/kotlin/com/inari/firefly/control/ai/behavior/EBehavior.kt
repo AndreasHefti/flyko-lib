@@ -19,7 +19,7 @@ class EBehavior private constructor() : EntityComponent(EBehavior::class.simpleN
     @JvmField var repeat: Boolean = true
     @JvmField var active: Boolean = true
     var updateResolution: Float
-        get() = throw UnsupportedOperationException()
+        get() = scheduler.resolution
         set(value) { scheduler = FFContext.timer.createUpdateScheduler(value) }
     var treeState: OpResult = OpResult.SUCCESS
         internal set

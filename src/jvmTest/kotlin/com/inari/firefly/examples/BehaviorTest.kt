@@ -41,7 +41,7 @@ class BehaviorTest : DesktopApp() {
                     name = "X"
                     node(BxAction) {
                         name="GoRight"
-                        withEntityAction { entityId, _, _ ->
+                        actionOperation = { entityId, _, _ ->
                             val entity = EntitySystem[entityId]
                             val mov = entity[EMovement]
                             if (mov.velocityX < 0)
@@ -55,7 +55,7 @@ class BehaviorTest : DesktopApp() {
                     }
                     node(BxAction) {
                         name="GoLeft"
-                        withEntityAction { entityId, _, _ ->
+                        actionOperation =  { entityId, _, _ ->
                             val entity = EntitySystem[entityId]
                             val mov = entity[EMovement]
                             if (mov.velocityX > 0)
@@ -72,7 +72,7 @@ class BehaviorTest : DesktopApp() {
                     name = "Y"
                     node(BxAction) {
                         name="GoDown"
-                        withEntityAction { entityId, _, _ ->
+                        actionOperation =  { entityId, _, _ ->
                             val entity = EntitySystem[entityId]
                             val mov = entity[EMovement]
                             if (mov.velocityY < 0)
@@ -86,7 +86,7 @@ class BehaviorTest : DesktopApp() {
                     }
                     node(BxAction) {
                         name="GoUp"
-                        withEntityAction { entityId, _, _ ->
+                        actionOperation =  { entityId, _, _ ->
                             val entity = EntitySystem[entityId]
                             val mov = entity[EMovement]
                             if (mov.velocityY > 0)
