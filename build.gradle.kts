@@ -1,6 +1,6 @@
 
 plugins {
-    kotlin("multiplatform") version "1.5.31"
+    kotlin("multiplatform") version "1.6.21"
     id("maven-publish")
 }
 
@@ -78,8 +78,6 @@ kotlin {
         val nativeMain by getting
         val nativeTest by getting
     }
-
-
 }
 
 

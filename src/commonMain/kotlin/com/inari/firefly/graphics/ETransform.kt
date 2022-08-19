@@ -1,6 +1,7 @@
 package com.inari.firefly.graphics
 
 import com.inari.firefly.FFContext
+import com.inari.firefly.NO_COMP_ID
 import com.inari.firefly.ZERO_FLOAT
 import com.inari.firefly.ZERO_INT
 import com.inari.firefly.core.ComponentRefResolver
@@ -76,6 +77,9 @@ class ETransform private constructor() : EntityComponent(ETransform::class.simpl
         val SCALE: PropertyRefResolver<Vector2f> = { FFContext[Entity, it][ETransform]::scale }
         val ROTATION: PropertyRefResolver<Float> = { FFContext[Entity, it][ETransform].data::rotation }
         val TRANSFORM: PropertyRefResolver<ETransform> = { FFContext[Entity, it][ETransform]::self }
+
+        val accessor = POSITION_X(NO_COMP_ID)
+        val v = accessor()
     }
 
     override fun componentType() = Companion

@@ -28,7 +28,7 @@ class Entity internal constructor(): SystemComponent(Entity::class.simpleName!!)
             } (configure)
 
     internal fun reset() {
-        check(!EntitySystem.entities.isActive(index)) {
+        check(EntitySystem.entities.isActive(index)) {
             "Entity: $index is still active and cannot be disposed"
         }
 

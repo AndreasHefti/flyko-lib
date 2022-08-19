@@ -33,4 +33,8 @@ abstract class ViewData constructor(
                 "index=$index, " +
                 "isBase=$isBase)"
     }
+
+    fun setShaderRef(shaderRef: Int) {
+        this.shaderRef = shaderRef
+    }
 }

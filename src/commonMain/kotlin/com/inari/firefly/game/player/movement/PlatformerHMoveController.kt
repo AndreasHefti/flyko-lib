@@ -16,7 +16,7 @@ import kotlin.math.min
 typealias MoveCallback = (Int, Float, ButtonType) -> Unit
 val VOID_MOVE_CALLBACK: MoveCallback = { _, _, _ -> }
 
-class PlatformerHMoveController : Controller() {
+class PlatformerHMoveController private constructor(): Controller() {
 
     @JvmField var runVelocityStep = 10.0f
     @JvmField var stopVelocityStep = 20.0f

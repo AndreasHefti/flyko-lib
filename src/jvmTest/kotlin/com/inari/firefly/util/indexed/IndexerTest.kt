@@ -5,6 +5,7 @@ import com.inari.util.indexed.Indexer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class IndexerTest {
 
@@ -38,7 +39,12 @@ class IndexerTest {
 
         o1.applyNew()
         assertTrue(o1.index == 3)
-        o1.applyNew()
+        try {
+            o1.applyNew()
+            fail("Exception expected here")
+        } catch (e: Exception) {
+            assertEquals("Index already applied: 3", e.message)
+        }
         assertTrue(o1.index == 3)
         assertEquals("SimpleIndexedObject : 4", Indexer.dump("SimpleIndexedObject")
         )

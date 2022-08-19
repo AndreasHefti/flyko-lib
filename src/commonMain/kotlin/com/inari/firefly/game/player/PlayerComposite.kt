@@ -22,7 +22,6 @@ class PlayerComposite private constructor(override var name: String = PLAYER_COM
         internal set
     var playerVelocity = Vector2f()
         internal set
-    val aspects = PlayerSystem.PLAYER_ASPECT_GROUP.createAspects()
 
     override fun loadComposite() {
         super.loadComposite()

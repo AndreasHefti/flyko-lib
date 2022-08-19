@@ -35,8 +35,8 @@ import kotlin.jvm.JvmField
  *  </pre>
  */
 class AssetInstanceRefResolver(
-    private inline val setter: Consumer<Int>,
-    private inline val getter: Supplier<Int>
+    private val setter: (Int) -> Unit,
+    private val getter: Supplier<Int>
 ) {
 
     operator fun invoke(id: CompId) =

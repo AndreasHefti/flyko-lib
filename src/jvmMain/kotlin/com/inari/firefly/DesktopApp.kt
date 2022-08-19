@@ -58,7 +58,7 @@ abstract class DesktopApp : ApplicationAdapter() {
         }
 
         FontAsset.buildAndActivate {
-            name = SYSTEM_FONT
+            name =  SYSTEM_FONT
             texture(SYSTEM_FONT_ASSET)
             charWidth = 8
             charHeight = 16

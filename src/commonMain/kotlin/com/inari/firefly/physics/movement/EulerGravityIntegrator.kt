@@ -7,7 +7,7 @@ import kotlin.jvm.JvmField
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-class EulerIntegrator private constructor() : Integrator() {
+class EulerGravityIntegrator private constructor() : Integrator() {
 
     @JvmField var gravity = 9.8f
     @JvmField var maxGravityVelocity: Float = 1f
@@ -39,7 +39,7 @@ class EulerIntegrator private constructor() : Integrator() {
     }
 
     private fun gravityIntegration(movement: EMovement) {
-        if (MovementAspect.ON_GROUND in movement.aspects) {
+        if (MovementAspect.ON_GROUND in movement.aspects || MovementAspect.BLOCK_SOUTH in movement.aspects) {
             movement.velocity.v1 = 0f
             movement.acceleration.v1 = 0f
         } else {
@@ -53,7 +53,7 @@ class EulerIntegrator private constructor() : Integrator() {
     }
 
     override fun componentType() = Companion
-    companion object : SystemComponentSubType<Integrator, EulerIntegrator>(Integrator, EulerIntegrator::class) {
-        override fun createEmpty() = EulerIntegrator()
+    companion object : SystemComponentSubType<Integrator, EulerGravityIntegrator>(Integrator, EulerGravityIntegrator::class) {
+        override fun createEmpty() = EulerGravityIntegrator()
     }
 }

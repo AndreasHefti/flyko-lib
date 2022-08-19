@@ -40,7 +40,7 @@ class View private constructor (
         get() = data.blendMode
         set(value) { data.blendMode = value }
     val shader = AssetInstanceRefResolver(
-        { instanceId -> data.shaderRef = instanceId },
+        data::setShaderRef,
         { data.shaderRef })
     var zoom: Float
         get() = data.zoom

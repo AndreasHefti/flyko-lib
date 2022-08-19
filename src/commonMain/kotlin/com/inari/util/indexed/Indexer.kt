@@ -47,7 +47,7 @@ class Indexer private constructor(
         typeCheck(indexed)
 
         if (indexed.index >= 0)
-            disposeIndex(indexed)
+            throw IllegalArgumentException("Index already applied: ${indexed.index}")
 
         indexed.iindex = indices.nextClearBit(0)
         indices.set(indexed.iindex)

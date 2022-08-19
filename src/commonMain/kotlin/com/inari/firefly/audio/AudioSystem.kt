@@ -8,7 +8,7 @@ import com.inari.firefly.core.system.SystemComponent
 import com.inari.util.aspect.Aspects
 import kotlin.jvm.JvmField
 
-object AudioSystem : ComponentSystem {
+object  AudioSystem : ComponentSystem {
 
     override val supportedComponents: Aspects =
         SystemComponent.SYSTEM_COMPONENT_ASPECTS.createAspects(Sound)

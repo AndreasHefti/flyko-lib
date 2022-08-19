@@ -4,6 +4,7 @@ import com.inari.firefly.core.ComponentRefPredicate
 import com.inari.firefly.core.ComponentRefResolver
 import com.inari.util.Named
 import com.inari.util.aspect.Aspect
+import com.inari.util.indexed.AbstractIndexed
 import com.inari.util.indexed.Indexed
 import kotlin.reflect.KClass
 

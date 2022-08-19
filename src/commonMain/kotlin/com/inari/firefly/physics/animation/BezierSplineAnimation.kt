@@ -20,7 +20,6 @@ class BezierSpline {
     }
 
     private fun calcRanges() {
-
         var lastToNormalized = 0f
         curves.forEach {
             val from = lastToNormalized

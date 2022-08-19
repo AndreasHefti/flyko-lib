@@ -9,7 +9,7 @@ import com.inari.firefly.core.system.SystemComponentSubType
 import com.inari.firefly.physics.movement.EMovement
 import kotlin.jvm.JvmField
 
-class PlatformerJumpController : Controller() {
+class PlatformerJumpController private constructor(): Controller() {
 
     @JvmField var inputDevice: InputDevice = FFContext.input.getDefaultDevice()
     @JvmField var jumpButton = ButtonType.FIRE_1

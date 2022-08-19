@@ -505,10 +505,6 @@ object GeomUtils {
     inline fun transformRange(n: Float, r0: Float = 0f, r1: Float = 1f, v0: Float = 0f, v1: Float = 1f): Float =
         v0 + ((v1 - v0) / (r1 - r0)) * (n - r0)
 
-
-
-
-
     private val tmpV0 = Vector2f()
     private val tmpV1 = Vector2f()
     private val tmpV2 = Vector2f()

@@ -4,7 +4,7 @@ import com.inari.firefly.FFContext
 import com.inari.firefly.core.system.SingletonComponent
 import com.inari.firefly.entity.EChild
 import com.inari.firefly.entity.Entity
-import com.inari.firefly.entity.EntityComponent
+import com.inari.firefly.entity.EntityComponent.Companion.ENTITY_COMPONENT_ASPECTS
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.tile.ETile
@@ -33,10 +33,10 @@ class SimpleSpriteRenderer private constructor() : Renderer() {
     override fun componentType() = Companion
     companion object : SingletonComponent<Renderer, SimpleSpriteRenderer>(Renderer, SimpleSpriteRenderer::class) {
         override fun create() = SimpleSpriteRenderer()
-        private val MATCHING_ASPECTS = EntityComponent.ENTITY_COMPONENT_ASPECTS.createAspects(
+        private val MATCHING_ASPECTS = ENTITY_COMPONENT_ASPECTS.createAspects(
             ETransform, ESprite
         )
-        private val EXCLUDING_ASPECTS = EntityComponent.ENTITY_COMPONENT_ASPECTS.createAspects(
+        private val EXCLUDING_ASPECTS = ENTITY_COMPONENT_ASPECTS.createAspects(
             EChild, ETile
         )
     }

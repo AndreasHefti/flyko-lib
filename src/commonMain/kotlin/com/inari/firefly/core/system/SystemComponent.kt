@@ -33,13 +33,11 @@ abstract class SystemComponent protected constructor(
         internal set
 
     internal fun internalInit() {
-        super.applyNewIndex()
         init()
         initialized = true
     }
 
     protected open fun init() {
-        initialized = true
     }
 
     override fun dispose() {
