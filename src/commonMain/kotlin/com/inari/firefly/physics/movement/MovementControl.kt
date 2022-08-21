@@ -30,18 +30,21 @@ object MovementControl : ComponentControl<Entity>() {
         override val aspectType: AspectType get() = aspect.aspectType
     }
 
-    init { Control.registerAsSingleton(this) }
+    init {
+        Control.registerAsSingleton(this, true)
+        Control.activate(this.index)
+    }
 
     override val controlledComponentType = Entity
 
     private val entities: BitSet = BitSet()
 
     override fun notifyActivation (component: Entity) {
-        if (EMovement !in component.components) return
+        if (EMovement !in component.aspects) return
         entities[component.index] = true
     }
     override fun notifyDeactivation(component: Entity) {
-        if (EMovement !in component.components) return
+        if (EMovement !in component.aspects) return
         entities[component.index] = false
     }
 

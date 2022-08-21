@@ -2,7 +2,6 @@ package com.inari.firefly.core
 
 import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
 import com.inari.util.Named
-import com.inari.util.VOID_CONSUMER
 import com.inari.util.indexed.Indexed
 
 enum class RelationPolicy {

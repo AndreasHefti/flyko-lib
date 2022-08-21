@@ -1,6 +1,5 @@
 package com.inari.util
 
-import com.inari.firefly.core.api.FFTimer
 import com.inari.util.geom.ImmutableVector2f
 import com.inari.util.geom.ImmutableVector2i
 import kotlin.jvm.JvmField
@@ -38,10 +37,6 @@ const val NO_PROGRAM: String = "[[NO_PROGRAM]]"
 @JvmField val TRUE_PREDICATE: (Any) -> Boolean = { true }
 @JvmField val VOID_CONSUMER: (Any) -> Unit = { _ -> }
 @JvmField val VOID_CALL: () -> Unit = {}
-@JvmField val INFINITE_SCHEDULER: FFTimer.Scheduler = object : FFTimer.Scheduler {
-    override val resolution: Float = 60f
-    override fun needsUpdate(): Boolean = true
-}
 
 interface Named {
     val name: String
@@ -91,3 +86,18 @@ val VOID_INT_PROPERTY_ACCESSOR = object : IntPropertyAccessor {
 
 val VOID_FLOAT_PROPERTY_ACCESSOR_PROVIDER: (Int) -> FloatPropertyAccessor = { _ -> VOID_FLOAT_PROPERTY_ACCESSOR }
 val VOID_INT_PROPERTY_ACCESSOR_PROVIDER: (Int) -> IntPropertyAccessor = { _ -> VOID_INT_PROPERTY_ACCESSOR }
+
+enum class OperationResult {
+    SUCCESS,
+    RUNNING,
+    FAILED
+}
+
+typealias Operation = () -> OperationResult
+typealias OperationCallback = (OperationResult) -> Unit
+typealias TaskOperation = (Int, Int, Int) -> OperationResult
+typealias TaskCallback = (Int, OperationResult) -> Unit
+
+val RUNNING_OPERATION: Operation = { OperationResult.RUNNING }
+val SUCCESS_OPERATION: Operation = { OperationResult.SUCCESS }
+val FAILED_OPERATION: Operation = { OperationResult.FAILED }

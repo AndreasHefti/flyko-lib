@@ -5,12 +5,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.inari.firefly.core.*
-import com.inari.firefly.core.Engine.Companion.SYSTEM_FONT
-import com.inari.firefly.core.Engine.Companion.SYSTEM_FONT_ASSET
 import com.inari.firefly.core.api.DesktopAppAdapter
+import com.inari.firefly.graphics.shape.SimpleShapeRenderer
+import com.inari.firefly.graphics.sprite.MultiPositionSpriteRenderer
 import com.inari.firefly.graphics.sprite.SimpleSpriteRenderer
+import com.inari.firefly.graphics.sprite.SpriteGroupRenderer
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.text.Font
+import com.inari.firefly.graphics.text.SimpleTextRenderer
 import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
 import kotlin.math.roundToInt
@@ -59,12 +61,40 @@ class DesktopApp(
         Layer
 
         // init base renderer pipeline
+        MultiPositionSpriteRenderer.init()
+        SpriteGroupRenderer.init()
         SimpleSpriteRenderer.init()
+        SimpleTextRenderer.init()
+        SimpleShapeRenderer.init()
 
         InariIntro.show {
             ComponentSystem.clearSystems()
+            loadSystemFont()
             initializer(this)
         }
+    }
+
+    private fun loadSystemFont() {
+        Texture.build {
+            name = Engine.SYSTEM_FONT_ASSET
+            resourceName = "firefly/fireflyMicroFont.png"
+
+            withChild(Font) {
+                name = Engine.SYSTEM_FONT
+                charWidth = 8
+                charHeight = 16
+                charSpace = 0
+                lineSpace = 0
+                defaultChar = 'a'
+                charMap = arrayOf(
+                    charArrayOf('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',' '),
+                    charArrayOf('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',' '),
+                    charArrayOf('1','2','3','4','5','6','7','8','9','0','!','@','£','$','%','?','&','*','(',')','-','+','=','"','.',',',':')
+                )
+            }
+        }
+
+        Font.activate(Engine.SYSTEM_FONT)
     }
 
     override fun render() = DesktopAppAdapter.update()

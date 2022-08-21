@@ -1,9 +1,6 @@
 package com.inari.firefly.graphics.text
 
-import com.inari.firefly.core.Asset
-import com.inari.firefly.core.CReference
-import com.inari.firefly.core.ComponentSubTypeSystem
-import com.inari.firefly.core.Engine
+import com.inari.firefly.core.*
 import com.inari.firefly.core.api.SpriteData
 import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.Texture
@@ -33,6 +30,8 @@ class Font private constructor(): Asset() {
         override val isHorizontalFlip = false
         override val isVerticalFlip = false
     }
+
+    override fun notifyParent(comp: Component) = textureRef(comp.name)
 
     override fun load() {
         tmpSpriteData.textureIndex = resolveAssetIndex(textureRef.targetKey)

@@ -80,6 +80,17 @@ abstract class EntityRenderer : ViewRenderer {
 
     abstract fun render(entities: DynArray<Entity>)
 
+    protected fun collectTransformData(parentId: Int, transformCollector: TransformDataCollector) {
+        if (parentId < 0)
+            return
+
+        val parent = Entity[parentId]
+        val parentTransform = parent[ETransform]
+        transformCollector + parentTransform
+        if (EChild in parent.aspects)
+            collectTransformData(parent[EChild].parent.targetKey.instanceId, transformCollector)
+    }
+
     override fun dispose() {
         Entity.disposeComponentListener(this::entityListener)
         disposeViewRenderer(this)

@@ -2,7 +2,20 @@ package com.inari.util.collection
 
 import kotlin.math.min
 
-class BitSet(nBits: Int = 64) {
+interface BitSetRO {
+    val cardinality: Int
+    val isEmpty: Boolean
+    fun length(): Int
+    val size: Int
+    operator fun get(pos: Int): Boolean
+    operator fun get(from: Int, to: Int): BitSet?
+    fun intersects(set: BitSet): Boolean
+    fun nextClearBit(from: Int): Int
+    fun nextSetBit(from: Int): Int
+    fun containsAll(other: BitSet): Boolean
+}
+
+class BitSet(nBits: Int = 64) : BitSetRO {
 
     private var bits: LongArray
 
@@ -28,7 +41,7 @@ class BitSet(nBits: Int = 64) {
         while (--i >= 0) bits[i] = bits[i] and bs.bits[i].inv()
     }
 
-    val cardinality: Int
+    override val cardinality: Int
         get() {
             var result = 0
             for (i in bits.size - 1 downTo 0) {
@@ -111,12 +124,12 @@ class BitSet(nBits: Int = 64) {
         for (i in lo_offset + 1 until hi_offset) bits[i] = bits[i] xor -1
     }
 
-    operator fun get(pos: Int): Boolean {
+    override operator fun get(pos: Int): Boolean {
         val offset = pos shr 6
         return if (offset >= bits.size) false else bits[offset] and (1L shl pos) != 0L
     }
 
-    operator fun get(from: Int, to: Int): BitSet? {
+    override operator fun get(from: Int, to: Int): BitSet? {
         if (from < 0 || from > to) throw IndexOutOfBoundsException()
         val bs = BitSet(to - from)
         var lo_offset = from ushr 6
@@ -154,19 +167,19 @@ class BitSet(nBits: Int = 64) {
         return (h shr 32 xor h).toInt()
     }
 
-    fun intersects(set: BitSet): Boolean {
+    override fun intersects(set: BitSet): Boolean {
         var i: Int = min(bits.size, set.bits.size)
         while (--i >= 0) if (bits[i] and set.bits[i] != 0L) return true
         return false
     }
 
-    val isEmpty: Boolean
+    override val isEmpty: Boolean
         get() {
             for (i in bits.size - 1 downTo 0) if (bits[i] != 0L) return false
             return true
         }
 
-    fun length(): Int {
+    override fun length(): Int {
         // Set i to highest index that contains a non-zero value.
         var i: Int = bits.size - 1
         while (i >= 0 && bits[i] == 0L) {
@@ -187,7 +200,7 @@ class BitSet(nBits: Int = 64) {
         return len
     }
 
-    fun nextClearBit(from: Int): Int {
+    override fun nextClearBit(from: Int): Int {
         var _from = from
         var offset = _from shr 6
         var mask = 1L shl _from
@@ -204,7 +217,7 @@ class BitSet(nBits: Int = 64) {
         return _from
     }
 
-    fun nextSetBit(from: Int): Int {
+    override fun nextSetBit(from: Int): Int {
         var _from = from
         var offset = _from shr 6
         var mask = 1L shl _from
@@ -255,7 +268,7 @@ class BitSet(nBits: Int = 64) {
         if (value) set(from, to) else clear(from, to)
     }
 
-    val size: Int
+    override val size: Int
         get() = bits.size * 64
 
     fun xor(bs: BitSet) {
@@ -269,7 +282,7 @@ class BitSet(nBits: Int = 64) {
         }
     }
 
-    fun containsAll(other: BitSet): Boolean {
+    override fun containsAll(other: BitSet): Boolean {
         for (i in other.bits.size - 1 downTo 0) {
             if (bits[i] and other.bits[i] != other.bits[i]) return false
         }

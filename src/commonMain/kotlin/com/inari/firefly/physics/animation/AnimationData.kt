@@ -1,9 +1,12 @@
 package com.inari.firefly.physics.animation
 
+import com.inari.util.FloatPropertyAccessor
+import com.inari.util.IntPropertyAccessor
+import com.inari.util.VOID_CALL
+import com.inari.util.VOID_FLOAT_PROPERTY_ACCESSOR_PROVIDER
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.Control
-import com.inari.util.*
 import com.inari.util.geom.*
 import kotlin.jvm.JvmField
 

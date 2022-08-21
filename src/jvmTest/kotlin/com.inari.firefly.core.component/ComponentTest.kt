@@ -1,7 +1,6 @@
 package com.inari.firefly.core.component
 
 import com.inari.firefly.core.*
-import com.inari.firefly.graphics.view.View
 import com.inari.util.NO_NAME
 import kotlin.test.*
 

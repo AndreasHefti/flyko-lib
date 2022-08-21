@@ -2,6 +2,7 @@ package com.inari.firefly.core.api
 
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.geom.*
+import kotlin.jvm.JvmField
 
 enum class BlendMode constructor(val source: Int, val dest: Int) {
     /** No blending. Disables blending  */
@@ -71,6 +72,13 @@ interface TransformData {
     val hasScale: Boolean get() = scale.v0 != 1.0f || scale.v1 != 1.0f
 }
 
+class TransformDataImpl() : TransformData {
+    override val position = Vector2f()
+    override val pivot = Vector2f()
+    override val scale = Vector2f()
+    override var rotation = 1.0f
+}
+
 interface ShaderData {
     val vertexShaderResourceName: String
     val vertexShaderProgram: String
@@ -111,6 +119,12 @@ interface SpriteRenderable {
     val spriteIndex: Int
     val tintColor: Vector4f
     val blendMode: BlendMode
+}
+
+class SpriteRenderableImpl : SpriteRenderable {
+    override var spriteIndex = -1
+    override val tintColor = Vector4f(1f, 1f, 1f, 1f)
+    override var blendMode = BlendMode.NORMAL_ALPHA
 }
 
 enum class ShapeType {

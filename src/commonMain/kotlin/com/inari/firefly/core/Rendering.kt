@@ -4,20 +4,14 @@ import com.inari.firefly.core.api.TransformData
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.event.Event
 import com.inari.util.geom.Vector2f
-import kotlin.jvm.JvmInline
 import kotlin.math.floor
 
 abstract class Renderer {
 
-    open fun activate() {
-        Engine.registerListener(RenderingEvent, ::render)
-    }
-
-    open fun deactivate() {
-        Engine.disposeListener(RenderingEvent, ::render)
-    }
-
+    open fun activate() = Engine.registerListener(RenderingEvent, ::render)
+    open fun deactivate() = Engine.disposeListener(RenderingEvent, ::render)
     abstract fun render()
+
 }
 
 @Suppress("OVERRIDE_BY_INLINE")

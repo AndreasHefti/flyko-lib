@@ -3,6 +3,7 @@ package com.inari.firefly.core
 import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
 import com.inari.util.NO_NAME
 import com.inari.util.collection.BitSet
+import com.inari.util.collection.BitSetIterator
 import com.inari.util.collection.DynArray
 import com.inari.util.event.Event
 
@@ -14,9 +15,9 @@ abstract class ComponentSystem<C : Component>(
     typeName: String,
 ) : ComponentType<C>(typeName), SubComponentSystemAdapter<C>, System {
 
-    private val COMPONENT_KEY_MAPPING: MutableMap<String, ComponentKey> =  HashMap()
-    private val COMPONENT_MAPPING: DynArray<C> = DynArray(50, 100, this::allocateArray)
-    private val ACTIVE_COMPONENT_MAPPING: BitSet = BitSet()
+    protected val COMPONENT_KEY_MAPPING: MutableMap<String, ComponentKey> =  HashMap()
+    protected val COMPONENT_MAPPING: DynArray<C> = DynArray(50, 100, this::allocateArray)
+    protected val ACTIVE_COMPONENT_MAPPING: BitSet = BitSet()
     private val EVENT_POOL = ArrayDeque<InternalComponentEvent>()
 
     init {
@@ -24,8 +25,16 @@ abstract class ComponentSystem<C : Component>(
     }
 
     override fun clearSystem() {
-        COMPONENT_MAPPING.forEach { delete(it) }
-        COMPONENT_KEY_MAPPING.clear()
+        COMPONENT_MAPPING.forEach {
+            if (!it.name.contains(STATIC_COMPONENT_MARKER))
+                this.delete(it.index)
+        }
+
+        val keys = COMPONENT_KEY_MAPPING
+            .filter { it.value.instanceId < 0 }
+            .map { it.key }
+        keys.forEach { COMPONENT_KEY_MAPPING.remove(it) }
+
         ACTIVE_COMPONENT_MAPPING.clear()
         EVENT_POOL.clear()
     }
@@ -60,7 +69,7 @@ abstract class ComponentSystem<C : Component>(
 
     // **** Component Handling ****
     // ****************************
-    internal fun registerComponent(c: C): ComponentKey {
+    internal open fun registerComponent(c: C): ComponentKey {
         if (checkComponentNameClash(c.name)) {
             c.iDelete()
             throw IllegalArgumentException("Key with same name already exists")
@@ -91,22 +100,28 @@ abstract class ComponentSystem<C : Component>(
         }
     }
 
-    fun registerAsSingleton(component: C) {
-        val name = component::class.simpleName!!
-        if (exists(name))
-            throw IllegalStateException("$name is singleton and already exists")
+    fun registerAsSingleton(component: C, static: Boolean ) {
+        val namePrefix = component::class.simpleName!! + SINGLETON_MARKER
+        COMPONENT_MAPPING.forEach {
+            if (it.name != NO_NAME && it.name.startsWith(namePrefix))
+                throw IllegalStateException("$namePrefix is singleton and already exists")
+        }
 
+        val name = namePrefix + if (static) STATIC_COMPONENT_MARKER else ""
         component.name = name
         registerComponent(component)
         component.iInitialize()
         send(component.index, ComponentEventType.INITIALIZED)
     }
 
-    internal fun unregisterComponent(index: Int) {
+    internal open fun unregisterComponent(index: Int) {
         val removed = COMPONENT_MAPPING.remove(index)
         if (removed != null && removed.name != NO_NAME)
             COMPONENT_KEY_MAPPING[removed.name]?.instanceId = -1
     }
+
+    fun getNextActiveIndex(fromIndex: Int) = ACTIVE_COMPONENT_MAPPING.nextSetBit(fromIndex)
+    fun getActiveIndexIterator(): com.inari.util.IntIterator = BitSetIterator(ACTIVE_COMPONENT_MAPPING)
 
     operator fun get(name: String): C = get(COMPONENT_KEY_MAPPING[name]!!)
     operator fun get(key: ComponentKey): C  = get(checkKey(key).instanceId)
@@ -170,6 +185,16 @@ abstract class ComponentSystem<C : Component>(
         unregisterComponent(index)
     }
 
+    fun doForEach(
+        filter: (C) -> Boolean,
+        process: (C) -> Unit
+    ) {
+        COMPONENT_MAPPING.forEach {
+            if (filter(it))
+                process(it)
+        }
+    }
+
     private fun checkKey(key: ComponentKey): ComponentKey =
         if (this.aspectIndex != key.type.aspectIndex) throw IllegalArgumentException("Component type mismatch!")
         else key
@@ -230,6 +255,9 @@ abstract class ComponentSystem<C : Component>(
         Engine.disposeListener(componentEventType, listener)
 
     companion object {
+        const val STATIC_COMPONENT_MARKER = "_STAT_"
+        private const val SINGLETON_MARKER = "_SINGL_"
+
         internal val COMPONENT_SYSTEM_MAPPING: DynArray<ComponentSystem<*>> = DynArray.of()
 
         internal fun clearSystems(type: ComponentType<*>) = COMPONENT_SYSTEM_MAPPING[type.aspectIndex]?.clearSystem()

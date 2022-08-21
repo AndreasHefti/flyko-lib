@@ -1,5 +1,10 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
+import com.inari.firefly.core.api.FFTimer
+import com.inari.util.*
+import kotlin.jvm.JvmField
+
 abstract class Control protected constructor(): Component(Control) {
 
     private val updateListener = ::update
@@ -16,6 +21,19 @@ abstract class Control protected constructor(): Component(Control) {
         override fun allocateArray(size: Int): Array<Control?> = arrayOfNulls(size)
         override fun create(): Control =
             throw UnsupportedOperationException("Control is abstract use a concrete implementation instead")
+    }
+}
+
+interface ControlledComponent<C : Component>{
+
+    val controllerReference: CReference
+
+    fun withControl(name: String) = controllerReference(name)
+    fun withControl(index: Int) = controllerReference(index)
+    fun withControl(key: ComponentKey) = controllerReference(key)
+    fun <CTRL : ComponentControl<C>> withControl(builder: ComponentBuilder<CTRL>, configure: (CTRL.() -> Unit)) {
+        val control = builder.buildAndGetActive(configure)
+        controllerReference(control)
     }
 }
 
@@ -45,66 +63,48 @@ abstract class ComponentControl<C : Component> : Control() {
     }
 }
 
-interface ControlledComponent<C : Component>{
+class Scene : Control() {
 
-    val controllerReference: CReference
+    @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
+    @JvmField internal var updateOperation: Operation = RUNNING_OPERATION
+    @JvmField internal var callback: OperationCallback = VOID_CONSUMER
+    @JvmField var deleteAfterRun: Boolean = false
 
-    fun withControl(name: String) = controllerReference(name)
-    fun withControl(index: Int) = controllerReference(index)
-    fun withControl(key: ComponentKey) = controllerReference(key)
-    fun <CTRL : ComponentControl<C>> withControl(builder: ComponentBuilder<CTRL>, configure: (CTRL.() -> Unit)) {
-        val control = builder.buildAndGetActive(configure)
-        controllerReference(control)
+    fun withCallback(callback: OperationCallback) {
+        this.callback = callback
+    }
+
+    fun withUpdate(update: Operation) {
+        updateOperation = update
+    }
+
+    override fun update() {
+        if (!scheduler.needsUpdate())
+            return
+
+        val result = updateOperation()
+        if (result == OperationResult.RUNNING)
+            return
+
+        stop(index)
+        callback(result)
+        if (deleteAfterRun)
+            Scene.delete(index)
+    }
+
+    companion object :  ComponentSubTypeSystem<Control, Scene>(Control) {
+        override fun create() = Scene()
+
+        fun run(index: Int, callback: OperationCallback) {
+            val scene = this[index]
+            scene.withCallback(callback)
+            activate(index)
+        }
+
+        fun pause(index: Int) = deactivate(index)
+        fun resume(index: Int) = activate(index)
+        fun stop(index: Int) = dispose(index)
     }
 
 }
 
-//abstract class SingleComponentControl : ComponentControl() {
-//
-//    protected var controlledIndex: CompIndex = -1
-//
-//    override fun register(index: Int) { controlledIndex = index }
-//    override fun unregister(index: Int) { controlledIndex = -1 }
-//
-//}
-//
-//abstract class ComponentsControl : ComponentControl() {
-//
-//    protected val controlled: BitSet = BitSet()
-//
-//    override fun register(index: Int) { controlled[index] = true }
-//    override fun unregister(index: Int) { controlled[index] = false }
-//
-//}
-
-//class SingleComponentOp : SingleComponentControl() {
-//
-//    val operation = ComponentOpRef()
-//    @JvmField var secondComponentRef: ComponentKey = NO_COMPONENT_KEY
-//    @JvmField var thirdComponentRef: ComponentKey = NO_COMPONENT_KEY
-//
-//    override fun update() {
-//        operation(controlledIndex, secondComponentRef.instanceId, thirdComponentRef.instanceId)
-//    }
-//
-//    companion object : ComponentSubTypeSystem<Control, SingleComponentOp>(Control) {
-//        override fun create() = SingleComponentOp()
-//    }
-//}
-
-//fun test() {
-//    val controlKey = SingleComponentOp.build {
-//        updateResolution = 4f
-//        secondComponentRef = NO_COMPONENT_KEY
-//        operation("someOp")
-//    }
-//
-//    val control: SingleComponentOp = SingleComponentOp[controlKey]
-//
-//    View.build {
-//        name = "test"
-//        shader.build {
-//
-//        }
-//    }
-//}

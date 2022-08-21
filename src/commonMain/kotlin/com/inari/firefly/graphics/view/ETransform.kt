@@ -3,19 +3,18 @@ package com.inari.firefly.graphics.view
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.TransformData
 import com.inari.util.FloatPropertyAccessor
-import com.inari.util.IntPropertyAccessor
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.ZERO_INT
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 
-class ETransform private constructor() : EntityComponent(ETransform), TransformData {
+class ETransform private constructor() : EntityComponent(ETransform), TransformData, ViewLayerAware {
 
     val view = CReference(View)
     val layer = CReference(Layer)
-    val viewIndex: Int
+    override val viewIndex: Int
         get() = view.targetKey.instanceId
-    val layerIndex: Int
+    override val layerIndex: Int
         get() = if (layer.exists) layer.targetKey.instanceId else 0
     override val position: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT)
     override val pivot: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT)

@@ -16,9 +16,7 @@ class Sprite private constructor(): Asset(), SpriteData {
     override var isHorizontalFlip: Boolean = false
     override var isVerticalFlip: Boolean = false
 
-    override fun notifyParent(comp: Component) {
-        textureRef(comp.name)
-    }
+    override fun notifyParent(comp: Component) = textureRef(comp.name)
 
     override fun load() {
         if (assetIndex >= 0) return

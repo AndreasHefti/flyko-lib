@@ -5,7 +5,12 @@ import com.inari.firefly.core.Engine.UpdateEvent.Companion.updateEvent
 import com.inari.firefly.core.PostRenderEvent.Companion.postRenderEvent
 import com.inari.firefly.core.RenderingEvent.Companion.renderingEvent
 import com.inari.firefly.core.api.*
+import com.inari.firefly.graphics.FFInfoSystem
+import com.inari.firefly.graphics.sprite.Texture
+import com.inari.firefly.graphics.text.Font
+import com.inari.util.collection.DynArray
 import com.inari.util.event.*
+import kotlin.jvm.JvmField
 
 abstract class Engine protected constructor(
     graphics: () -> GraphicsAPI,
@@ -40,8 +45,13 @@ abstract class Engine protected constructor(
     }
 
     companion object {
-        const val SYSTEM_FONT_ASSET = "SYSTEM_FONT_ASSET"
-        const val SYSTEM_FONT = "SYSTEM_FONT"
+        const val SYSTEM_FONT_ASSET = "SYSTEM_FONT_ASSET" + ComponentSystem.STATIC_COMPONENT_MARKER
+        const val SYSTEM_FONT = "SYSTEM_FONT" + ComponentSystem.STATIC_COMPONENT_MARKER
+
+        @JvmField val INFINITE_SCHEDULER: FFTimer.Scheduler = object : FFTimer.Scheduler {
+            override val resolution: Float = 60f
+            override fun needsUpdate(): Boolean = true
+        }
 
         private val eventDispatcher = EventDispatcher()
         lateinit var graphics: GraphicsAPI
@@ -64,7 +74,7 @@ abstract class Engine protected constructor(
         }
         fun <L> notify(event: Event<L>) = eventDispatcher.notify(event)
         fun <L : AspectedEventListener> notify(event: AspectedEvent<L>) = eventDispatcher.notify(event)
-        
+
     }
 
     @Suppress("OVERRIDE_BY_INLINE")

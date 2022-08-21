@@ -43,7 +43,6 @@ object InariIntro {
                 region( 0, 0, pngWidth, pngHeight )
             }
         }
-        //Sprite.activate(spriteAssetId)
 
         entityId = Entity.buildActive {
             withComponent(ETransform) {
@@ -53,7 +52,6 @@ object InariIntro {
                     Engine.graphics.screenHeight / 2 - pngHeight / 2
                 )
             }
-
             withComponent(ESprite) {
                 spriteRef(spriteAssetName)
                 tintColor(1f, 1f, 1f, 0f)

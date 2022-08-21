@@ -11,12 +11,10 @@ import com.inari.util.collection.DynArray
 
 object SimpleSpriteRenderer : EntityRenderer() {
 
-    init {
-        order = 30
-    }
+    init { order = 35 }
 
-    override fun acceptEntity(entity: Entity): Boolean =
-        entity.components.include(MATCHING_ASPECTS) && entity.components.exclude(EXCLUDING_ASPECTS)
+    override fun acceptEntity(entity: Entity) =
+        entity.aspects.include(MATCHING_ASPECTS) && entity.aspects.exclude(EXCLUDING_ASPECTS)
 
     override fun sort(entities: DynArray<Entity>) {
         // no sorting
@@ -31,10 +29,10 @@ object SimpleSpriteRenderer : EntityRenderer() {
         }
     }
 
-    val MATCHING_ASPECTS = ENTITY_COMPONENT_ASPECTS.createAspects(
+    private val MATCHING_ASPECTS = ENTITY_COMPONENT_ASPECTS.createAspects(
         ETransform, ESprite
     )
-     val EXCLUDING_ASPECTS =ENTITY_COMPONENT_ASPECTS.createAspects(
+    private val EXCLUDING_ASPECTS =ENTITY_COMPONENT_ASPECTS.createAspects(
         EChild, EMultiplier
     )
 }

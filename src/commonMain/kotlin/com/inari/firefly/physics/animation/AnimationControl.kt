@@ -14,7 +14,7 @@ abstract class AnimationControl<D : AnimatedData>(
     override val controlledComponentType = Entity
 
     override fun notifyActivation(component: Entity) {
-        if (EAnimation !in component.components) return
+        if (EAnimation !in component.aspects) return
         val eAnimation = component[EAnimation]
         eAnimation.animations.forEach { iAccept(it)?.let {
                 data -> animatedData + data
@@ -22,7 +22,7 @@ abstract class AnimationControl<D : AnimatedData>(
     }
 
     override fun notifyDeactivation(component: Entity) {
-        if (EAnimation !in component.components) return
+        if (EAnimation !in component.aspects) return
         val eAnimation = component[EAnimation]
         eAnimation.animations.forEach { accept(it)?.let {
                 data -> animatedData - data
@@ -61,7 +61,7 @@ abstract class AnimationControl<D : AnimatedData>(
 object DefaultFloatEasingControl : AnimationControl<EasedFloatAnimation>(DynArray.of(5, 10)) {
 
     init {
-        Control.registerAsSingleton(this)
+        Control.registerAsSingleton(this, true)
         Control.activate(this.name)
     }
 
@@ -90,7 +90,7 @@ object DefaultFloatEasingControl : AnimationControl<EasedFloatAnimation>(DynArra
 object BezierCurveAnimationControl: AnimationControl<BezierCurveAnimation>(DynArray.of(5, 10)) {
 
     init {
-        Control.registerAsSingleton(this)
+        Control.registerAsSingleton(this, true)
         Control.activate(this.name)
     }
 
@@ -128,7 +128,7 @@ object BezierCurveAnimationControl: AnimationControl<BezierCurveAnimation>(DynAr
 object BezierSplineAnimationControl : AnimationControl<BezierSplineAnimation>(DynArray.of(5, 10)) {
 
     init {
-        Control.registerAsSingleton(this)
+        Control.registerAsSingleton(this, true)
         Control.activate(this.name)
     }
 
@@ -172,7 +172,7 @@ object BezierSplineAnimationControl : AnimationControl<BezierSplineAnimation>(Dy
 object IntFrameAnimationControl : AnimationControl<IntFrameAnimation>(DynArray.of(5, 10)) {
 
     init {
-        Control.registerAsSingleton(this)
+        Control.registerAsSingleton(this, true)
         Control.activate(this.name)
     }
 

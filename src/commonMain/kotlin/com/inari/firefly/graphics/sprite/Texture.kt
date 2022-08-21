@@ -19,13 +19,13 @@ class Texture private constructor() : Asset(), TextureData {
         set(value) { field = checkNotLoaded(value, "ResourceName") }
     override var isMipmap = false
         set(value) { field = checkNotLoaded(value, "MipMap") }
-    override var wrapS = ZERO_INT
+    override var wrapS = -1
         set(value) { field = checkNotLoaded(value, "WrapS") }
-    override var wrapT = ZERO_INT
+    override var wrapT = -1
         set(value) { field = checkNotLoaded(value, "WrapT") }
-    override var minFilter = ZERO_INT
+    override var minFilter = -1
         set(value) { field = checkNotLoaded(value, "MinFilter") }
-    override var magFilter = ZERO_INT
+    override var magFilter = -1
         set(value) { field = checkNotLoaded(value, "MagFilter") }
     override var colorConverter = NULL_INT_FUNCTION
         set(value) { field = checkNotLoaded(value, "ColorConverter") }

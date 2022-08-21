@@ -5,7 +5,6 @@ import com.inari.firefly.core.ComponentSubTypeSystem
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.TriggeredComponent
 import com.inari.util.ZERO_INT
-import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
 
 class Sound private constructor(): Play(), TriggeredComponent {

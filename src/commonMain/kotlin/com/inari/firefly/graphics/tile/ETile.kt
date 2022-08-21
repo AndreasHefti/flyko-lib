@@ -1,20 +1,24 @@
-package com.inari.firefly.graphics.sprite
+package com.inari.firefly.graphics.tile
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.SpriteRenderable
+import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.util.FloatPropertyAccessor
+import com.inari.util.geom.Vector2i
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
-class ESprite private constructor() : EntityComponent(ESprite), SpriteRenderable {
+class ETile private constructor(): EntityComponent(ETile), SpriteRenderable {
 
-    val spriteRef = CReference(Sprite)
+
     override var spriteIndex = -1
         internal set
-
     override val tintColor = Vector4f(1f, 1f, 1f, 1f)
     override var blendMode = BlendMode.NONE
+    @JvmField val spriteRef = CReference(Sprite)
+    @JvmField val position: Vector2i = Vector2i()
+    @JvmField val tileGridRef = CReference(TileGrid)
 
     override fun activate() {
         spriteIndex = Asset.resolveAssetIndex(spriteRef.targetKey)
@@ -32,7 +36,7 @@ class ESprite private constructor() : EntityComponent(ESprite), SpriteRenderable
     }
 
     object PropertyAccessor {
-        fun getInstance(index: Int) = ComponentSystem[Entity, index][ESprite]
+        fun getInstance(index: Int) = ComponentSystem[Entity, index][ETile]
         fun getTintColor(index: Int) = getInstance(index).tintColor
         fun getTintColorRed(index: Int) = getTintColor(index).getV0PropertyAccessor()
         fun getTintColorGreen(index: Int) = getTintColor(index).getV1PropertyAccessor()
@@ -45,7 +49,7 @@ class ESprite private constructor() : EntityComponent(ESprite), SpriteRenderable
     }
 
     override val componentType = Companion
-    companion object : EntityComponentBuilder<ESprite>("ESprite") {
-        override fun create() = ESprite()
+    companion object : EntityComponentBuilder<ETile>("ETile") {
+        override fun create() = ETile()
     }
 }

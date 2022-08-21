@@ -21,7 +21,7 @@ class View private constructor(): Component(View), ViewData, ControlledComponent
     override var  blendMode = BlendMode.NONE
     @JvmField val shader = CReference(Shader)
     override var zoom = 1.0f
-    override val  fboScale = ZERO_FLOAT
+    override val  fboScale = 1.0f
     override val controllerReference: CReference = CReference(Control)
 
     override var shaderIndex = -1
@@ -45,26 +45,14 @@ class View private constructor(): Component(View), ViewData, ControlledComponent
     override val componentType = Companion
     companion object : ComponentSystem<View>("View") {
 
-        @JvmField val BASE_VIEW_KEY = View.createKey("BASE_VIEW")
+        val BASE_VIEW_KEY = View.buildActive {
+            name = "BASE_VIEW$STATIC_COMPONENT_MARKER"
+            bounds(0, 0, Engine.graphics.screenWidth, Engine.graphics.screenHeight)
+            isBase = true
+        }
 
         init {
             ViewSystemRenderer  // initialize the view system rendering
-            createBaseView()
-        }
-
-        private fun createBaseView() {
-            if (BASE_VIEW_KEY.instanceId >= 0) return
-
-            View.buildAndGetActive {
-                name = BASE_VIEW_KEY.name
-                bounds(0, 0, Engine.graphics.screenWidth, Engine.graphics.screenHeight)
-                isBase = true
-            }
-        }
-
-        override fun clearSystem() {
-            super.clearSystem()
-            createBaseView()
         }
 
         override fun allocateArray(size: Int): Array<View?> = arrayOfNulls(size)

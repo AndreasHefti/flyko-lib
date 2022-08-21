@@ -1,10 +1,5 @@
 package com.inari.firefly.core
 
-import com.inari.firefly.graphics.sprite.ESprite
-import com.inari.util.FloatPropertyAccessor
-import com.inari.util.IntPropertyAccessor
-import com.inari.util.ZERO_FLOAT
-import com.inari.util.ZERO_INT
 import com.inari.util.aspect.*
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynFloatArray
@@ -143,6 +138,8 @@ interface EntityComponentBuilderAdapter<C : EntityComponent> {
 class EChild private constructor() : EntityComponent(EChild) {
 
     @JvmField val parent = CReference(Entity)
+    val parentIndex: Int
+        get() = parent.targetKey.instanceId
     @JvmField var zPos: Int = -1
 
     override fun reset() {
