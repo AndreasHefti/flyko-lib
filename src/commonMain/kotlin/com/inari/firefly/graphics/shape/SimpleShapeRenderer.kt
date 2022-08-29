@@ -6,7 +6,7 @@ import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.EntityRenderer
 import com.inari.util.collection.DynArray
 
-object SimpleShapeRenderer : EntityRenderer() {
+object SimpleShapeRenderer : EntityRenderer("SimpleShapeRenderer") {
 
     init { order = 40 }
 

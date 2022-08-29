@@ -70,6 +70,7 @@ class DesktopApp(
         InariIntro.show {
             ComponentSystem.clearSystems()
             loadSystemFont()
+            ComponentSystem.dumpInfo()
             initializer(this)
         }
     }

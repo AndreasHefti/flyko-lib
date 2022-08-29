@@ -2,7 +2,6 @@ package com.inari.firefly.graphics.text
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.SpriteData
-import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.util.collection.DynIntArray
 import com.inari.util.geom.Vector4i
@@ -31,7 +30,10 @@ class Font private constructor(): Asset() {
         override val isVerticalFlip = false
     }
 
-    override fun notifyParent(comp: Component) = textureRef(comp.name)
+    override fun setParentComponent(key: ComponentKey) {
+        super.setParentComponent(key)
+        textureRef(key)
+    }
 
     override fun load() {
         tmpSpriteData.textureIndex = resolveAssetIndex(textureRef.targetKey)
@@ -66,7 +68,7 @@ class Font private constructor(): Asset() {
         tmpSpriteData.textureIndex = -1
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, Font>(Asset) {
+    companion object :  ComponentSubTypeSystem<Asset, Font>(Asset, "Font") {
         override fun create() = Font()
     }
 }

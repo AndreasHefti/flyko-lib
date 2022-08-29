@@ -79,10 +79,10 @@ class ContactScans internal constructor() {
     }
 
     fun getSimpleScan(constraint: ContactConstraint): SimpleContactScan? = getSimpleScan(constraint.index)
-    fun getSimpleScan(constraint: ComponentKey): SimpleContactScan? = getSimpleScan(constraint.instanceId)
+    fun getSimpleScan(constraint: ComponentKey): SimpleContactScan? = getSimpleScan(constraint.instanceIndex)
     fun getSimpleScan(constraintRef: Int): SimpleContactScan? = scans[constraintRef] as SimpleContactScan
     fun getFullScan(constraint: ContactConstraint): FullContactScan? = getFullScan(constraint.index)
-    fun getFullScan(constraint: ComponentKey): FullContactScan? = getFullScan(constraint.instanceId)
+    fun getFullScan(constraint: ComponentKey): FullContactScan? = getFullScan(constraint.instanceIndex)
     fun getFullScan(constraintRef: Int): FullContactScan? = scans[constraintRef] as FullContactScan
 
     fun clearContacts() {

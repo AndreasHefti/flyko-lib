@@ -6,7 +6,7 @@ import com.inari.firefly.graphics.view.EntityRenderer
 import com.inari.util.collection.DynArray
 import com.inari.util.geom.Vector4i
 
-object SimpleTileGridRenderer : EntityRenderer() {
+object SimpleTileGridRenderer : EntityRenderer("SimpleTileGridRenderer") {
     override fun acceptEntity(entity: Entity) = false
 
     override fun sort(entities: DynArray<Entity>) {

@@ -1,6 +1,5 @@
-package com.inari.firefly.core.component
+package com.inari.firefly.core
 
-import com.inari.firefly.core.*
 import com.inari.util.NO_NAME
 import kotlin.test.*
 
@@ -91,15 +90,13 @@ class ComponentTest {
         val parentKey = TestParent.build {
             name = "parent1"
             ptest1 = "ptest1"
-            withChild(TestChild, ChildLifeCyclePolicy.ACTIVATE) {
+            withChild(TestChild) {
                 name = "child1"
                 cest1 = "cest1"
-                parent("parent1")
             }
-            withChild(TestChild, ChildLifeCyclePolicy.LOAD) {
+            withChild(TestChild) {
                 name = "child2"
                 cest1 = "cest2"
-                parent("parent1")
             }
         }
 
@@ -149,7 +146,7 @@ class ComponentTest {
         assertTrue(child2.loaded)
         assertTrue(parent1.active)
         assertTrue(child1.active)
-        assertFalse(child2.active) // because of ChildLifeCyclePolicy.LOAD
+        assertTrue(child2.active)
     }
 
     class TestComponent : Component(TestComponent) {
@@ -179,7 +176,6 @@ class ComponentTest {
 
     class TestChild : Component(TestChild) {
 
-        @JvmField var parent = CReference(TestParent)
         @JvmField var cest1: String = NO_NAME
         @JvmField var cest2: String = NO_NAME
 

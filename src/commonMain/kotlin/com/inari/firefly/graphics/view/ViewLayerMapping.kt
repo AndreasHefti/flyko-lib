@@ -21,7 +21,7 @@ class ViewLayerMapping {
 
     operator fun get(view: Int, layer: Int): BitSetRO = internalGet(view, layer)
     operator fun get(viewLayer: ViewLayerAware): BitSetRO = internalGet(viewLayer.viewIndex, viewLayer.layerIndex)
-    operator fun get(view: ComponentKey, layer: ComponentKey): BitSetRO = internalGet(view.instanceId, layer.instanceId)
+    operator fun get(view: ComponentKey, layer: ComponentKey): BitSetRO = internalGet(view.instanceIndex, layer.instanceIndex)
     operator fun get(view: View, layer: Layer): BitSetRO = internalGet(view.index, layer.index)
 
     fun add(viewLayer: ViewLayerAware, index: Int) =
@@ -40,10 +40,11 @@ class ViewLayerMapping {
         if (view !in mapping)
             mapping[view] = DynArray.of(1, 1)
 
+        val l = if (layer >= 0) layer else 0
         val perView = mapping[view]!!
         if (layer !in perView)
-            perView[layer] = BitSet()
+            perView[l] = BitSet()
 
-        return perView[layer]!!
+        return perView[l]!!
     }
 }

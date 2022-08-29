@@ -9,7 +9,7 @@ import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.EntityRenderer
 import com.inari.util.collection.DynArray
 
-object SimpleSpriteRenderer : EntityRenderer() {
+object SimpleSpriteRenderer : EntityRenderer("SimpleSpriteRenderer") {
 
     init { order = 35 }
 

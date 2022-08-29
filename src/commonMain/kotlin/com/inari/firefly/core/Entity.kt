@@ -139,7 +139,7 @@ class EChild private constructor() : EntityComponent(EChild) {
 
     @JvmField val parent = CReference(Entity)
     val parentIndex: Int
-        get() = parent.targetKey.instanceId
+        get() = parent.targetKey.instanceIndex
     @JvmField var zPos: Int = -1
 
     override fun reset() {

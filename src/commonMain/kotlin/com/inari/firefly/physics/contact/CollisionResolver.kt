@@ -1,6 +1,7 @@
 package com.inari.firefly.physics.contact
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGrid
 import com.inari.firefly.graphics.view.ETransform
@@ -46,7 +47,7 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
 
         init {
             MovementControl // load movement first to ensure Contact MapUpdate first
-            Engine.registerListener(Engine.UpdateEvent, this::update)
+            Engine.registerListener(UPDATE_EVENT_TYPE, this::update)
         }
 
         private fun update() {
@@ -67,8 +68,8 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                 }
 
                 if (contacts.notifyContacts && contacts.contactScans.hasAnyContact()) {
-                    ContactEvent.contactEvent.entityId = entity.index
-                    Engine.notify(ContactEvent.contactEvent)
+                    contactEvent.entityId = entity.index
+                    Engine.notify(contactEvent)
                 }
             }
         }
@@ -79,6 +80,15 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                 val c = contactsComp.contactScans.scans[i++] ?: continue
                 updateContacts(entity, c)
             }
+        }
+
+        fun updateContacts(entityIndex: Int) = updateContacts(Entity[entityIndex])
+        fun updateContacts(entity: Entity) {
+            val contacts = entity[EContact]
+            if (!contacts.contactScans.hasAnyScan)
+                return
+
+            scanContacts(entity, contacts)
         }
 
         private val originWorldBounds = SystemContactBounds(circle = Vector3i())
@@ -217,17 +227,14 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
             if (EChild in parentEntity.aspects)
                 addTransformPos(parentEntity[EChild].parentIndex)
         }
+
+        private val contactEventType = Event.EventType("ContactEvent")
+        private val contactEvent = ContactEvent(contactEventType)
     }
 
     class ContactEvent(override val eventType: EventType) : Event<(Int) -> Unit>() {
-
         var entityId: Int = -1
             internal set
-
         override fun notify(listener: (Int) -> Unit) { listener(entityId) }
-
-        companion object : EventType("ContactEvent") {
-            internal val contactEvent = ContactEvent(this)
-        }
     }
 }

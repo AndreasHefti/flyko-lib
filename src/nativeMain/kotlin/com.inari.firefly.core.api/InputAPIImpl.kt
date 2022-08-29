@@ -74,7 +74,7 @@ actual object InputAPIImpl : InputAPI {
                         callback.invoke(it, ACTION_PRESS)
                 }
             }
-            Engine.registerListener(Engine.UpdateEvent, buttonCallbackUpdate)
+            Engine.registerListener(Engine.UPDATE_EVENT_TYPE, buttonCallbackUpdate)
         } else throw IllegalArgumentException("No device with name: $deviceName found")
     }
 

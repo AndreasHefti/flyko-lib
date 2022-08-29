@@ -1,5 +1,6 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.Engine.Companion.RENDER_EVENT_TYPE
 import com.inari.firefly.core.api.TransformData
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.event.Event
@@ -8,26 +9,10 @@ import kotlin.math.floor
 
 abstract class Renderer {
 
-    open fun activate() = Engine.registerListener(RenderingEvent, ::render)
-    open fun deactivate() = Engine.disposeListener(RenderingEvent, ::render)
+    open fun activate() = Engine.registerListener(RENDER_EVENT_TYPE, ::render)
+    open fun deactivate() = Engine.disposeListener(RENDER_EVENT_TYPE, ::render)
     abstract fun render()
 
-}
-
-@Suppress("OVERRIDE_BY_INLINE")
-class RenderingEvent private constructor(override val eventType: EventType) : Event<() -> Unit>() {
-    override inline fun notify(listener: () -> Unit) = listener()
-    companion object : EventType("RenderingEvent") {
-        internal val renderingEvent = RenderingEvent(this)
-    }
-}
-
-@Suppress("OVERRIDE_BY_INLINE")
-class PostRenderEvent private constructor(override val eventType: EventType) : Event<() -> Unit>() {
-    override inline fun notify(listener: () -> Unit) = listener()
-    companion object : EventType("PostRenderEvent") {
-        internal val postRenderEvent = PostRenderEvent(this)
-    }
 }
 
 class Transform constructor(

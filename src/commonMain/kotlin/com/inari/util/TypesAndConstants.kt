@@ -6,6 +6,18 @@ import kotlin.jvm.JvmField
 
 const val ZERO_INT = 0
 const val ZERO_FLOAT = 0.0f
+const val UNDERLINE = "_"
+const val COLON = ":"
+const val EMPTY_STRING = ""
+const val COMMA = ","
+const val VALUE_SEPARATOR = ','
+const val VALUE_SEPARATOR_STRING = ","
+
+const val KEY_VALUE_SEPARATOR = '='
+const val KEY_VALUE_SEPARATOR_STRING = "="
+
+const val LIST_VALUE_SEPARATOR = '|'
+const val LIST_VALUE_SEPARATOR_STRING = "|"
 
 const val NO_NAME = "[[NO_NAME]]"
 const val NO_STATE: String = "[[NO_STATE]]"
@@ -97,7 +109,26 @@ typealias Operation = () -> OperationResult
 typealias OperationCallback = (OperationResult) -> Unit
 typealias TaskOperation = (Int, Int, Int) -> OperationResult
 typealias TaskCallback = (Int, OperationResult) -> Unit
+typealias ConditionalOperation = (Int, Int, Int) -> Boolean
+typealias NormalOperation = (Int, Int, Int) -> Float
 
 val RUNNING_OPERATION: Operation = { OperationResult.RUNNING }
 val SUCCESS_OPERATION: Operation = { OperationResult.SUCCESS }
 val FAILED_OPERATION: Operation = { OperationResult.FAILED }
+val RUNNING_TASK_OPERATION: TaskOperation = {  _, _, _ -> OperationResult.RUNNING }
+val SUCCESS_TASK_OPERATION: TaskOperation = {  _, _, _ -> OperationResult.SUCCESS }
+val FAILED_TASK_OPERATION: TaskOperation = {  _, _, _ -> OperationResult.FAILED }
+val TRUE_OPERATION: ConditionalOperation = { _, _, _ -> true }
+val FALSE_OPERATION: ConditionalOperation = { _, _, _ -> false }
+@JvmField val ZERO_OP: NormalOperation = { _, _, _ -> 0f }
+@JvmField val ONE_OP : NormalOperation = { _, _, _ -> 1f }
+
+operator fun ConditionalOperation.invoke() = this(-1, -1, -1)
+operator fun ConditionalOperation.invoke(entityId: Int) = this(entityId, -1, -1)
+operator fun ConditionalOperation.invoke(entityId1: Int, entityId2: Int) = this(entityId1, entityId2, -1)
+operator fun TaskOperation.invoke() = this(-1, -1, -1)
+operator fun TaskOperation.invoke(entityId: Int) = this(entityId, -1, -1)
+operator fun TaskOperation.invoke(entityId1: Int, entityId2: Int) = this(entityId1, entityId2, -1)
+operator fun NormalOperation.invoke() = this(-1, -1, -1)
+operator fun NormalOperation.invoke(entityId: Int) = this(entityId, -1, -1)
+operator fun NormalOperation.invoke(entityId1: Int, entityId2: Int) = this(entityId1, entityId2, -1)

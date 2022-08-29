@@ -15,9 +15,9 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
     @JvmField internal val cellDim = Vector2i(-1, -1)
 
     override val viewIndex: Int
-        get() = viewRef.targetKey.instanceId
+        get() = viewRef.targetKey.instanceIndex
     override val layerIndex: Int
-        get() = layerRef.targetKey.instanceId
+        get() = if(layerRef.targetKey.instanceIndex >= 0) layerRef.targetKey.instanceIndex else 0
     @JvmField val viewRef = CReference(View)
     @JvmField val layerRef = CReference(Layer)
     @JvmField var renderer: EntityRenderer = SimpleTileGridRenderer
@@ -218,7 +218,7 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
             val entity = Entity[index]
             val tile = entity[ETile]
             val tileGrid = if (tile.tileGridRef.exists)
-                if (this.exists(tile.tileGridRef.targetKey.instanceId))
+                if (this.exists(tile.tileGridRef.targetKey.instanceIndex))
                     this[tile.tileGridRef.targetKey]
                 else return
             else

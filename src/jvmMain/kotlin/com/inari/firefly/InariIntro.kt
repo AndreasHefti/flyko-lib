@@ -2,7 +2,6 @@ package com.inari.firefly
 
 import com.inari.firefly.core.Asset
 import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
-import com.inari.firefly.core.ComponentSystem
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Entity
 import com.inari.firefly.core.api.ButtonType
@@ -22,10 +21,7 @@ object InariIntro {
 
     private var textureAssetName = "INARI_LOGO_TEX"
     private var spriteAssetName = "INARI_LOGO_SPRITE"
-    //private var textureAssetKey = Asset.createKey(textureAssetName)
-    //private var spriteAssetId = NO_COMPONENT_KEY
     private var entityId = NO_COMPONENT_KEY
-    //private var animationId = NO_COMPONENT_KEY
     private var callback: () -> Unit = {}
     private var disposing = false
 
@@ -46,7 +42,7 @@ object InariIntro {
 
         entityId = Entity.buildActive {
             withComponent(ETransform) {
-                view(View.BASE_VIEW_KEY)
+                viewRef(View.BASE_VIEW_KEY)
                 position(
                     Engine.graphics.screenWidth / 2 - pngWidth / 2,
                     Engine.graphics.screenHeight / 2 - pngHeight / 2
@@ -84,9 +80,7 @@ object InariIntro {
     private fun dispose() {
         if (!disposing) {
             disposing = true
-//            Entity.delete(entityId)
             Asset.delete(textureAssetName)
-//            FFContext.delete(animationId)
             Engine.input.resetInputCallbacks()
             callback()
         }

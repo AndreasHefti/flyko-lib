@@ -7,7 +7,7 @@ import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.EntityRenderer
 import com.inari.util.collection.DynArray
 
-object MultiPositionSpriteRenderer : EntityRenderer() {
+object MultiPositionSpriteRenderer : EntityRenderer("MultiPositionSpriteRenderer") {
 
     init { order = 30 }
 

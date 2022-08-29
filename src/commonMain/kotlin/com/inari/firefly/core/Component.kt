@@ -2,6 +2,7 @@ package com.inari.firefly.core
 
 import com.inari.firefly.core.Component.Companion.COMPONENT_TYPE_ASPECTS
 import com.inari.firefly.core.ComponentEventType.*
+import com.inari.firefly.core.Apply.*
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.AspectType
 import com.inari.util.aspect.IndexedAspectType
@@ -27,15 +28,31 @@ enum class ComponentEventType {
     DELETED
 }
 
-enum class ChildLifeCyclePolicy(
-    val load: Boolean,
-    val activate: Boolean,
-    val deactivate: Boolean,
-    val dispose: Boolean,
-) {
-    NONE(false, false, false, false),
-    LOAD(true, false, false, true),
-    ACTIVATE(true, true, true, true),
+//enum class ChildLifeCyclePolicy(
+//    val load: Boolean,
+//    val activate: Boolean,
+//    val deactivate: Boolean,
+//    val dispose: Boolean,
+//) {
+//    NONE(false, false, false, false),
+//    LOAD(true, false, false, true),
+//    ACTIVATE(true, true, true, true),
+//}
+
+enum class Apply { NONE, BEFORE, AFTER }
+interface ApplyPolicy {
+    val parentPolicy: Apply
+    val childPolicy: Apply
+}
+enum class ApplyPolicies(
+    override val parentPolicy: Apply,
+    override val childPolicy: Apply) : ApplyPolicy {
+
+    DEFAULT_LOAD(BEFORE, AFTER),
+    DEFAULT_ACTIVATE(BEFORE, AFTER),
+    DEFAULT_DEACTIVATE(NONE, BEFORE),
+    DEFAULT_DISPOSE(NONE, BEFORE),
+    DEFAULT_DELETE(NONE, BEFORE)
 }
 
 abstract class ComponentEvent internal constructor(): Event<ComponentEventListener>() {
@@ -66,7 +83,7 @@ abstract class ComponentType<C : Component>(
 
 interface ComponentId {
     val type: ComponentType<*>
-    val instanceId: Int
+    val instanceIndex: Int
 }
 
 open class ComponentKey internal constructor (
@@ -74,11 +91,11 @@ open class ComponentKey internal constructor (
     override val type: ComponentType<*>
 ) : ComponentId {
 
-    override var instanceId: Int = -1
+    override var instanceIndex: Int = -1
         internal set
 
     override fun toString(): String =
-        "CKey($name, ${type.aspectName}, $instanceId)"
+        "CKey($name, ${type.aspectName}, $instanceIndex)"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -120,12 +137,12 @@ abstract class Component protected constructor(
                 sys.createKey(value)
         }
 
-    @JvmField val onInitTask = NO_NAME
-    @JvmField val onLoadTask = NO_NAME
-    @JvmField val onActivationTask = NO_NAME
-    @JvmField val onDeactivationTask = NO_NAME
-    @JvmField val onDisposeTask = NO_NAME
-    @JvmField val onDeleteTask = NO_NAME
+    @JvmField var onInitTask = NO_NAME
+    @JvmField var onLoadTask = NO_NAME
+    @JvmField var onActivationTask = NO_NAME
+    @JvmField var onDeactivationTask = NO_NAME
+    @JvmField var onDisposeTask = NO_NAME
+    @JvmField var onDeleteTask = NO_NAME
 
     var initialized: Boolean = false
         protected set
@@ -144,99 +161,86 @@ abstract class Component protected constructor(
             Task[onInitTask](this.index)
     }
 
-    internal fun iLoad() {
-        if (!initialized)
-            throw IllegalStateException("Component in illegal state to load")
-        if (loaded) {
-            loadChildren()
-            return
-        }
+    internal fun iLoad(apply: ApplyPolicy) {
+        this.loaded = true
+
+        if (apply.childPolicy == BEFORE)
+            processChildren(LOADED)
+        if (parent != NO_COMPONENT_KEY && apply.parentPolicy == BEFORE)
+            ComponentSystem.load(parent)
 
         load()
-        this.loaded = true
+
         if (onLoadTask != NO_NAME)
             Task[onLoadTask](this.index)
 
-        loadChildren()
+        if (apply.childPolicy == AFTER)
+            processChildren(LOADED)
+        if (parent != NO_COMPONENT_KEY && apply.parentPolicy == AFTER)
+            ComponentSystem.load(parent)
     }
 
-    private fun loadChildren() {if (children != null)
-        children!!.forEach {
-            if (it.second.load)
-                ComponentSystem.load(it.first)
-        }
-    }
-
-    internal fun iActivate() {
-        if (!initialized)
-            throw IllegalStateException("Component in illegal state to activate")
-        if (active) {
-            activateChildren()
-            return
-        }
+    internal fun iActivate(apply: ApplyPolicy) {
+        this.active = true
 
         if (!loaded) // load first before activation
             ComponentSystem[componentType].load(index)
+        if (apply.childPolicy == BEFORE)
+            processChildren(ACTIVATED)
+        if (parent != NO_COMPONENT_KEY && apply.parentPolicy == BEFORE)
+            ComponentSystem.activate(parent)
 
         activate()
-        this.active = true
+
         if (onActivationTask != NO_NAME)
             Task[onActivationTask](this.index)
 
-        activateChildren()
+        if (apply.childPolicy == AFTER)
+            processChildren(ACTIVATED)
+        if (parent != NO_COMPONENT_KEY && apply.parentPolicy == AFTER)
+            ComponentSystem.activate(parent)
     }
 
-    private fun activateChildren() {
-        if (children != null)
-            children!!.forEach {
-                if (it.second.activate)
-                    ComponentSystem.activate(it.first)
-            }
-    }
+    internal fun iDeactivate(apply: ApplyPolicy) {
+        this.active = false
 
-    internal fun iDeactivate() {
-        if (!initialized)
-            throw IllegalStateException("Component in illegal state to activate")
-
-        // deactivate children first
-        if (children != null)
-            children!!.forEach {
-                if (it.second.deactivate)
-                    ComponentSystem.deactivate(it.first)
-            }
-
-        if (!active)
-            return
+        if (apply.childPolicy == BEFORE)
+            processChildren(DEACTIVATED)
+        if (parent != NO_COMPONENT_KEY && apply.parentPolicy == BEFORE)
+            ComponentSystem.delete(parent)
 
         if (onDeactivationTask != NO_NAME)
             Task[onDeactivationTask](this.index)
+
         deactivate()
-        this.active = false
+
+        if (apply.childPolicy == AFTER)
+            processChildren(DEACTIVATED)
+        if (parent != NO_COMPONENT_KEY && apply.parentPolicy == AFTER)
+            ComponentSystem.deactivate(parent)
     }
 
-    internal fun iDispose() {
-        if (!initialized)
-            throw IllegalStateException("Component in illegal state to dispose")
+    internal fun iDispose(apply: ApplyPolicy) {
+        this.loaded = false
 
-        // dispose children first
-        if (children != null)
-            children!!.forEach {
-                if (it.second.dispose)
-                    ComponentSystem.dispose(it.first)
-            }
-
-        if (!loaded)
-            return
         if (active) // deactivate first if still active
             ComponentSystem[componentType].deactivate(index)
+        if (apply.childPolicy == BEFORE)
+            processChildren(DISPOSED)
+        if (parent != NO_COMPONENT_KEY && apply.parentPolicy == BEFORE)
+            ComponentSystem.dispose(parent)
 
         if (onDisposeTask != NO_NAME)
             Task[onDisposeTask](this.index)
         dispose()
-        this.loaded = false
+
+        if (apply.childPolicy == AFTER)
+            processChildren(DISPOSED)
+        if (parent != NO_COMPONENT_KEY && apply.parentPolicy == AFTER)
+            ComponentSystem.dispose(parent)
     }
 
-    internal fun iDelete() {
+    internal fun iDelete(apply: ApplyPolicy) {
         if (!initialized) {
             children?.clear()
             disposeIndex()
@@ -245,21 +249,36 @@ abstract class Component protected constructor(
 
         if (loaded) // dispose first when still loaded
             ComponentSystem[componentType].dispose(index)
-
-        // delete children first
-        if (children != null)
-            children!!.forEach {
-                ComponentSystem.delete(it.first)
-            }
+        if (apply.childPolicy == BEFORE)
+            processChildren(DELETED)
+        if (parent != NO_COMPONENT_KEY && apply.parentPolicy == BEFORE)
+            ComponentSystem.delete(  parent)
 
         if (onDeleteTask != NO_NAME)
             Task[onDeleteTask](this.index)
-
         delete()
-
         this.initialized = false
+
+        if (apply.childPolicy == AFTER)
+            processChildren(DELETED)
+        if (parent != NO_COMPONENT_KEY && apply.parentPolicy == AFTER)
+            ComponentSystem.delete(parent)
+
         children?.clear()
         disposeIndex()
+    }
+
+    private fun processChildren(type: ComponentEventType) {
+        children?.forEach {
+            when (type) {
+                LOADED -> ComponentSystem.load(it)
+                ACTIVATED -> ComponentSystem.activate(it)
+                DEACTIVATED -> ComponentSystem.deactivate(it)
+                DISPOSED -> ComponentSystem.dispose(it)
+                DELETED -> ComponentSystem.delete(it)
+                else -> {}
+            }
+        }
     }
 
     protected open fun initialize() {}
@@ -269,45 +288,56 @@ abstract class Component protected constructor(
     protected open fun dispose() {}
     protected open fun delete() {}
 
-    // **** Child References ****
-    // **************************
-    private var children: DynArray<Pair<ComponentKey, ChildLifeCyclePolicy>>? = null
+    // **** References ****
+    // ********************
+    protected var parent: ComponentKey = NO_COMPONENT_KEY
+    protected var children: DynArray<ComponentKey>? = null
 
-    fun withChild(key: ComponentKey, policy: ChildLifeCyclePolicy = ChildLifeCyclePolicy.LOAD): ComponentKey {
+    protected open fun setParentComponent(key: ComponentKey) {
+        parent = key
+    }
+    fun withChild(key: ComponentKey): ComponentKey {
+        val child: Component = ComponentSystem[key]
+        if (child.parent != NO_COMPONENT_KEY)
+            throw IllegalArgumentException("Component for key: $key has already a parent")
+        else
+            child.setParentComponent(ComponentSystem[this.componentType].getKey(this.index))
+
         if (children == null)
             children = DynArray.of()
-        children!!.add(Pair(key, policy))
+        children!!.add(key)
+
         return key
     }
 
     fun <C : Component> withChild(
         type: ComponentType<C>,
-        policy: ChildLifeCyclePolicy = ChildLifeCyclePolicy.LOAD,
-        configure: (C.() -> Unit)): ComponentKey = withChild(ComponentSystem[type].builder, policy, configure)
+        configure: (C.() -> Unit)): ComponentKey = withChild(ComponentSystem[type].builder, configure)
 
     fun <C : Component> withChild(
         cBuilder: ComponentBuilder<C>,
-        policy: ChildLifeCyclePolicy = ChildLifeCyclePolicy.LOAD,
         configure: (C.() -> Unit)): ComponentKey {
 
         if (children == null)
             children = DynArray.of()
 
         val child = cBuilder.buildAndGet(configure)
-
         if (child.name == NO_NAME)
-            throw IllegalArgumentException("Component needs a name if it is uses as child reference")
+            throw IllegalArgumentException("Component needs a name if it is used as child reference")
 
-        child.notifyParent(this)
+        child.setParentComponent(ComponentSystem[this.componentType].getKey(this.name))
         val key = ComponentSystem[child.componentType].getKey(child.name)
-        children!!.add(Pair(key, policy))
+        children!!.add(key)
         return  key
     }
 
-    fun removeChild(key: ComponentKey) =
-        children?.find { it.first == key }?.let { pair -> children?.remove(pair) }
+    fun removeChild(key: ComponentKey) {
+        if (children == null || key !in children!!) return
+        children?.remove(key)
+        val child: Component = ComponentSystem[key]
+        child.setParentComponent(NO_COMPONENT_KEY)
+    }
 
-    protected open fun notifyParent(comp: Component) {}
     protected fun <T> checkNotLoaded(value: T, s: String): T {
         if (loaded)
             throw IllegalStateException("No property change allows on load: $s")
@@ -329,6 +359,11 @@ abstract class Component protected constructor(
 abstract class ComponentBuilder<C : Component>(
     internal val system: ComponentSystem<in C>
 ) {
+
+    init {
+        @Suppress("LeakingThis")
+        ComponentSystem.COMPONENT_BUILDER_MAPPING[system.aspectName] = this
+    }
 
     fun build(configure: C.() -> Unit): ComponentKey {
         @Suppress("UNCHECKED_CAST")

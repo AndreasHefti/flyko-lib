@@ -1,9 +1,7 @@
 package com.inari.firefly.physics.contact
 
 import com.inari.firefly.core.*
-import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.tile.ETile
-import com.inari.firefly.graphics.tile.TileGrid
 import com.inari.firefly.graphics.view.*
 import com.inari.firefly.physics.movement.MovementControl
 import com.inari.util.DO_NOTHING
@@ -14,17 +12,15 @@ import kotlin.jvm.JvmField
 abstract class ContactMap protected constructor() : Component(ContactMap), ViewLayerAware  {
 
     override val viewIndex: Int
-        get() = viewRef.targetKey.instanceId
+        get() = viewRef.targetKey.instanceIndex
     override val layerIndex: Int
-        get() = layerRef.targetKey.instanceId
+        get() = layerRef.targetKey.instanceIndex
     @JvmField val viewRef = CReference(View)
     @JvmField val layerRef = CReference(Layer)
 
     protected val entities: BitSet = BitSet()
 
-    internal fun notifyEntityActivation (index: Int) {
-        val entity = Entity[index]
-        if (EContact !in entity.aspects || ETile in entity.aspects) return
+    internal fun notifyEntityActivation (entity: Entity) {
         val transform = entity[ETransform]
         if (viewIndex != transform.viewIndex || layerIndex != transform.layerIndex)
             return
@@ -96,14 +92,17 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
         }
 
         private val entityListener: ComponentEventListener = { index, type ->
-            when(type) {
-                ComponentEventType.ACTIVATED -> COMPONENT_MAPPING.forEach {
-                    it.notifyEntityActivation(index)
+            val entity = Entity[index]
+            if (EContact in entity.aspects && ETile !in entity.aspects) {
+                when (type) {
+                    ComponentEventType.ACTIVATED -> COMPONENT_MAPPING.forEach {
+                        it.notifyEntityActivation(entity)
+                    }
+                    ComponentEventType.DEACTIVATED -> COMPONENT_MAPPING.forEach {
+                        it.notifyEntityDeactivation(index)
+                    }
+                    else -> {}
                 }
-                ComponentEventType.DEACTIVATED -> COMPONENT_MAPPING.forEach {
-                    it.notifyEntityDeactivation(index)
-                }
-                else -> {}
             }
         }
 
@@ -130,7 +129,7 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
         init {
             Entity.registerComponentListener(entityListener)
             View.registerComponentListener(viewListener)
-            Engine.registerListener(MovementControl.MoveEvent, moveListener)
+            Engine.registerListener(MovementControl.moveEvent, moveListener)
         }
 
         fun update(entity: Entity) {
@@ -165,7 +164,7 @@ class SimpleContactMap private constructor(): ContactMap() {
         return iterator
     }
 
-    companion object :  ComponentSubTypeSystem<ContactMap, SimpleContactMap>(ContactMap) {
+    companion object :  ComponentSubTypeSystem<ContactMap, SimpleContactMap>(ContactMap, "SimpleContactMap") {
         override fun create() = SimpleContactMap()
         private val ITERATOR_POOL = ArrayDeque<EntityIdIterator>()
     }

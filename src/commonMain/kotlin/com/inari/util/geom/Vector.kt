@@ -3,6 +3,7 @@ package com.inari.util.geom
 import com.inari.util.FloatPropertyAccessor
 import com.inari.util.IntPropertyAccessor
 import com.inari.util.StringUtils
+import com.inari.util.VALUE_SEPARATOR
 import kotlin.jvm.JvmField
 import kotlin.math.sqrt
 
@@ -89,7 +90,7 @@ open class Vector2i constructor(
     }
 
     open operator fun invoke(jsonString: String) : Vector2i {
-        val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
+        val split = jsonString.split(VALUE_SEPARATOR)
         v0 = try { split[0].toInt() } catch (e: Exception) { v0 }
         v1 = try { split[1].toInt() } catch (e: Exception) { v1 }
         return this
@@ -131,8 +132,8 @@ open class Vector2i constructor(
         return this
     }
 
-    open fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1"
-    override fun toString(): String = "[x=$v0${StringUtils.VALUE_SEPARATOR}y=$v1]"
+    open fun toJsonString(): String = "$v0${VALUE_SEPARATOR}$v1"
+    override fun toString(): String = "[x=$v0${VALUE_SEPARATOR}y=$v1]"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
@@ -211,7 +212,7 @@ open class Vector3i constructor(
     }
 
     override operator fun invoke(jsonString: String): Vector3i {
-        val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
+        val split = jsonString.split(VALUE_SEPARATOR)
         v0 = try { split[0].toInt() } catch (e: Exception) { v0 }
         v1 = try { split[1].toInt() } catch (e: Exception) { v1 }
         v2 = try { split[2].toInt() } catch (e: Exception) { v2 }
@@ -254,8 +255,8 @@ open class Vector3i constructor(
         return this
     }
 
-    override fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1${StringUtils.VALUE_SEPARATOR}$v2"
-    override fun toString(): String = "[x=$v0${StringUtils.VALUE_SEPARATOR}y=$v1${StringUtils.VALUE_SEPARATOR}r=$v2]"
+    override fun toJsonString(): String = "$v0${VALUE_SEPARATOR}$v1${VALUE_SEPARATOR}$v2"
+    override fun toString(): String = "[x=$v0${VALUE_SEPARATOR}y=$v1${VALUE_SEPARATOR}r=$v2]"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
@@ -372,7 +373,7 @@ class Vector4i constructor(
     }
 
     override operator fun invoke(jsonString: String) : Vector4i {
-        val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
+        val split = jsonString.split(VALUE_SEPARATOR)
         v0 = try { split[0].toInt() } catch (e: Exception) { v0 }
         v1 = try { split[1].toInt() } catch (e: Exception) { v1 }
         v2 = try { split[2].toInt() } catch (e: Exception) { v2 }
@@ -422,8 +423,8 @@ class Vector4i constructor(
         return this
     }
 
-    override fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1${StringUtils.VALUE_SEPARATOR}$v2${StringUtils.VALUE_SEPARATOR}$v3"
-    override fun toString(): String = "[x=$v0${StringUtils.VALUE_SEPARATOR}y=$v1${StringUtils.VALUE_SEPARATOR}width=$v2${StringUtils.VALUE_SEPARATOR}height=$v3]"
+    override fun toJsonString(): String = "$v0${VALUE_SEPARATOR}$v1${VALUE_SEPARATOR}$v2${VALUE_SEPARATOR}$v3"
+    override fun toString(): String = "[x=$v0${VALUE_SEPARATOR}y=$v1${VALUE_SEPARATOR}width=$v2${VALUE_SEPARATOR}height=$v3]"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
@@ -558,7 +559,7 @@ open class Vector2f constructor(
     }
 
     open operator fun invoke(jsonString: String): Vector2f {
-        val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
+        val split = jsonString.split(VALUE_SEPARATOR)
         v0 = try { split[0].toFloat() } catch (e: Exception) { v0 }
         v1 = try { split[1].toFloat() } catch (e: Exception) { v1 }
         return this
@@ -604,8 +605,8 @@ open class Vector2f constructor(
         return this
     }
 
-    open fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1"
-    override fun toString(): String = "[x=$v0${StringUtils.VALUE_SEPARATOR}y=$v1]"
+    open fun toJsonString(): String = "$v0${VALUE_SEPARATOR}$v1"
+    override fun toString(): String = "[x=$v0${VALUE_SEPARATOR}y=$v1]"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false
@@ -692,7 +693,7 @@ open class Vector3f constructor(
     }
 
     override operator fun invoke(jsonString: String): Vector3f {
-        val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
+        val split = jsonString.split(VALUE_SEPARATOR)
         v0 = try { split[0].toFloat() } catch (e: Exception) { v0 }
         v1 = try { split[1].toFloat() } catch (e: Exception) { v1 }
         v2 = try { split[2].toFloat() } catch (e: Exception) { v2 }
@@ -739,8 +740,8 @@ open class Vector3f constructor(
         return this
     }
 
-    override fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1${StringUtils.VALUE_SEPARATOR}$v2"
-    override fun toString(): String = "[x=$v0${StringUtils.VALUE_SEPARATOR}y=$v1${StringUtils.VALUE_SEPARATOR}z=$v2]"
+    override fun toJsonString(): String = "$v0${VALUE_SEPARATOR}$v1${VALUE_SEPARATOR}$v2"
+    override fun toString(): String = "[x=$v0${VALUE_SEPARATOR}y=$v1${VALUE_SEPARATOR}z=$v2]"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
@@ -854,7 +855,7 @@ class Vector4f constructor(
     }
 
     override operator fun invoke(jsonString: String): Vector4f {
-        val split = jsonString.split(StringUtils.VALUE_SEPARATOR)
+        val split = jsonString.split(VALUE_SEPARATOR)
         v0 = try { split[0].toFloat() } catch (e: Exception) { v0 }
         v1 = try { split[1].toFloat() } catch (e: Exception) { v1 }
         v2 = try { split[2].toFloat() } catch (e: Exception) { v2 }
@@ -902,8 +903,8 @@ class Vector4f constructor(
         return this
     }
 
-    override fun toJsonString(): String = "$v0${StringUtils.VALUE_SEPARATOR}$v1${StringUtils.VALUE_SEPARATOR}$v2${StringUtils.VALUE_SEPARATOR}$v3"
-    override fun toString(): String = "[r=$v0${StringUtils.VALUE_SEPARATOR}g=$v1${StringUtils.VALUE_SEPARATOR}b=$v2${StringUtils.VALUE_SEPARATOR}a=$v3]"
+    override fun toJsonString(): String = "$v0${VALUE_SEPARATOR}$v1${VALUE_SEPARATOR}$v2${VALUE_SEPARATOR}$v3"
+    override fun toString(): String = "[r=$v0${VALUE_SEPARATOR}g=$v1${VALUE_SEPARATOR}b=$v2${VALUE_SEPARATOR}a=$v3]"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false

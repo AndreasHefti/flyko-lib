@@ -7,7 +7,7 @@ import com.inari.firefly.graphics.view.EntityRenderer
 import com.inari.util.collection.DynArray
 import com.inari.util.geom.Vector4i
 
-object FullTileGridRenderer : EntityRenderer() {
+object FullTileGridRenderer : EntityRenderer("FullTileGridRenderer") {
 
     override fun acceptEntity(entity: Entity) = false
 

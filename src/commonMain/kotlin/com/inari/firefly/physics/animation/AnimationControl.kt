@@ -44,8 +44,8 @@ abstract class AnimationControl<D : AnimatedData>(
     }
 
    private fun iAccept(data: AnimatedData): D? {
-        if ( data.animationController.targetKey.instanceId >= 0 &&
-                    data.animationController.targetKey.instanceId != this.index)
+        if ( data.animationController.targetKey.instanceIndex >= 0 &&
+                    data.animationController.targetKey.instanceIndex != this.index)
             return null
         return accept(data)
     }

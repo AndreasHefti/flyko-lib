@@ -1,9 +1,6 @@
 package com.inari.firefly.core
 
-import com.inari.firefly.graphics.sprite.Texture
-import com.inari.firefly.graphics.text.Font
-
-abstract class Asset  protected constructor() : Component(Asset) {
+abstract class Asset protected constructor() : Component(Asset) {
 
     var assetIndex: Int = -1
         protected set
@@ -21,9 +18,9 @@ abstract class Asset  protected constructor() : Component(Asset) {
                 return -1
             if (key.type.aspectIndex != Asset.aspectIndex)
                 throw IllegalArgumentException("Type mismatch")
-            if (key.instanceId < 0)
+            if (key.instanceIndex < 0)
                 throw IllegalArgumentException("No instance")
-            return resolveAssetIndex(key.instanceId, preload)
+            return resolveAssetIndex(key.instanceIndex, preload)
         }
 
         fun resolveAssetIndex(assetIndex: Int, preload: Boolean = true): Int {

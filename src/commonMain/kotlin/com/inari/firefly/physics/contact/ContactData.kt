@@ -1,11 +1,7 @@
 package com.inari.firefly.physics.contact
 
-import com.inari.firefly.core.CReference
-import com.inari.firefly.core.ComponentDSL
-import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_MATERIAL
-import com.inari.util.aspect.Aspects
 import com.inari.util.geom.BitMask
 import com.inari.util.geom.GeomUtils
 import com.inari.util.geom.Vector3i

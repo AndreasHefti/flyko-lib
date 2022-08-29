@@ -8,7 +8,6 @@ import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.ShapeData
 import com.inari.firefly.core.api.ShapeType
 import com.inari.util.FloatPropertyAccessor
-import com.inari.util.ZERO_INT
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 

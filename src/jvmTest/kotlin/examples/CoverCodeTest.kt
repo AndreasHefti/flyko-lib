@@ -1,11 +1,7 @@
 package examples
 
 import com.inari.firefly.DesktopApp
-import com.inari.firefly.core.ComponentSystem
-import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Entity
-import com.inari.firefly.graphics.FFInfoSystem
-import com.inari.firefly.graphics.FrameRateInfo
 import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.Texture
@@ -37,7 +33,7 @@ fun main(args: Array<String>) {
         val entityId = Entity.buildActive {
             // add a transform component to the entity that defines the orientation of the Entity
             withComponent(ETransform) {
-                view(View.BASE_VIEW_KEY)
+                viewRef(View.BASE_VIEW_KEY)
                 position(50, 150)
                 scale(4f, 4f)
             }

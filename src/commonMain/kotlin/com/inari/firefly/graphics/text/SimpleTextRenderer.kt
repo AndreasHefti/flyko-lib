@@ -8,7 +8,7 @@ import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.EntityRenderer
 import com.inari.util.collection.DynArray
 
-object SimpleTextRenderer : EntityRenderer() {
+object SimpleTextRenderer : EntityRenderer("SimpleTextRenderer") {
 
     init { order = 50 }
 
@@ -39,7 +39,7 @@ object SimpleTextRenderer : EntityRenderer() {
             textRenderable.blendMode = text.blend
             transformCollector(transform)
             if (EChild in entity.aspects)
-                collectTransformData(entity[EChild].parent.targetKey.instanceId, transformCollector)
+                collectTransformData(entity[EChild].parent.targetKey.instanceIndex, transformCollector)
 
             val horizontalStep = (font.charWidth + font.charSpace) * transform.scale.v0
             val verticalStep = (font.charHeight + font.lineSpace) * transform.scale.v1

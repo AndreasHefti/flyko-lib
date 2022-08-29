@@ -1,9 +1,6 @@
 package com.inari.firefly.graphics.view
 
-import com.inari.firefly.core.Asset
-import com.inari.firefly.core.CReference
-import com.inari.firefly.core.Component
-import com.inari.firefly.core.ComponentSystem
+import com.inari.firefly.core.*
 import kotlin.jvm.JvmField
 
 class Layer private constructor(): Component(Layer) {
@@ -11,12 +8,15 @@ class Layer private constructor(): Component(Layer) {
     @JvmField var view = CReference(View)
     @JvmField var zPosition = 0
     val shader = CReference(Shader)
-    var shaderIndex = -1
+    var shaderIndex: Int = -1
         internal set
 
-    override fun notifyParent(comp: Component) {
-        if (comp.componentType.aspectIndex == View.aspectIndex)
-            shader(comp)
+    override fun setParentComponent(key: ComponentKey) {
+        super.setParentComponent(key)
+        if (key.type.aspectIndex == Shader.aspectIndex)
+            shader(key)
+        else
+            shader.reset()
     }
 
     override fun activate() {

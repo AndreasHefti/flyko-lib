@@ -1,6 +1,7 @@
 package com.inari.firefly.core
 
 import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
+import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.firefly.core.api.FFTimer
 import com.inari.util.*
 import kotlin.jvm.JvmField
@@ -10,9 +11,9 @@ abstract class Control protected constructor(): Component(Control) {
     private val updateListener = ::update
 
     override fun activate() =
-        Engine.registerListener(Engine.UpdateEvent, updateListener)
+        Engine.registerListener(UPDATE_EVENT_TYPE, updateListener)
     override fun deactivate() =
-        Engine.disposeListener(Engine.UpdateEvent, updateListener)
+        Engine.disposeListener(UPDATE_EVENT_TYPE, updateListener)
 
     abstract fun update()
 
@@ -41,11 +42,10 @@ abstract class ComponentControl<C : Component> : Control() {
 
     private val componentListener: ComponentEventListener = { index, type ->
         val component = ComponentSystem[controlledComponentType][index]
-        when (type) {
-            ComponentEventType.ACTIVATED -> notifyActivation(component)
-            ComponentEventType.DEACTIVATED -> notifyDeactivation(component)
-            else -> {}
-        }
+        if (type == ComponentEventType.ACTIVATED)
+            notifyActivation(component)
+        else if (type == ComponentEventType.DEACTIVATED)
+            notifyDeactivation(component)
     }
 
     abstract val controlledComponentType: ComponentType<C>
@@ -92,7 +92,7 @@ class Scene : Control() {
             Scene.delete(index)
     }
 
-    companion object :  ComponentSubTypeSystem<Control, Scene>(Control) {
+    companion object :  ComponentSubTypeSystem<Control, Scene>(Control, "Scene") {
         override fun create() = Scene()
 
         fun run(index: Int, callback: OperationCallback) {

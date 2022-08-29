@@ -1,14 +1,8 @@
 package com.inari.firefly.core
 
 
-import com.inari.firefly.core.Engine.UpdateEvent.Companion.updateEvent
-import com.inari.firefly.core.PostRenderEvent.Companion.postRenderEvent
-import com.inari.firefly.core.RenderingEvent.Companion.renderingEvent
+
 import com.inari.firefly.core.api.*
-import com.inari.firefly.graphics.FFInfoSystem
-import com.inari.firefly.graphics.sprite.Texture
-import com.inari.firefly.graphics.text.Font
-import com.inari.util.collection.DynArray
 import com.inari.util.event.*
 import kotlin.jvm.JvmField
 
@@ -40,7 +34,7 @@ abstract class Engine protected constructor(
         notify(updateEvent)
         timer.updateSchedulers()
         // render objects
-        notify(renderingEvent)
+        notify(renderEvent)
         notify(postRenderEvent)
     }
 
@@ -75,13 +69,27 @@ abstract class Engine protected constructor(
         fun <L> notify(event: Event<L>) = eventDispatcher.notify(event)
         fun <L : AspectedEventListener> notify(event: AspectedEvent<L>) = eventDispatcher.notify(event)
 
+        val UPDATE_EVENT_TYPE = Event.EventType("UpdateEvent")
+        val RENDER_EVENT_TYPE = Event.EventType("RenderingEvent")
+        val POST_RENDER_EVENT_TYPE = Event.EventType("PostRenderEvent")
+
+        internal val updateEvent = UpdateEvent(UPDATE_EVENT_TYPE)
+        internal val renderEvent = UpdateEvent(RENDER_EVENT_TYPE)
+        internal val postRenderEvent = UpdateEvent(POST_RENDER_EVENT_TYPE)
     }
 
     @Suppress("OVERRIDE_BY_INLINE")
     class UpdateEvent(override val eventType: EventType) : Event<() -> Unit>() {
         override inline fun notify(listener: () -> Unit) = listener()
-        companion object : EventType("UpdateEvent") {
-            internal val updateEvent = UpdateEvent(this)
-        }
+    }
+
+    @Suppress("OVERRIDE_BY_INLINE")
+    class RenderingEvent private constructor(override val eventType: EventType) : Event<() -> Unit>() {
+        override inline fun notify(listener: () -> Unit) = listener()
+    }
+
+    @Suppress("OVERRIDE_BY_INLINE")
+    class PostRenderEvent private constructor(override val eventType: EventType) : Event<() -> Unit>() {
+        override inline fun notify(listener: () -> Unit) = listener()
     }
 }

@@ -26,9 +26,9 @@ class CReference internal constructor(
     val defined: Boolean
         get() { return targetKey != NO_COMPONENT_KEY }
     val exists: Boolean
-        get() { return targetKey.instanceId >= 0 }
+        get() { return targetKey.instanceIndex >= 0 }
 
-    operator fun invoke(id: ComponentId) { targetKey = ComponentSystem[targetType].getKey(id.instanceId) }
+    operator fun invoke(id: ComponentId) { targetKey = ComponentSystem[targetType].getKey(id.instanceIndex) }
     operator fun invoke(index: Int) { targetKey = ComponentSystem[targetType].getKey(index) }
     operator fun invoke(indexed: Indexed) { targetKey = ComponentSystem[targetType].getKey(indexed.index) }
     operator fun invoke(name: String) { targetKey = ComponentSystem[targetType].getKey(name) }

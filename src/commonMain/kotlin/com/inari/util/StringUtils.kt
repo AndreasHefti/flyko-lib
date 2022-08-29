@@ -10,17 +10,6 @@ import kotlin.math.roundToInt
  */
 object StringUtils {
 
-    const val EMPTY_STRING = ""
-    const val VALUE_SEPARATOR = ','
-    const val VALUE_SEPARATOR_STRING = ","
-
-    const val KEY_VALUE_SEPARATOR = '='
-    const val KEY_VALUE_SEPARATOR_STRING = "="
-
-    const val LIST_VALUE_SEPARATOR = '|'
-    const val LIST_VALUE_SEPARATOR_STRING = "|"
-
-
     /** Indicates if the String s is null or an empty String
      * @param s the String
      * @return true if the String s is null or an empty String

@@ -7,7 +7,7 @@ import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.EntityRenderer
 import com.inari.util.collection.DynArray
 
-object SpriteGroupRenderer : EntityRenderer() {
+object SpriteGroupRenderer : EntityRenderer("SpriteGroupRenderer") {
 
     init { order = 32 }
 

@@ -10,12 +10,13 @@ import kotlin.jvm.JvmField
 
 class ETransform private constructor() : EntityComponent(ETransform), TransformData, ViewLayerAware {
 
-    val view = CReference(View)
-    val layer = CReference(Layer)
     override val viewIndex: Int
-        get() = view.targetKey.instanceId
+        get() = viewRef.targetKey.instanceIndex
     override val layerIndex: Int
-        get() = if (layer.exists) layer.targetKey.instanceId else 0
+        get() = if (layerRef.exists) layerRef.targetKey.instanceIndex else 0
+    val viewRef = CReference(View)
+    val layerRef = CReference(Layer)
+
     override val position: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT)
     override val pivot: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT)
     override val scale: Vector2f = Vector2f(1.0f, 1.0f)
@@ -37,8 +38,8 @@ class ETransform private constructor() : EntityComponent(ETransform), TransformD
     }
 
     override fun reset() {
-        view.reset()
-        layer.reset()
+        viewRef.reset()
+        layerRef.reset()
         position.x = ZERO_FLOAT
         position.y = ZERO_FLOAT
         pivot.x = ZERO_FLOAT

@@ -13,13 +13,14 @@ import kotlin.jvm.JvmField
 import kotlin.math.floor
 
 interface ViewRenderer {
+    val name: String
     val order: Int
     fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i)
     fun init()
     fun dispose()
 }
 
-abstract class EntityRenderer : ViewRenderer {
+abstract class EntityRenderer(override val name: String) : ViewRenderer {
 
     @JvmField val transformCollector = ExactTransformDataCollector()
 
@@ -88,7 +89,7 @@ abstract class EntityRenderer : ViewRenderer {
         val parentTransform = parent[ETransform]
         transformCollector + parentTransform
         if (EChild in parent.aspects)
-            collectTransformData(parent[EChild].parent.targetKey.instanceId, transformCollector)
+            collectTransformData(parent[EChild].parent.targetKey.instanceIndex, transformCollector)
     }
 
     override fun dispose() {
@@ -126,7 +127,7 @@ object ViewSystemRenderer : Renderer() {
     }
 
     private fun layerListener(index: Int, type: ComponentEventType) {
-        val viewIndex = Layer[index].view.targetKey.instanceId
+        val viewIndex = Layer[index].view.targetKey.instanceIndex
         if (type == ACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.add(index)
         else if (type == DEACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.remove(index)
         sort()
@@ -156,6 +157,10 @@ object ViewSystemRenderer : Renderer() {
             RENDERING_CHAIN.add(renderer)
         sortRenderingChain()
     }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <R: ViewRenderer>byName(rendererName: String): R =
+        RENDERING_CHAIN.find { renderer -> renderer.name == rendererName } as R
 
     fun disposeViewRenderer(renderer: ViewRenderer) {
         if (renderer in RENDERING_CHAIN)

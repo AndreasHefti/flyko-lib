@@ -5,6 +5,7 @@ import com.inari.firefly.core.api.ShaderData
 import com.inari.firefly.core.api.ShaderInit
 import com.inari.util.NO_NAME
 import com.inari.util.NO_PROGRAM
+import com.inari.util.aspect.AspectType
 
 class Shader private constructor(): Asset(), ShaderData {
 
@@ -54,7 +55,7 @@ class Shader private constructor(): Asset(), ShaderData {
         return shaderProgram
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, Shader>(Asset) {
+    companion object :  ComponentSubTypeSystem<Asset, Shader>(Asset, "Shader") {
         override fun create() = Shader()
     }
 }

@@ -30,14 +30,15 @@ object MovementControl : ComponentControl<Entity>() {
         override val aspectType: AspectType get() = aspect.aspectType
     }
 
+    val moveEventType = Event.EventType("MoveEvent")
+    val moveEvent = MoveEvent(moveEventType)
+    private val entities: BitSet = BitSet()
+    override val controlledComponentType = Entity
+
     init {
         Control.registerAsSingleton(this, true)
         Control.activate(this.index)
     }
-
-    override val controlledComponentType = Entity
-
-    private val entities: BitSet = BitSet()
 
     override fun notifyActivation (component: Entity) {
         if (EMovement !in component.aspects) return
@@ -49,7 +50,7 @@ object MovementControl : ComponentControl<Entity>() {
     }
 
     override fun update() {
-        MoveEvent.moveEvent.entities.clear()
+        moveEvent.entities.clear()
         val deltaTimeInSeconds: Float = min(Engine.timer.timeElapsed / 1000f, .5f)
 
         var i: Int = entities.nextSetBit(0)
@@ -67,23 +68,17 @@ object MovementControl : ComponentControl<Entity>() {
             movement.integrator.integrate(movement, transform, dtEntity)
             if (movement.velocity.v0 != ZERO_FLOAT || movement.velocity.v1 != ZERO_FLOAT) {
                 movement.integrator.step(movement, transform, dtEntity)
-                MoveEvent.moveEvent.entities.set(entity.index)
+                moveEvent.entities.set(entity.index)
             }
         }
 
-        if (!MoveEvent.moveEvent.entities.isEmpty)
-            Engine.notify(MoveEvent.moveEvent)
+        if (!moveEvent.entities.isEmpty)
+            Engine.notify(moveEvent)
     }
 
     class MoveEvent(override val eventType: EventType) : Event<(MoveEvent) -> Unit>() {
-
         @JvmField val entities: BitSet = BitSet(100)
-
         override fun notify(listener: (MoveEvent) -> Unit) = listener(this)
-
-        companion object : EventType("MoveEvent") {
-            internal val moveEvent = MoveEvent(this)
-        }
     }
 }
 

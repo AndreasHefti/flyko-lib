@@ -6,7 +6,7 @@ import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.EntityRenderer
 import com.inari.util.collection.DynArray
 
-object SpriteParticleRenderer : EntityRenderer() {
+object SpriteParticleRenderer : EntityRenderer("SpriteParticleRenderer") {
     override fun acceptEntity(entity: Entity)  =
         entity.aspects.include(MATCHING_ASPECTS) &&
                 entity[EParticle].renderer == this

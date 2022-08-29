@@ -2,6 +2,7 @@ package com.inari.firefly.graphics.sprite
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.SpriteData
+import com.inari.firefly.physics.animation.IntFrameAnimation
 import com.inari.util.NO_NAME
 import com.inari.util.ZERO_INT
 import com.inari.util.collection.DynArray
@@ -29,10 +30,12 @@ class SpriteSet private constructor(): Asset() {
     @JvmField val sprites: DynArrayRO<SpriteInfo> = spriteData
     @JvmField val textureRef = CReference(Texture)
 
-    override fun notifyParent(comp: Component) {
-        textureRef(comp.name)
+    override fun setParentComponent(key: ComponentKey) {
+        super.setParentComponent(key)
+        textureRef(key)
     }
 
+    fun withSpriteInfo(spriteInfo: SpriteInfo) = spriteData.add(spriteInfo)
     fun withSpriteInfo(builder: SpriteInfo.() -> Unit) {
         val s = SpriteInfo()
         s.also(builder)
@@ -74,7 +77,7 @@ class SpriteSet private constructor(): Asset() {
         }
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, SpriteSet>(Asset) {
+    companion object :  ComponentSubTypeSystem<Asset, SpriteSet>(Asset, "SpriteSet") {
         override fun create() = SpriteSet()
     }
 
@@ -87,5 +90,32 @@ class SpriteSet private constructor(): Asset() {
         @JvmField val textureBounds: Vector4i = Vector4i()
         @JvmField var hFlip: Boolean = false
         @JvmField var vFlip: Boolean = false
+    }
+
+    @ComponentDSL
+    class SpriteFrame : IntFrameAnimation.IntFrame {
+
+        var interval: Long = 0
+        var sprite: SpriteInfo = SpriteInfo()
+
+        val protoSprite: (SpriteInfo.() -> Unit) -> Unit = { configure ->
+            val sprite = SpriteInfo()
+            sprite.also(configure)
+            this.sprite = sprite
+        }
+
+        override val timeInterval: Long
+            get() { return interval }
+
+        override val value: Int
+            get() = sprite.assetIndex
+
+        companion object {
+            val of: (SpriteFrame.() -> Unit) -> SpriteFrame = { configure ->
+                val instance = SpriteFrame()
+                instance.also(configure)
+                instance
+            }
+        }
     }
 }

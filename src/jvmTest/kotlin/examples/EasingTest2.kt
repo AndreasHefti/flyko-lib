@@ -24,8 +24,6 @@ fun main(args: Array<String>) {
                 .activate()
 
         DefaultFloatEasingControl
-//            FFContext.loadSystem(EntitySystem)
-//            FFContext.loadSystem(AnimationSystem)
 
             for ((index, easingType) in EasingTest.EasingType.values().withIndex()) {
                 createEasingAnimation(easingType, index)
@@ -38,7 +36,7 @@ fun main(args: Array<String>) {
 
         Entity.buildActive {
             withComponent(ETransform) {
-                view(0)
+                viewRef(0)
                 position(10f, ypos)
             }
             withComponent(EText) {
@@ -51,7 +49,7 @@ fun main(args: Array<String>) {
         }
         Entity.buildActive {
             withComponent(ETransform) {
-                view(0)
+                viewRef(0)
             }
             withComponent(EShape) {
                 this.type = ShapeType.RECTANGLE

@@ -2,8 +2,8 @@ package com.inari.firefly.graphics
 
 import com.inari.firefly.core.Asset
 import com.inari.firefly.core.Engine
+import com.inari.firefly.core.Engine.Companion.POST_RENDER_EVENT_TYPE
 import com.inari.firefly.core.Engine.Companion.SYSTEM_FONT
-import com.inari.firefly.core.PostRenderEvent
 import com.inari.firefly.core.System
 import com.inari.firefly.core.api.*
 import com.inari.firefly.graphics.text.Font
@@ -45,7 +45,7 @@ object FFInfoSystem : System {
         if (active)
             return this
 
-        Engine.registerListener(PostRenderEvent.postRenderEvent, postRenderListener)
+        Engine.registerListener(POST_RENDER_EVENT_TYPE, postRenderListener)
         active = true
         return this
     }
@@ -54,7 +54,7 @@ object FFInfoSystem : System {
         if (!active)
             return this
 
-        Engine.disposeListener(PostRenderEvent.postRenderEvent, postRenderListener)
+        Engine.disposeListener(POST_RENDER_EVENT_TYPE, postRenderListener)
         active = false
         return this
     }

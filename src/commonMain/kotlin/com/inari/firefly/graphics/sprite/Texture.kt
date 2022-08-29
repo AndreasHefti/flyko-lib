@@ -6,7 +6,6 @@ import com.inari.firefly.core.Engine
 import com.inari.firefly.core.api.TextureData
 import com.inari.util.NO_NAME
 import com.inari.util.NULL_INT_FUNCTION
-import com.inari.util.ZERO_INT
 
 class Texture private constructor() : Asset(), TextureData {
 
@@ -46,7 +45,7 @@ class Texture private constructor() : Asset(), TextureData {
         height = -1
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, Texture>(Asset) {
+    companion object :  ComponentSubTypeSystem<Asset, Texture>(Asset, "Texture") {
         override fun create() = Texture()
     }
 }

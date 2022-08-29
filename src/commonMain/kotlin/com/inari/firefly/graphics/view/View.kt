@@ -4,6 +4,7 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.ViewData
 import com.inari.util.ZERO_FLOAT
+import com.inari.util.event.Event
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4f
 import com.inari.util.geom.Vector4i
@@ -40,10 +41,28 @@ class View private constructor(): Component(View), ViewData, ControlledComponent
     }
 
     fun withLayer(configure: (Layer.() -> Unit)): ComponentKey =
-        withChild(Layer.builder, ChildLifeCyclePolicy.ACTIVATE, configure)
+        withChild(Layer.builder, configure)
 
     override val componentType = Companion
     companion object : ComponentSystem<View>("View") {
+
+        val VIEW_CHANGE_EVENT_TYPE = Event.EventType("ViewChangeEvent")
+        private val viewChangeEvent = ViewChangeEvent(VIEW_CHANGE_EVENT_TYPE)
+
+        fun notifyViewChangeEvent(viewIndex: Int, type: ViewChangeEvent.Type, pixelPerfect: Boolean) {
+            viewChangeEvent.viewIndex = viewIndex
+            viewChangeEvent.type = type
+            viewChangeEvent.pixelPerfect = pixelPerfect
+            Engine.notify(viewChangeEvent)
+        }
+
+        fun createViewChangeEvent(viewIndex: Int, type: ViewChangeEvent.Type, pixelPerfect: Boolean): ViewChangeEvent {
+            val viewChangeEvent = ViewChangeEvent(VIEW_CHANGE_EVENT_TYPE)
+            viewChangeEvent.viewIndex = viewIndex
+            viewChangeEvent.type = type
+            viewChangeEvent.pixelPerfect = pixelPerfect
+            return viewChangeEvent
+        }
 
         val BASE_VIEW_KEY = View.buildActive {
             name = "BASE_VIEW$STATIC_COMPONENT_MARKER"
@@ -57,6 +76,21 @@ class View private constructor(): Component(View), ViewData, ControlledComponent
 
         override fun allocateArray(size: Int): Array<View?> = arrayOfNulls(size)
         override fun create() = View()
+    }
+
+    class ViewChangeEvent(override val eventType: EventType) : Event<(ViewChangeEvent) -> Unit>() {
+
+        enum class Type { POSITION, ORIENTATION, SIZE }
+
+        var viewIndex: Int = -1
+            internal set
+        var type: Type = Type.POSITION
+            internal set
+        var pixelPerfect = false
+            internal set
+
+        override fun notify(listener: (ViewChangeEvent) -> Unit) = listener(this)
+
     }
 
 }

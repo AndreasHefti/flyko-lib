@@ -32,7 +32,7 @@ class Sound private constructor(): Play(), TriggeredComponent {
         playId = -1
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, Sound>(Asset) {
+    companion object :  ComponentSubTypeSystem<Asset, Sound>(Asset, "Sound") {
         override fun create() = Sound()
     }
 }

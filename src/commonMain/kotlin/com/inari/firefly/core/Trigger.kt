@@ -1,5 +1,6 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.util.FALSE_SUPPLIER
 import com.inari.util.TRUE_SUPPLIER
 import kotlin.jvm.JvmField
@@ -36,10 +37,10 @@ class UpdateEventTrigger private constructor() : Trigger() {
 
     private val updateEventListener = { doTrigger() }
 
-    override fun load() = Engine.registerListener(Engine.UpdateEvent, updateEventListener)
-    override fun dispose() = Engine.disposeListener(Engine.UpdateEvent, updateEventListener)
+    override fun load() = Engine.registerListener(UPDATE_EVENT_TYPE, updateEventListener)
+    override fun dispose() = Engine.disposeListener(UPDATE_EVENT_TYPE, updateEventListener)
 
-    companion object :  ComponentSubTypeSystem<Trigger, UpdateEventTrigger>(Trigger) {
+    companion object :  ComponentSubTypeSystem<Trigger, UpdateEventTrigger>(Trigger, "UpdateEventTrigger") {
         override fun create() = UpdateEventTrigger()
     }
 }
