@@ -9,15 +9,18 @@ import kotlin.jvm.JvmField
 
 class ESprite private constructor() : EntityComponent(ESprite), SpriteRenderable {
 
-    val spriteRef = CReference(Sprite)
     override var spriteIndex = -1
-        internal set
-
     override val tintColor = Vector4f(1f, 1f, 1f, 1f)
     override var blendMode = BlendMode.NONE
 
+    @JvmField val spriteRef = CReference(Sprite)
+    @JvmField val spriteSetRef = CReference(SpriteSet)
+
     override fun activate() {
-        spriteIndex = Asset.resolveAssetIndex(spriteRef.targetKey)
+        if (spriteRef.exists)
+            spriteIndex = Asset.resolveAssetIndex(spriteRef.targetKey)
+        if (spriteSetRef.exists)
+            spriteIndex = Asset.resolveAssetIndex(spriteSetRef.targetKey)
     }
 
     override fun deactivate() {
@@ -27,6 +30,7 @@ class ESprite private constructor() : EntityComponent(ESprite), SpriteRenderable
     override fun reset() {
         spriteIndex = -1
         spriteRef.reset()
+        spriteSetRef.reset()
         tintColor(1f, 1f, 1f, 1f)
         blendMode = BlendMode.NONE
     }

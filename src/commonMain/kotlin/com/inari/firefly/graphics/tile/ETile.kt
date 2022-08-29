@@ -4,6 +4,7 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.SpriteRenderable
 import com.inari.firefly.graphics.sprite.Sprite
+import com.inari.firefly.graphics.sprite.SpriteSet
 import com.inari.util.FloatPropertyAccessor
 import com.inari.util.IntPropertyAccessor
 import com.inari.util.geom.Vector2i
@@ -12,18 +13,21 @@ import kotlin.jvm.JvmField
 
 class ETile private constructor(): EntityComponent(ETile), SpriteRenderable {
 
-
     override var spriteIndex = -1
-        internal set
     override val tintColor = Vector4f(1f, 1f, 1f, 1f)
     override var blendMode = BlendMode.NONE
-    @JvmField val spriteRef = CReference(Sprite)
     @JvmField val position: Vector2i = Vector2i()
+
     @JvmField val tileGridRef = CReference(TileGrid)
+    @JvmField val spriteRef = CReference(Sprite)
+    @JvmField val spriteSetRef = CReference(SpriteSet)
 
 
     override fun activate() {
-        spriteIndex = Asset.resolveAssetIndex(spriteRef.targetKey)
+        if (spriteRef.exists)
+            spriteIndex = Asset.resolveAssetIndex(spriteRef.targetKey)
+        if (spriteSetRef.exists)
+            spriteIndex = Asset.resolveAssetIndex(spriteSetRef.targetKey)
     }
 
     override fun deactivate() {
@@ -33,6 +37,7 @@ class ETile private constructor(): EntityComponent(ETile), SpriteRenderable {
     override fun reset() {
         spriteIndex = -1
         spriteRef.reset()
+        spriteSetRef.reset()
         tintColor(1f, 1f, 1f, 1f)
         blendMode = BlendMode.NONE
     }

@@ -122,7 +122,7 @@ class TileMap  private constructor(): Component(TileMap) {
                     }
 
                     withComponent(ETile) {
-                        spriteRef(spriteId)
+                        spriteIndex = spriteId
                         tintColor(tile.tintColor ?: data.tint)
                         blendMode = tile.blendMode ?: data.blend
                         tileGridRef(data.tileGridIndex)
