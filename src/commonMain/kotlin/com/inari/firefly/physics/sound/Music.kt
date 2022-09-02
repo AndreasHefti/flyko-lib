@@ -1,14 +1,11 @@
 package com.inari.firefly.physics.sound
 
-import com.inari.firefly.core.Asset
-import com.inari.firefly.core.ComponentSubTypeSystem
-import com.inari.firefly.core.Engine
-import com.inari.firefly.core.TriggeredComponent
+import com.inari.firefly.core.*
 import com.inari.util.NO_NAME
 import com.inari.util.ZERO_FLOAT
 import kotlin.jvm.JvmField
 
-abstract class Play protected constructor() : Asset(), TriggeredComponent {
+abstract class Play protected constructor(subType: ComponentType<out Play>) : Asset(subType), TriggeredComponent {
 
     @JvmField internal var playId: Long = -1
 
@@ -45,10 +42,9 @@ abstract class Play protected constructor() : Asset(), TriggeredComponent {
 
     override fun activate() = play()
     override fun deactivate() = stop()
-
 }
 
-class Music private constructor(): Play() {
+class Music private constructor(): Play(Music) {
 
     override val streaming: Boolean = true
 

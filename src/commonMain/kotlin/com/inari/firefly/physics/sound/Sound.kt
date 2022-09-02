@@ -7,7 +7,7 @@ import com.inari.firefly.core.TriggeredComponent
 import com.inari.util.ZERO_INT
 import kotlin.jvm.JvmField
 
-class Sound private constructor(): Play(), TriggeredComponent {
+class Sound private constructor(): Play(Sound), TriggeredComponent {
 
     var pitch: Float = 1.0f
         set(value) {

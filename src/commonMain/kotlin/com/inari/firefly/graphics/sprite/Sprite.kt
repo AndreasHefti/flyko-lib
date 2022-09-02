@@ -6,15 +6,15 @@ import com.inari.util.ZERO_INT
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
-class Sprite private constructor(): Asset(), SpriteData {
+class Sprite private constructor(): Asset(Sprite), SpriteData {
 
     override val textureIndex: Int
         get() =  resolveAssetIndex(textureRef.targetKey)
 
     @JvmField val textureRef = CReference(Texture)
-    override val region: Vector4i = Vector4i(ZERO_INT, ZERO_INT, ZERO_INT, ZERO_INT)
-    override var isHorizontalFlip: Boolean = false
-    override var isVerticalFlip: Boolean = false
+    override val textureBounds: Vector4i = Vector4i(ZERO_INT, ZERO_INT, ZERO_INT, ZERO_INT)
+    override var hFlip: Boolean = false
+    override var vFlip: Boolean = false
 
     override fun setParentComponent(key: ComponentKey) {
         super.setParentComponent(key)
@@ -37,5 +37,6 @@ class Sprite private constructor(): Asset(), SpriteData {
 
     companion object :  ComponentSubTypeSystem<Asset, Sprite>(Asset, "Sprite") {
         override fun create() = Sprite()
+
     }
 }

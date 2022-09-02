@@ -20,4 +20,12 @@ class DynArrayTest {
         assertEquals(2, array.size)
         assertEquals(2, array.capacity)
     }
+
+    @Test
+    fun testIterateEmptyArray() {
+        val array: DynArray<String> = DynArray.of()
+        array.forEach {
+            println(it)
+        }
+    }
 }

@@ -26,7 +26,6 @@ class ContactConstraint private constructor(): Component(ContactConstraint) {
         (typeFilter.isEmpty || contact.contactType in typeFilter) &&
                 (materialFilter.isEmpty || contact.material in materialFilter)
 
-    override val componentType = Companion
     companion object : ComponentSystem<ContactConstraint>("ContactConstraint") {
         override fun allocateArray(size: Int): Array<ContactConstraint?> = arrayOfNulls(size)
         override fun create() = ContactConstraint()

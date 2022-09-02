@@ -5,9 +5,8 @@ import com.inari.firefly.core.api.ShaderData
 import com.inari.firefly.core.api.ShaderInit
 import com.inari.util.NO_NAME
 import com.inari.util.NO_PROGRAM
-import com.inari.util.aspect.AspectType
 
-class Shader private constructor(): Asset(), ShaderData {
+class Shader private constructor(): Asset(Shader), ShaderData {
 
     override var vertexShaderResourceName: String = NO_NAME
         set(value) { field = checkNotLoaded(value, "vertexShaderResourceName") }

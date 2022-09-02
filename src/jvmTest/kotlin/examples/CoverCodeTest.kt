@@ -23,9 +23,9 @@ fun main(args: Array<String>) {
             // This also implicitly loads the TextureAsset if it is not already loaded.
             withChild(Sprite) {
                 name = "inariSprite"
-                region(0, 0, 32, 32)
-                isHorizontalFlip = false
-                isVerticalFlip = false
+                textureBounds(0, 0, 32, 32)
+                hFlip = false
+                vFlip = false
             }
         }
         // Create an Entity positioned on the base View on x=50/y=150, and the formerly

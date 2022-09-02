@@ -36,7 +36,7 @@ object InariIntro {
             resourceName = "firefly/inari.png"
             withChild(Sprite) {
                 name = spriteAssetName
-                region( 0, 0, pngWidth, pngHeight )
+                textureBounds( 0, 0, pngWidth, pngHeight )
             }
         }
 

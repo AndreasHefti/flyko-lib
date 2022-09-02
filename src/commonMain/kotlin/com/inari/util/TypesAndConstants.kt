@@ -1,5 +1,6 @@
 package com.inari.util
 
+import com.inari.firefly.core.api.ButtonType
 import com.inari.util.geom.ImmutableVector2f
 import com.inari.util.geom.ImmutableVector2i
 import kotlin.jvm.JvmField
@@ -111,7 +112,10 @@ typealias TaskOperation = (Int, Int, Int) -> OperationResult
 typealias TaskCallback = (Int, OperationResult) -> Unit
 typealias ConditionalOperation = (Int, Int, Int) -> Boolean
 typealias NormalOperation = (Int, Int, Int) -> Float
-
+/** { entityId, velocity, button -> } */
+typealias MoveCallback = (Int, Float, ButtonType) -> Unit
+val VOID_MOVE_CALLBACK: MoveCallback = { _, _, _ -> }
+val VOID_TASK_CALLBACK: TaskCallback = { _, _, -> }
 val RUNNING_OPERATION: Operation = { OperationResult.RUNNING }
 val SUCCESS_OPERATION: Operation = { OperationResult.SUCCESS }
 val FAILED_OPERATION: Operation = { OperationResult.FAILED }

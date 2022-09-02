@@ -24,7 +24,7 @@ class EContact private constructor() : EntityComponent(EContact) {
             else throw IllegalArgumentException()
 
     fun withConstraint(configure: ContactConstraint.() -> Unit): ComponentKey {
-        val cc = ContactConstraint.builder.buildAndGetActive(configure)
+        val cc = ContactConstraint.buildAndGetActive(configure)
         withConstraint(cc)
         return ContactConstraint.getKey(cc.index)
     }

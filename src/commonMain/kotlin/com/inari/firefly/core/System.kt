@@ -1,11 +1,11 @@
 package com.inari.firefly.core
 
 import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
-import com.inari.firefly.core.Component.*
-import com.inari.firefly.core.ApplyPolicies.*
-import com.inari.firefly.core.ComponentSystem.Companion.COMPONENT_BUILDER_MAPPING
+import com.inari.firefly.game.composite.Composite
 import com.inari.util.NO_NAME
+import com.inari.util.TRUE_PREDICATE
 import com.inari.util.aspect.Aspect
+import com.inari.util.aspect.AspectType
 import com.inari.util.collection.BitSet
 import com.inari.util.collection.BitSetIterator
 import com.inari.util.collection.DynArray
@@ -16,28 +16,84 @@ interface System {
 }
 
 abstract class ComponentSystem<C : Component>(
-    typeName: String,
-) : ComponentType<C>(typeName), SubComponentSystemAdapter<C>, System {
+    name: String,
+) : ComponentBuilder<C>, ComponentType<C>, System {
 
-    protected val COMPONENT_KEY_MAPPING: MutableMap<String, ComponentKey> =  HashMap()
-    protected val COMPONENT_MAPPING: DynArray<C> = DynArray(50, 100, this::allocateArray)
-    protected val ACTIVE_COMPONENT_MAPPING: BitSet = BitSet()
-    private val EVENT_POOL = ArrayDeque<InternalComponentEvent>()
+    private lateinit var typeAspect: Aspect
 
     init {
-        COMPONENT_SYSTEM_MAPPING[super.aspectIndex] = this
+        typeAspect = Component.COMPONENT_TYPE_ASPECTS.createAspect(name)
+        COMPONENT_SYSTEM_MAPPING[typeAspect.aspectIndex] = this
+    }
+
+    final override val typeName: String = name
+    final override val subTypeName: String = name
+    final override val aspectIndex: Int = typeAspect.aspectIndex
+    final override val aspectName: String = typeAspect.aspectName
+    final override val aspectType: AspectType = typeAspect.aspectType
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as ComponentType<*>
+        if (aspectIndex != other.aspectIndex) return false
+        return true
+    }
+    override fun hashCode(): Int {
+        return aspectIndex
+    }
+
+    internal val COMPONENT_KEY_MAPPING: MutableMap<String, ComponentKey> =  HashMap()
+    internal val COMPONENT_MAPPING: DynArray<C> = DynArray(50, 100) { size -> allocateArray(size) }
+    internal val ACTIVE_COMPONENT_MAPPING: BitSet = BitSet()
+    private val EVENT_POOL = ArrayDeque<ComponentEvent>()
+
+    protected abstract fun create(): C
+    override fun build(configure: C.() -> Unit): ComponentKey {
+        val comp: C = create()
+        comp.also(configure)
+        val key = registerComponent(comp)
+        comp.iInitialize()
+        send(comp.index, ComponentEventType.INITIALIZED)
+        return key
+    }
+
+    override fun buildActive(configure: C.() -> Unit): ComponentKey {
+        val key = build(configure)
+        activate(key)
+        return key
+    }
+
+    override fun buildAndGet(configure: C.() -> Unit): C {
+        val comp: C = create()
+        comp.also(configure)
+        registerComponent(comp)
+        comp.iInitialize()
+        send(comp.index, ComponentEventType.INITIALIZED)
+        return comp
+    }
+
+    override fun buildAndGetActive(configure: C.() -> Unit): C {
+        val c = buildAndGet(configure)
+        activate(c.index)
+        return c
     }
 
     override fun clearSystem() {
+
         COMPONENT_MAPPING.forEach {
-            if (!it.name.contains(STATIC_COMPONENT_MARKER))
+            if (!it.name.contains(STATIC_COMPONENT_MARKER) && it.index >= 0)
                 this.delete(it.index)
         }
 
-        val keys = COMPONENT_KEY_MAPPING
-            .filter { it.value.instanceIndex < 0 }
-            .map { it.key }
-        keys.forEach { COMPONENT_KEY_MAPPING.remove(it) }
+
+        try {
+            val keys = COMPONENT_KEY_MAPPING
+                .filter { it.value.instanceIndex < 0 }
+                .map { it.key }
+            keys.forEach { COMPONENT_KEY_MAPPING.remove(it) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         ACTIVE_COMPONENT_MAPPING.clear()
         EVENT_POOL.clear()
@@ -46,7 +102,6 @@ abstract class ComponentSystem<C : Component>(
     // **** MISC ****
     // **************
     internal abstract fun allocateArray(size: Int): Array<C?>
-    internal abstract fun create(): C
 
     val hasComponents: Boolean
         get() = !COMPONENT_MAPPING.isEmpty
@@ -66,21 +121,11 @@ abstract class ComponentSystem<C : Component>(
         return builder.toString()
     }
 
-    // **** Component Builder ****
-    // ***************************
-    override val builder: ComponentBuilder<C> = object : ComponentBuilder<C>(this) {
-        override fun create() = this@ComponentSystem.create()
-    }
-    fun build(configure: C.() -> Unit): ComponentKey = builder.build(configure)
-    fun buildAndGet(configure: C.() -> Unit): C = builder.buildAndGet(configure)
-    fun buildActive(configure: C.() -> Unit): ComponentKey = builder.buildActive(configure)
-    fun buildAndGetActive(configure: C.() -> Unit): C = builder.buildAndGetActive(configure)
-
     // **** Component Handling ****
     // ****************************
     internal open fun registerComponent(c: C): ComponentKey {
         if (checkComponentNameClash(c.name)) {
-            c.iDelete(DEFAULT_DELETE)
+            c.iDelete()
             throw IllegalArgumentException("Key with same name already exists")
         }
 
@@ -109,7 +154,7 @@ abstract class ComponentSystem<C : Component>(
         }
     }
 
-    fun registerAsSingleton(component: C, static: Boolean ) {
+    fun registerAsSingleton(component: C, static: Boolean = false) {
         val namePrefix = component::class.simpleName!! + SINGLETON_MARKER
         COMPONENT_MAPPING.forEach {
             if (it.name != NO_NAME && it.name.startsWith(namePrefix))
@@ -134,25 +179,27 @@ abstract class ComponentSystem<C : Component>(
 
     operator fun get(name: String): C = get(COMPONENT_KEY_MAPPING[name]
         ?: throw IllegalArgumentException("No component for name: $name found on system: $typeName"))
+    operator fun get(ref: CLooseReference): C  = get(checkKey(ref.targetKey).instanceIndex)
+    operator fun get(ref: CReference): C  = get(checkKey(ref.targetKey).instanceIndex)
     operator fun get(key: ComponentKey): C  = get(checkKey(key).instanceIndex)
-    override operator fun get(index: Int): C = COMPONENT_MAPPING[index]
+    operator fun get(index: Int): C = COMPONENT_MAPPING[index]
         ?: throw IllegalArgumentException("No component for index: $index on system: $typeName")
 
-    operator fun <CC : C> get(name: String, subType: SubComponentSystemAdapter<CC>): CC =
+    operator fun <CC : C> get(name: String, subType: ComponentSubTypeSystem<C, CC>): CC =
         get(COMPONENT_KEY_MAPPING[name]!!, subType)
-    operator fun <CC : C> get(key: ComponentKey, subType: SubComponentSystemAdapter<CC>): CC  =
+    operator fun <CC : C> get(key: ComponentKey, subType: ComponentSubTypeSystem<C, CC>): CC  =
         get(checkKey(key).instanceIndex, subType)
     @Suppress("UNCHECKED_CAST")
-    operator fun  <CC : C> get(index: Int, subType: SubComponentSystemAdapter<CC>): CC =
+    operator fun  <CC : C> get(index: Int, subType: ComponentSubTypeSystem<C, CC>): CC =
         COMPONENT_MAPPING[index]!! as CC
 
     fun exists(name: String): Boolean = name in COMPONENT_KEY_MAPPING && exists(COMPONENT_KEY_MAPPING[name]!!)
     fun exists(key: ComponentKey): Boolean = exists(checkKey(key).instanceIndex)
     fun exists(index: Int): Boolean = COMPONENT_MAPPING.contains(index)
 
-    fun load(name: String, policy: ApplyPolicy = DEFAULT_LOAD) = load(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1, policy)
-    fun load(key: ComponentKey, policy: ApplyPolicy = DEFAULT_LOAD) = load(key.instanceIndex, policy)
-    fun load(index: Int, policy: ApplyPolicy = DEFAULT_LOAD) {
+    fun load(name: String) = load(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1)
+    fun load(key: ComponentKey) = load(key.instanceIndex)
+    fun load(index: Int) {
         checkIndex(index)
         val comp =  this[index]
         if (!comp.initialized)
@@ -160,13 +207,13 @@ abstract class ComponentSystem<C : Component>(
         if (comp.loaded)
             return
 
-        comp.iLoad(policy)
+        comp.iLoad()
         send(index, ComponentEventType.LOADED)
     }
 
-    fun activate(name: String, policy: ApplyPolicy = DEFAULT_ACTIVATE) = activate(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1, policy)
-    fun activate(key: ComponentKey, policy: ApplyPolicy = DEFAULT_ACTIVATE) = activate(key.instanceIndex, policy)
-    fun activate(index: Int, policy: ApplyPolicy = DEFAULT_ACTIVATE) {
+    fun activate(name: String) = activate(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1)
+    fun activate(key: ComponentKey) = activate(key.instanceIndex)
+    fun activate(index: Int) {
         checkIndex(index)
         val comp = this[index]
         if (!comp.initialized)
@@ -174,14 +221,14 @@ abstract class ComponentSystem<C : Component>(
         if (comp.active)
             return
 
-        comp.iActivate(policy)
+        comp.iActivate()
         ACTIVE_COMPONENT_MAPPING[index] = true
         send(index, ComponentEventType.ACTIVATED)
     }
 
-    fun deactivate(name: String, policy: ApplyPolicy = DEFAULT_DEACTIVATE) = deactivate(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1, policy)
-    fun deactivate(key: ComponentKey, policy: ApplyPolicy = DEFAULT_DEACTIVATE) = deactivate(key.instanceIndex, policy)
-    fun deactivate(index: Int, policy: ApplyPolicy = DEFAULT_DEACTIVATE) {
+    fun deactivate(name: String) = deactivate(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1)
+    fun deactivate(key: ComponentKey) = deactivate(key.instanceIndex)
+    fun deactivate(index: Int) {
         checkIndex(index)
         val comp = this[index]
         if (!comp.initialized)
@@ -189,14 +236,14 @@ abstract class ComponentSystem<C : Component>(
         if (!comp.active)
             return
 
-        comp.iDeactivate(policy)
+        comp.iDeactivate()
         ACTIVE_COMPONENT_MAPPING[index] = false
         send(index, ComponentEventType.DEACTIVATED)
     }
 
-    fun dispose(name: String, policy: ApplyPolicy = DEFAULT_DISPOSE) = dispose(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1, policy)
-    fun dispose(key: ComponentKey, policy: ApplyPolicy = DEFAULT_DISPOSE) = dispose(key.instanceIndex, policy)
-    fun dispose(index: Int, policy: ApplyPolicy = DEFAULT_DISPOSE) {
+    fun dispose(name: String) = dispose(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1)
+    fun dispose(key: ComponentKey) = dispose(key.instanceIndex)
+    fun dispose(index: Int) {
         checkIndex(index)
         val comp = this[index]
         if (!comp.initialized)
@@ -204,28 +251,49 @@ abstract class ComponentSystem<C : Component>(
         if (!comp.loaded)
             return
 
-        comp.iDispose(policy)
+        comp.iDispose()
         send(index, ComponentEventType.DISPOSED)
     }
 
-    fun delete(c: C, policy: ApplyPolicy = DEFAULT_DELETE) = delete(c.index, policy)
-    fun delete(name: String, policy: ApplyPolicy = DEFAULT_DELETE) = delete(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1, policy)
-    fun delete(key: ComponentKey, policy: ApplyPolicy = DEFAULT_DELETE) = delete(checkKey(key).instanceIndex, policy)
-    fun delete(index: Int, policy: ApplyPolicy = DEFAULT_DELETE) {
+    fun delete(c: C) = delete(c.index)
+    fun delete(name: String) = delete(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1)
+    fun delete(key: ComponentKey) = delete(checkKey(key).instanceIndex)
+    fun delete(index: Int) {
         checkIndex(index)
         val comp = this[index]
-        comp.iDelete(policy)
+        comp.iDelete()
         send(index, ComponentEventType.DELETED)
         unregisterComponent(index)
     }
 
-    fun doForEach(
-        filter: (C) -> Boolean,
+    fun findFirst(filter: (C) -> Boolean): C? {
+        COMPONENT_MAPPING.forEach {
+            if (filter(it))
+                return it
+        }
+        return null
+    }
+
+    fun forEachComponent(
+        filter: (C) -> Boolean = TRUE_PREDICATE,
         process: (C) -> Unit
     ) {
         COMPONENT_MAPPING.forEach {
             if (filter(it))
                 process(it)
+        }
+    }
+
+    fun forEachActiveComponent(
+        filter: (C) -> Boolean = TRUE_PREDICATE,
+        process: (C) -> Unit
+    ) {
+        var i = Composite.ACTIVE_COMPONENT_MAPPING.nextSetBit(0)
+        while (i >= 0) {
+            val component = COMPONENT_MAPPING[i]!!
+            if (filter(component))
+                process(component)
+            i = Composite.ACTIVE_COMPONENT_MAPPING.nextSetBit(i + 1)
         }
     }
 
@@ -235,7 +303,7 @@ abstract class ComponentSystem<C : Component>(
 
     private fun checkIndex(index: Int) {
         if (index < 0)
-            throw IllegalArgumentException("No component instance defined (index < 0)")
+            throw IllegalArgumentException("No component instance defined (index < 0) $typeName - $subTypeName")
     }
 
     // **** ComponentKey handling ****
@@ -248,9 +316,16 @@ abstract class ComponentSystem<C : Component>(
         return newKey
     }
     fun hasKey(name: String): Boolean = name in COMPONENT_KEY_MAPPING
-    override fun getKey(name: String): ComponentKey = COMPONENT_KEY_MAPPING[name]
-        ?: throw NoSuchElementException("No ComponentKey found for: $name type: ${this.typeName}")
-    override fun getKey(index: Int): ComponentKey =
+
+    fun getKey(name: String, createIfNotExists: Boolean = false): ComponentKey =
+        if (hasKey(name))
+            COMPONENT_KEY_MAPPING[name]!!
+        else if (createIfNotExists)
+            createKey(name)
+        else
+            throw NoSuchElementException("No ComponentKey found for: $name type: ${this.typeName}")
+
+    fun getKey(index: Int): ComponentKey =
         COMPONENT_MAPPING[index]?.let {
             if (it.name != NO_NAME)
                 COMPONENT_KEY_MAPPING[it.name]
@@ -270,12 +345,11 @@ abstract class ComponentSystem<C : Component>(
     // **** Event Handling ****
     // ************************
     val componentEventType: Event.EventType = Event.EventType("$typeName Event")
-    internal class InternalComponentEvent(override val eventType: EventType) : ComponentEvent()
     fun send(compIndex: CompIndex, eventType: ComponentEventType) {
         val event = if (!EVENT_POOL.isEmpty())
             EVENT_POOL.removeFirst()
         else
-            InternalComponentEvent(componentEventType)
+            ComponentEvent(componentEventType)
         event.index = compIndex
         event.componentEventType = eventType
         Engine.notify(event)
@@ -293,7 +367,7 @@ abstract class ComponentSystem<C : Component>(
         private const val SINGLETON_MARKER = "_SINGL_"
 
         internal val COMPONENT_SYSTEM_MAPPING: DynArray<ComponentSystem<*>> = DynArray.of()
-        internal val COMPONENT_BUILDER_MAPPING = mutableMapOf<String, ComponentBuilder<*>>()
+        internal val COMPONENT_BUILDER_MAPPING: DynArray<ComponentBuilder<*>> = DynArray.of()
 
         internal fun clearSystems(type: ComponentType<*>) = COMPONENT_SYSTEM_MAPPING[type.aspectIndex]?.clearSystem()
         internal fun clearAllSystems() {
@@ -301,13 +375,13 @@ abstract class ComponentSystem<C : Component>(
         }
 
         @Suppress("UNCHECKED_CAST")
-        fun <C : Component>  getComponentBuilder(componentName: String): ComponentBuilder<C> =
-            COMPONENT_BUILDER_MAPPING[componentName] as ComponentBuilder<C>
+        fun <C : Component> getComponentBuilder(typeName: String): ComponentBuilder<C> =
+            COMPONENT_SYSTEM_MAPPING.find { system -> system.typeName == typeName } as ComponentBuilder<C>
 
         @Suppress("UNCHECKED_CAST")
-        operator fun <C : Component> get(type: ComponentType<C>): ComponentSystem<C> {
-            return COMPONENT_SYSTEM_MAPPING[type.aspectIndex] as ComponentSystem<C>
-        }
+        operator fun <C : Component> get(type: ComponentType<C>): ComponentSystem<C> =
+            COMPONENT_SYSTEM_MAPPING[type.aspectIndex] as ComponentSystem<C>
+
 
         fun exists(key: ComponentKey): Boolean = this[key.type].exists(key)
         @Suppress("UNCHECKED_CAST")
@@ -315,11 +389,11 @@ abstract class ComponentSystem<C : Component>(
         operator fun <C : Component> get(type: ComponentType<C>, name: String): C = this[type][name]
         operator fun <C : Component> get(type: ComponentType<C>, index: Int): C = this[type][index]
 
-        fun load(key: ComponentKey, policy: ApplyPolicy = DEFAULT_LOAD) = this[key.type].load(key, policy)
-        fun activate(key: ComponentKey, policy: ApplyPolicy = DEFAULT_ACTIVATE) = this[key.type].activate(key, policy)
-        fun deactivate(key: ComponentKey, policy: ApplyPolicy = DEFAULT_DEACTIVATE) = this[key.type].deactivate(key, policy)
-        fun dispose(key: ComponentKey, policy: ApplyPolicy = DEFAULT_DISPOSE) = this[key.type].dispose(key, policy)
-        fun delete(key: ComponentKey, policy: ApplyPolicy = DEFAULT_DELETE) = this[key.type].delete(key, policy)
+        fun load(key: ComponentKey) = this[key.type].load(key)
+        fun activate(key: ComponentKey) = this[key.type].activate(key)
+        fun deactivate(key: ComponentKey) = this[key.type].deactivate(key)
+        fun dispose(key: ComponentKey) = this[key.type].dispose(key)
+        fun delete(key: ComponentKey) = this[key.type].delete(key)
 
         fun clearSystems() = COMPONENT_SYSTEM_MAPPING.forEach { it.clearSystem() }
 
@@ -334,51 +408,127 @@ abstract class ComponentSystem<C : Component>(
     }
 }
 
+class ComponentEvent internal constructor(override val eventType: EventType): Event<ComponentEventListener>() {
+    internal var index: CompIndex = -1
+    internal lateinit var componentEventType: ComponentEventType
+    override fun notify(listener: ComponentEventListener) = listener(index, componentEventType)
+}
+
 abstract class ComponentSubTypeSystem<C : Component, CC : C>(
-    system: ComponentSystem<C>,
-    subTypeName: String
-) : ComponentBuilder<CC>(system), SubComponentSystemAdapter<CC>, Aspect  {
+    val system: ComponentSystem<C>,
+    override val subTypeName: String
+) : ComponentBuilder<CC>, ComponentType<CC> {
 
-    val subType: ComponentType<CC> = object : ComponentType<CC>(subTypeName) {}
-    override val aspectName = subType.aspectName
-    override val aspectType = subType.aspectType
-    override val aspectIndex = subType.aspectIndex
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as ComponentType<*>
+        if (aspectIndex != other.aspectIndex) return false
+        return true
+    }
+    override fun hashCode(): Int {
+        return aspectIndex
+    }
 
-    override val builder get() = this
+    final override val aspectName = system.aspectName
+    final override val aspectType = system.aspectType
+    final override val aspectIndex = system.aspectIndex
+    final override val typeName = system.typeName
 
-    override fun getKey(name: String) = system.getKey(name)
-    override fun getKey(index: Int) = system.getKey(index)
+    protected abstract fun create(): CC
+    override fun build(configure: CC.() -> Unit): ComponentKey {
+        @Suppress("UNCHECKED_CAST")
+        val comp: CC = create()
+        comp.also(configure)
+        val key = system.registerComponent(comp)
+        comp.iInitialize()
+        system.send(comp.index, ComponentEventType.INITIALIZED)
+        return key
+    }
+
+    override fun buildActive(configure: CC.() -> Unit): ComponentKey {
+        val key = build(configure)
+        system.activate(key)
+        return key
+    }
+
+    override fun buildAndGet(configure: CC.() -> Unit): CC {
+        @Suppress("UNCHECKED_CAST")
+        val comp: CC = create()
+        comp.also(configure)
+        system.registerComponent(comp)
+        comp.iInitialize()
+        system.send(comp.index, ComponentEventType.INITIALIZED)
+        return comp
+    }
+
+    override fun buildAndGetActive(configure: CC.() -> Unit): CC {
+        val c = buildAndGet(configure)
+        system.activate(c.index)
+        return c
+    }
+
+    fun getKey(name: String, createIfNotExists: Boolean) = system.getKey(name, createIfNotExists)
+    fun getKey(index: Int) = system.getKey(index)
 
     @Suppress("UNCHECKED_CAST")
     operator fun get(name: String): CC = system[name] as CC
     @Suppress("UNCHECKED_CAST")
     operator fun get(key: ComponentKey): CC  = system[key] as CC
     @Suppress("UNCHECKED_CAST")
-    override operator fun get(index: Int): CC = system[index] as CC
+    operator fun get(index: Int): CC = system[index] as CC
 
     fun exists(name: String): Boolean = system.exists(name)
     fun exists(key: ComponentKey): Boolean = system.exists(key)
     fun exists(index: Int): Boolean = system.exists(index)
 
-    fun load(name: String, policy: ApplyPolicy = DEFAULT_LOAD) = system.load(name, policy)
-    fun load(key: ComponentKey, policy: ApplyPolicy = DEFAULT_LOAD) = system.load(key, policy)
-    fun load(index: Int, policy: ApplyPolicy = DEFAULT_LOAD) =  system.load(index, policy)
+    fun load(name: String) = system.load(name)
+    fun load(key: ComponentKey) = system.load(key)
+    fun load(index: Int) =  system.load(index)
 
-    fun activate(name: String, policy: ApplyPolicy = DEFAULT_ACTIVATE) = system.activate(name, policy)
-    fun activate(key: ComponentKey, policy: ApplyPolicy = DEFAULT_ACTIVATE) = system.activate(key, policy)
-    fun activate(index: Int, policy: ApplyPolicy = DEFAULT_ACTIVATE) = system.activate(index, policy)
+    fun activate(name: String) = system.activate(name)
+    fun activate(key: ComponentKey) = system.activate(key)
+    fun activate(index: Int) = system.activate(index)
 
-    fun deactivate(name: String, policy: ApplyPolicy = DEFAULT_DEACTIVATE) = system.deactivate(name, policy)
-    fun deactivate(key: ComponentKey, policy: ApplyPolicy = DEFAULT_DEACTIVATE) = system.deactivate(key, policy)
-    fun deactivate(index: Int, policy: ApplyPolicy = DEFAULT_DEACTIVATE) = system.deactivate(index, policy)
+    fun deactivate(name: String) = system.deactivate(name)
+    fun deactivate(key: ComponentKey) = system.deactivate(key)
+    fun deactivate(index: Int) = system.deactivate(index)
 
-    fun dispose(name: String, policy: ApplyPolicy = DEFAULT_DISPOSE) = system.dispose(name, policy)
-    fun dispose(key: ComponentKey, policy: ApplyPolicy = DEFAULT_DISPOSE) = system.dispose(key, policy)
-    fun dispose(index: Int, policy: ApplyPolicy = DEFAULT_DISPOSE) = system.dispose(index, policy)
+    fun dispose(name: String) = system.dispose(name)
+    fun dispose(key: ComponentKey) = system.dispose(key)
+    fun dispose(index: Int) = system.dispose(index)
 
-    fun delete(name: String, policy: ApplyPolicy = DEFAULT_DELETE) = system.delete(name, policy)
-    fun delete(key: ComponentKey, policy: ApplyPolicy = DEFAULT_DELETE) = system.delete(key, policy)
-    fun delete(index: Int, policy: ApplyPolicy = DEFAULT_DELETE) = system.delete(index, policy)
+    fun delete(name: String) = system.delete(name)
+    fun delete(key: ComponentKey) = system.delete(key)
+    fun delete(index: Int) = system.delete(index)
+
+    @Suppress("UNCHECKED_CAST")
+    fun forEachComponent(
+        filter: (CC) -> Boolean = TRUE_PREDICATE,
+        process: (CC) -> Unit
+    ) {
+        this.system.forEachComponent({ c -> c.componentType.typeName == subTypeName && filter(c as CC)}) {
+            process(it as CC)
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun forEachActiveComponent(
+        filter: (CC) -> Boolean = TRUE_PREDICATE,
+        process: (CC) -> Unit
+    ) {
+        this.system.forEachActiveComponent({ c -> c.componentType.typeName == subTypeName && filter(c as CC)}) {
+            process(it as CC)
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun findFirst(filter: (CC) -> Boolean): CC? {
+        val comp = this.system.findFirst {
+            it.componentType.subTypeName == subTypeName && filter(it as CC)
+        }
+        return if (comp == null) null else comp as CC
+    }
 
 }
 

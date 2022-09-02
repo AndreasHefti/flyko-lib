@@ -1,7 +1,5 @@
 package com.inari.firefly
 
-import com.inari.firefly.core.ComponentEventListener
-import com.inari.firefly.core.ComponentEventType
 import com.inari.firefly.core.ComponentKey
 import com.inari.firefly.core.api.*
 import com.inari.firefly.graphics.view.View
@@ -50,7 +48,7 @@ object GraphicsMock : GraphicsAPI {
     }
 
     override fun createSprite(data: SpriteData): Int {
-        return _loadedAssets.add("sprite: ${data.textureIndex} : ${data.region}")
+        return _loadedAssets.add("sprite: ${data.textureIndex} : ${data.textureBounds}")
     }
 
     override fun disposeSprite(spriteId: Int) {

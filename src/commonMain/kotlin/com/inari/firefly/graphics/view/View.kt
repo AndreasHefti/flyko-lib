@@ -10,7 +10,7 @@ import com.inari.util.geom.Vector4f
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
-class View private constructor(): Component(View), ViewData, ControlledComponent<View> {
+class View private constructor(): ComponentNode(View), ViewData, ControlledComponent<View> {
 
     override var isBase = false
         internal set
@@ -23,7 +23,6 @@ class View private constructor(): Component(View), ViewData, ControlledComponent
     @JvmField val shader = CReference(Shader)
     override var zoom = 1.0f
     override val  fboScale = 1.0f
-    override val controllerReference: CReference = CReference(Control)
 
     override var shaderIndex = -1
         internal set
@@ -41,9 +40,8 @@ class View private constructor(): Component(View), ViewData, ControlledComponent
     }
 
     fun withLayer(configure: (Layer.() -> Unit)): ComponentKey =
-        withChild(Layer.builder, configure)
+        withChild(Layer, configure)
 
-    override val componentType = Companion
     companion object : ComponentSystem<View>("View") {
 
         val VIEW_CHANGE_EVENT_TYPE = Event.EventType("ViewChangeEvent")

@@ -3,7 +3,7 @@ package com.inari.firefly.graphics.view
 import com.inari.firefly.core.*
 import kotlin.jvm.JvmField
 
-class Layer private constructor(): Component(Layer) {
+class Layer private constructor(): ComponentNode(Layer) {
 
     @JvmField var view = CReference(View)
     @JvmField var zPosition = 0
@@ -13,10 +13,10 @@ class Layer private constructor(): Component(Layer) {
 
     override fun setParentComponent(key: ComponentKey) {
         super.setParentComponent(key)
-        if (key.type.aspectIndex == Shader.aspectIndex)
-            shader(key)
+        if (key.type.aspectIndex == View.aspectIndex)
+            view(key)
         else
-            shader.reset()
+            view.reset()
     }
 
     override fun activate() {
@@ -27,7 +27,6 @@ class Layer private constructor(): Component(Layer) {
         shaderIndex = -1
     }
 
-    override val componentType = Companion
     companion object : ComponentSystem<Layer>("Layer") {
         override fun allocateArray(size: Int): Array<Layer?> = arrayOfNulls(size)
         override fun create() = Layer()

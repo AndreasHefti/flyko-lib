@@ -17,7 +17,6 @@ abstract class Trigger protected constructor(): Component(Trigger) {
                 Trigger.delete(this)
     }
 
-    override val componentType = Companion
     companion object : ComponentSystem<Trigger>("Trigger") {
         override fun allocateArray(size: Int): Array<Trigger?> = arrayOfNulls(size)
         override fun create(): Trigger =

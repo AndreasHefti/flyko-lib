@@ -13,10 +13,10 @@ import kotlin.jvm.JvmField
 import kotlin.math.min
 
 
-object MovementControl : ComponentControl<Entity>() {
+object MovementControl : EntityControl() {
 
     @JvmField val MOVEMENT_ASPECT_GROUP = IndexedAspectType("MOVEMENT_ASPECT_GROUP")
-    @JvmField val UNDEFINED_MOVEMENT = MOVEMENT_ASPECT_GROUP.createAspect("UNDEFINED_MOVEMEN")
+    @JvmField val UNDEFINED_MOVEMENT = MOVEMENT_ASPECT_GROUP.createAspect("UNDEFINED_MOVEMENT")
 
     enum class MovementAspect(private val aspect: Aspect) : Aspect {
         ON_GROUND(MOVEMENT_ASPECT_GROUP.createAspect("ON_GROUND")),
@@ -33,20 +33,19 @@ object MovementControl : ComponentControl<Entity>() {
     val moveEventType = Event.EventType("MoveEvent")
     val moveEvent = MoveEvent(moveEventType)
     private val entities: BitSet = BitSet()
-    override val controlledComponentType = Entity
 
     init {
         Control.registerAsSingleton(this, true)
         Control.activate(this.index)
     }
 
-    override fun notifyActivation (component: Entity) {
-        if (EMovement !in component.aspects) return
-        entities[component.index] = true
+    override fun notifyActivation (entity: Entity) {
+        if (EMovement !in entity.aspects) return
+        entities[entity.index] = true
     }
-    override fun notifyDeactivation(component: Entity) {
-        if (EMovement !in component.aspects) return
-        entities[component.index] = false
+    override fun notifyDeactivation(entity: Entity) {
+        if (EMovement !in entity.aspects) return
+        entities[entity.index] = false
     }
 
     override fun update() {

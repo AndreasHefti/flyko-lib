@@ -142,7 +142,6 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
     fun tileGridIterator(worldClip: Vector4i): TileGridIterator =
         TileGrid.getTileGridIterator(worldClip, this)
 
-    override val componentType = Companion
     companion object : ComponentSystem<TileGrid>("TileGrid") {
 
         private val NULL_TILE_GRID: TileGrid  = TileGrid()
@@ -164,7 +163,7 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
 
         override fun unregisterComponent(index: Int) {
             val c = this[index]
-            VIEW_LAYER_MAPPING.delete(c, c.index)
+            VIEW_LAYER_MAPPING.delete(c, index)
             super.unregisterComponent(index)
         }
 
@@ -221,8 +220,12 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
                 if (this.exists(tile.tileGridRef.targetKey.instanceIndex))
                     this[tile.tileGridRef.targetKey]
                 else return
-            else
-                this[this[entity[ETransform]].nextSetBit(0)]
+            else {
+                val tileGridIndex = this[entity[ETransform]].nextSetBit(0)
+                if (tileGridIndex >= 0)
+                    this[tileGridIndex]
+                else return
+            }
 
             if (entity.has(EMultiplier)) {
                 val multiplier = entity[EMultiplier]

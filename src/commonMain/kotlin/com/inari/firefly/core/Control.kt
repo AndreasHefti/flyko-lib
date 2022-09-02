@@ -1,12 +1,8 @@
 package com.inari.firefly.core
 
-import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
-import com.inari.firefly.core.api.FFTimer
-import com.inari.util.*
-import kotlin.jvm.JvmField
 
-abstract class Control protected constructor(): Component(Control) {
+abstract class Control protected constructor(): ComponentNode(Control) {
 
     private val updateListener = ::update
 
@@ -17,7 +13,6 @@ abstract class Control protected constructor(): Component(Control) {
 
     abstract fun update()
 
-    override val componentType = Companion
     companion object : ComponentSystem<Control>("Control") {
         override fun allocateArray(size: Int): Array<Control?> = arrayOfNulls(size)
         override fun create(): Control =
@@ -25,86 +20,94 @@ abstract class Control protected constructor(): Component(Control) {
     }
 }
 
-interface ControlledComponent<C : Component>{
+abstract class ComponentControl() : Control() {
+    abstract fun register(name: String)
+    abstract fun unregister(name: String)
+}
 
-    val controllerReference: CReference
+abstract class SingleComponentControl(controlledType: ComponentType<*>) : ComponentControl() {
 
-    fun withControl(name: String) = controllerReference(name)
-    fun withControl(index: Int) = controllerReference(index)
-    fun withControl(key: ComponentKey) = controllerReference(key)
-    fun <CTRL : ComponentControl<C>> withControl(builder: ComponentBuilder<CTRL>, configure: (CTRL.() -> Unit)) {
-        val control = builder.buildAndGetActive(configure)
-        controllerReference(control)
+    constructor(subType: ComponentSubTypeSystem<*,*>) : this(subType.system)
+
+    internal val controlledComponent = CLooseReference(controlledType)
+    val controlledComponentIndex: Int
+        get() = controlledComponent.targetKey.instanceIndex
+
+    override fun register(name: String) = controlledComponent(name)
+    override fun unregister(name: String) = controlledComponent.reset()
+
+}
+
+abstract class ComponentsControl(controlledType: ComponentType<*>) : ComponentControl() {
+
+    constructor(subType: ComponentSubTypeSystem<*,*>) : this(subType.system)
+
+    internal val controlledComponents = CLooseReferences(controlledType)
+
+    override fun register(name: String) = controlledComponents.withReference(name)
+    override fun unregister(name: String) = controlledComponents.removeReference(name)
+
+    override fun activate() {
+        cleanControlledReferences()
+        super.activate()
+    }
+
+    private fun cleanControlledReferences() {
+        controlledComponents.refKeys.forEach { key ->
+            if (key.instanceIndex < 0)
+                controlledComponents.refKeys.remove(key)
+            controlledComponents.refKeys.trim()
+        }
+    }
+    fun clearControlledReferences() = controlledComponents.reset()
+
+}
+
+interface ControlledComponent<C : Component> {
+
+    val name: String
+
+    fun withControl(name: String) = register(Control[name])
+    fun withControl(index: Int) = register(Control[index])
+    fun withControl(key: ComponentKey) = register(Control[key])
+    fun <CTRL : ComponentControl> withControl(builder: ComponentBuilder<CTRL>, configure: (CTRL.() -> Unit)) {
+        val control = builder.buildAndGet(configure)
+        register(control)
+    }
+
+    fun withChild(key: ComponentKey): ComponentKey
+
+    private fun register(control: Control) {
+        with(control as ComponentControl) {
+            register(name)
+        }
+        withChild(Control.getKey(control.index))
     }
 }
 
-abstract class ComponentControl<C : Component> : Control() {
+abstract class EntityControl : Control() {
 
     private val componentListener: ComponentEventListener = { index, type ->
-        val component = ComponentSystem[controlledComponentType][index]
+        val entity = Entity[index]
         if (type == ComponentEventType.ACTIVATED)
-            notifyActivation(component)
+            notifyActivation(entity)
         else if (type == ComponentEventType.DEACTIVATED)
-            notifyDeactivation(component)
+            notifyDeactivation(entity)
     }
 
-    abstract val controlledComponentType: ComponentType<C>
-    abstract fun notifyActivation(component: C)
-    abstract fun notifyDeactivation(component: C)
+    abstract fun notifyActivation(entity: Entity)
+    abstract fun notifyDeactivation(entity: Entity)
 
     override fun load() {
         super.load()
-        ComponentSystem[controlledComponentType].registerComponentListener(componentListener)
+        Entity.registerComponentListener(componentListener)
     }
 
     override fun dispose() {
         super.dispose()
-        ComponentSystem[controlledComponentType].disposeComponentListener(componentListener)
+        Entity.disposeComponentListener(componentListener)
     }
 }
 
-class Scene : Control() {
 
-    @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
-    @JvmField internal var updateOperation: Operation = RUNNING_OPERATION
-    @JvmField internal var callback: OperationCallback = VOID_CONSUMER
-    @JvmField var deleteAfterRun: Boolean = false
-
-    fun withCallback(callback: OperationCallback) {
-        this.callback = callback
-    }
-
-    fun withUpdate(update: Operation) {
-        updateOperation = update
-    }
-
-    override fun update() {
-        if (!scheduler.needsUpdate())
-            return
-
-        val result = updateOperation()
-        if (result == OperationResult.RUNNING)
-            return
-
-        stop(index)
-        callback(result)
-        if (deleteAfterRun)
-            Scene.delete(index)
-    }
-
-    companion object :  ComponentSubTypeSystem<Control, Scene>(Control, "Scene") {
-        override fun create() = Scene()
-
-        fun run(index: Int, callback: OperationCallback) {
-            val scene = this[index]
-            scene.withCallback(callback)
-            activate(index)
-        }
-
-        fun pause(index: Int) = deactivate(index)
-        fun resume(index: Int) = activate(index)
-        fun stop(index: Int) = dispose(index)
-    }
-
-}
 

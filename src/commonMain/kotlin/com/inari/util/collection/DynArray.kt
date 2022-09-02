@@ -374,6 +374,8 @@ class DynArray<T> constructor(
         }
 
         override fun hasNext(): Boolean {
+            if (index < array.size && array[index] == null)
+                findNext()
             return index < array.size
         }
 

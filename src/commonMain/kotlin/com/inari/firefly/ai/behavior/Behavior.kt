@@ -12,7 +12,6 @@ abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
 
     abstract fun tick(entityId: Int): OperationResult
 
-    override val componentType = Companion
     companion object : ComponentSystem<BehaviorNode>("BehaviorNode") {
         override fun allocateArray(size: Int): Array<BehaviorNode?> = arrayOfNulls(size)
         override fun create() =

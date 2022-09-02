@@ -10,9 +10,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 
-class SimpleCameraController private constructor() : ComponentControl<View>() {
-
-    override val controlledComponentType = View
+class SimpleCameraController private constructor() : SingleComponentControl(View) {
 
     @JvmField var pixelPerfect = false
     @JvmField var pivot: Vector2f = Vector2f()
@@ -31,16 +29,11 @@ class SimpleCameraController private constructor() : ComponentControl<View>() {
         }
     }
 
-    override fun notifyActivation(component: View) {
-        this.view = component
+    override fun activate() {
+        super.activate()
+        this.view = View[name]
         viewChangeEvent = View.createViewChangeEvent(view.index, ORIENTATION, pixelPerfect)
     }
-
-    override fun notifyDeactivation(component: View) {
-        view = null!!
-        viewChangeEvent = null!!
-    }
-
 
     override fun update() {
         if (getPos(view.zoom, view.bounds, view.worldPosition)) {

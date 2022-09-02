@@ -1,9 +1,16 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.TestApp
 import com.inari.util.NO_NAME
 import kotlin.test.*
 
 class ComponentTest {
+
+    @BeforeTest
+    fun init() {
+        TestApp
+        ComponentSystem.clearSystems()
+    }
 
     @Test
     fun testLifecycle() {
@@ -154,7 +161,6 @@ class ComponentTest {
         @JvmField var test1: String = NO_NAME
         @JvmField var test2: String = NO_NAME
 
-        override val componentType = Companion
         companion object : ComponentSystem<TestComponent>("TestComponent") {
             override fun allocateArray(size: Int): Array<TestComponent?> = arrayOfNulls(size)
             override fun create() = TestComponent()
@@ -162,24 +168,21 @@ class ComponentTest {
 
     }
 
-    class TestParent : Component(TestParent) {
+    class TestParent : ComponentNode(TestParent) {
         @JvmField var ptest1: String = NO_NAME
         @JvmField var ptest2: String = NO_NAME
 
-
-        override val componentType = Companion
         companion object : ComponentSystem<TestParent>("TestParent") {
             override fun allocateArray(size: Int): Array<TestParent?> = arrayOfNulls(size)
             override fun create() = TestParent()
         }
     }
 
-    class TestChild : Component(TestChild) {
+    class TestChild : ComponentNode(TestChild) {
 
         @JvmField var cest1: String = NO_NAME
         @JvmField var cest2: String = NO_NAME
 
-        override val componentType = Companion
         companion object : ComponentSystem<TestChild>("TestChild") {
             override fun allocateArray(size: Int): Array<TestChild?> = arrayOfNulls(size)
             override fun create() = TestChild()

@@ -2,9 +2,12 @@ package com.inari.firefly.graphics.view
 
 import com.inari.firefly.GraphicsMock
 import com.inari.firefly.TestApp
+import com.inari.firefly.core.ComponentSystem
+import com.inari.firefly.core.Control
 import com.inari.firefly.graphics.view.View.Companion.BASE_VIEW_KEY
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ViewSystemTest {
@@ -13,7 +16,7 @@ class ViewSystemTest {
     fun init() {
         TestApp
         GraphicsMock.clearLogs()
-        View.clearSystem()
+        ComponentSystem.clearSystems()
     }
 
     @Test
@@ -25,11 +28,17 @@ class ViewSystemTest {
 
     @Test
     fun testInitWithController() {
-        View.build {
+        val viewKey = View.buildActive {
             name = "test"
             withControl(SimpleCameraController) {
                 name = "test"
             }
         }
+
+        assertEquals("CKey(test, View, 1)", viewKey.toString())
+        val control = Control["test"]
+        assertTrue(control.initialized)
+        assertTrue(control.loaded)
+        assertTrue(control.active)
     }
 }

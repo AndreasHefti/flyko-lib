@@ -1,8 +1,8 @@
 package com.inari.firefly.core.api
 
 import com.inari.util.ZERO_FLOAT
+import com.inari.util.ZERO_INT
 import com.inari.util.geom.*
-import kotlin.jvm.JvmField
 
 enum class BlendMode constructor(val source: Int, val dest: Int) {
     /** No blending. Disables blending  */
@@ -110,9 +110,9 @@ interface TextureData {
 
 interface SpriteData {
     val textureIndex: Int
-    val region: Vector4i
-    val isHorizontalFlip: Boolean
-    val isVerticalFlip: Boolean
+    val textureBounds: Vector4i
+    val hFlip: Boolean
+    val vFlip: Boolean
 }
 
 interface SpriteRenderable {

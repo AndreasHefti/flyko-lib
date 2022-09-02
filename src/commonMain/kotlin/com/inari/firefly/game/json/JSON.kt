@@ -1,6 +1,6 @@
 package com.inari.firefly.game.json
 
-import com.inari.firefly.game.WorldOrientationType
+import com.inari.firefly.game.world.WorldOrientationType
 import com.inari.util.NO_NAME
 import com.inari.util.ZERO_FLOAT
 import kotlin.jvm.JvmField

@@ -4,7 +4,8 @@ import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.game.tile.TileUtils.TILE_ASPECT_GROUP
-import com.inari.firefly.graphics.sprite.SpriteSet
+import com.inari.firefly.graphics.sprite.SpriteFrame
+import com.inari.firefly.graphics.sprite.SpriteTemplate
 import com.inari.firefly.graphics.view.EntityRenderer
 import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.physics.contact.EContact.Companion.CONTACT_TYPE_ASPECT_GROUP
@@ -102,7 +103,7 @@ enum class TileMaterialType(private val aspect: Aspect) : Aspect {
 @ComponentDSL
 class TileTemplate internal constructor() {
 
-    @JvmField internal val protoSprite = SpriteSet.SpriteInfo()
+    @JvmField internal val spriteTemplate = SpriteTemplate()
     @JvmField internal var animationData: TileAnimation? = null
 
     @JvmField var name: String = NO_NAME
@@ -121,8 +122,8 @@ class TileTemplate internal constructor() {
         animationData = TileAnimation()
         animationData!!.also(configure)
     }
-    @JvmField val withSprite: (SpriteSet.SpriteInfo.() -> Unit) -> Unit = { configure ->
-        protoSprite.also(configure)
+    @JvmField val withSprite: (SpriteTemplate.() -> Unit) -> Unit = { configure ->
+        spriteTemplate.also(configure)
     }
 
     val hasContactComp: Boolean
@@ -133,11 +134,11 @@ class TileTemplate internal constructor() {
 @ComponentDSL
 class TileAnimation internal constructor() {
 
-    @JvmField internal val frames: DynArray<SpriteSet.SpriteFrame> = DynArray.of(5, 5)
-    @JvmField internal val sprites: MutableMap<String, SpriteSet.SpriteInfo> = mutableMapOf()
+    @JvmField internal val frames: DynArray<SpriteFrame> = DynArray.of(5, 5)
+    @JvmField internal val sprites: MutableMap<String, SpriteTemplate> = mutableMapOf()
 
-    val withFrame: (SpriteSet.SpriteFrame.() -> Unit) -> Unit = { configure ->
-        val frame = SpriteSet.SpriteFrame()
+    val withFrame: (SpriteFrame.() -> Unit) -> Unit = { configure ->
+        val frame = SpriteFrame()
         frame.also(configure)
 
         if (frame.sprite.name == NO_NAME)
@@ -181,7 +182,7 @@ class TileMapData {
     val layerIndex: Int
         get() = if (layer.targetKey.instanceIndex >= 0) layer.targetKey.instanceIndex else 0
 
-    val withTileSet: (TileSetAssetMapping.() -> Unit) -> Unit = { configure ->
+    val withTileSetMapping: (TileSetAssetMapping.() -> Unit) -> Unit = { configure ->
         val instance = TileSetAssetMapping()
         instance.also(configure)
         tileSetMapping.add(instance)

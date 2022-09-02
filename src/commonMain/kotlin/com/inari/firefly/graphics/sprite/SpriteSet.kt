@@ -10,112 +10,104 @@ import com.inari.util.collection.DynArrayRO
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
-class SpriteSet private constructor(): Asset() {
+class SpriteTemplate internal constructor(): SpriteData {
 
-    private val spriteData = DynArray.of<SpriteInfo>(30)
-    private val tmpSpriteData = object : SpriteData {
-        override var textureIndex: Int = -1
-            internal set
-        override val region: Vector4i = Vector4i(ZERO_INT, ZERO_INT, ZERO_INT, ZERO_INT)
-        override var isHorizontalFlip: Boolean = false
-        override var isVerticalFlip: Boolean = false
-        fun reset() {
-            textureIndex = -1
-            region(ZERO_INT, ZERO_INT, ZERO_INT, ZERO_INT)
-            isHorizontalFlip = false
-            isVerticalFlip = true
-        }
+    @JvmField var name: String = NO_NAME
+    override val textureBounds: Vector4i = Vector4i()
+    override var hFlip: Boolean = false
+    override var vFlip: Boolean = false
+
+    var spriteIndex: Int = -1
+        internal set
+    override var textureIndex: Int = -1
+        internal set
+
+    fun reset() {
+        spriteIndex = -1
+        textureIndex = -1
+        textureBounds(ZERO_INT, ZERO_INT, ZERO_INT, ZERO_INT)
+        hFlip = false
+        vFlip = true
+    }
+}
+
+@ComponentDSL
+class SpriteFrame : IntFrameAnimation.IntFrame {
+
+    var interval: Long = 0
+    var sprite: SpriteTemplate = SpriteTemplate()
+
+    val spriteTemplate: (SpriteTemplate.() -> Unit) -> Unit = { configure ->
+        val sprite = SpriteTemplate()
+        sprite.also(configure)
+        this.sprite = sprite
     }
 
-    @JvmField val sprites: DynArrayRO<SpriteInfo> = spriteData
+    override val timeInterval: Long
+        get() { return interval }
+
+    override val value: Int
+        get() = sprite.spriteIndex
+
+    companion object {
+        val of: (SpriteFrame.() -> Unit) -> SpriteFrame = { configure ->
+            val instance = SpriteFrame()
+            instance.also(configure)
+            instance
+        }
+    }
+}
+
+open class SpriteSet protected constructor(): Asset(SpriteSet) {
+
     @JvmField val textureRef = CReference(Texture)
+
+    protected val spriteData = DynArray.of<SpriteTemplate>()
+    val sprites: DynArrayRO<SpriteTemplate>
+        get() = spriteData
 
     override fun setParentComponent(key: ComponentKey) {
         super.setParentComponent(key)
         textureRef(key)
     }
 
-    fun withSpriteInfo(spriteInfo: SpriteInfo) = spriteData.add(spriteInfo)
-    fun withSpriteInfo(builder: SpriteInfo.() -> Unit) {
-        val s = SpriteInfo()
-        s.also(builder)
-        spriteData.add(s)
-    }
-
     override fun assetIndex(at: Int) =
-        spriteData[at]?.assetIndex ?: -1
+        spriteData[at]?.spriteIndex ?: -1
 
     fun assetIndex(name: String): Int {
         if (name == NO_NAME)
             return -1
 
         return spriteData
-            .first { name == it.name }.assetIndex
+            .first { name == it.name }.spriteIndex
+    }
+
+    fun withSpriteTemplate(spriteTemplate: SpriteTemplate) = spriteData.add(spriteTemplate)
+    fun withSpriteTemplate(builder: SpriteTemplate.() -> Unit) {
+        val s = SpriteTemplate()
+        s.also(builder)
+        spriteData.add(s)
     }
 
     override fun load() {
-        with( Engine.graphics) {
-            tmpSpriteData.textureIndex = resolveAssetIndex(textureRef.targetKey)
-            for (i in 0 until spriteData.capacity) {
-                val sprite = spriteData[i] ?: continue
-                tmpSpriteData.region(sprite.textureBounds)
-                tmpSpriteData.isHorizontalFlip = sprite.hFlip
-                tmpSpriteData.isVerticalFlip = sprite.vFlip
-                sprite.assetIndex = createSprite(tmpSpriteData)
-            }
+        val textureIndex = resolveAssetIndex(textureRef.targetKey)
+        for (i in 0 until spriteData.capacity) {
+            val sprite = spriteData[i] ?: continue
+            sprite.textureIndex = textureIndex
+            sprite.spriteIndex = Engine.graphics.createSprite(sprite)
         }
-        tmpSpriteData.reset()
     }
 
     override fun dispose() {
-        with( Engine.graphics) {
-            for (i in 0 until spriteData.capacity) {
-                val sprite = spriteData[i] ?: continue
-                disposeSprite(sprite.assetIndex)
-                sprite.assetIndex = -1
-            }
+        for (i in 0 until spriteData.capacity) {
+            val sprite = spriteData[i] ?: continue
+            Engine.graphics.disposeSprite(sprite.spriteIndex)
+            sprite.spriteIndex = -1
         }
     }
 
     companion object :  ComponentSubTypeSystem<Asset, SpriteSet>(Asset, "SpriteSet") {
         override fun create() = SpriteSet()
     }
-
-    class SpriteInfo internal constructor() {
-
-        var assetIndex: Int = -1
-            internal set
-
-        @JvmField var name: String = NO_NAME
-        @JvmField val textureBounds: Vector4i = Vector4i()
-        @JvmField var hFlip: Boolean = false
-        @JvmField var vFlip: Boolean = false
-    }
-
-    @ComponentDSL
-    class SpriteFrame : IntFrameAnimation.IntFrame {
-
-        var interval: Long = 0
-        var sprite: SpriteInfo = SpriteInfo()
-
-        val protoSprite: (SpriteInfo.() -> Unit) -> Unit = { configure ->
-            val sprite = SpriteInfo()
-            sprite.also(configure)
-            this.sprite = sprite
-        }
-
-        override val timeInterval: Long
-            get() { return interval }
-
-        override val value: Int
-            get() = sprite.assetIndex
-
-        companion object {
-            val of: (SpriteFrame.() -> Unit) -> SpriteFrame = { configure ->
-                val instance = SpriteFrame()
-                instance.also(configure)
-                instance
-            }
-        }
-    }
 }
+

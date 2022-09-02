@@ -1,14 +1,24 @@
 package com.inari.firefly.game.composite
 
-import com.inari.firefly.core.CReference
-import com.inari.firefly.core.Component
-import com.inari.firefly.core.ComponentSystem
+import com.inari.firefly.core.*
 import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
+import com.inari.firefly.graphics.view.ViewLayerAware
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 
-abstract class Composite protected constructor() : Component(Composite) {
+open class Composite protected constructor(subType: ComponentType<out Composite>) : ComponentNode(subType), ViewLayerAware {
+
+    constructor() : this(Composite)
+
+    override val viewIndex: Int
+        get() = viewRef.targetKey.instanceIndex
+    override val layerIndex: Int
+        get() = layerRef.targetKey.instanceIndex
+
+    @JvmField var viewRef = CReference(View)
+    @JvmField var layerRef = CReference(Layer)
+    @JvmField val position = Vector2f()
 
     @JvmField internal val attributes = mutableMapOf<String, String>()
 
@@ -21,16 +31,4 @@ abstract class Composite protected constructor() : Component(Composite) {
         override fun create(): Composite =
             throw UnsupportedOperationException("Composite is abstract use a concrete implementation instead")
     }
-}
-
-abstract class WordViewComposite protected constructor() : Composite() {
-
-    val viewIndex: Int
-        get() = view.targetKey.instanceIndex
-    val layerIndex: Int
-        get() = layer.targetKey.instanceIndex
-    @JvmField var view = CReference(View)
-    @JvmField var layer = CReference(Layer)
-    @JvmField val position = Vector2f()
-
 }

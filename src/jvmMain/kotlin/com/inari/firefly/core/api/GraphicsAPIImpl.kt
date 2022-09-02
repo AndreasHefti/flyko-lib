@@ -143,13 +143,13 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         val texture = textures[data.textureIndex]
         val sprite = TextureRegion(
             texture,
-            data.region.x,
-            data.region.y,
-            data.region.width,
-            data.region.height
+            data.textureBounds.x,
+            data.textureBounds.y,
+            data.textureBounds.width,
+            data.textureBounds.height
         )
 
-        sprite.flip(data.isHorizontalFlip, !data.isVerticalFlip)
+        sprite.flip(data.hFlip, !data.vFlip)
         return sprites.add(sprite)
     }
 

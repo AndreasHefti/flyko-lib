@@ -74,7 +74,6 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
      */
     abstract operator fun get(region: Vector4i, entity: Entity): IntIterator
 
-    override val componentType = Companion
     companion object : ComponentSystem<ContactMap>("ContactMap") {
 
         val VIEW_LAYER_MAPPING = ViewLayerMapping()

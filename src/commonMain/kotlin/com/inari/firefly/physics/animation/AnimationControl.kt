@@ -9,21 +9,19 @@ import com.inari.util.geom.GeomUtils
 
 abstract class AnimationControl<D : AnimatedData>(
     protected val animatedData: DynArray<D>
-) : ComponentControl<Entity>() {
+) : EntityControl() {
 
-    override val controlledComponentType = Entity
-
-    override fun notifyActivation(component: Entity) {
-        if (EAnimation !in component.aspects) return
-        val eAnimation = component[EAnimation]
+    override fun notifyActivation(entity: Entity) {
+        if (EAnimation !in entity.aspects) return
+        val eAnimation = entity[EAnimation]
         eAnimation.animations.forEach { iAccept(it)?.let {
                 data -> animatedData + data
         } }
     }
 
-    override fun notifyDeactivation(component: Entity) {
-        if (EAnimation !in component.aspects) return
-        val eAnimation = component[EAnimation]
+    override fun notifyDeactivation(entity: Entity) {
+        if (EAnimation !in entity.aspects) return
+        val eAnimation = entity[EAnimation]
         eAnimation.animations.forEach { accept(it)?.let {
                 data -> animatedData - data
         } }

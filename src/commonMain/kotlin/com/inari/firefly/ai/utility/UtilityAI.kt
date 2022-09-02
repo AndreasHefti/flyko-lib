@@ -11,7 +11,6 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
 
     abstract  fun getUtilityValue(entityId: Int, intentionId: Int): Float
 
-    override val componentType = Companion
     companion object : ComponentSystem<UtilityAI>("UtilityAI") {
         override fun allocateArray(size: Int): Array<UtilityAI?> = arrayOfNulls(size)
         override fun create() =

@@ -50,8 +50,8 @@ class Entity internal constructor(): Component(Entity), AspectAware {
     fun <C : EntityComponent> withComponent(cBuilder: EntityComponentBuilderAdapter<C>, configure: (C.() -> Unit)): C =
         cBuilder.type.builder(this)(configure)
 
-    override fun toString(): String = "Entity(name=$name  components=$components)"
-    override val componentType = Companion
+    override fun toString(): String = "${super.toString()} | $aspects"
+
     companion object : ComponentSystem<Entity>("Entity")  {
 
         val ENTITY_COMPONENT_ASPECTS = IndexedAspectType("ENTITY_COMPONENT_ASPECTS")

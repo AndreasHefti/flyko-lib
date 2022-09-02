@@ -18,7 +18,6 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
 
     abstract fun resolve(entity: Entity, contact: EContact, contactScan: ContactScans)
 
-    override val componentType = Companion
     companion object : ComponentSystem<CollisionResolver>("ContactResolver") {
         override fun allocateArray(size: Int): Array<CollisionResolver?> = arrayOfNulls(size)
         override fun create(): CollisionResolver =

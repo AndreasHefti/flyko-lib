@@ -1,10 +1,9 @@
 package com.inari.firefly.game.tile
 
-import com.inari.firefly.GraphicsMock
 import com.inari.firefly.TestApp
 import com.inari.firefly.core.Asset
+import com.inari.firefly.core.ComponentSystem
 import com.inari.firefly.core.Entity
-import com.inari.firefly.game.json.TiledTileSetJSONAsset
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.View.Companion.BASE_VIEW_KEY
 import com.inari.util.geom.BitMask
@@ -12,53 +11,58 @@ import kotlin.test.*
 
 class TestTiledTileSetAsset {
 
+    @BeforeTest
+    fun init() {
+        TestApp
+        ComponentSystem.clearSystems()
+    }
+
     @Test
     fun testLoad_Activate_Deactivate() {
         TestApp
 
-        val tileSetAssetId = TiledTileSetJSONAsset.build {
-            name = "testTileSet"
-            resourceName = "tiles/outline_full.json"
-        }
-
-        assertTrue { Asset.exists("testTileSet") }
-
         // create tilemap for the tile set
         val tileMapId = TileMap.build {
+            name = "testTileMap"
             viewRef(BASE_VIEW_KEY)
+            withTileSet(TiledJSONTileSet) {
+                name = "testTileSet"
+                resourceName = "tiles/outline_full.json"
+            }
             withTileLayer {
-                withTileSet {
-                    tileSetRef(tileSetAssetId)
+                withTileSetMapping {
+                    tileSetRef("testTileSet")
                     codeOffset = 1
                 }
             }
         }
 
+        assertTrue { Asset.exists("testTileSet") }
         TileMap.load(tileMapId)
 
         // check all expected assets and components are created correctly
-        val tiledTileSetAsset = TiledTileSetJSONAsset[tileSetAssetId]
+        val tiledTileSetAsset = TiledJSONTileSet["testTileSet"]
         assertNotNull(tiledTileSetAsset)
         val textureAssetName = "tileSetAtlas_${tiledTileSetAsset.name}"
         assertTrue { Asset.exists(textureAssetName) }
         val textureAsset = Texture[textureAssetName]
         assertNotNull(textureAsset)
         assertTrue { textureAsset.loaded }
-        assertEquals("tiles/outline_16_16.png", GraphicsMock._loadedAssets[0])
+        //assertEquals("tiles/outline_16_16.png", GraphicsMock._loadedAssets[0])
 
-        assertTrue { TileSet.exists("outline_full") }
-        val tileSet = TileSet["outline_full"]
-        assertEquals("40", tileSet.tileTemplates.size.toString())
+        assertTrue { TileSet.exists("testTileSet") }
+        val tileSet = TileSet["testTileSet"]
+        assertEquals("40", tileSet.tiles.size.toString())
 
         // test some tile templates
-        val tile1 = tileSet.tileTemplates[0]!!
+        val tile1 = tileSet.tiles[0]!!
         assertEquals("outline_full_terrain_quad:full_0:0", tile1.name)
         assertTrue(TileSizeType.FULL in tile1.aspects)
         assertEquals( "TERRAIN_SOLID", tile1.material.toString())
         assertEquals( "QUAD", tile1.contactType.toString())
         assertNull(tile1.contactMask)
 
-        val tile2 = tileSet.tileTemplates[3]!!
+        val tile2 = tileSet.tiles[3]!!
         assertEquals("outline_full_terrain_slope:quarterto:se:h_3:0", tile2.name)
         assertTrue(TileOrientation.HORIZONTAL in tile2.aspects)
         assertTrue(TileSizeType.QUARTER_TO in tile2.aspects)
@@ -105,7 +109,7 @@ class TestTiledTileSetAsset {
                     "0011111111111100\n" +
                     "0111111111111110\n" +
                     "1111111111111111]",
-            tileSet.tileTemplates[7]!!.contactMask.toString())
+            tileSet.tiles[7]!!.contactMask.toString())
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
                     "0000000010000000\n" +
@@ -124,7 +128,7 @@ class TestTiledTileSetAsset {
                     "0111111111111110\n" +
                     "0111111111111111\n" +
                     "1111111111111111]",
-            tileSet.tileTemplates[8]!!.contactMask.toString())
+            tileSet.tiles[8]!!.contactMask.toString())
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
                     "1000000000000000\n" +
@@ -143,7 +147,7 @@ class TestTiledTileSetAsset {
                     "1110000000000000\n" +
                     "1100000000000000\n" +
                     "1000000000000000]",
-            tileSet.tileTemplates[27]!!.contactMask.toString())
+            tileSet.tiles[27]!!.contactMask.toString())
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
                     "1100000000000000\n" +
@@ -162,7 +166,7 @@ class TestTiledTileSetAsset {
                     "1111110000000000\n" +
                     "1111000000000000\n" +
                     "1100000000000000]",
-            tileSet.tileTemplates[28]!!.contactMask.toString())
+            tileSet.tiles[28]!!.contactMask.toString())
 
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
@@ -182,7 +186,7 @@ class TestTiledTileSetAsset {
                     "0000000000000111\n" +
                     "0000000000000011\n" +
                     "0000000000000001]",
-            tileSet.tileTemplates[37]!!.contactMask.toString())
+            tileSet.tiles[37]!!.contactMask.toString())
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
                     "0000000000000011\n" +
@@ -201,7 +205,7 @@ class TestTiledTileSetAsset {
                     "0000000000111111\n" +
                     "0000000000001111\n" +
                     "0000000000000011]",
-            tileSet.tileTemplates[38]!!.contactMask.toString())
+            tileSet.tiles[38]!!.contactMask.toString())
 
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
@@ -221,7 +225,7 @@ class TestTiledTileSetAsset {
                     "0000000000111111\n" +
                     "0000000000001111\n" +
                     "0000000000000011]",
-            tileSet.tileTemplates[38]!!.contactMask.toString())
+            tileSet.tiles[38]!!.contactMask.toString())
 
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
@@ -241,7 +245,7 @@ class TestTiledTileSetAsset {
                     "0001111111111000\n" +
                     "0000111111110000\n" +
                     "0000001111000000]",
-            tileSet.tileTemplates[10]!!.contactMask.toString())
+            tileSet.tiles[10]!!.contactMask.toString())
 
         assertEquals(
             "BitMask [region=[x=0,y=0,width=16,height=16], bits=\n" +
@@ -261,7 +265,7 @@ class TestTiledTileSetAsset {
                     "0000011111100000\n" +
                     "0000001111000000\n" +
                     "0000000110000000]",
-            tileSet.tileTemplates[20]!!.contactMask.toString())
+            tileSet.tiles[20]!!.contactMask.toString())
 
 
 
@@ -278,6 +282,8 @@ class TestTiledTileSetAsset {
         assertTrue( entityRefId >= 0)
         entity = Entity[entityRefId]
         assertEquals("tile_outline_full_terrain_circle:full_0:1_view:0_layer:0", entity.name)
+
+        ComponentSystem.clearSystems()
     }
 
     @Test

@@ -1,9 +1,7 @@
 package com.inari.firefly.ai.state
 
 import com.inari.firefly.ai.state.FiniteStateMachine.Companion.STATE_CHANGE_EVENT_TYPE
-import com.inari.firefly.core.ComponentSubTypeSystem
-import com.inari.firefly.core.Engine
-import com.inari.firefly.core.Trigger
+import com.inari.firefly.core.*
 
 class StateMachineEventTrigger  private constructor() : Trigger() {
 
@@ -15,5 +13,4 @@ class StateMachineEventTrigger  private constructor() : Trigger() {
     companion object :  ComponentSubTypeSystem<Trigger, StateMachineEventTrigger>(Trigger, "StateMachineEventTrigger") {
         override fun create() = StateMachineEventTrigger()
     }
-
 }

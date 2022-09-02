@@ -1,6 +1,7 @@
 package com.inari.firefly.graphics.tile
 
 import com.inari.firefly.TestApp
+import com.inari.firefly.core.ComponentSystem
 import com.inari.firefly.graphics.view.View.Companion.BASE_VIEW_KEY
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -11,6 +12,7 @@ class TileGridSystemTest {
     fun testSystemInit() {
         TestApp
         TileGrid
+        ComponentSystem.clearSystems()
     }
 
     @Test

@@ -12,14 +12,11 @@ interface IntegratorBuilder<I : Integrator> {
 
 abstract class Integrator {
 
-    @JvmField
-    var gravityVec = Vector2f(0f, 9.8f)
-    @JvmField
-    var adjustMax = true
-    @JvmField
-    var adjustGround = true
-    @JvmField
-    var adjustBlock = false
+    @JvmField var gravityVec = Vector2f(0f, 9.8f)
+    @JvmField var massFactor = 1f
+    @JvmField var adjustMax = true
+    @JvmField var adjustGround = true
+    @JvmField var adjustBlock = false
 
     abstract fun integrate(
         movement: EMovement,
@@ -60,75 +57,76 @@ abstract class Integrator {
 
 class SimpleStepIntegrator private constructor() : Integrator() {
 
-    override fun integrate(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) {
-        val velocity = movement.velocity
-        if (movement.mass == 0f)
-            return
+    private val gravityAcc = Vector2f(0f, 0f)
 
-        if (ON_GROUND in movement.aspects) {
-            if (velocity.v1 != 0f )
-                velocity.v1 = 0f
-            return
-        }
-        velocity.v1 = velocity.v1 + abs( (velocity.v1 / movement.mass - 1f ) * 0.2f )
+    override fun integrate(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) {
+        gravityAcc(super.gravityVec)
+        val accMass = 1 / movement.mass * massFactor
+        gravityAcc / accMass
+
+        movement.velocity.v0 += deltaTimeInSeconds * gravityAcc.v0
+        movement.velocity.v1 += deltaTimeInSeconds * gravityAcc.v1
+
+        adjustVelocity(movement)
     }
 
     override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) =
-        transform.move(movement.velocity.v0 * deltaTimeInSeconds, movement.velocity.v1 * deltaTimeInSeconds)
+        transform.move(
+            movement.velocity.v0 * deltaTimeInSeconds,
+            movement.velocity.v1 * deltaTimeInSeconds)
 
     companion object : IntegratorBuilder<SimpleStepIntegrator> {
         override fun create() = SimpleStepIntegrator()
     }
 }
 
-class EulerGravityIntegrator private constructor() : Integrator() {
+class VelocityVerletIntegrator private constructor() : Integrator() {
 
-    @JvmField
-    var gravity = 9.8f
-    @JvmField
-    var maxGravityVelocity: Float = 1f
-    @JvmField
-    var massFactor: Float  = 1f
-    @JvmField
-    var shift = 10.0.pow(0.0).toFloat()
-    var scale = -1
-        set(value) {
-            field = value
-            shift = if (value < 0)
-                10.0.pow(0.0).toFloat()
-            else
-                10.0.pow(value.toDouble()).toFloat()
-        }
+    private val newAcc = Vector2f(0f, 0f)
 
     override fun integrate(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) {
-        gravityIntegration( movement )
-        val velocity = movement.velocity
-        val acceleration = movement.acceleration
+        // calc new acceleration
+        newAcc(0f,0f) + gravityVec
+        newAcc + movement.force
+        val accMass = 1 / movement.mass * massFactor
+        newAcc / accMass
 
-        velocity.v0 = velocity.v0 + acceleration.v0 * deltaTimeInSeconds
-        velocity.v1 = velocity.v1 + acceleration.v1 * deltaTimeInSeconds
+        movement.velocity.v0 += deltaTimeInSeconds * (movement.acceleration.v0 + newAcc.v0) / 2
+        movement.velocity.v1 += deltaTimeInSeconds * (movement.acceleration.v1 + newAcc.v1) / 2
+
+        adjustVelocity(movement)
     }
 
-    override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) {
+    override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) =
         transform.move(
-            (movement.velocity.v0 * deltaTimeInSeconds * shift).roundToInt() / shift,
-            (movement.velocity.v1 * deltaTimeInSeconds * shift).roundToInt() / shift
-        )
+            deltaTimeInSeconds * (movement.velocity.v0 + deltaTimeInSeconds * movement.acceleration.v0 / 2),
+            deltaTimeInSeconds * (movement.velocity.v1 + deltaTimeInSeconds * movement.acceleration.v1 / 2))
+
+    companion object : IntegratorBuilder<VelocityVerletIntegrator> {
+        override fun create() = VelocityVerletIntegrator()
+    }
+}
+
+class EulerGravityIntegrator private constructor() : Integrator() {
+
+    override fun integrate(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) {
+
+        movement.acceleration(0f,0f)
+        movement.acceleration + gravityVec
+        movement.acceleration + movement.force
+        val accMass = 1 / movement.mass * massFactor
+        movement.acceleration / accMass
+
+        movement.velocity.v0 += deltaTimeInSeconds * movement.acceleration.v0
+        movement.velocity.v1 += deltaTimeInSeconds * movement.acceleration.v1
+
+        adjustVelocity(movement)
     }
 
-    private fun gravityIntegration(movement: EMovement) {
-        if (ON_GROUND in movement.aspects || BLOCK_SOUTH in movement.aspects) {
-            movement.velocity.v1 = 0f
-            movement.acceleration.v1 = 0f
-        } else {
-            if (movement.velocity.v1 >= maxGravityVelocity) {
-                movement.acceleration.v1 = 0f
-                movement.velocity.v1 = maxGravityVelocity
-                return
-            }
-            movement.acceleration.v1 = gravity * (movement.mass * massFactor)
-        }
-    }
+    override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float)  =
+        transform.move(
+            movement.velocity.v0 * deltaTimeInSeconds,
+            movement.velocity.v1 * deltaTimeInSeconds)
 
     companion object : IntegratorBuilder<EulerGravityIntegrator> {
         override fun create() = EulerGravityIntegrator()

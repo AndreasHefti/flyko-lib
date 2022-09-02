@@ -9,7 +9,7 @@ class AssetTest {
     @BeforeTest
     fun init() {
         TestApp
-        Asset.clearSystem()
+        ComponentSystem.clearSystems()
     }
 
     @Test
@@ -140,6 +140,7 @@ class AssetTest {
                     "|index=1:childAsset:ACTIVATED",
             testEvents.toString()
         )
+
         Asset.dispose(asset1)
         assertEquals(
             "|index=1:childAsset:INITIALIZED" +
@@ -155,13 +156,14 @@ class AssetTest {
             testEvents.toString()
         )
 
+
     }
 }
 
 class TestAsset private constructor(
     var Param1: String = "",
     var Param2: Float = 0.0f
-) : Asset() {
+) : Asset(TestAsset) {
 
     override fun load() {
         assetIndex = 0

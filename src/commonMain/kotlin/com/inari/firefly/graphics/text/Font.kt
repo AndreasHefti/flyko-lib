@@ -7,7 +7,7 @@ import com.inari.util.collection.DynIntArray
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
-class Font private constructor(): Asset() {
+class Font private constructor(): Asset(Font) {
 
     @JvmField val textureRef = CReference(Texture)
     @JvmField internal var dChar = -1
@@ -25,9 +25,9 @@ class Font private constructor(): Asset() {
 
     private val tmpSpriteData = object : SpriteData {
         override var textureIndex = -1
-        override val region = Vector4i()
-        override val isHorizontalFlip = false
-        override val isVerticalFlip = false
+        override val textureBounds = Vector4i()
+        override val hFlip = false
+        override val vFlip = false
     }
 
     override fun setParentComponent(key: ComponentKey) {
@@ -37,10 +37,10 @@ class Font private constructor(): Asset() {
 
     override fun load() {
         tmpSpriteData.textureIndex = resolveAssetIndex(textureRef.targetKey)
-        tmpSpriteData.region(0, 0, charWidth, charHeight)
+        tmpSpriteData.textureBounds(0, 0, charWidth, charHeight)
         for (y in charMap.indices) {
             for (x in charMap[y].indices) {
-                tmpSpriteData.region(
+                tmpSpriteData.textureBounds(
                     x * charWidth + xOffset,
                     y * charHeight + yOffset)
 

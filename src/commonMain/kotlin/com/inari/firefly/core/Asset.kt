@@ -1,13 +1,12 @@
 package com.inari.firefly.core
 
-abstract class Asset protected constructor() : Component(Asset) {
+abstract class Asset protected constructor(subType: ComponentType<out Asset>) : ComponentNode(subType) {
 
     var assetIndex: Int = -1
         protected set
 
     open fun assetIndex(at: Int) = assetIndex
 
-    override val componentType = Companion
     companion object : ComponentSystem<Asset>("Asset") {
         override fun allocateArray(size: Int): Array<Asset?> = arrayOfNulls(size)
         override fun create(): Asset =

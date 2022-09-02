@@ -7,7 +7,7 @@ import com.inari.firefly.core.api.TextureData
 import com.inari.util.NO_NAME
 import com.inari.util.NULL_INT_FUNCTION
 
-class Texture private constructor() : Asset(), TextureData {
+class Texture private constructor() : Asset(Texture), TextureData {
 
     var width: Int = -1
         private set
