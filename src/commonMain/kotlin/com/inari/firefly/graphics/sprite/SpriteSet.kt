@@ -90,6 +90,7 @@ open class SpriteSet protected constructor(): Asset(SpriteSet) {
     }
 
     override fun load() {
+        super.load()
         val textureIndex = resolveAssetIndex(textureRef.targetKey)
         for (i in 0 until spriteData.capacity) {
             val sprite = spriteData[i] ?: continue
@@ -104,6 +105,7 @@ open class SpriteSet protected constructor(): Asset(SpriteSet) {
             Engine.graphics.disposeSprite(sprite.spriteIndex)
             sprite.spriteIndex = -1
         }
+        super.dispose()
     }
 
     companion object :  ComponentSubTypeSystem<Asset, SpriteSet>(Asset, "SpriteSet") {

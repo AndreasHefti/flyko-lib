@@ -52,8 +52,7 @@ abstract class ComponentSystem<C : Component>(
         val comp: C = create()
         comp.also(configure)
         val key = registerComponent(comp)
-        comp.iInitialize()
-        send(comp.index, ComponentEventType.INITIALIZED)
+        initComponent(comp)
         return key
     }
 
@@ -61,9 +60,17 @@ abstract class ComponentSystem<C : Component>(
         val comp: C = create()
         comp.also(configure)
         registerComponent(comp)
-        comp.iInitialize()
-        send(comp.index, ComponentEventType.INITIALIZED)
+        initComponent(comp)
         return comp
+    }
+
+    private fun initComponent(comp: C) {
+        if(comp.initialized) return
+        comp.iInitialize()
+        comp.initialized = true
+        send(comp.index, ComponentEventType.INITIALIZED)
+        if (comp.autoActivation)
+            activate(comp.index)
     }
 
     override fun clearSystem() {
@@ -149,11 +156,16 @@ abstract class ComponentSystem<C : Component>(
                 throw IllegalStateException("$namePrefix is singleton and already exists")
         }
 
+        component.onStateChange = true
         val name = namePrefix + if (static) STATIC_COMPONENT_MARKER else ""
         component.name = name
         registerComponent(component)
         component.iInitialize()
+        component.initialized = true
+        component.onStateChange = false
         send(component.index, ComponentEventType.INITIALIZED)
+        if (component.autoActivation)
+            activate(component.index)
     }
 
     internal open fun unregisterComponent(index: Int) {
@@ -188,70 +200,98 @@ abstract class ComponentSystem<C : Component>(
     fun load(name: String) = load(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1)
     fun load(key: ComponentKey) = load(key.instanceIndex)
     fun load(index: Int) {
-        checkIndex(index)
+        if (!checkIndex(index)) return
         val comp =  this[index]
-        if (!comp.initialized)
-            throw IllegalStateException("Component in illegal state to load")
-        if (comp.loaded)
-            return
+        if (!comp.initialized) throw IllegalStateException("Component in illegal state to load")
+        if (comp.onStateChange || comp.loaded) return
 
+        comp.onStateChange = true
+        comp.stateChangeProcessing(Apply.BEFORE, ComponentEventType.LOADED)
         comp.iLoad()
+        comp.loaded = true
+        comp.onStateChange = false
         send(index, ComponentEventType.LOADED)
+        comp.stateChangeProcessing(Apply.AFTER, ComponentEventType.LOADED)
     }
 
     fun activate(name: String) = activate(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1)
     fun activate(key: ComponentKey) = activate(key.instanceIndex)
     fun activate(index: Int) {
-        checkIndex(index)
+        if (!checkIndex(index)) return
         val comp = this[index]
-        if (!comp.initialized)
-            throw IllegalStateException("Component in illegal state to activate")
-        if (comp.active)
-            return
+        if (!comp.initialized) throw IllegalStateException("Component in illegal state to activate")
+        if (comp.onStateChange || comp.active) return
 
+        if (!comp.loaded) // load first before activation
+            load(index)
+
+        comp.onStateChange = true
+        comp.stateChangeProcessing(Apply.BEFORE, ComponentEventType.ACTIVATED)
         comp.iActivate()
+        comp.active = true
+        comp.onStateChange = false
         ACTIVE_COMPONENT_MAPPING[index] = true
         send(index, ComponentEventType.ACTIVATED)
+        comp.stateChangeProcessing(Apply.AFTER, ComponentEventType.ACTIVATED)
     }
 
     fun deactivate(name: String) = deactivate(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1)
     fun deactivate(key: ComponentKey) = deactivate(key.instanceIndex)
     fun deactivate(index: Int) {
-        checkIndex(index)
+        if (!checkIndex(index)) return
         val comp = this[index]
-        if (!comp.initialized)
-            throw IllegalStateException("Component in illegal state to activate")
-        if (!comp.active)
-            return
+        if (!comp.initialized) throw IllegalStateException("Component in illegal state to activate")
+        if (comp.onStateChange || !comp.active) return
 
+        comp.onStateChange = true
+        comp.stateChangeProcessing(Apply.BEFORE, ComponentEventType.DEACTIVATED)
         comp.iDeactivate()
+        comp.active = false
+        comp.onStateChange = false
         ACTIVE_COMPONENT_MAPPING[index] = false
         send(index, ComponentEventType.DEACTIVATED)
+        comp.stateChangeProcessing(Apply.AFTER, ComponentEventType.DEACTIVATED)
     }
 
     fun dispose(name: String) = dispose(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1)
     fun dispose(key: ComponentKey) = dispose(key.instanceIndex)
     fun dispose(index: Int) {
-        checkIndex(index)
+        if (!checkIndex(index)) return
         val comp = this[index]
-        if (!comp.initialized)
-            throw IllegalStateException("Component in illegal state to dispose")
-        if (!comp.loaded)
-            return
+        if (!comp.initialized) throw IllegalStateException("Component in illegal state to dispose")
+        if (comp.onStateChange || !comp.loaded) return
 
+        if (comp.active) // deactivate first if still active
+            deactivate(index)
+
+        comp.onStateChange = true
+        comp.stateChangeProcessing(Apply.BEFORE, ComponentEventType.DISPOSED)
         comp.iDispose()
+        comp.loaded = false
+        comp.onStateChange = false
         send(index, ComponentEventType.DISPOSED)
+        comp.stateChangeProcessing(Apply.AFTER, ComponentEventType.DISPOSED)
     }
 
     fun delete(c: C) = delete(c.index)
     fun delete(name: String) = delete(COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1)
     fun delete(key: ComponentKey) = delete(checkKey(key).instanceIndex)
     fun delete(index: Int) {
-        checkIndex(index)
+        if (!checkIndex(index)) return
         val comp = this[index]
+        if (comp.onStateChange) return
+
+        if (comp.loaded) // dispose first when still loaded
+            dispose(index)
+
+        comp.onStateChange = true
+        comp.stateChangeProcessing(Apply.BEFORE, ComponentEventType.DELETED)
         comp.iDelete()
+        comp.initialized = false
+        comp.onStateChange = false
         send(index, ComponentEventType.DELETED)
         unregisterComponent(index)
+        comp.stateChangeProcessing(Apply.AFTER, ComponentEventType.DELETED)
     }
 
     fun findFirst(filter: (C) -> Boolean): C? {
@@ -289,9 +329,11 @@ abstract class ComponentSystem<C : Component>(
         if (this.aspectIndex != key.type.aspectIndex) throw IllegalArgumentException("Component type mismatch!")
         else key
 
-    fun checkIndex(index: Int) {
+    fun checkIndex(index: Int): Boolean  {
         if (index < 0)
-            throw IllegalArgumentException("No component instance defined (index < 0) $typeName - $subTypeName")
+            println("!!! No component instance defined (index < 0) $typeName - $subTypeName. Ignore it !!!")
+        return (index >= 0)
+            //throw IllegalArgumentException("No component instance defined (index < 0) $typeName - $subTypeName")
     }
 
     // **** ComponentKey handling ****
@@ -430,8 +472,7 @@ abstract class ComponentSubTypeSystem<C : Component, CC : C>(
         val comp: CC = create()
         comp.also(configure)
         val key = system.registerComponent(comp)
-        comp.iInitialize()
-        system.send(comp.index, ComponentEventType.INITIALIZED)
+        initComponent(comp)
         return key
     }
 
@@ -440,9 +481,17 @@ abstract class ComponentSubTypeSystem<C : Component, CC : C>(
         val comp: CC = create()
         comp.also(configure)
         system.registerComponent(comp)
-        comp.iInitialize()
-        system.send(comp.index, ComponentEventType.INITIALIZED)
+        initComponent(comp)
         return comp
+    }
+
+    private fun initComponent(comp: CC) {
+        if (comp.initialized) return
+        comp.iInitialize()
+        comp.initialized = true
+        system.send(comp.index, ComponentEventType.INITIALIZED)
+        if (comp.autoActivation)
+            activate(comp.index)
     }
 
     fun checkIndex(index: Int) = system.checkIndex(index)

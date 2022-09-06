@@ -11,11 +11,9 @@ class Shader private constructor(): Asset(Shader), ShaderData {
     override var vertexShaderResourceName: String = NO_NAME
         set(value) { field = checkNotLoaded(value, "vertexShaderResourceName") }
     override var vertexShaderProgram: String = NO_PROGRAM
-        set(value) { field = checkNotLoaded(value, "vertShaderProgram") }
     override var fragmentShaderResourceName: String = NO_NAME
         set(value) { field = checkNotLoaded(value, "fragmentShaderResourceName") }
     override var fragmentShaderProgram: String = NO_PROGRAM
-        set(value) { field = checkNotLoaded(value, "fragmentShaderProgram") }
     override var shaderInit: ShaderInit = {}
         set(value) { field = checkNotLoaded(value, "shaderInit") }
 

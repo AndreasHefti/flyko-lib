@@ -118,7 +118,7 @@ object ViewSystemRenderer : Renderer() {
         a.order.compareTo(b.order)
     }
 
-    private val onlyBaseView: Boolean get() = VIEW_LAYER_MAPPING.size <= 1
+    private val onlyBaseView: Boolean get() = VIEW_LAYER_MAPPING.size <= 0
 
     private fun viewListener(index: Int, type: ComponentEventType) {
         if (type == ACTIVATED) VIEW_LAYER_MAPPING[index] = Pair(View[index], DynIntArray())

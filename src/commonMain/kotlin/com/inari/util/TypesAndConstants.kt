@@ -3,6 +3,8 @@ package com.inari.util
 import com.inari.firefly.core.api.ButtonType
 import com.inari.util.geom.ImmutableVector2f
 import com.inari.util.geom.ImmutableVector2i
+import com.inari.util.geom.ImmutableVector4f
+import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
 const val ZERO_INT = 0
@@ -50,6 +52,9 @@ const val NO_PROGRAM: String = "[[NO_PROGRAM]]"
 @JvmField val TRUE_PREDICATE: (Any) -> Boolean = { true }
 @JvmField val VOID_CONSUMER: (Any) -> Unit = { _ -> }
 @JvmField val VOID_CALL: () -> Unit = {}
+
+@JvmField val BLACK = ImmutableVector4f(0f, 0f, 0f, 1f)
+@JvmField val WHITE = ImmutableVector4f(1f, 1f, 1f, 1f)
 
 interface Named {
     val name: String

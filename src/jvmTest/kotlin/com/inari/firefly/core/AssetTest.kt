@@ -211,11 +211,13 @@ class TestAsset private constructor(
 ) : Asset(TestAsset) {
 
     override fun load() {
+        super.load()
         assetIndex = 0
     }
 
     override fun dispose() {
         assetIndex = -1
+        super.dispose()
     }
 
     override fun toString(): String {

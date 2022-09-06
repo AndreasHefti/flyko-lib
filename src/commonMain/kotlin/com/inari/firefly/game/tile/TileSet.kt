@@ -35,6 +35,7 @@ open class TileSet protected constructor(): Asset(TileSet) {
     }
 
     override fun load() {
+        super.load()
         // load all sprites
         val textureIndex = resolveAssetIndex(textureRef.targetKey)
         tileTemplates.forEach { tileTemplate ->
@@ -62,6 +63,7 @@ open class TileSet protected constructor(): Asset(TileSet) {
                 }
             }
         }
+        super.dispose()
     }
 
     companion object :  ComponentSubTypeSystem<Asset, TileSet>(Asset, "TileSet") {

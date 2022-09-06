@@ -101,66 +101,20 @@ abstract class Component protected constructor(
             key = ComponentSystem[componentType].getKey(name, true)
         }
 
+    @JvmField internal var onStateChange = false
     var initialized: Boolean = false
-        protected set
+        internal set
     var loaded: Boolean = false
-        protected set
+        internal set
     var active: Boolean = false
-        protected set
+        internal set
 
-    internal open fun iInitialize() {
-        if (initialized)
-            return
-
-        initialize()
-        this.initialized = true
-
-        if (autoActivation)
-            ComponentSystem[componentType].activate(this.index)
-    }
-
-    internal open fun iLoad() {
-        this.loaded = true
-        load()
-    }
-
-    internal open fun iActivate() {
-        this.active = true
-
-        if (!loaded) // load first before activation
-            ComponentSystem[componentType].load(index)
-
-        activate()
-    }
-
-    internal open fun iDeactivate() {
-        this.active = false
-        deactivate()
-    }
-
-    internal open fun iDispose() {
-        this.loaded = false
-
-        if (active) // deactivate first if still active
-            ComponentSystem[componentType].deactivate(index)
-
-        dispose()
-    }
-
-    internal open fun iDelete() {
-        if (!initialized) {
-            disposeIndex()
-            return
-        }
-
-        if (loaded) // dispose first when still loaded
-            ComponentSystem[componentType].dispose(index)
-
-        delete()
-
-        this.initialized = false
-        disposeIndex()
-    }
+    internal fun iInitialize() = initialize()
+    internal fun iLoad() = load()
+    internal fun iActivate() = activate()
+    internal fun iDeactivate() = deactivate()
+    internal fun iDispose() = dispose()
+    internal fun iDelete() = disposeIndex()
 
     protected open fun initialize() {}
     protected open fun load() {}
@@ -168,6 +122,8 @@ abstract class Component protected constructor(
     protected open fun deactivate() {}
     protected open fun dispose() {}
     protected open fun delete() {}
+
+    internal open fun stateChangeProcessing(apply: Apply, type: ComponentEventType) {}
 
     protected fun <T> checkNotLoaded(value: T, s: String): T {
         if (loaded)
@@ -206,118 +162,34 @@ abstract class ComponentNode protected constructor(componentType: ComponentType<
     @JvmField var disposePolicy = ApplyPolicies.DEFAULT_DISPOSE
     @JvmField var deletePolicy = ApplyPolicies.DEFAULT_DELETE
 
-    override fun iInitialize() {
-        super.iInitialize()
+    override fun initialize() {
         if (onInitTask.exists)
             Task[onInitTask](this.index)
     }
 
-    final override fun iLoad() {
-        this.loaded = true
-
-        if (loadPolicy.childPolicy == BEFORE)
-            processChildren(LOADED)
-        if (parent != NO_COMPONENT_KEY && loadPolicy.parentPolicy == BEFORE)
-            ComponentSystem.load(parent)
-
-        load()
-
+    override fun load() {
         if (onLoadTask.exists)
             Task[onLoadTask](this.index)
-
-        if (loadPolicy.childPolicy == AFTER)
-            processChildren(LOADED)
-        if (parent != NO_COMPONENT_KEY && loadPolicy.parentPolicy == AFTER)
-            ComponentSystem.load(parent)
     }
 
-    final override fun iActivate() {
-        this.active = true
-
-        if (!loaded) // load first before activation
-            ComponentSystem[componentType].load(index)
-        if (activationPolicy.childPolicy == BEFORE)
-            processChildren(ACTIVATED)
-        if (parent != NO_COMPONENT_KEY && activationPolicy.parentPolicy == BEFORE)
-            ComponentSystem.activate(parent)
-
-        activate()
-
+    override fun activate() {
         if (onActivationTask.exists)
             Task[onActivationTask](this.index)
-
-        if (activationPolicy.childPolicy == AFTER)
-            processChildren(ACTIVATED)
-        if (parent != NO_COMPONENT_KEY && activationPolicy.parentPolicy == AFTER)
-            ComponentSystem.activate(parent)
     }
 
-    final override fun iDeactivate() {
-        this.active = false
-
-        if (deactivationPolicy.childPolicy == BEFORE)
-            processChildren(DEACTIVATED)
-        if (parent != NO_COMPONENT_KEY && deactivationPolicy.parentPolicy == BEFORE)
-            ComponentSystem.delete(parent)
-
+    override fun deactivate() {
         if (onDeactivationTask.exists)
             Task[onDeactivationTask](this.index)
-
-        deactivate()
-
-        if (deactivationPolicy.childPolicy == AFTER)
-            processChildren(DEACTIVATED)
-        if (parent != NO_COMPONENT_KEY && deactivationPolicy.parentPolicy == AFTER)
-            ComponentSystem.deactivate(parent)
     }
 
-    final override fun iDispose() {
-        this.loaded = false
-
-        if (active) // deactivate first if still active
-            ComponentSystem[componentType].deactivate(index)
-        if (disposePolicy.childPolicy == BEFORE)
-            processChildren(DISPOSED)
-        if (parent != NO_COMPONENT_KEY && disposePolicy.parentPolicy == BEFORE)
-            ComponentSystem.dispose(parent)
-
+    override fun dispose() {
         if (onDisposeTask.exists)
             Task[onDisposeTask](this.index)
-
-        dispose()
-
-        if (disposePolicy.childPolicy == AFTER)
-            processChildren(DISPOSED)
-        if (parent != NO_COMPONENT_KEY && disposePolicy.parentPolicy == AFTER)
-            ComponentSystem.dispose(parent)
     }
 
-    final override fun iDelete() {
-        if (!initialized) {
-            children?.clear()
-            disposeIndex()
-            return
-        }
-
-        if (loaded) // dispose first when still loaded
-            ComponentSystem[componentType].dispose(index)
-        if (deletePolicy.childPolicy == BEFORE)
-            processChildren(DELETED)
-        if (parent != NO_COMPONENT_KEY && deletePolicy.parentPolicy == BEFORE)
-            ComponentSystem.delete(  parent)
-
+    override fun delete() {
         if (onDeleteTask.exists)
             Task[onDeleteTask](this.index)
-        delete()
-        this.initialized = false
-
-        if (deletePolicy.childPolicy == AFTER)
-            processChildren(DELETED)
-        if (parent != NO_COMPONENT_KEY && deletePolicy.parentPolicy == AFTER)
-            ComponentSystem.delete(parent)
-
-        children?.clear()
-        disposeIndex()
     }
 
     protected var parent: ComponentKey = NO_COMPONENT_KEY
@@ -367,19 +239,41 @@ abstract class ComponentNode protected constructor(componentType: ComponentType<
         child.setParentComponent(NO_COMPONENT_KEY)
     }
 
-    private fun processChildren(type: ComponentEventType) {
-        children?.forEach {
-            if (it.instanceIndex >= 0) {
-                when (type) {
-                    LOADED -> ComponentSystem.load(it)
-                    ACTIVATED -> ComponentSystem.activate(it)
-                    DEACTIVATED -> ComponentSystem.deactivate(it)
-                    DISPOSED -> ComponentSystem.dispose(it)
-                    DELETED -> ComponentSystem.delete(it)
-                    else -> {}
-                }
+    override fun stateChangeProcessing(apply: Apply, type: ComponentEventType) {
+        val policy: ApplyPolicies
+        val process: (ComponentKey) -> Unit
+        when (type) {
+            LOADED -> {
+                policy = loadPolicy
+                process = ComponentSystem.Companion::load
             }
+            ACTIVATED -> {
+                policy = activationPolicy
+                process = ComponentSystem.Companion::activate
+            }
+            DEACTIVATED -> {
+                policy = deactivationPolicy
+                process = ComponentSystem.Companion::deactivate
+            }
+            DISPOSED -> {
+                policy = disposePolicy
+                process = ComponentSystem.Companion::dispose
+            }
+            DELETED -> {
+                policy = deletePolicy
+                process = ComponentSystem.Companion::delete
+            }
+            else -> return
         }
+
+        if (apply == BEFORE && policy.childPolicy == BEFORE)
+            children?.forEach(process)
+        if (apply == BEFORE && parent != NO_COMPONENT_KEY && policy.parentPolicy == BEFORE)
+            process(parent)
+        if (apply == AFTER && policy.childPolicy == AFTER)
+            children?.forEach(process)
+        if (apply == AFTER && parent != NO_COMPONENT_KEY && policy.parentPolicy == AFTER)
+            process(parent)
     }
 }
 

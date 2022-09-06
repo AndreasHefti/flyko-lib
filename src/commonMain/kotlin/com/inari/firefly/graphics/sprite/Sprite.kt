@@ -27,6 +27,7 @@ class Sprite private constructor(): Asset(Sprite), SpriteData {
     }
 
     override fun load() {
+        super.load()
         if (assetIndex >= 0) return
         assetIndex = Engine.graphics.createSprite(this)
     }
@@ -35,6 +36,7 @@ class Sprite private constructor(): Asset(Sprite), SpriteData {
         if (assetIndex < 0) return
         Engine.graphics.disposeSprite(assetIndex)
         assetIndex = -1
+        super.dispose()
     }
 
     companion object :  ComponentSubTypeSystem<Asset, Sprite>(Asset, "Sprite") {

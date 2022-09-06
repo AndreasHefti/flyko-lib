@@ -40,6 +40,7 @@ open class TileMap protected constructor(): Composite(TileMap) {
     }
 
     override fun activate() {
+        super.activate()
         tileMapData.forEach { data ->
             buildTileGrid(data)
             activateTileSetForLayer(data)
@@ -62,6 +63,7 @@ open class TileMap protected constructor(): Composite(TileMap) {
             deleteTileGrid(data)
             deactivateTileSetsForLayer(data)
         }
+        super.deactivate()
     }
 
     fun getTileEntityIndex(code: Int, layerKey: ComponentKey): Int =
@@ -238,6 +240,7 @@ class TiledJSONTileMap private constructor() : TileMap() {
     private val tileSetAssetToCodeOffsetMapping = mutableMapOf<String, Int>()
 
     override fun load() {
+        super.load()
         if (!viewRef.exists)
             throw RuntimeException("Missing view reference")
 
@@ -376,6 +379,7 @@ class TiledJSONTileMap private constructor() : TileMap() {
             Asset.deactivate("${tileSetName}${TILE_SET_ASSET_NAME_SUFFIX}")
         }
         tileSetAssetToCodeOffsetMapping.clear()
+        super.dispose()
     }
 
     companion object :  ComponentSubTypeSystem<Composite, TiledJSONTileMap>(Composite, "TiledJSONTileMap") {

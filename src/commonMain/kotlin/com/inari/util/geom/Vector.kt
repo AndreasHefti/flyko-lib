@@ -803,6 +803,7 @@ class Vector4f constructor(
 
     constructor(v0: Int = 1, v1: Int = 1, v2: Int = 1, v3: Int) : this(v0.toFloat(), v1.toFloat(), v2.toFloat(), v3.toFloat())
     constructor(other: Vector4f) : this(other.v0, other.v1, other.v2, other.v3)
+    constructor(other: ImmutableVector4f) : this(other.v0, other.v1, other.v2, other.v3)
 
     fun getV3PropertyAccessor(): FloatPropertyAccessor = object : FloatPropertyAccessor {
         override fun invoke(value: Float) { v3 = value }
@@ -846,6 +847,12 @@ class Vector4f constructor(
 
     operator fun invoke(v: Vector4f): Vector4f {
         super.invoke(v)
+        this.v3 = v.v3
+        return this
+    }
+
+    operator fun invoke(v: ImmutableVector4f): Vector4f {
+        super.invoke(v.v0, v.v1, v.v2)
         this.v3 = v.v3
         return this
     }
