@@ -96,7 +96,8 @@ fun main(args: Array<String>) {
 
         val vert = floatArrayOf(0f, 0f, 10f, 20f)
         for (i in 1..10000) {
-            Entity.buildActive {
+            Entity {
+                autoActivation = true
                 withComponent(ETransform) {
                     viewRef(0)
                     position(Random.nextInt(0,800), Random.nextInt(0,600))

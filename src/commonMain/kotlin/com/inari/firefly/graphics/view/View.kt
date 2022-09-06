@@ -62,7 +62,8 @@ class View private constructor(): ComponentNode(View), ViewData, ControlledCompo
             return viewChangeEvent
         }
 
-        val BASE_VIEW_KEY = View.buildActive {
+        val BASE_VIEW_KEY = View {
+            autoActivation = true
             name = "BASE_VIEW$STATIC_COMPONENT_MARKER"
             bounds(0, 0, Engine.graphics.screenWidth, Engine.graphics.screenHeight)
             isBase = true

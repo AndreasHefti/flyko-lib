@@ -57,12 +57,6 @@ abstract class ComponentSystem<C : Component>(
         return key
     }
 
-    override fun buildActive(configure: C.() -> Unit): ComponentKey {
-        val key = build(configure)
-        activate(key)
-        return key
-    }
-
     override fun buildAndGet(configure: C.() -> Unit): C {
         val comp: C = create()
         comp.also(configure)
@@ -70,12 +64,6 @@ abstract class ComponentSystem<C : Component>(
         comp.iInitialize()
         send(comp.index, ComponentEventType.INITIALIZED)
         return comp
-    }
-
-    override fun buildAndGetActive(configure: C.() -> Unit): C {
-        val c = buildAndGet(configure)
-        activate(c.index)
-        return c
     }
 
     override fun clearSystem() {
@@ -274,7 +262,7 @@ abstract class ComponentSystem<C : Component>(
         return null
     }
 
-    fun forEachComponent(
+    fun forEachDo(
         filter: (C) -> Boolean = TRUE_PREDICATE,
         process: (C) -> Unit
     ) {
@@ -284,7 +272,7 @@ abstract class ComponentSystem<C : Component>(
         }
     }
 
-    fun forEachActiveComponent(
+    fun forEachActiveDo(
         filter: (C) -> Boolean = TRUE_PREDICATE,
         process: (C) -> Unit
     ) {
@@ -301,7 +289,7 @@ abstract class ComponentSystem<C : Component>(
         if (this.aspectIndex != key.type.aspectIndex) throw IllegalArgumentException("Component type mismatch!")
         else key
 
-    private fun checkIndex(index: Int) {
+    fun checkIndex(index: Int) {
         if (index < 0)
             throw IllegalArgumentException("No component instance defined (index < 0) $typeName - $subTypeName")
     }
@@ -436,6 +424,7 @@ abstract class ComponentSubTypeSystem<C : Component, CC : C>(
     final override val typeName = system.typeName
 
     protected abstract fun create(): CC
+
     override fun build(configure: CC.() -> Unit): ComponentKey {
         @Suppress("UNCHECKED_CAST")
         val comp: CC = create()
@@ -443,12 +432,6 @@ abstract class ComponentSubTypeSystem<C : Component, CC : C>(
         val key = system.registerComponent(comp)
         comp.iInitialize()
         system.send(comp.index, ComponentEventType.INITIALIZED)
-        return key
-    }
-
-    override fun buildActive(configure: CC.() -> Unit): ComponentKey {
-        val key = build(configure)
-        system.activate(key)
         return key
     }
 
@@ -462,11 +445,7 @@ abstract class ComponentSubTypeSystem<C : Component, CC : C>(
         return comp
     }
 
-    override fun buildAndGetActive(configure: CC.() -> Unit): CC {
-        val c = buildAndGet(configure)
-        system.activate(c.index)
-        return c
-    }
+    fun checkIndex(index: Int) = system.checkIndex(index)
 
     fun getKey(name: String, createIfNotExists: Boolean) = system.getKey(name, createIfNotExists)
     fun getKey(index: Int) = system.getKey(index)
@@ -503,33 +482,40 @@ abstract class ComponentSubTypeSystem<C : Component, CC : C>(
     fun delete(index: Int) = system.delete(index)
 
     @Suppress("UNCHECKED_CAST")
-    fun forEachComponent(
+    fun forEachDo(
         filter: (CC) -> Boolean = TRUE_PREDICATE,
         process: (CC) -> Unit
     ) {
-        this.system.forEachComponent({ c -> c.componentType.typeName == subTypeName && filter(c as CC)}) {
+        this.system.forEachDo({ c -> c.componentType.subTypeName == subTypeName && filter(c as CC)}) {
             process(it as CC)
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun forEachActiveComponent(
+    fun forEachActiveDo(
         filter: (CC) -> Boolean = TRUE_PREDICATE,
         process: (CC) -> Unit
     ) {
-        this.system.forEachActiveComponent({ c -> c.componentType.typeName == subTypeName && filter(c as CC)}) {
+        this.system.forEachActiveDo({ c -> c.componentType.subTypeName == subTypeName && filter(c as CC)}) {
             process(it as CC)
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun findFirst(filter: (CC) -> Boolean): CC? {
+    fun findFirst(filter: (CC) -> Boolean = TRUE_PREDICATE): CC? {
         val comp = this.system.findFirst {
             it.componentType.subTypeName == subTypeName && filter(it as CC)
         }
         return if (comp == null) null else comp as CC
     }
 
+    @Suppress("UNCHECKED_CAST")
+    fun findFirstActive(filter: (CC) -> Boolean = TRUE_PREDICATE): CC? {
+        val comp = this.system.findFirst {
+            it.componentType.subTypeName == subTypeName && it.active && filter(it as CC)
+        }
+        return if (comp == null) null else comp as CC
+    }
 }
 
 

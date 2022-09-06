@@ -12,6 +12,8 @@ class Sprite private constructor(): Asset(Sprite), SpriteData {
         get() =  resolveAssetIndex(textureRef.targetKey)
 
     @JvmField val textureRef = CReference(Texture)
+    val textureRegion: Vector4i
+        get() = textureBounds
     override val textureBounds: Vector4i = Vector4i(ZERO_INT, ZERO_INT, ZERO_INT, ZERO_INT)
     override var hFlip: Boolean = false
     override var vFlip: Boolean = false

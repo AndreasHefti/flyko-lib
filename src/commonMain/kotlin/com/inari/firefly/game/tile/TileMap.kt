@@ -84,7 +84,8 @@ open class TileMap protected constructor(): Composite(TileMap) {
                 if (spriteId < 0)
                     throw IllegalStateException("Missing sprite id for tile: ${tile.name} in TileSet: ${tileSet.name}")
 
-                val entityId = Entity.buildActive {
+                val entityId = Entity {
+                    autoActivation = true
                     name = "tile_${tile.name}_view:${this@TileMap.viewIndex}_layer:${data.layerIndex}"
 
                     withComponent(ETransform) {
@@ -132,7 +133,8 @@ open class TileMap protected constructor(): Composite(TileMap) {
     }
 
     private fun buildTileGrid(data: TileMapData) {
-        data.tileGridIndex = TileGrid.buildActive {
+        data.tileGridIndex = TileGrid {
+            autoActivation = true
             name = "tilegrid_${this@TileMap.name}_${data.layerIndex}"
             viewRef(this@TileMap.viewIndex)
             layerRef(data.layerIndex)
@@ -195,7 +197,7 @@ open class TileMap protected constructor(): Composite(TileMap) {
 
         private val viewListener: ComponentEventListener = { index, type ->
             when(type) {
-                ComponentEventType.DELETED ->  TileMap.forEachComponent { tileMap ->
+                ComponentEventType.DELETED ->  TileMap.forEachDo { tileMap ->
                     if (tileMap.viewIndex == index)
                         TileMap.delete(tileMap.index)
                 }
@@ -254,7 +256,8 @@ class TiledJSONTileMap private constructor() : TileMap() {
 
             // activate existing tileset or create new one and activate
             if (!TileSet.exists(tileSetAssetName))
-                TiledJSONTileSet.buildActive {
+                TiledJSONTileSet {
+                    autoActivation = true
                     name = tileSetAssetName
                     resourceName = tilesetResource
                 }

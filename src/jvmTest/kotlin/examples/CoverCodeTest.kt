@@ -30,7 +30,9 @@ fun main(args: Array<String>) {
         }
         // Create an Entity positioned on the base View on x=50/y=150, and the formerly
         // created sprite with a tint color. This also automatically loads the needed assets if not already done
-        val entityId = Entity.buildActive {
+        val entityId = Entity {
+            // automatically activate after creation
+            autoActivation = true
             // add a transform component to the entity that defines the orientation of the Entity
             withComponent(ETransform) {
                 viewRef(View.BASE_VIEW_KEY)

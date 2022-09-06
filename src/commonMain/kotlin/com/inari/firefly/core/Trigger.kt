@@ -27,9 +27,10 @@ abstract class Trigger protected constructor(): Component(Trigger) {
 interface TriggeredComponent {
 
     fun <A : Trigger> withTrigger(builder: ComponentBuilder<A>, configure: (A.() -> Unit)): ComponentKey {
-        return builder.buildActive(configure)
+        val key = builder(configure)
+        Trigger.activate(key)
+        return key
     }
-
 }
 
 class UpdateEventTrigger private constructor() : Trigger() {

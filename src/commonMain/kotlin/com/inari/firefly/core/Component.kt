@@ -89,6 +89,7 @@ abstract class Component protected constructor(
     val componentType: ComponentType<out Component>
 ) : AbstractIndexed(componentType.typeName), Named {
 
+    @JvmField var autoActivation = false
     var key = NO_COMPONENT_KEY
         private set
     override var name: String = NO_NAME
@@ -113,6 +114,9 @@ abstract class Component protected constructor(
 
         initialize()
         this.initialized = true
+
+        if (autoActivation)
+            ComponentSystem[componentType].activate(this.index)
     }
 
     internal open fun iLoad() {
@@ -380,10 +384,9 @@ abstract class ComponentNode protected constructor(componentType: ComponentType<
 }
 
 interface ComponentBuilder<C : Component> {
+    operator fun invoke(configure: C.() -> Unit): ComponentKey = build(configure)
     fun build(configure: C.() -> Unit): ComponentKey
-    fun buildActive(configure: C.() -> Unit): ComponentKey
     fun buildAndGet(configure: C.() -> Unit): C
-    fun buildAndGetActive(configure: C.() -> Unit): C
 }
 
 

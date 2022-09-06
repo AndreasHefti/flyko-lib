@@ -40,7 +40,8 @@ object InariIntro {
             }
         }
 
-        entityId = Entity.buildActive {
+        entityId = Entity {
+            autoActivation = true
             withComponent(ETransform) {
                 viewRef(View.BASE_VIEW_KEY)
                 position(

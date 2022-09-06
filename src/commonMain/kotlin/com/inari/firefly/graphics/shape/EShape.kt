@@ -16,6 +16,8 @@ class EShape private constructor() : EntityComponent(EShape), ShapeData {
     override var type: ShapeType = ShapeType.POINT
     override var vertices: FloatArray = floatArrayOf()
     override var segments: Int = -1
+    val color: Vector4f
+        get() = color1
     override val color1 = Vector4f(1f, 1f, 1f, 1f)
     override var color2 = null
     override var color3 = null

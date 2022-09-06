@@ -1,6 +1,10 @@
 package com.inari.firefly.core
 
 import com.inari.firefly.TestApp
+import com.inari.firefly.graphics.sprite.Sprite
+import com.inari.firefly.graphics.sprite.Texture
+import com.inari.firefly.physics.sound.Music
+import com.inari.firefly.physics.sound.Sound
 import com.inari.util.NO_NAME
 import kotlin.test.*
 
@@ -155,8 +159,49 @@ class AssetTest {
                     "|index=0:parentAsset:DISPOSED",
             testEvents.toString()
         )
+    }
 
+    @Test
+    fun testAssetSubTypeFunctions() {
+        val textureAssetKey = Texture {
+            name = "textureAsset"
+            resourceName = "someRes"
+        }
 
+        val sprite1AssetKey = Sprite {
+            name = "sprite1Asset"
+            textureRef(textureAssetKey)
+        }
+
+        val sprite2AssetKey = Sprite {
+            name = "sprite2Asset"
+            textureRef(textureAssetKey)
+        }
+
+        val soundAssetKey = Sound {
+            name = "soundAsset"
+            resourceName = "soundRes"
+        }
+
+        var str = ""
+        Asset.forEachDo { asset -> str = "$str ${asset.name} | " }
+        assertEquals(" textureAsset |  sprite1Asset |  sprite2Asset |  soundAsset | ", str)
+
+        str = ""
+        Sprite.forEachDo { asset -> str = "$str ${asset.name} | " }
+        assertEquals(" sprite1Asset |  sprite2Asset | ", str)
+
+        str = ""
+        Sound.forEachDo { asset -> str = "$str ${asset.name} | " }
+        assertEquals(" soundAsset | ", str)
+
+        str = ""
+        Music.forEachDo { asset -> str = "$str ${asset.name} | " }
+        assertEquals("", str)
+
+        str = ""
+        Sprite.forEachActiveDo { asset -> str = "$str ${asset.name} | " }
+        assertEquals("", str)
     }
 }
 

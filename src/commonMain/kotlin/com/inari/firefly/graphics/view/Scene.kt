@@ -1,8 +1,6 @@
 package com.inari.firefly.graphics.view
 
-import com.inari.firefly.core.ComponentSubTypeSystem
-import com.inari.firefly.core.Control
-import com.inari.firefly.core.Engine
+import com.inari.firefly.core.*
 import com.inari.firefly.core.api.FFTimer
 import com.inari.util.*
 import kotlin.jvm.JvmField
@@ -30,7 +28,7 @@ class Scene : Control() {
         if (result == OperationResult.RUNNING)
             return
 
-        stop(index)
+        stopScene(index)
         callback(result)
         if (deleteAfterRun)
             Scene.delete(index)
@@ -39,15 +37,19 @@ class Scene : Control() {
     companion object :  ComponentSubTypeSystem<Control, Scene>(Control, "Scene") {
         override fun create() = Scene()
 
-        fun run(index: Int, callback: OperationCallback) {
+        fun runScene(reference: CLooseReference, callback: OperationCallback) = runScene(reference.targetKey, callback)
+        fun runScene(name: String, callback: OperationCallback) = runScene(Scene[name].index, callback)
+        fun runScene(key: ComponentKey, callback: OperationCallback) = runScene(key.instanceIndex, callback)
+        fun runScene(index: Int, callback: OperationCallback) {
+            checkIndex(index)
             val scene = this[index]
             scene.withCallback(callback)
             activate(index)
         }
 
-        fun pause(index: Int) = deactivate(index)
-        fun resume(index: Int) = activate(index)
-        fun stop(index: Int) = dispose(index)
+        fun pauseScene(index: Int) = deactivate(index)
+        fun resumeScene(index: Int) = activate(index)
+        fun stopScene(index: Int) = dispose(index)
     }
 
 }

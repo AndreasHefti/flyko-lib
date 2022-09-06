@@ -28,7 +28,8 @@ class ViewSystemTest {
 
     @Test
     fun testInitWithController() {
-        val viewKey = View.buildActive {
+        val viewKey = View {
+            autoActivation = true
             name = "test"
             withControl(SimpleCameraController) {
                 name = "test"

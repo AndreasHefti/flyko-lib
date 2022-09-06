@@ -34,7 +34,8 @@ fun main(args: Array<String>) {
     private fun createEasingAnimation(type: EasingTest.EasingType, position: Int) {
         val ypos = position.toFloat() * (20f + 10f) + 50f
 
-        Entity.buildActive {
+        Entity {
+            autoActivation = true
             withComponent(ETransform) {
                 viewRef(0)
                 position(10f, ypos)
@@ -47,7 +48,8 @@ fun main(args: Array<String>) {
                 tint(1f, 1f, 1f, 1f)
             }
         }
-        Entity.buildActive {
+        Entity {
+            autoActivation = true
             withComponent(ETransform) {
                 viewRef(0)
             }
