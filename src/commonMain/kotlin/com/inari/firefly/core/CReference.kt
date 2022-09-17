@@ -6,19 +6,9 @@ import com.inari.util.Named
 import com.inari.util.collection.DynArray
 import com.inari.util.indexed.Indexed
 
-enum class RelationPolicy {
-    NO_RELATION,
-    CHILD,
-    PARENT
-}
-
 class CLooseReference internal constructor(
     val targetType: ComponentType<*>
 ) {
-
-    constructor(
-        targetType: ComponentSubTypeSystem<*,*>
-    ) : this(targetType.system)
 
     var targetKey: ComponentKey = NO_COMPONENT_KEY
         internal set
@@ -28,12 +18,19 @@ class CLooseReference internal constructor(
     val exists: Boolean
         get() { return targetKey.instanceIndex >= 0 }
 
-    operator fun invoke(name: String) { targetKey = ComponentSystem[targetType].getKey(name, true) }
-    operator fun invoke(named: Named) { targetKey = ComponentSystem[targetType].getKey(named.name, true) }
+    operator fun invoke(named: Named) = invoke(named.name)
+    operator fun invoke(name: String) {
+        targetKey = if (name === NO_NAME)
+            NO_COMPONENT_KEY
+        else
+            ComponentSystem[targetType].getOrCreateKey(name)
+    }
     operator fun invoke(key: ComponentKey) {
-        if (key.name == NO_NAME)
-            throw IllegalArgumentException("Key needs a name to be used as loose reference")
         targetKey = key
+    }
+    fun setKey(key: ComponentKey): ComponentKey {
+        this(key)
+        return key
     }
 
     fun reset() {
@@ -45,10 +42,6 @@ class CLooseReferences internal constructor(
     val targetType: ComponentType<*>
 ) {
 
-    constructor(
-        targetType: ComponentSubTypeSystem<*,*>
-    ) : this(targetType.system)
-
     lateinit var refKeys: DynArray<ComponentKey>
         internal set
 
@@ -59,14 +52,13 @@ class CLooseReferences internal constructor(
         initialized = true
     }
 
+    fun withReference(named: Named) = withReference(named.name)
     fun withReference(name: String) {
         init()
-        refKeys + ComponentSystem[targetType].getKey(name, true)
+        if (name === NO_NAME) return
+        refKeys + ComponentSystem[targetType].getOrCreateKey(name)
     }
-    fun withReference(named: Named) {
-        init()
-        refKeys + ComponentSystem[targetType].getKey(named.name, true)
-    }
+
     fun withReference(key: ComponentKey) {
         if (key.name == NO_NAME)
             throw IllegalArgumentException("Key needs a name to be used as loose reference")
@@ -86,15 +78,14 @@ class CLooseReferences internal constructor(
         refKeys.clear()
         initialized = false
     }
+
+    fun contains(index: Int): Boolean =
+        refKeys.find { it.instanceIndex == index }?.let { true } ?: false
 }
 
 class CReference internal constructor(
     val targetType: ComponentType<*>
 ) {
-
-    constructor(
-        targetType: ComponentSubTypeSystem<*,*>
-    ) : this(targetType.system)
 
     var targetKey: ComponentKey = NO_COMPONENT_KEY
         internal set
@@ -104,12 +95,18 @@ class CReference internal constructor(
     val exists: Boolean
         get() { return targetKey.instanceIndex >= 0 }
 
-    operator fun invoke(id: ComponentId) { targetKey = ComponentSystem[targetType].getKey(id.instanceIndex) }
+    operator fun invoke(id: ComponentId) = invoke(id.instanceIndex)
     operator fun invoke(index: Int) { targetKey = ComponentSystem[targetType].getKey(index) }
-    operator fun invoke(indexed: Indexed) { targetKey = ComponentSystem[targetType].getKey(indexed.index) }
-    operator fun invoke(name: String) { targetKey = ComponentSystem[targetType].getKey(name) }
-    operator fun invoke(named: Named) { targetKey = ComponentSystem[targetType].getKey(named.name) }
+    operator fun invoke(indexed: Indexed) = invoke(indexed.index)
+    operator fun invoke(named: Named) = invoke(named.name)
+    operator fun invoke(name: String) {
+        targetKey = if (name === NO_NAME)
+            NO_COMPONENT_KEY
+        else
+            ComponentSystem[targetType].getKey(name)
+    }
     operator fun invoke(key: ComponentKey) { targetKey = (key) }
+    operator fun invoke(otherRef: CReference) { targetKey = otherRef.targetKey }
     operator fun invoke(component: Component) { targetKey = ComponentSystem[targetType].getKey(component.name) }
 
     fun reset() {

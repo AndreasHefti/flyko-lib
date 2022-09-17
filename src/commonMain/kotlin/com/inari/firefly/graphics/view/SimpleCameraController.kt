@@ -9,8 +9,7 @@ import kotlin.jvm.JvmField
 import kotlin.math.ceil
 import kotlin.math.floor
 
-
-class SimpleCameraController private constructor() : SingleComponentControl(View) {
+class SimpleCameraController private constructor() : SystemControl(View) {
 
     @JvmField var pixelPerfect = false
     @JvmField var pivot: Vector2f = Vector2f()
@@ -29,10 +28,15 @@ class SimpleCameraController private constructor() : SingleComponentControl(View
         }
     }
 
-    override fun activate() {
-        super.activate()
-        this.view = View[name]
-        viewChangeEvent = View.createViewChangeEvent(view.index, ORIENTATION, pixelPerfect)
+    override fun update(index: Int) {}
+    override fun matchForControl(key: ComponentKey): Boolean {
+        val comp = View[key]
+        if (this.index in comp.controllerReferences) {
+            this.view = View[key]
+            viewChangeEvent = View.createViewChangeEvent(view.index, ORIENTATION, pixelPerfect)
+            return true
+        }
+        return false
     }
 
     override fun update() {
@@ -75,7 +79,7 @@ class SimpleCameraController private constructor() : SingleComponentControl(View
         return pos.x != 0f || pos.y != 0f
     }
 
-    companion object :  ComponentSubTypeSystem<Control, SimpleCameraController>(Control, "SimpleCameraController") {
+    companion object : ComponentSubTypeBuilder<Control, SimpleCameraController>(Control, "SimpleCameraController") {
         override fun create() = SimpleCameraController()
     }
 }

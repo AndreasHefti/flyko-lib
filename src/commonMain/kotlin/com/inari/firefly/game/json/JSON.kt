@@ -7,7 +7,6 @@ import kotlin.jvm.JvmField
 
 
 const val COMPOSITE_OBJECT_NAME_PREFIX = "Composite"
-const val ENTITY_COMPOSITE_OBJECT_NAME_PREFIX = "EComposite"
 const val TILE_SET_ASSET_NAME_SUFFIX = "_tileSetAsset"
 const val TILE_SET_ASSET_NAME_PREFIX = "tileSetAtlas_"
 
@@ -30,37 +29,7 @@ const val PROP_NAME_TILE_LAYER = "tilelayer"
 const val PROP_NAME_OBJECT_LAYER = "objectgroup"
 const val PROP_NAME_TILE_SETS = "tilesets"
 
-
-
-/** example-world.json
- *  {
- *      "name": "world1",
- *      "orientationType": "COUNT",
- *      "orientation": "1",
- *      "onLoadTasks": "Task1|Task2|...",
- *      "onActivationTasks": "Task1|Task2|...",
- *      "onDeactivationTasks" :"Task1|Task2|...",
- *      "onDisposeTasks": "Task1|Task2|...",
- *      "attributes": {
- *          ...
- *      },
- *      "areasData": [{
- *          "name": "area1",
- *          "resource": "area1.json",
- *          "attributes": {
- *              ...
- *          }
- *      },
- *      {
- *          "name": "area2",
- *          "resource": "area2.json",
- *          "attributes": {
- *              ...
- *          }
- *      }]
- *  }
- */
-class WorldJson(
+class AreaData(
     @JvmField val name: String,
     @JvmField val orientationType: WorldOrientationType = WorldOrientationType.COUNT,
     @JvmField val orientation: String = "0",
@@ -69,71 +38,10 @@ class WorldJson(
     @JvmField val onDeactivationTasks: String = NO_NAME,
     @JvmField val onDisposeTasks: String = NO_NAME,
     @JvmField val attributes: Map<String, String> = emptyMap(),
-    @JvmField val areasData: Collection<AreaMetaJson>
+    @JvmField val areasData: Collection<AreaData> = emptyList(),
+    @JvmField val roomsData: Collection<RoomData>
 )
-class AreaMetaJson(
-    @JvmField val name: String,
-    @JvmField val resource: String,
-    @JvmField val attributes: Map<String, String> = emptyMap()
-)
-
-/** example-area.json
- *  {
- *      "name": "area1",
- *      "orientationType": "COUNT",
- *      "orientation": "1",
- *      "onLoadTasks": "Task1|Task2|...",
- *      "onActivationTasks": "Task1|Task2|...",
- *      "onDeactivationTasks" :"Task1|Task2|...",
- *      "onDisposeTasks": "Task1|Task2|...",
- *      "attributes": {
- *          ...
- *      },
- *      "roomsData": [{
- *          "name": "room1",
- *          "tiledMapResource": "room1Map.json",
- *          "orientationType": "TILES",
- *          "orientation": "0,0,40,20",
- *          "onLoadTasks": "Task1|Task2|...",
- *          "onActivationTasks": "Task1|Task2|...",
- *          "onDeactivationTasks" :"Task1|Task2|...",
- *          "onDisposeTasks": "Task1|Task2|...",
- *          "attributes": {
- *              ...
- *          }
- *      },
- *      {
- *          "name": "room2",
- *          "tiledMapResource": "room1Map.json",
- *          "orientationType": "tiles|pixels",
- *          "orientationType": "PIXELS",
- *          "orientation": "0,0,40,20",
- *          "onLoadTasks": "Task1|Task2|...",
- *          "onActivationTasks": "Task1|Task2|...",
- *          "onDeactivationTasks" :"Task1|Task2|...",
- *          "onDisposeTasks": "Task1|Task2|...",
- *          "pauseTask": "RoomPauseTask",
- *          "resumeTask": "RoomResumeTask",
- *          "activationScene": "Scene1",
- *          "deactivationScene": "Scene1",
- *          "attributes": {
- *              ...
- *          }
- *      }]
- *  }
- */
-class AreaJson(
-    @JvmField val name: String,
-    @JvmField val orientationType: WorldOrientationType = WorldOrientationType.COUNT,
-    @JvmField val orientation: String = "0",
-    @JvmField val onLoadTasks: String = NO_NAME,
-    @JvmField val onActivationTasks: String = NO_NAME,
-    @JvmField val onDeactivationTasks: String = NO_NAME,
-    @JvmField val onDisposeTasks: String = NO_NAME,
-    @JvmField val attributes: Map<String, String> = emptyMap(),
-    @JvmField val roomsData: Collection<RoomMetaJson>
-)
-class RoomMetaJson(
+class RoomData(
     @JvmField val name: String,
     @JvmField val roomOrientationType: WorldOrientationType = WorldOrientationType.PIXELS,
     @JvmField val roomOrientation: String = "0,0,0,0",
@@ -149,8 +57,6 @@ class RoomMetaJson(
     @JvmField val deactivationScene: String = NO_NAME,
     @JvmField val attributes: Map<String, String> = emptyMap()
 )
-
-
 
 class TiledTileMap(
     @JvmField val width: Int,

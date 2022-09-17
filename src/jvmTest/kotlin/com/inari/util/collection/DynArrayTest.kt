@@ -28,4 +28,11 @@ class DynArrayTest {
             println(it)
         }
     }
+
+    @Test
+    fun testNextIndex() {
+        val array: DynArray<String> = DynArray.of()
+        var index = array.nextIndex(0)
+        assertEquals("-1", "$index")
+    }
 }

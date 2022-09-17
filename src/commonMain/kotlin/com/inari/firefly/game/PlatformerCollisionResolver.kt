@@ -1,7 +1,8 @@
 package com.inari.firefly.game
 
+import com.inari.firefly.core.CLooseReference
 import com.inari.firefly.core.ComponentKey
-import com.inari.firefly.core.ComponentSubTypeSystem
+import com.inari.firefly.core.ComponentSubTypeBuilder
 import com.inari.firefly.core.Entity
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.contact.*
@@ -53,15 +54,14 @@ class PlatformerCollisionResolver : CollisionResolver() {
     private val contactSensorR3 = BitMask()
 
     private val contactSensorGround = BitMask()
-
-    private var fullContactConstraintIndex = -1
     private val fullContactCallbacks = DynArray.of<CollisionCallback>()
-    private var terrainContactConstraintIndex = -1
 
     @JvmField var groundContactOffset = 2
     @JvmField var touchGroundCallback: (Int) -> Unit = VOID_INT_CONSUMER
     @JvmField var looseGroundContactCallback: (Int) -> Unit = VOID_INT_CONSUMER
     @JvmField var onSlopeCallback: (Int, Int, FullContactScan) -> Unit = VOID_ON_SLOPE_CALLBACK
+    @JvmField val fullContactConstraintRef = CLooseReference(ContactConstraint)
+    @JvmField val terrainContactConstraintRef = CLooseReference(ContactConstraint)
 
     fun withFullContactCallback(
         material: Aspect = UNDEFINED_MATERIAL,
@@ -71,7 +71,7 @@ class PlatformerCollisionResolver : CollisionResolver() {
     fun withTerrainContactConstraint(gapSouth: Int = 5, configure: (ContactConstraint.() -> Unit)): ComponentKey {
         this.gapSouth = gapSouth
         val result = ContactConstraint.build(configure)
-        terrainContactConstraintIndex = result.instanceIndex
+        terrainContactConstraintRef(result)
         initTerrainContact()
         return result
     }
@@ -79,22 +79,25 @@ class PlatformerCollisionResolver : CollisionResolver() {
     fun withTerrainContactConstraint(gapSouth: Int = 5, constraintName: String): ComponentKey {
         this.gapSouth = gapSouth
         val result = ContactConstraint[constraintName]
-        terrainContactConstraintIndex = result.index
+        terrainContactConstraintRef(result)
         initTerrainContact()
         return ContactConstraint.getKey(result.index)
     }
 
     override fun resolve(entity: Entity, contact: EContact, contactScan: ContactScans) {
-        val terrainContact = contactScan.getFullScan(terrainContactConstraintIndex)!!
-        val movement = entity[EMovement]
-        val prefGround = movement.onGround
-        movement.onGround = false
 
-        if (terrainContact.hasAnyContact())
-            resolveTerrainContact(terrainContact, entity, movement, prefGround)
+        if (terrainContactConstraintRef.exists) {
+            val terrainContact = contactScan.getFullScan(terrainContactConstraintRef.targetKey.instanceIndex)!!
+            if (terrainContact.hasAnyContact()) {
+                val movement = entity[EMovement]
+                val prefGround = movement.onGround
+                movement.onGround = false
+                resolveTerrainContact(terrainContact, entity, movement, prefGround)
+            }
+        }
 
-        if (fullContactConstraintIndex >= 0) {
-            val fullContact = contactScan.getFullScan(fullContactConstraintIndex)!!
+        if (fullContactConstraintRef.exists) {
+            val fullContact = contactScan.getFullScan(fullContactConstraintRef.targetKey.instanceIndex)!!
 
             // process callbacks first if available
             // stop processing on first callback returns true
@@ -231,7 +234,7 @@ class PlatformerCollisionResolver : CollisionResolver() {
     }
 
     private fun initTerrainContact() {
-        val constraint = ContactConstraint[terrainContactConstraintIndex]
+        val constraint = ContactConstraint[terrainContactConstraintRef.targetKey.instanceIndex]
         x2 = constraint.bounds.width / 2
         x3 = constraint.bounds.width - 3
         y2 = (constraint.bounds.height - gapSouth) / 2
@@ -257,7 +260,7 @@ class PlatformerCollisionResolver : CollisionResolver() {
         contactSensorGround.reset(groundContactOffset, constraint.bounds.height - gapSouth, constraint.bounds.width - 2 * groundContactOffset, 1)
     }
 
-    companion object :  ComponentSubTypeSystem<CollisionResolver, PlatformerCollisionResolver>(
+    companion object : ComponentSubTypeBuilder<CollisionResolver, PlatformerCollisionResolver>(
         CollisionResolver,
         "PlatformerCollisionResolver") {
 

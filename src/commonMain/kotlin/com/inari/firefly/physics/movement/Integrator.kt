@@ -1,13 +1,14 @@
 package com.inari.firefly.physics.movement
 
 import com.inari.firefly.graphics.view.ETransform
-import com.inari.firefly.physics.movement.MovementControl.MovementAspect.*
+import com.inari.firefly.physics.movement.Movement.MovementAspect.*
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 import kotlin.math.*
 
 interface IntegratorBuilder<I : Integrator> {
     fun create(): I
+    operator fun invoke(configure: I.() -> Unit): I = create().also(configure)
 }
 
 abstract class Integrator {

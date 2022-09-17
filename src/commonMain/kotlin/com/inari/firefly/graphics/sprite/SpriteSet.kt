@@ -108,7 +108,7 @@ open class SpriteSet protected constructor(): Asset(SpriteSet) {
         super.dispose()
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, SpriteSet>(Asset, "SpriteSet") {
+    companion object : ComponentSubTypeBuilder<Asset, SpriteSet>(Asset,"SpriteSet") {
         override fun create() = SpriteSet()
     }
 }

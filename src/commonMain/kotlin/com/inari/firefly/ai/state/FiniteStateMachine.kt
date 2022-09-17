@@ -139,7 +139,7 @@ class FiniteStateMachine : Control() {
         }
     }
 
-    companion object :  ComponentSubTypeSystem<Control, FiniteStateMachine>(Control, "FiniteStateMachine") {
+    companion object : ComponentSubTypeBuilder<Control, FiniteStateMachine>(Control, "FiniteStateMachine") {
         const val NO_STATE: String = "[[NO_STATE]]"
         val STATE_CHANGE_EVENT_TYPE = Event.EventType("StateChangeEvent")
         override fun create() = FiniteStateMachine()

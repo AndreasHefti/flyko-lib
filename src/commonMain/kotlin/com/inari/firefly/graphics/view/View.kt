@@ -3,14 +3,13 @@ package com.inari.firefly.graphics.view
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.ViewData
-import com.inari.util.ZERO_FLOAT
 import com.inari.util.event.Event
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4f
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
-class View private constructor(): ComponentNode(View), ViewData, ControlledComponent<View> {
+class View private constructor(): ComponentNode(View), ViewData, Controlled {
 
     override var isBase = false
         internal set
@@ -22,13 +21,16 @@ class View private constructor(): ComponentNode(View), ViewData, ControlledCompo
     override var  blendMode = BlendMode.NONE
     @JvmField val shader = CReference(Shader)
     override var zoom = 1.0f
-    override val  fboScale = 1.0f
+    override var  fboScale = 1.0f
 
     override var shaderIndex = -1
         internal set
 
+    override val controllerReferences = ControllerReferences(View)
+
     override fun load() {
-        shaderIndex = Asset.resolveAssetIndex(shader.targetKey)
+        if (shader.targetKey !== NO_COMPONENT_KEY)
+            shaderIndex = Asset.resolveAssetIndex(shader.targetKey)
         Engine.graphics.createView(this)
         super.load()
     }
@@ -42,7 +44,15 @@ class View private constructor(): ComponentNode(View), ViewData, ControlledCompo
     fun withLayer(configure: (Layer.() -> Unit)): ComponentKey =
         withChild(Layer, configure)
 
+    fun withShader(configure: (Shader.() -> Unit)): ComponentKey {
+        val key = withChild(Shader, configure)
+        shader(key)
+        return key
+    }
+
     companion object : ComponentSystem<View>("View") {
+        override fun allocateArray(size: Int): Array<View?> = arrayOfNulls(size)
+        override fun create() = View()
 
         val VIEW_CHANGE_EVENT_TYPE = Event.EventType("ViewChangeEvent")
         private val viewChangeEvent = ViewChangeEvent(VIEW_CHANGE_EVENT_TYPE)
@@ -72,9 +82,6 @@ class View private constructor(): ComponentNode(View), ViewData, ControlledCompo
         init {
             ViewSystemRenderer  // initialize the view system rendering
         }
-
-        override fun allocateArray(size: Int): Array<View?> = arrayOfNulls(size)
-        override fun create() = View()
     }
 
     class ViewChangeEvent(override val eventType: EventType) : Event<(ViewChangeEvent) -> Unit>() {

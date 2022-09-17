@@ -5,7 +5,7 @@ import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.EntityComponent
 import com.inari.firefly.core.EntityComponentBuilder
 import com.inari.firefly.core.api.FFTimer
-import com.inari.firefly.physics.movement.MovementControl.MOVEMENT_ASPECT_GROUP
+import com.inari.firefly.physics.movement.Movement.MOVEMENT_ASPECT_GROUP
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.aspect.Aspects
 import com.inari.util.geom.Vector2f
@@ -53,7 +53,7 @@ class EMovement private constructor() : EntityComponent(EMovement) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<EMovement>("EMovement") {
-        init { MovementControl } // make sure MovementControl is initialised
+        init { Movement } // make sure MovementControl is initialised
         override fun create() = EMovement()
     }
 }

@@ -32,7 +32,7 @@ object SimpleTextRenderer : EntityRenderer("SimpleTextRenderer") {
             val text = entity[EText]
             val transform = entity[ETransform]
             val metadata = if (entity.has(ETextMeta)) entity[ETextMeta] else null
-            val font = Font[text.fontAssetRef.targetKey]
+            val font = Font[text.fontRef.targetKey]
             val chars = text.text
 
             textRenderable.tintColor(text.tint)

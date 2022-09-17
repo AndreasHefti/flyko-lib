@@ -1,112 +1,133 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
+import com.inari.firefly.core.api.FFTimer
+import com.inari.util.collection.BitSet
+import kotlin.jvm.JvmField
 
-abstract class Control protected constructor(): ComponentNode(Control) {
+abstract class Control protected constructor() : Component(Control) {
 
-    private val updateListener = ::update
+    @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
+    var updateResolution: Float
+        get() = scheduler.resolution
+        set(value) { scheduler = Engine.timer.createUpdateScheduler(value) }
 
     override fun activate() =
-        Engine.registerListener(UPDATE_EVENT_TYPE, updateListener)
+        Engine.registerListener(UPDATE_EVENT_TYPE, ::internalUpdate)
     override fun deactivate() =
-        Engine.disposeListener(UPDATE_EVENT_TYPE, updateListener)
+        Engine.disposeListener(UPDATE_EVENT_TYPE, ::internalUpdate)
+
+    private fun internalUpdate() {
+        if (scheduler.needsUpdate())
+            update()
+    }
 
     abstract fun update()
 
     companion object : ComponentSystem<Control>("Control") {
         override fun allocateArray(size: Int): Array<Control?> = arrayOfNulls(size)
-        override fun create(): Control =
-            throw UnsupportedOperationException("Control is abstract use a concrete implementation instead")
+        override fun create() = throw UnsupportedOperationException("Control is abstract use sub type builder instead")
+
+//        internal val CONTROLLED: DynArray<BitSet> = DynArray.of()
+//        fun isControlledBy(controllerIndex: Int, componentKey: ComponentKey)
+//            = CONTROLLED[componentKey.type.aspectIndex]?.get(controllerIndex) ?: false
     }
 }
 
-abstract class ComponentControl() : Control() {
-    abstract fun register(name: String)
-    abstract fun unregister(name: String)
-}
+abstract class SystemControl protected constructor(
+    val controlledType: ComponentType<*>
+) : Control() {
 
-abstract class SingleComponentControl(controlledType: ComponentType<*>) : ComponentControl() {
-
-    constructor(subType: ComponentSubTypeSystem<*,*>) : this(subType.system)
-
-    internal val controlledComponent = CLooseReference(controlledType)
-    val controlledComponentIndex: Int
-        get() = controlledComponent.targetKey.instanceIndex
-
-    override fun register(name: String) = controlledComponent(name)
-    override fun unregister(name: String) = controlledComponent.reset()
-
-}
-
-abstract class ComponentsControl(controlledType: ComponentType<*>) : ComponentControl() {
-
-    constructor(subType: ComponentSubTypeSystem<*,*>) : this(subType.system)
-
-    internal val controlledComponents = CLooseReferences(controlledType)
-
-    override fun register(name: String) = controlledComponents.withReference(name)
-    override fun unregister(name: String) = controlledComponents.removeReference(name)
-
-    override fun activate() {
-        cleanControlledReferences()
-        super.activate()
+    init {
+        autoLoad = true
     }
 
-    private fun cleanControlledReferences() {
-        controlledComponents.refKeys.forEach { key ->
-            if (key.instanceIndex < 0)
-                controlledComponents.refKeys.remove(key)
-            controlledComponents.refKeys.trim()
+    protected val componentIndexes = BitSet()
+    private val componentListener: ComponentEventListener = { key, type ->
+        if (type == ComponentEventType.ACTIVATED && matchForControl(key)) {
+            componentIndexes[key.instanceIndex] = true
+            if (!this.active)
+                Control.activate(this)
         }
+        else if (type == ComponentEventType.DEACTIVATED && key.instanceIndex < componentIndexes.size)
+            componentIndexes[key.instanceIndex] = false
     }
-    fun clearControlledReferences() = controlledComponents.reset()
-
-}
-
-interface ControlledComponent<C : Component> {
-
-    val name: String
-
-    fun withControl(name: String) = register(Control[name])
-    fun withControl(index: Int) = register(Control[index])
-    fun withControl(key: ComponentKey) = register(Control[key])
-    fun <CTRL : ComponentControl> withControl(builder: ComponentBuilder<CTRL>, configure: (CTRL.() -> Unit)) {
-        val control = builder.buildAndGet(configure)
-        register(control)
-    }
-
-    fun withChild(key: ComponentKey): ComponentKey
-
-    private fun register(control: Control) {
-        with(control as ComponentControl) {
-            register(name)
-        }
-        withChild(Control.getKey(control.index))
-    }
-}
-
-abstract class EntityControl : Control() {
-
-    private val componentListener: ComponentEventListener = { index, type ->
-        val entity = Entity[index]
-        if (type == ComponentEventType.ACTIVATED)
-            notifyActivation(entity)
-        else if (type == ComponentEventType.DEACTIVATED)
-            notifyDeactivation(entity)
-    }
-
-    abstract fun notifyActivation(entity: Entity)
-    abstract fun notifyDeactivation(entity: Entity)
 
     override fun load() {
         super.load()
-        Entity.registerComponentListener(componentListener)
+        ComponentSystem[controlledType].registerComponentListener(componentListener)
     }
 
     override fun dispose() {
         super.dispose()
-        Entity.disposeComponentListener(componentListener)
+        ComponentSystem[controlledType].disposeComponentListener(componentListener)
     }
+
+    override fun update() {
+        var index = componentIndexes.nextSetBit(0)
+        while (index >= 0) {
+            update(index)
+            index = componentIndexes.nextSetBit(index + 1)
+        }
+    }
+
+    abstract fun matchForControl(key: ComponentKey): Boolean
+    abstract fun update(index: Int)
+
+}
+
+class ControllerReferences(val componentType: ComponentType<out Component>) {
+
+    private var indexes: BitSet? = null
+    internal fun register(key: ComponentKey) {
+        if (key === Component.NO_COMPONENT_KEY)
+            throw IllegalStateException("Illegal control key, NO_COMPONENT_KEY")
+        if (key.instanceIndex < 0)
+            throw IllegalStateException("Control key has no instance yet")
+
+        val control = Control[key] as SystemControl
+        if (componentType.aspectIndex != control.controlledType.aspectIndex)
+            throw IllegalStateException("Illegal control key, control type mismatch: ${control.controlledType.subTypeName} : ${componentType.typeName}")
+
+        register(key.instanceIndex)
+    }
+    internal fun register(index: Int) {
+        if (indexes == null)
+            indexes = BitSet()
+        indexes?.set(index, true)
+    }
+    internal fun dispose(index: Int) = indexes?.set(index, false)
+    fun clear() = indexes?.clear()
+    operator fun contains(index: Int) = indexes?.get(index) ?: false
+}
+
+interface Controlled {
+
+    val controllerReferences: ControllerReferences
+
+    fun withControl(name: String) = controllerReferences.register(Control[name].key)
+    fun withControl(key: ComponentKey) = controllerReferences.register(key)
+    fun <CTRL : SystemControl> withControl(builder: ComponentBuilder<CTRL>, configure: (CTRL.() -> Unit)) =
+        controllerReferences.register(builder.build(configure))
+
+//    private fun register(key: ComponentKey) {
+//        if (key === Component.NO_COMPONENT_KEY)
+//            throw IllegalStateException("Illegal control key, NO_COMPONENT_KEY")
+//        if (key.instanceIndex < 0)
+//            throw IllegalStateException("Control key has no instance yet")
+//
+//        val control = Control[key] as SystemControl
+//        if (componentType.aspectIndex != control.controlledType.aspectIndex)
+//            throw IllegalStateException("Illegal control key, control type mismatch: ${control.controlledType.subTypeName} : ${componentType.typeName}")
+//
+//        controllerReferences.register(key.instanceIndex)
+////        if (componentType.aspectIndex !in CONTROLLED)
+////            CONTROLLED[componentType.aspectIndex] = BitSet()
+////
+////        CONTROLLED[componentType.aspectIndex]?.set(key.instanceIndex, true)
+//    }
+
 }
 
 

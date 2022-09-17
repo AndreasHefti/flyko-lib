@@ -11,7 +11,7 @@ import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.text.EText
 import com.inari.firefly.graphics.text.SimpleTextRenderer
 import com.inari.firefly.graphics.view.ETransform
-import com.inari.firefly.physics.animation.DefaultFloatEasingControl
+import com.inari.firefly.physics.animation.DefaultFloatEasing
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.EasedFloatAnimation
 import com.inari.firefly.util.geom.EasingTest
@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
                 .addInfo(FrameRateInfo)
                 .activate()
 
-        DefaultFloatEasingControl
+        DefaultFloatEasing
 
             for ((index, easingType) in EasingTest.EasingType.values().withIndex()) {
                 createEasingAnimation(easingType, index)
@@ -42,7 +42,7 @@ fun main(args: Array<String>) {
             }
             withComponent(EText) {
                 renderer = SimpleTextRenderer
-                fontAssetRef(SYSTEM_FONT)
+                fontRef(SYSTEM_FONT)
                 text.append(type.name.replace("_", "-"))
                 blend = BlendMode.NORMAL_ALPHA
                 tint(1f, 1f, 1f, 1f)
@@ -68,7 +68,7 @@ fun main(args: Array<String>) {
                     endValue = 400f
                     duration = 5000
                     animatedProperty = ETransform.PropertyAccessor.POSITION_X
-                    animationController(DefaultFloatEasingControl)
+                    animationController(DefaultFloatEasing)
                 }
             }
         }

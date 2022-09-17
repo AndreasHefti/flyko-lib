@@ -4,7 +4,9 @@ import com.inari.firefly.TestApp
 import com.inari.firefly.core.Asset
 import com.inari.firefly.core.ComponentSystem
 import com.inari.firefly.core.Entity
+import com.inari.firefly.game.json.TiledTileSetAsset
 import com.inari.firefly.graphics.sprite.Texture
+import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.View.Companion.BASE_VIEW_KEY
 import com.inari.util.geom.BitMask
 import kotlin.test.*
@@ -17,34 +19,40 @@ class TestTiledTileSetAsset {
         ComponentSystem.clearSystems()
     }
 
+    @AfterTest fun cleanup() {
+        ComponentSystem.clearSystems()
+    }
+
     @Test
     fun testLoad_Activate_Deactivate() {
-        TestApp
+        TiledTileSetAsset {
+            name = "testTileSet"
+            resourceName = "tiles/outline_full.json"
+        }
 
         // create tilemap for the tile set
-        val tileMapId = TileMap.build {
-            name = "testTileMap"
+        TileMap {
+            name = "tileMap"
             viewRef(BASE_VIEW_KEY)
-            withTileSet(TiledJSONTileSet) {
-                name = "testTileSet"
-                resourceName = "tiles/outline_full.json"
-            }
             withTileLayer {
                 withTileSetMapping {
-                    tileSetRef("testTileSet")
+                    tileSetAssetRef("testTileSet")
                     codeOffset = 1
                 }
             }
         }
 
-        assertTrue { Asset.exists("testTileSet") }
-        TileMap.load(tileMapId)
+
+        assertTrue(TiledTileSetAsset.exists("testTileSet"))
+        assertFalse(TiledTileSetAsset["testTileSet"].loaded)
+
+        TileMap.load("tileMap")
 
         // check all expected assets and components are created correctly
-        val tiledTileSetAsset = TiledJSONTileSet["testTileSet"]
+        val tiledTileSetAsset = TiledTileSetAsset["testTileSet"]
         assertNotNull(tiledTileSetAsset)
         val textureAssetName = "tileSetAtlas_${tiledTileSetAsset.name}"
-        assertTrue { Asset.exists(textureAssetName) }
+        assertTrue { Texture.exists(textureAssetName) }
         val textureAsset = Texture[textureAssetName]
         assertNotNull(textureAsset)
         assertTrue { textureAsset.loaded }
@@ -271,7 +279,7 @@ class TestTiledTileSetAsset {
 
         // test tile map activation
         assertTrue{ TileMap.getTileEntityIndex(1) == -1 }
-        TileMap.activate(tileMapId)
+        TileMap.activate("tileMap")
 
         var entityRefId = TileMap.getTileEntityIndex(1)
         assertTrue( entityRefId >= 0)
@@ -283,7 +291,6 @@ class TestTiledTileSetAsset {
         entity = Entity[entityRefId]
         assertEquals("tile_outline_full_terrain_circle:full_0:1_view:0_layer:0", entity.name)
 
-        ComponentSystem.clearSystems()
     }
 
     @Test
@@ -332,7 +339,6 @@ class TestTiledTileSetAsset {
         }
         assertEquals(2, firstSet)
         assertEquals(4, lastSet)
-
     }
 
 }

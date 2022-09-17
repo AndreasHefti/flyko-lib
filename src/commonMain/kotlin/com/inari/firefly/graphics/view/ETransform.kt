@@ -22,6 +22,13 @@ class ETransform private constructor() : EntityComponent(ETransform), TransformD
     override val scale: Vector2f = Vector2f(1.0f, 1.0f)
     override var rotation: Float = ZERO_FLOAT
 
+    override fun activate() {
+        super.activate()
+        // if view is not defined yet, set the base view for default
+        if (!viewRef.defined)
+            viewRef(View.BASE_VIEW_KEY)
+    }
+
     fun getRotationPropertyAccessor(): FloatPropertyAccessor = object : FloatPropertyAccessor {
         override fun invoke(value: Float) { rotation = value }
         override fun invoke(): Float = rotation

@@ -11,9 +11,10 @@ import com.inari.util.collection.BitSet
 import com.inari.util.event.Event
 import kotlin.jvm.JvmField
 import kotlin.math.min
+import kotlin.native.concurrent.ThreadLocal
 
-
-object MovementControl : EntityControl() {
+@ThreadLocal
+object Movement : SystemControl(Entity) {
 
     @JvmField val MOVEMENT_ASPECT_GROUP = IndexedAspectType("MOVEMENT_ASPECT_GROUP")
     @JvmField val UNDEFINED_MOVEMENT = MOVEMENT_ASPECT_GROUP.createAspect("UNDEFINED_MOVEMENT")
@@ -32,47 +33,42 @@ object MovementControl : EntityControl() {
 
     val moveEventType = Event.EventType("MoveEvent")
     val moveEvent = MoveEvent(moveEventType)
-    private val entities: BitSet = BitSet()
+    private var deltaTimeInSeconds: Float = 0.0f
 
     init {
         Control.registerAsSingleton(this, true)
         Control.activate(this.index)
     }
 
-    override fun notifyActivation (entity: Entity) {
-        if (EMovement !in entity.aspects) return
-        entities[entity.index] = true
-    }
-    override fun notifyDeactivation(entity: Entity) {
-        if (EMovement !in entity.aspects) return
-        entities[entity.index] = false
-    }
+    override fun matchForControl(key: ComponentKey) =
+        EMovement in Entity[key].aspects
+
 
     override fun update() {
         moveEvent.entities.clear()
-        val deltaTimeInSeconds: Float = min(Engine.timer.timeElapsed / 1000f, .5f)
+        deltaTimeInSeconds = min(Engine.timer.timeElapsed / 1000f, .5f)
 
-        var i: Int = entities.nextSetBit(0)
-        while (i >= 0) {
-            val entity = Entity[i]
-            i = entities.nextSetBit(i + 1)
-
-            val movement = entity[EMovement]
-            if (!movement.active || !movement.scheduler.needsUpdate())
-                continue
-
-            val dtEntity = deltaTimeInSeconds * (60 / movement.scheduler.resolution)
-
-            val transform = entity[ETransform]
-            movement.integrator.integrate(movement, transform, dtEntity)
-            if (movement.velocity.v0 != ZERO_FLOAT || movement.velocity.v1 != ZERO_FLOAT) {
-                movement.integrator.step(movement, transform, dtEntity)
-                moveEvent.entities.set(entity.index)
-            }
-        }
+        super.update()
 
         if (!moveEvent.entities.isEmpty)
             Engine.notify(moveEvent)
+    }
+
+    override fun update(index: Int) {
+        val entity = Entity[index]
+
+        val movement = entity[EMovement]
+        if (!movement.active || !movement.scheduler.needsUpdate())
+            return
+
+        val dtEntity = deltaTimeInSeconds * (60 / movement.scheduler.resolution)
+
+        val transform = entity[ETransform]
+        movement.integrator.integrate(movement, transform, dtEntity)
+        if (movement.velocity.v0 != ZERO_FLOAT || movement.velocity.v1 != ZERO_FLOAT) {
+            movement.integrator.step(movement, transform, dtEntity)
+            moveEvent.entities.set(entity.index)
+        }
     }
 
     class MoveEvent(override val eventType: EventType) : Event<(MoveEvent) -> Unit>() {

@@ -7,25 +7,25 @@ import com.inari.util.geom.CubicBezierCurve.Companion.bezierCurveAngleX
 import com.inari.util.geom.CubicBezierCurve.Companion.bezierCurvePoint
 import com.inari.util.geom.GeomUtils
 
-abstract class AnimationControl<D : AnimatedData>(
+abstract class Animation<D : AnimatedData>(
     protected val animatedData: DynArray<D>
-) : EntityControl() {
+) : Control() {
 
-    override fun notifyActivation(entity: Entity) {
-        if (EAnimation !in entity.aspects) return
-        val eAnimation = entity[EAnimation]
-        eAnimation.animations.forEach { iAccept(it)?.let {
-                data -> animatedData + data
-        } }
+    override fun load() {
+        super.load()
+        Entity.registerComponentListener(::entityListener)
     }
 
-    override fun notifyDeactivation(entity: Entity) {
-        if (EAnimation !in entity.aspects) return
-        val eAnimation = entity[EAnimation]
-        eAnimation.animations.forEach { accept(it)?.let {
-                data -> animatedData - data
-        } }
+    override fun dispose() {
+        Entity.disposeComponentListener(::entityListener)
+        super.dispose()
     }
+
+    override fun update() =
+        animatedData.forEach { update(it) }
+
+    protected abstract fun update(data: D)
+    protected abstract fun accept(data: AnimatedData): D?
 
     protected fun applyTimeStep(timeStep: Float, data: AnimatedData): Boolean {
         data.normalizedTime += timeStep
@@ -41,22 +41,37 @@ abstract class AnimationControl<D : AnimatedData>(
         return true
     }
 
-   private fun iAccept(data: AnimatedData): D? {
+    private fun entityListener(key: ComponentKey, type: ComponentEventType) {
+        if (type == ComponentEventType.ACTIVATED) notifyActivation(Entity[key])
+        else if (type == ComponentEventType.DEACTIVATED) notifyDeactivation(Entity[key])
+    }
+
+    private fun notifyActivation(entity: Entity) {
+        if (EAnimation !in entity.aspects) return
+        val eAnimation = entity[EAnimation]
+        eAnimation.animations.forEach { iAccept(it)?.let {
+                data -> animatedData + data
+        } }
+    }
+
+    private fun notifyDeactivation(entity: Entity) {
+        if (EAnimation !in entity.aspects) return
+        val eAnimation = entity[EAnimation]
+        eAnimation.animations.forEach { accept(it)?.let {
+                data -> animatedData - data
+        } }
+    }
+
+    private fun iAccept(data: AnimatedData): D? {
         if ( data.animationController.targetKey.instanceIndex >= 0 &&
-                    data.animationController.targetKey.instanceIndex != this.index)
+            data.animationController.targetKey.instanceIndex != this.index)
             return null
         return accept(data)
     }
 
-    override fun update() =
-        animatedData.forEach { update(it) }
-
-    protected abstract fun update(data: D)
-    protected abstract fun accept(data: AnimatedData): D?
-
 }
 
-object DefaultFloatEasingControl : AnimationControl<EasedFloatAnimation>(DynArray.of(5, 10)) {
+object DefaultFloatEasing : Animation<EasedFloatAnimation>(DynArray.of(5, 10)) {
 
     init {
         Control.registerAsSingleton(this, true)
@@ -85,7 +100,7 @@ object DefaultFloatEasingControl : AnimationControl<EasedFloatAnimation>(DynArra
         else data
 }
 
-object BezierCurveAnimationControl: AnimationControl<BezierCurveAnimation>(DynArray.of(5, 10)) {
+object BezierCurveAnimationControl: Animation<BezierCurveAnimation>(DynArray.of(5, 10)) {
 
     init {
         Control.registerAsSingleton(this, true)
@@ -123,7 +138,7 @@ object BezierCurveAnimationControl: AnimationControl<BezierCurveAnimation>(DynAr
 
 }
 
-object BezierSplineAnimationControl : AnimationControl<BezierSplineAnimation>(DynArray.of(5, 10)) {
+object BezierSplineAnimationControl : Animation<BezierSplineAnimation>(DynArray.of(5, 10)) {
 
     init {
         Control.registerAsSingleton(this, true)
@@ -167,7 +182,7 @@ object BezierSplineAnimationControl : AnimationControl<BezierSplineAnimation>(Dy
         else data
 }
 
-object IntFrameAnimationControl : AnimationControl<IntFrameAnimation>(DynArray.of(5, 10)) {
+object IntFrameAnimationControl : Animation<IntFrameAnimation>(DynArray.of(5, 10)) {
 
     init {
         Control.registerAsSingleton(this, true)

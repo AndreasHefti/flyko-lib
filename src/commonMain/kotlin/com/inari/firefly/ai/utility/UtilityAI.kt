@@ -17,12 +17,12 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
             throw UnsupportedOperationException("UtilityAI is abstract use a concrete implementation instead")
 
         private val entityIds = BitSet()
-        private val entityListener: ComponentEventListener = { index, type ->
-            val entity = Entity[index]
+        private val entityListener: ComponentEventListener = { key, type ->
+            val entity = Entity[key.instanceIndex]
             if (EUtility in entity.aspects) {
                 when (type) {
-                    ComponentEventType.ACTIVATED -> entityIds[index] = true
-                    ComponentEventType.DEACTIVATED -> entityIds[index] = false
+                    ComponentEventType.ACTIVATED -> entityIds[key.instanceIndex] = true
+                    ComponentEventType.DEACTIVATED -> entityIds[key.instanceIndex] = false
                     else -> {}
                 }
             }
@@ -94,7 +94,7 @@ class Consideration private constructor() : UtilityAI() {
     override fun getUtilityValue(entityId: Int, intentionId: Int): Float =
         quantifier(normalOperation(entityId, intentionId)) * weighting
 
-    companion object :  ComponentSubTypeSystem<UtilityAI, Consideration>(UtilityAI, "Consideration") {
+    companion object : ComponentSubTypeBuilder<UtilityAI, Consideration>(UtilityAI, "Consideration") {
         override fun create() = Consideration()
     }
 }
@@ -125,7 +125,7 @@ class Intention private constructor() : UtilityAI() {
         return result
     }
 
-    companion object :  ComponentSubTypeSystem<UtilityAI, Intention>(UtilityAI, "Intention") {
+    companion object : ComponentSubTypeBuilder<UtilityAI, Intention>(UtilityAI, "Intention") {
         override fun create() = Intention()
     }
 }
@@ -159,7 +159,7 @@ class UtilityAction private constructor() : UtilityAI() {
         return result
     }
 
-    companion object :  ComponentSubTypeSystem<UtilityAI, UtilityAction>(UtilityAI, "UtilityAction") {
+    companion object : ComponentSubTypeBuilder<UtilityAI, UtilityAction>(UtilityAI, "UtilityAction") {
         override fun create() = UtilityAction()
     }
 }

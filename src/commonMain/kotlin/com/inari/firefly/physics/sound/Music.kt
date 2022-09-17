@@ -63,7 +63,7 @@ class Music private constructor(): Play(Music) {
             Engine.audio.stopMusic(assetIndex)
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, Music>(Asset, "Music") {
+    companion object : ComponentSubTypeBuilder<Asset, Music>(Asset,"Music") {
         override fun create() = Music()
     }
 }

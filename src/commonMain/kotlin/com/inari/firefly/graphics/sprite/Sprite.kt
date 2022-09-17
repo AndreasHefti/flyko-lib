@@ -8,9 +8,8 @@ import kotlin.jvm.JvmField
 
 class Sprite private constructor(): Asset(Sprite), SpriteData {
 
-    override val textureIndex: Int
-        get() =  resolveAssetIndex(textureRef.targetKey)
-
+    override var textureIndex: Int = -1
+        internal set
     @JvmField val textureRef = CReference(Texture)
     val textureRegion: Vector4i
         get() = textureBounds
@@ -20,7 +19,7 @@ class Sprite private constructor(): Asset(Sprite), SpriteData {
 
     override fun setParentComponent(key: ComponentKey) {
         super.setParentComponent(key)
-        if (key.type.aspectIndex == Asset.aspectIndex)
+        if (key.type.aspectIndex == Texture.aspectIndex)
             textureRef(key)
         else
             textureRef.reset()
@@ -29,6 +28,14 @@ class Sprite private constructor(): Asset(Sprite), SpriteData {
     override fun load() {
         super.load()
         if (assetIndex >= 0) return
+        // ensure texture is defined
+        if (!textureRef.exists)
+            throw IllegalStateException("No texture defined. Define texture for sprite first")
+        val tex = Texture[textureRef]
+        // ensure texture is loaded otherwise load it first
+        if (!tex.loaded)
+            Texture.load(textureRef.targetKey)
+        textureIndex = tex.assetIndex
         assetIndex = Engine.graphics.createSprite(this)
     }
 
@@ -39,8 +46,7 @@ class Sprite private constructor(): Asset(Sprite), SpriteData {
         super.dispose()
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, Sprite>(Asset, "Sprite") {
+    companion object : ComponentSubTypeBuilder<Asset, Sprite>(Asset,"Sprite") {
         override fun create() = Sprite()
-
     }
 }

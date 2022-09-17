@@ -2,19 +2,24 @@ package com.inari.firefly.core
 
 import com.inari.firefly.core.ComponentEventType.*
 import com.inari.firefly.core.Apply.*
+import com.inari.firefly.graphics.view.Layer
+import com.inari.firefly.graphics.view.View
+import com.inari.firefly.graphics.view.ViewLayerAware
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.IndexedAspectType
 import com.inari.util.indexed.AbstractIndexed
 import kotlin.jvm.JvmField
 import com.inari.util.NO_NAME
 import com.inari.util.Named
+import com.inari.util.collection.BitSet
 import com.inari.util.collection.DynArray
+import com.inari.util.collection.DynArrayRO
+import com.inari.util.geom.Vector2f
 
 /** Defines the component based builder DSL marker */
 @DslMarker annotation class ComponentDSL
 /** Component event listener expects the component index, component type and the component event type */
-typealias CompIndex = Int
-typealias ComponentEventListener = (CompIndex, ComponentEventType) -> Unit
+typealias ComponentEventListener = (key: ComponentKey, ComponentEventType) -> Unit
 
 enum class ComponentEventType {
     INITIALIZED,
@@ -44,7 +49,9 @@ enum class ApplyPolicies(
     DEFAULT_ACTIVATE(BEFORE, AFTER),
     DEFAULT_DEACTIVATE(NONE, BEFORE),
     DEFAULT_DISPOSE(NONE, BEFORE),
-    DEFAULT_DELETE(NONE, BEFORE)
+    DEFAULT_DELETE(NONE, BEFORE),
+
+    PARENT_BEFORE(BEFORE, NONE)
 }
 
 interface ComponentType<C : Component> : Aspect {
@@ -52,12 +59,12 @@ interface ComponentType<C : Component> : Aspect {
     val subTypeName: String
 }
 
-interface ComponentId {
+sealed interface ComponentId {
     val type: ComponentType<*>
     val instanceIndex: Int
 }
 
-open class ComponentKey internal constructor (
+class ComponentKey internal constructor (
     val name: String,
     override val type: ComponentType<*>
 ) : ComponentId {
@@ -84,21 +91,27 @@ open class ComponentKey internal constructor (
     }
 }
 
+sealed interface ComponentBuilder<C : Component> {
+    operator fun invoke(configure: C.() -> Unit): ComponentKey = build(configure)
+    fun build(configure: C.() -> Unit): ComponentKey
+    fun buildAndGet(configure: C.() -> Unit): C
+}
+
 @ComponentDSL
 abstract class Component protected constructor(
     val componentType: ComponentType<out Component>
 ) : AbstractIndexed(componentType.typeName), Named {
 
+    @JvmField var autoLoad = false
     @JvmField var autoActivation = false
+
     var key = NO_COMPONENT_KEY
-        private set
+        internal set
     override var name: String = NO_NAME
         set(value) {
             if (value === NO_NAME || name !== NO_NAME)
                 throw IllegalStateException("An illegal reassignment of name: $value to: $name")
             field = value
-            // TODO should it automatically create a key for the name if not existing!?
-            key = ComponentSystem[componentType].getKey(name, true)
         }
 
     @JvmField internal var onStateChange = false
@@ -149,65 +162,25 @@ abstract class Component protected constructor(
 
 abstract class ComponentNode protected constructor(componentType: ComponentType<*>) : Component(componentType) {
 
-    @JvmField val onInitTask = CLooseReference(Task)
-    @JvmField val onLoadTask = CLooseReference(Task)
-    @JvmField val onActivationTask = CLooseReference(Task)
-    @JvmField val onDeactivationTask = CLooseReference(Task)
-    @JvmField val onDisposeTask = CLooseReference(Task)
-    @JvmField val onDeleteTask = CLooseReference(Task)
-
     @JvmField var loadPolicy = ApplyPolicies.DEFAULT_LOAD
     @JvmField var activationPolicy = ApplyPolicies.DEFAULT_ACTIVATE
     @JvmField var deactivationPolicy = ApplyPolicies.DEFAULT_DEACTIVATE
     @JvmField var disposePolicy = ApplyPolicies.DEFAULT_DISPOSE
     @JvmField var deletePolicy = ApplyPolicies.DEFAULT_DELETE
 
-    override fun initialize() {
-        if (onInitTask.exists)
-            Task[onInitTask](this.index)
-    }
-
-    override fun load() {
-        if (onLoadTask.exists)
-            Task[onLoadTask](this.index)
-    }
-
-    override fun activate() {
-        if (onActivationTask.exists)
-            Task[onActivationTask](this.index)
-    }
-
-    override fun deactivate() {
-        if (onDeactivationTask.exists)
-            Task[onDeactivationTask](this.index)
-    }
-
-    override fun dispose() {
-        if (onDisposeTask.exists)
-            Task[onDisposeTask](this.index)
-    }
-
-    override fun delete() {
-        if (onDeleteTask.exists)
-            Task[onDeleteTask](this.index)
-    }
-
-    protected var parent: ComponentKey = NO_COMPONENT_KEY
-    protected var children: DynArray<ComponentKey>? = null
+    var parent: ComponentKey = NO_COMPONENT_KEY
+        protected set
+    val children: DynArrayRO<ComponentKey>?
+        get() = writableChildren
+    protected var writableChildren : DynArray<ComponentKey>? = null
 
     protected open fun setParentComponent(key: ComponentKey) {
         parent = key
     }
     fun withChild(key: ComponentKey): ComponentKey {
-        val child: ComponentNode = ComponentSystem[key]
-        if (child.parent != NO_COMPONENT_KEY)
-            throw IllegalArgumentException("ComponentNode for key: $key has already a parent")
-        else
-            child.setParentComponent(ComponentSystem[this.componentType].getKey(this.index))
-
         if (children == null)
-            children = DynArray.of()
-        children!!.add(key)
+            writableChildren = DynArray.of()
+        writableChildren!!.add(key)
 
         return key
     }
@@ -215,31 +188,41 @@ abstract class ComponentNode protected constructor(componentType: ComponentType<
     fun <C : ComponentNode> withChild(
         cBuilder: ComponentBuilder<C>,
         configure: (C.() -> Unit)): ComponentKey {
-
-        if (this.name == NO_NAME)
-            throw IllegalArgumentException("Component needs a name if it is used as a parent reference")
-
         if (children == null)
-            children = DynArray.of()
+            writableChildren = DynArray.of()
 
         val child = cBuilder.buildAndGet(configure)
-        if (child.name == NO_NAME)
-            throw IllegalArgumentException("Component needs a name if it is used as child reference")
-
-        child.setParentComponent(ComponentSystem[this.componentType].getKey(this.name))
         val key = ComponentSystem[child.componentType].getKey(child.name)
-        children!!.add(key)
+        writableChildren!!.add(key)
         return  key
+    }
+
+    override fun initialize() {
+        super.initialize()
+        children?.forEach {
+            ComponentSystem.get<ComponentNode>(it).setParentComponent(this.key)
+        }
     }
 
     fun removeChild(key: ComponentKey) {
         if (children == null || key !in children!!) return
-        children?.remove(key)
+        writableChildren?.remove(key)
         val child: ComponentNode = ComponentSystem[key]
         child.setParentComponent(NO_COMPONENT_KEY)
     }
 
+    private fun updateReferences() {
+        if (parent != NO_COMPONENT_KEY && parent.instanceIndex < 0)
+            parent = NO_COMPONENT_KEY
+        children?.forEach {
+            if (it.instanceIndex < 0)
+                writableChildren?.remove(it)
+        }
+        writableChildren?.trim()
+    }
+
     override fun stateChangeProcessing(apply: Apply, type: ComponentEventType) {
+        updateReferences()
         val policy: ApplyPolicies
         val process: (ComponentKey) -> Unit
         when (type) {
@@ -277,10 +260,82 @@ abstract class ComponentNode protected constructor(componentType: ComponentType<
     }
 }
 
-interface ComponentBuilder<C : Component> {
-    operator fun invoke(configure: C.() -> Unit): ComponentKey = build(configure)
-    fun build(configure: C.() -> Unit): ComponentKey
-    fun buildAndGet(configure: C.() -> Unit): C
+open class Composite protected constructor(
+    subType: ComponentType<out Composite>
+) : ComponentNode(subType), ViewLayerAware {
+
+    @JvmField val onInitTask = CLooseReference(Task)
+    @JvmField val onLoadTask = CLooseReference(Task)
+    @JvmField val onActivationTask = CLooseReference(Task)
+    @JvmField val onDeactivationTask = CLooseReference(Task)
+    @JvmField val onDisposeTask = CLooseReference(Task)
+    @JvmField val onDeleteTask = CLooseReference(Task)
+
+    fun withInitTask(configure: (Task.() -> Unit)) = onInitTask.setKey(Task(configure))
+    fun withLoadTask(configure: (Task.() -> Unit)) = onLoadTask.setKey(Task(configure))
+    fun withActivationTask(configure: (Task.() -> Unit)) = onActivationTask.setKey(Task(configure))
+    fun withDeactivationTask(configure: (Task.() -> Unit)) = onDeactivationTask.setKey(Task(configure))
+    fun withDisposeTask(configure: (Task.() -> Unit)) = onDisposeTask.setKey(Task(configure))
+    fun withDeleteTask(configure: (Task.() -> Unit)) = onDeleteTask.setKey(Task(configure))
+
+    override val viewIndex: Int
+        get() = viewRef.targetKey.instanceIndex
+    override val layerIndex: Int
+        get() = layerRef.targetKey.instanceIndex
+
+    @JvmField var viewRef = CReference(View)
+    @JvmField var layerRef = CReference(Layer)
+    @JvmField val position = Vector2f()
+
+    @JvmField internal val attributes = mutableMapOf<String, String>()
+
+    fun setAttribute(name: String, value: String) { attributes[name] = value }
+    fun getAttribute(name: String): String? = attributes[name]
+    fun getAttributeFloat(name: String): Float? = attributes[name]?.toFloat()
+
+    override fun initialize() {
+        super.initialize()
+        if (onInitTask.exists)
+            Task[onInitTask](this.index)
+    }
+
+    override fun load() {
+        super.load()
+        if (onLoadTask.exists)
+            Task[onLoadTask](this.index)
+    }
+
+    override fun activate() {
+        super.activate()
+        if (onActivationTask.exists)
+            Task[onActivationTask](this.index)
+    }
+
+    override fun deactivate() {
+        if (onDeactivationTask.exists)
+            Task[onDeactivationTask](this.index)
+        super.deactivate()
+    }
+
+    override fun dispose() {
+        if (onDisposeTask.exists)
+            Task[onDisposeTask](this.index)
+        super.dispose()
+    }
+
+    override fun delete() {
+        if (onDeleteTask.exists)
+            Task[onDeleteTask](this.index)
+        super.delete()
+    }
+
+    companion object : ComponentSystem<Composite>("Composite") {
+        override fun allocateArray(size: Int): Array<Composite?> = arrayOfNulls(size)
+        override fun create(): Composite =
+            throw UnsupportedOperationException("Composite is abstract use a concrete implementation instead")
+    }
 }
+
+
 
 

@@ -68,7 +68,7 @@ class Font private constructor(): Asset(Font) {
         tmpSpriteData.textureIndex = -1
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, Font>(Asset, "Font") {
+    companion object : ComponentSubTypeBuilder<Asset, Font>(Asset,"Font") {
         override fun create() = Font()
     }
 }

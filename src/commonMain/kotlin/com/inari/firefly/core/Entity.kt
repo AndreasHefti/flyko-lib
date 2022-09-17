@@ -32,12 +32,13 @@ abstract class EntityComponent protected constructor(
     abstract val componentType: EntityComponentType<out EntityComponent>
 }
 
-class Entity internal constructor(): Component(Entity), AspectAware {
+class Entity internal constructor(): Component(Entity), Controlled, AspectAware {
 
     /** The set of EntityComponent of a specified Entity. EntityComponent are indexed by type for fast accesses */
     internal val components: AspectSet<EntityComponent> = AspectSet.of(ENTITY_COMPONENT_ASPECTS)
     /** The Aspects that reflects the EntityComponent types that are hold by this Entity */
     override val aspects: Aspects = components.aspects
+    override val controllerReferences = ControllerReferences(Entity)
 
     override fun activate() = components.forEach { components.get(it)?.iActivate() }
     override fun deactivate()  = components.forEach { components.get(it)?.iDeactivate() }
@@ -57,7 +58,7 @@ class Entity internal constructor(): Component(Entity), AspectAware {
         val ENTITY_COMPONENT_ASPECTS = IndexedAspectType("ENTITY_COMPONENT_ASPECTS")
         private val entityListener: ComponentEventListener = { index, eType ->
             if (eType == ComponentEventType.DISPOSED)
-                dispose(Entity[index])
+                disposeEntity(Entity[index])
         }
 
         init {
@@ -92,7 +93,7 @@ class Entity internal constructor(): Component(Entity), AspectAware {
                 cache.removeFirst() as C
         }
 
-        private fun dispose(entity: Entity) {
+        private fun disposeEntity(entity: Entity) {
             entity.components.forEach { dispose(entity.components.get(it)!!) }
             entity.components.clear()
             entity.disposeIndex()

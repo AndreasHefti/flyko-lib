@@ -18,12 +18,12 @@ abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
             throw UnsupportedOperationException("BehaviorNode is abstract use a concrete implementation instead")
 
         private val entityIds = BitSet()
-        private val entityListener: ComponentEventListener = { index, type ->
-            val entity = Entity[index]
+        private val entityListener: ComponentEventListener = { key, type ->
+            val entity = Entity[key.instanceIndex]
             if (EBehavior in entity.aspects) {
                 when (type) {
-                    ComponentEventType.ACTIVATED -> entityIds[index] = true
-                    ComponentEventType.DEACTIVATED -> entityIds[index] = false
+                    ComponentEventType.ACTIVATED -> entityIds[key.instanceIndex] = true
+                    ComponentEventType.DEACTIVATED -> entityIds[key.instanceIndex] = false
                     else -> {}
                 }
             }
@@ -101,7 +101,7 @@ class ParallelNode private constructor() : BranchNode() {
         }
     }
 
-    companion object :  ComponentSubTypeSystem<BehaviorNode, ParallelNode>(BehaviorNode, "ParallelNode") {
+    companion object : ComponentSubTypeBuilder<BehaviorNode, ParallelNode>(BehaviorNode, "ParallelNode") {
         override fun create() = ParallelNode()
     }
 }
@@ -121,7 +121,7 @@ class SelectionNode private constructor() : BranchNode() {
         return FAILED
     }
 
-    companion object :  ComponentSubTypeSystem<BehaviorNode, SelectionNode>(BehaviorNode, "SelectionNode") {
+    companion object : ComponentSubTypeBuilder<BehaviorNode, SelectionNode>(BehaviorNode, "SelectionNode") {
         override fun create() = SelectionNode()
     }
 }
@@ -141,7 +141,7 @@ class SequenceNode private constructor() : BranchNode() {
         return OperationResult.SUCCESS
     }
 
-    companion object :  ComponentSubTypeSystem<BehaviorNode, SequenceNode>(BehaviorNode, "SequenceNode") {
+    companion object : ComponentSubTypeBuilder<BehaviorNode, SequenceNode>(BehaviorNode, "SequenceNode") {
         override fun create() = SequenceNode()
     }
 }
@@ -156,7 +156,7 @@ class ConditionNode private constructor() : BehaviorNode() {
             false -> FAILED
         }
 
-    companion object :  ComponentSubTypeSystem<BehaviorNode, ConditionNode>(BehaviorNode, "ConditionNode") {
+    companion object : ComponentSubTypeBuilder<BehaviorNode, ConditionNode>(BehaviorNode, "ConditionNode") {
         override fun create() = ConditionNode()
     }
 }
@@ -167,7 +167,7 @@ class ActionNode private constructor() : BehaviorNode() {
 
     override fun tick(entityId: Int): OperationResult = actionOperation(entityId)
 
-    companion object :  ComponentSubTypeSystem<BehaviorNode, ActionNode>(BehaviorNode, "ActionNode") {
+    companion object : ComponentSubTypeBuilder<BehaviorNode, ActionNode>(BehaviorNode, "ActionNode") {
         override fun create() = ActionNode()
     }
 }

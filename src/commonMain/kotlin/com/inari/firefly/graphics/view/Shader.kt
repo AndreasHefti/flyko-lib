@@ -52,7 +52,7 @@ class Shader private constructor(): Asset(Shader), ShaderData {
         return shaderProgram
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, Shader>(Asset, "Shader") {
+    companion object : ComponentSubTypeBuilder<Asset, Shader>(Asset,"Shader") {
         override fun create() = Shader()
     }
 }

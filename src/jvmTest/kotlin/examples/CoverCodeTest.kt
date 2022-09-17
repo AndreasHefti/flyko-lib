@@ -7,7 +7,7 @@ import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.View
-import com.inari.firefly.physics.animation.DefaultFloatEasingControl
+import com.inari.firefly.physics.animation.DefaultFloatEasing
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.EasedFloatAnimation
 import com.inari.util.geom.Easing
@@ -64,7 +64,7 @@ fun main(args: Array<String>) {
                     endValue = 400f
                     duration = 1000
                     animatedProperty = ETransform.PropertyAccessor.POSITION_X
-                    animationController(DefaultFloatEasingControl)
+                    animationController(DefaultFloatEasing)
                 }
             }
         }

@@ -3,13 +3,13 @@ package com.inari.firefly.physics.contact
 import com.inari.firefly.core.*
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.view.*
-import com.inari.firefly.physics.movement.MovementControl
+import com.inari.firefly.physics.movement.Movement
 import com.inari.util.DO_NOTHING
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
-abstract class ContactMap protected constructor() : Component(ContactMap), ViewLayerAware  {
+abstract class ContactMap protected constructor() : ComponentNode(ContactMap), ViewLayerAware  {
 
     override val viewIndex: Int
         get() = viewRef.targetKey.instanceIndex
@@ -90,34 +90,34 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
             super.unregisterComponent(index)
         }
 
-        private val entityListener: ComponentEventListener = { index, type ->
-            val entity = Entity[index]
+        private val entityListener: ComponentEventListener = { key, type ->
+            val entity = Entity[key.instanceIndex]
             if (EContact in entity.aspects && ETile !in entity.aspects) {
                 when (type) {
                     ComponentEventType.ACTIVATED -> COMPONENT_MAPPING.forEach {
                         it.notifyEntityActivation(entity)
                     }
                     ComponentEventType.DEACTIVATED -> COMPONENT_MAPPING.forEach {
-                        it.notifyEntityDeactivation(index)
+                        it.notifyEntityDeactivation(key.instanceIndex)
                     }
                     else -> {}
                 }
             }
         }
 
-        private val viewListener: ComponentEventListener = { index, type ->
+        private val viewListener: ComponentEventListener = { key, type ->
             when(type) {
                 ComponentEventType.DELETED -> {
                     COMPONENT_MAPPING.forEach {
-                        if (it.viewIndex == index)
-                            delete(index)
+                        if (it.viewIndex == key.instanceIndex)
+                            delete(key.instanceIndex)
                     }
                 }
                 else -> DO_NOTHING
             }
         }
 
-        private val moveListener: (MovementControl.MoveEvent) -> Unit = {
+        private val moveListener: (Movement.MoveEvent) -> Unit = {
             var index = ACTIVE_COMPONENT_MAPPING.nextSetBit(0)
             while (index >= 0) {
                 ContactMap[index].updateAll(it.entities)
@@ -128,7 +128,7 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
         init {
             Entity.registerComponentListener(entityListener)
             View.registerComponentListener(viewListener)
-            Engine.registerListener(MovementControl.moveEvent, moveListener)
+            Engine.registerListener(Movement.moveEvent, moveListener)
         }
 
         fun update(entity: Entity) {
@@ -163,7 +163,7 @@ class SimpleContactMap private constructor(): ContactMap() {
         return iterator
     }
 
-    companion object :  ComponentSubTypeSystem<ContactMap, SimpleContactMap>(ContactMap, "SimpleContactMap") {
+    companion object : ComponentSubTypeBuilder<ContactMap, SimpleContactMap>(ContactMap, "SimpleContactMap") {
         override fun create() = SimpleContactMap()
         private val ITERATOR_POOL = ArrayDeque<EntityIdIterator>()
     }
@@ -197,4 +197,5 @@ class SimpleContactMap private constructor(): ContactMap() {
             findNext()
         }
     }
+
 }

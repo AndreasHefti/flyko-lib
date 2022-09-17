@@ -148,9 +148,9 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
         private val ITERATOR_POOL = ArrayDeque<TileGridIterator>(5)
         private val VIEW_LAYER_MAPPING = ViewLayerMapping()
 
-        private fun entityListener(index: Int, type: ComponentEventType) {
-            if (type == ComponentEventType.ACTIVATED) addEntity(index)
-            else if (type == ComponentEventType.DEACTIVATED) removeEntity(index)
+        private fun entityListener(key: ComponentKey, type: ComponentEventType) {
+            if (type == ComponentEventType.ACTIVATED) addEntity(key.instanceIndex)
+            else if (type == ComponentEventType.DEACTIVATED) removeEntity(key.instanceIndex)
         }
 
         init { Entity.registerComponentListener(this::entityListener) }
@@ -194,13 +194,15 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
 
         private fun addEntity(index: Int) {
             val entity = Entity[index]
+            if (ETile !in entity.aspects)
+                return
             val tile = entity[ETile]
             val tileGrid = if (tile.tileGridRef.exists)
                 this[tile.tileGridRef.targetKey]
             else
                 this[this[entity[ETransform]].nextSetBit(0)]
 
-            if (entity.has(EMultiplier)) {
+            if (EMultiplier in entity.aspects) {
                 val multiplier = entity[EMultiplier]
                 val pi = multiplier.positions.iterator()
                 while (pi.hasNext()) {
@@ -215,6 +217,8 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
 
         private fun removeEntity(index: Int) {
             val entity = Entity[index]
+            if (ETile !in entity.aspects)
+                return
             val tile = entity[ETile]
             val tileGrid = if (tile.tileGridRef.exists)
                 if (this.exists(tile.tileGridRef.targetKey.instanceIndex))

@@ -1,7 +1,6 @@
 package com.inari.firefly.game.world
 
 import com.inari.firefly.TestApp
-import com.inari.firefly.core.Component
 import com.inari.firefly.core.ComponentSystem
 import com.inari.firefly.core.Entity
 import kotlin.test.*
@@ -12,6 +11,10 @@ class PlayerTest {
     @BeforeTest
     fun init() {
         TestApp
+        ComponentSystem.clearSystems()
+    }
+
+    @AfterTest fun cleanup() {
         ComponentSystem.clearSystems()
     }
 

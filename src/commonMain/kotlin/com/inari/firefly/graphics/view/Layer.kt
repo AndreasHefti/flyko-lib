@@ -20,7 +20,8 @@ class Layer private constructor(): ComponentNode(Layer) {
     }
 
     override fun activate() {
-        shaderIndex = Asset.resolveAssetIndex(shader.targetKey)
+        if (shader.targetKey !== NO_COMPONENT_KEY)
+            shaderIndex = Asset.resolveAssetIndex(shader.targetKey)
     }
 
     override fun deactivate() {

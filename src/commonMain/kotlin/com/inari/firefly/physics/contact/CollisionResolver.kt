@@ -6,7 +6,7 @@ import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGrid
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.movement.EMovement
-import com.inari.firefly.physics.movement.MovementControl
+import com.inari.firefly.physics.movement.Movement
 import com.inari.util.collection.BitSet
 import com.inari.util.event.Event
 import com.inari.util.geom.Vector2f
@@ -26,14 +26,13 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
         // Contains all entity ids that has contact scans defined and are active
         // They are all processed during one contact scan cycle. A contact scan is triggered by a move event
         private val entitiesWithScan = BitSet()
-        private val entityListener: ComponentEventListener = { index, type ->
-            if (entityMatch(index)) {
-                when(type) {
-                    ComponentEventType.ACTIVATED -> entitiesWithScan[index] = true
-                    ComponentEventType.DEACTIVATED -> entitiesWithScan[index] = false
-                    else -> {}
-                }
-            }
+
+        private fun entityListener(key: ComponentKey, type: ComponentEventType) {
+            if (!entityMatch(key.instanceIndex)) return
+            if (type == ComponentEventType.ACTIVATED )
+                entitiesWithScan[key.instanceIndex] = true
+            else if (type == ComponentEventType.DEACTIVATED)
+                entitiesWithScan[key.instanceIndex] = false
         }
 
         private fun entityMatch(index: Int) : Boolean {
@@ -45,8 +44,9 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
         }
 
         init {
-            MovementControl // load movement first to ensure Contact MapUpdate first
-            Engine.registerListener(UPDATE_EVENT_TYPE, this::update)
+            Movement // load movement first to ensure Contact MapUpdate first
+            Entity.registerComponentListener(::entityListener)
+            Engine.registerListener(UPDATE_EVENT_TYPE, ::update)
         }
 
         private fun update() {

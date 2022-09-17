@@ -26,7 +26,6 @@ class Vector2fTest {
         val time = timeMillis()
         for (i in 0..10000)
             v1 + v2
-        println( "+++++" + (timeMillis() - time))
         assertEquals("[x=10002.0,y=10002.0]", v1.toString())
 
     }

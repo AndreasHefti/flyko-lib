@@ -10,6 +10,20 @@ class Task private constructor(): Component(Task) {
     @JvmField var operation: TaskOperation = SUCCESS_TASK_OPERATION
     @JvmField var callback: TaskCallback = VOID_TASK_CALLBACK
 
+    fun withSimpleOperation(op: (Int) -> Unit) {
+        operation = { i1, _, _ ->
+            op(i1)
+            OperationResult.SUCCESS
+        }
+    }
+    fun withVoidOperation(op: () -> Unit) {
+        operation = { _, _, _ ->
+            op()
+            OperationResult.SUCCESS
+        }
+    }
+
+
     operator fun invoke(compId1: Int = -1, compId2: Int = -1, compId3: Int = -1): OperationResult {
         return if (noneBlocking) {
             startParallelTask(

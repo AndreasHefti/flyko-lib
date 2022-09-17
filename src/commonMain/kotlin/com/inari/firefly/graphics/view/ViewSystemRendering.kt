@@ -32,9 +32,9 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
 
     private val entities: DynArray<DynArray<DynArray<Entity>>> = DynArray.of(10, 2) // { size -> arrayOfNulls(size) }
 
-    private fun entityListener(index: Int, type: ComponentEventType) {
-        if (type == ACTIVATED) registerEntity(index)
-        else if (type == DEACTIVATED) disposeEntity(index)
+    private fun entityListener(key: ComponentKey, type: ComponentEventType) {
+        if (type == ACTIVATED) registerEntity(key.instanceIndex)
+        else if (type == DEACTIVATED) disposeEntity(key.instanceIndex)
     }
 
     override fun init() {
@@ -120,16 +120,16 @@ object ViewSystemRenderer : Renderer() {
 
     private val onlyBaseView: Boolean get() = VIEW_LAYER_MAPPING.size <= 0
 
-    private fun viewListener(index: Int, type: ComponentEventType) {
-        if (type == ACTIVATED) VIEW_LAYER_MAPPING[index] = Pair(View[index], DynIntArray())
-        else if (type == DEACTIVATED) VIEW_LAYER_MAPPING.remove(index)
+    private fun viewListener(key: ComponentKey, type: ComponentEventType) {
+        if (type == ACTIVATED) VIEW_LAYER_MAPPING[key.instanceIndex] = Pair(View[key.instanceIndex], DynIntArray())
+        else if (type == DEACTIVATED) VIEW_LAYER_MAPPING.remove(key.instanceIndex)
         sort()
     }
 
-    private fun layerListener(index: Int, type: ComponentEventType) {
-        val viewIndex = Layer[index].view.targetKey.instanceIndex
-        if (type == ACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.add(index)
-        else if (type == DEACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.remove(index)
+    private fun layerListener(key: ComponentKey, type: ComponentEventType) {
+        val viewIndex = Layer[key.instanceIndex].view.targetKey.instanceIndex
+        if (type == ACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.add(key.instanceIndex)
+        else if (type == DEACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.remove(key.instanceIndex)
         sort()
     }
 

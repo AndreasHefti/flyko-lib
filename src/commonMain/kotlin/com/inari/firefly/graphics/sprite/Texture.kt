@@ -1,7 +1,7 @@
 package com.inari.firefly.graphics.sprite
 
 import com.inari.firefly.core.Asset
-import com.inari.firefly.core.ComponentSubTypeSystem
+import com.inari.firefly.core.ComponentSubTypeBuilder
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.api.TextureData
 import com.inari.util.NO_NAME
@@ -45,7 +45,7 @@ class Texture private constructor() : Asset(Texture), TextureData {
         height = -1
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, Texture>(Asset, "Texture") {
+    companion object : ComponentSubTypeBuilder<Asset, Texture>(Asset,"Texture") {
         override fun create() = Texture()
     }
 }

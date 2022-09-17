@@ -1,6 +1,7 @@
 package com.inari.firefly.core
 
 import com.inari.firefly.TestApp
+import com.inari.firefly.game.json.AreaJsonAsset
 import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.physics.sound.Music
@@ -13,6 +14,10 @@ class AssetTest {
     @BeforeTest
     fun init() {
         TestApp
+        ComponentSystem.clearSystems()
+    }
+
+    @AfterTest fun cleanup() {
         ComponentSystem.clearSystems()
     }
 
@@ -107,8 +112,8 @@ class AssetTest {
     @Test
     fun lifeCycleWithDependentAssets() {
         val testEvents = StringBuilder()
-        val assetListener: ComponentEventListener =  { index, type ->
-            testEvents.append("|index=").append(index).append(":").append(Asset[index].name).append(":").append(type)
+        val assetListener: ComponentEventListener =  { key, type ->
+            testEvents.append("|index=").append(key.instanceIndex).append(":").append(Asset[key.instanceIndex].name).append(":").append(type)
         }
         Asset.registerComponentListener(assetListener )
         assertEquals("", testEvents.toString())
@@ -227,7 +232,7 @@ class TestAsset private constructor(
                 "assetIndex=$assetIndex)"
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, TestAsset>(Asset, "TestAsset") {
+    companion object : ComponentSubTypeBuilder<Asset, TestAsset>(Asset,"TestAsset") {
         override fun create() = TestAsset()
     }
 }

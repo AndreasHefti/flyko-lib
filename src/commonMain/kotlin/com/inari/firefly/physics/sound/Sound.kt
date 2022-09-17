@@ -1,13 +1,12 @@
 package com.inari.firefly.physics.sound
 
-import com.inari.firefly.core.Asset
-import com.inari.firefly.core.ComponentSubTypeSystem
-import com.inari.firefly.core.Engine
-import com.inari.firefly.core.TriggeredComponent
+import com.inari.firefly.core.*
 import com.inari.util.ZERO_INT
 import kotlin.jvm.JvmField
 
-class Sound private constructor(): Play(Sound), TriggeredComponent {
+class Sound private constructor(): Play(Sound), Controlled, TriggeredComponent {
+
+    override val controllerReferences = ControllerReferences(Sound)
 
     var pitch: Float = 1.0f
         set(value) {
@@ -32,7 +31,7 @@ class Sound private constructor(): Play(Sound), TriggeredComponent {
         playId = -1
     }
 
-    companion object :  ComponentSubTypeSystem<Asset, Sound>(Asset, "Sound") {
+    companion object : ComponentSubTypeBuilder<Asset, Sound>(Asset,"Sound") {
         override fun create() = Sound()
     }
 }

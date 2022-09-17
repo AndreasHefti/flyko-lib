@@ -6,7 +6,7 @@ import com.inari.util.TRUE_SUPPLIER
 import kotlin.jvm.JvmField
 
 
-abstract class Trigger protected constructor(): Component(Trigger) {
+abstract class Trigger protected constructor(componentType: ComponentType<out Trigger>): Component(componentType) {
 
     @JvmField var condition: () -> Boolean = FALSE_SUPPLIER
     @JvmField var call: () -> Boolean = TRUE_SUPPLIER
@@ -14,13 +14,12 @@ abstract class Trigger protected constructor(): Component(Trigger) {
     protected fun doTrigger() {
         if (condition())
             if (!call())
-                Trigger.delete(this)
+                ComponentSystem.delete(this.key)
     }
 
     companion object : ComponentSystem<Trigger>("Trigger") {
         override fun allocateArray(size: Int): Array<Trigger?> = arrayOfNulls(size)
-        override fun create(): Trigger =
-            throw UnsupportedOperationException("Trigger is abstract use a concrete implementation instead")
+        override fun create() = throw UnsupportedOperationException("Trigger is abstract use sub type builder instead")
     }
 }
 
@@ -28,19 +27,20 @@ interface TriggeredComponent {
 
     fun <A : Trigger> withTrigger(builder: ComponentBuilder<A>, configure: (A.() -> Unit)): ComponentKey {
         val key = builder(configure)
-        Trigger.activate(key)
+        ComponentSystem.activate(key)
         return key
     }
+
 }
 
-class UpdateEventTrigger private constructor() : Trigger() {
+class UpdateEventTrigger private constructor() : Trigger(UpdateEventTrigger) {
 
     private val updateEventListener = { doTrigger() }
 
     override fun load() = Engine.registerListener(UPDATE_EVENT_TYPE, updateEventListener)
     override fun dispose() = Engine.disposeListener(UPDATE_EVENT_TYPE, updateEventListener)
 
-    companion object :  ComponentSubTypeSystem<Trigger, UpdateEventTrigger>(Trigger, "UpdateEventTrigger") {
+    companion object : ComponentSubTypeBuilder<Trigger, UpdateEventTrigger>(Trigger,"UpdateEventTrigger") {
         override fun create() = UpdateEventTrigger()
     }
 }

@@ -69,6 +69,12 @@ interface DynArrayRO<T> : Iterable<T> {
      */
     fun indexOf(value: T): Int
 
+    /** Use this to get the next none empty index of the array from given index
+     * @param fromIndex the start index where to get the next none empty index of the array
+     * @return the next none empty index in the array or -1 if there is no such index
+     */
+    fun nextIndex(fromIndex: Int): Int
+
 }
 
 /** An Array that dynamically grows if more space is needed.
@@ -204,6 +210,21 @@ class DynArray<T> constructor(
         }
 
         return -1
+    }
+
+    /** Use this to get the next none empty index of the array from given index
+     * @param fromIndex the start index where to get the next none empty index of the array
+     * @return the next none empty index in the array or -1 if there is no such index
+     */
+    override fun nextIndex(fromIndex: Int): Int {
+        if (fromIndex >= this.capacity)
+            return -1
+        var result = fromIndex
+        while (result < array.size && array[result] == null) {
+            result++
+        }
+        if (result >= array.size) return -1
+        return result
     }
 
     /** Removes the object on specified index of DynArray and returns the objects that was set before.

@@ -4,7 +4,6 @@ import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.EntityComponent
 import com.inari.firefly.core.EntityComponentBuilder
 import com.inari.firefly.core.api.BlendMode
-import com.inari.firefly.core.api.TransformData
 import com.inari.firefly.core.api.TransformDataImpl
 import com.inari.util.collection.DynArray
 import com.inari.util.geom.Vector2f

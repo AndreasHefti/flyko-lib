@@ -11,7 +11,7 @@ import kotlin.jvm.JvmField
 class EText private constructor() : EntityComponent(EText) {
 
     @JvmField var renderer: EntityRenderer = SimpleTextRenderer
-    @JvmField var fontAssetRef = CReference(Font)
+    @JvmField var fontRef = CReference(Font)
 
     @JvmField val text: StringBuilder = StringBuilder()
     @JvmField var tint: Vector4f = Vector4f(1f, 1f, 1f, 1f)
@@ -20,7 +20,7 @@ class EText private constructor() : EntityComponent(EText) {
 
     override fun reset() {
         renderer = SimpleTextRenderer
-        fontAssetRef.reset()
+        fontRef.reset()
         text.setLength(0)
         tint.r = 1f; tint.g = 1f; tint.b = 1f; tint.a = 1f
         blend = BlendMode.NONE

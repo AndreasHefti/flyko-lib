@@ -3,14 +3,13 @@ package com.inari.firefly.game.world
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.api.InputDevice
-import com.inari.firefly.physics.movement.EMovement
 import com.inari.util.VOID_MOVE_CALLBACK
 import com.inari.util.ZERO_FLOAT
 import kotlin.jvm.JvmField
 import kotlin.math.max
 import kotlin.math.min
 
-class PlatformerHMoveController private constructor() : SingleComponentControl(Player) {
+class PlatformerHMoveController private constructor() : SystemControl(Player) {
 
     @JvmField var runVelocityStep = 10.0f
     @JvmField var stopVelocityStep = 20.0f
@@ -22,44 +21,43 @@ class PlatformerHMoveController private constructor() : SingleComponentControl(P
 
     @JvmField var directionChangeCallback = VOID_MOVE_CALLBACK
 
-    private lateinit var playerMovement: EMovement
+    private lateinit var player: Player
 
-    override fun register(name: String) {
-        super.register(name)
-        playerMovement = Entity[name][EMovement]
-    }
-
-    override fun unregister(name: String) {
-        playerMovement = null!!
+    override fun update(index: Int) {}
+    override fun matchForControl(key: ComponentKey): Boolean {
+        player = Player[key]
+        return this.index in player.controllerReferences
     }
 
     override fun update() {
-        if (!moveOnAir &&!playerMovement.onGround)
+        val mov = player.playerMovement ?: return
+        if (!moveOnAir && !mov.onGround)
             return
 
+        val cIndex = super.componentIndexes.nextSetBit(0)
         if (inputDevice.buttonPressed(buttonLeft)) {
-                val outRef = this@PlatformerHMoveController
-                if (playerMovement.velocity.v0 <= -playerMovement.maxVelocityWest)
-                    return
+            val outRef = this@PlatformerHMoveController
+            if (mov.velocity.v0 <= -mov.maxVelocityWest)
+                return
 
-                if (playerMovement.velocity.v0 > ZERO_FLOAT) {
-                    playerMovement.velocity.v0 = max(ZERO_FLOAT, playerMovement.velocity.v0 - outRef.stopVelocityStep)
-                    outRef.directionChangeCallback(controlledComponentIndex, playerMovement.velocity.v0, outRef.buttonLeft)
-                }
-                else
-                    playerMovement.velocity.v0 = max( -playerMovement.maxVelocityWest, playerMovement.velocity.v0 - outRef.runVelocityStep)
+            if (mov.velocity.v0 > ZERO_FLOAT) {
+                mov.velocity.v0 = max(ZERO_FLOAT, mov.velocity.v0 - outRef.stopVelocityStep)
+                outRef.directionChangeCallback(cIndex, mov.velocity.v0, outRef.buttonLeft)
+            }
+            else
+                mov.velocity.v0 = max( -mov.maxVelocityWest, mov.velocity.v0 - outRef.runVelocityStep)
         } else if (inputDevice.buttonPressed(buttonRight)) {
-                val outRef = this@PlatformerHMoveController
-                if (playerMovement.velocity.v0 >= playerMovement.maxVelocityWest)
-                    return
-                if (playerMovement.velocity.v0 < ZERO_FLOAT) {
-                    playerMovement.velocity.v0 = min(ZERO_FLOAT, playerMovement.velocity.v0 + outRef.stopVelocityStep)
-                    outRef.directionChangeCallback(controlledComponentIndex, playerMovement.velocity.v0, outRef.buttonRight)
-                }
-                else
-                    playerMovement.velocity.v0 = min(playerMovement.maxVelocityWest, playerMovement.velocity.v0 + outRef.runVelocityStep)
-        } else if (playerMovement.velocity.v0 != ZERO_FLOAT) {
-            with (playerMovement) {
+            val outRef = this@PlatformerHMoveController
+            if (mov.velocity.v0 >= mov.maxVelocityWest)
+                return
+            if (mov.velocity.v0 < ZERO_FLOAT) {
+                mov.velocity.v0 = min(ZERO_FLOAT, mov.velocity.v0 + outRef.stopVelocityStep)
+                outRef.directionChangeCallback(cIndex, mov.velocity.v0, outRef.buttonRight)
+            }
+            else
+                mov.velocity.v0 = min(mov.maxVelocityWest, mov.velocity.v0 + outRef.runVelocityStep)
+        } else if (mov.velocity.v0 != ZERO_FLOAT) {
+            with (mov) {
                 val outRef = this@PlatformerHMoveController
                 if (velocity.v0 > ZERO_FLOAT)
                     velocity.v0 = max(ZERO_FLOAT, velocity.v0 - outRef.stopVelocityStep)
@@ -69,12 +67,12 @@ class PlatformerHMoveController private constructor() : SingleComponentControl(P
         }
     }
 
-    companion object :  ComponentSubTypeSystem<Control, PlatformerHMoveController>(Control, "PlatformerHMoveController") {
+    companion object : ComponentSubTypeBuilder<Control, PlatformerHMoveController>(Control, "PlatformerHMoveController") {
         override fun create() = PlatformerHMoveController()
     }
 }
 
-class PlatformerJumpController private constructor(): SingleComponentControl(Player) {
+class PlatformerJumpController private constructor(): SystemControl(Player) {
 
     @JvmField var inputDevice: InputDevice = Engine.input.getDefaultDevice()
     @JvmField var jumpButton = ButtonType.FIRE_1
@@ -84,41 +82,39 @@ class PlatformerJumpController private constructor(): SingleComponentControl(Pla
 
     private var jumpAction = 0
     private var doubleJumpOn = true
-    private lateinit var playerMovement: EMovement
+    private lateinit var player: Player
 
-    override fun register(name: String) {
-        super.register(name)
-        playerMovement = Entity[name][EMovement]
-    }
-
-    override fun unregister(name: String) {
-        playerMovement = null!!
+    override fun update(index: Int) {}
+    override fun matchForControl(key: ComponentKey): Boolean {
+        player = Player[key]
+        return this.index in player.controllerReferences
     }
 
     override fun update() {
+        val mov = player.playerMovement ?: return
         if (inputDevice.buttonTyped(jumpButton)) {
-            if (playerMovement.onGround) {
-                playerMovement.onGround = false
-                playerMovement.velocity.v1 = -jumpImpulse
+            if (mov.onGround) {
+                mov.onGround = false
+                mov.velocity.v1 = -jumpImpulse
                 doubleJumpOn = false
                 jumpAction = 0
             } else if (doubleJump && !doubleJumpOn) {
-                playerMovement.velocity.v1 = -jumpImpulse
+                mov.velocity.v1 = -jumpImpulse
                 doubleJumpOn = true
                 jumpAction = 0
             } else
                 jumpAction = 1
 
-        } else if (playerMovement.onGround && jumpAction > 0 && jumpAction < jumpActionTolerance) {
-            playerMovement.onGround = false
-            playerMovement.velocity.v1 = -jumpImpulse
+        } else if (mov.onGround && jumpAction > 0 && jumpAction < jumpActionTolerance) {
+            mov.onGround = false
+            mov.velocity.v1 = -jumpImpulse
             doubleJumpOn = false
             jumpAction = 0
         } else if (jumpAction > 0)
             jumpAction++
     }
 
-    companion object :  ComponentSubTypeSystem<Control, PlatformerJumpController>(Control, "PlatformerJumpController") {
+    companion object : ComponentSubTypeBuilder<Control, PlatformerJumpController>(Control, "PlatformerJumpController") {
         override fun create() = PlatformerJumpController()
     }
 }

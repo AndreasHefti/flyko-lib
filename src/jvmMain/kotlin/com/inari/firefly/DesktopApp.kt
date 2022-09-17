@@ -72,6 +72,16 @@ class DesktopApp(
             loadSystemFont()
             ComponentSystem.dumpInfo()
             initializer(this)
+
+            val runtime = Runtime.getRuntime()
+            val usedMemInMB=(runtime.totalMemory() - runtime.freeMemory()) / 1048576L
+            val maxHeapSizeInMB=runtime.maxMemory() / 1048576L
+            val availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB
+            println("*************************************************************************")
+            println("usedMemInMB: : $usedMemInMB")
+            println("maxHeapSizeInMB: : $maxHeapSizeInMB")
+            println("availHeapSizeInMB: : $availHeapSizeInMB")
+            println("*************************************************************************")
         }
     }
 

@@ -14,6 +14,7 @@ import com.inari.firefly.graphics.FrameRateInfo
 import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.movement.EMovement
+import com.inari.firefly.physics.movement.Movement
 import com.inari.util.OperationResult.*
 import kotlin.random.Random
 
@@ -123,6 +124,5 @@ fun main(args: Array<String>) {
         }
 
         ComponentSystem.dumpInfo()
-
     }
 }

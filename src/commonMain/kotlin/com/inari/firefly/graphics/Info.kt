@@ -1,6 +1,5 @@
 package com.inari.firefly.graphics
 
-import com.inari.firefly.core.Asset
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Engine.Companion.POST_RENDER_EVENT_TYPE
 import com.inari.firefly.core.Engine.Companion.SYSTEM_FONT
@@ -13,6 +12,7 @@ import com.inari.util.collection.DynArray
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
+@Suppress("VARIABLE_IN_SINGLETON_WITHOUT_THREAD_LOCAL")
 object FFInfoSystem : System {
 
     private var active = false
@@ -34,9 +34,9 @@ object FFInfoSystem : System {
     }
 
     init {
-        if (!Asset.exists(SYSTEM_FONT))
+        if (!Font.exists(SYSTEM_FONT))
             throw IllegalStateException("No FontAsset for SYSTEM_FONT found in AssetSystem. SYSTEM_FONT must be defined")
-        font = Asset[SYSTEM_FONT, Font]
+        font = Font[SYSTEM_FONT]
         hStep = font.charWidth + font.charSpace
         vStep = font.charHeight + font.lineSpace
     }

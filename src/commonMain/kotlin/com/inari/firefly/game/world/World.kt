@@ -1,13 +1,12 @@
 package com.inari.firefly.game.world
 
 import com.inari.firefly.core.*
-import com.inari.firefly.game.composite.Composite
-import com.inari.firefly.game.world.Room.Companion.activeRoomKey
 import com.inari.firefly.graphics.view.Scene
 import com.inari.util.OperationCallback
 import com.inari.util.OperationResult
 import com.inari.util.geom.*
 import kotlin.jvm.JvmField
+import kotlin.native.concurrent.ThreadLocal
 
 enum class WorldOrientationType {
     TILES,
@@ -27,10 +26,15 @@ interface RoomSupplier {
 
 class Area private constructor() : Composite(Area) {
 
+    override fun initialize() {
+        super.initialize()
+        activationPolicy = ApplyPolicies.PARENT_BEFORE
+    }
+
     @JvmField var orientationType: WorldOrientationType = WorldOrientationType.COUNT
     @JvmField val orientation: Vector4i = Vector4i()
 
-    companion object :  ComponentSubTypeSystem<Composite, Area>(Composite, "Area") {
+    companion object : ComponentSubTypeBuilder<Composite, Area>(Composite,"Area") {
         override fun create() = Area()
     }
 }
@@ -51,7 +55,10 @@ class Room private constructor() : Composite(Room) {
 
     @JvmField var roomSupplier: RoomSupplier = DefaultSelectionBasedRoomSupplier()
 
-    @JvmField internal var paused = false
+    override fun activate() {
+        activateRoom(this.index)
+        super.activate()
+    }
 
     fun  withActivationScene(configure: (Scene.() -> Unit)): ComponentKey  {
         val key = Scene.build(configure)
@@ -77,36 +84,40 @@ class Room private constructor() : Composite(Room) {
         return key
     }
 
-    companion object :  ComponentSubTypeSystem<Composite, Room>(Composite, "Room") {
+    @ThreadLocal
+    companion object : ComponentSubTypeBuilder<Composite, Room>(Composite,"Room") {
         override fun create() = Room()
+
+        var paused = false
+            internal set
 
         var activeRoomKey = NO_COMPONENT_KEY
             private set
 
-        fun activateRoom(roomIndex: Int) {
+        private fun activateRoom(roomIndex: Int) {
             // If this room is already active, ignore
             if (activeRoomKey.instanceIndex == roomIndex) return
             // If there is another active room, deactivate it first
             deactivateRoom()
 
             // set new active room and notify
-            Room.activate(roomIndex)
             activeRoomKey = Room.getKey(roomIndex)
         }
 
         fun pauseRoom() {
-            if (activeRoomKey == NO_COMPONENT_KEY) return
+            if (paused || activeRoomKey == NO_COMPONENT_KEY) return
 
             val activeRoom = Room[activeRoomKey]
             if (activeRoom.pauseTask.exists)
                 Task[activeRoom.pauseTask](activeRoom.index)
-            activeRoom.paused = true
+            paused = true
         }
 
         fun startRoom(playerIndex: Int, px: Int, py: Int, roomIndex: Int) {
             val startGameCall: OperationCallback = { resumeRoom() }
             // activate new room and player
-            activateRoom(roomIndex)
+            Room.activate(roomIndex)
+            //activateRoom(roomIndex)
             val activeRoom = Room[activeRoomKey]
             Player.activate(playerIndex)
             val player = Player[playerIndex]
@@ -122,12 +133,12 @@ class Room private constructor() : Composite(Room) {
         }
 
         fun resumeRoom() {
-            if (activeRoomKey == NO_COMPONENT_KEY) return
+            if (!paused || activeRoomKey == NO_COMPONENT_KEY) return
 
             val activeRoom = Room[activeRoomKey]
             if (activeRoom.resumeTask.exists)
                 Task[activeRoom.resumeTask](activeRoom.index)
-            activeRoom.paused = false
+            paused = false
         }
 
         fun deactivateRoom() {
@@ -136,7 +147,7 @@ class Room private constructor() : Composite(Room) {
             activeRoomKey = NO_COMPONENT_KEY
         }
 
-        private fun handleRoomChange(playerXPos: Int, playerYPos: Int, orientation: Orientation = Orientation.NONE) {
+        fun handleRoomChange(playerXPos: Int, playerYPos: Int, orientation: Orientation = Orientation.NONE) {
             if (activeRoomKey.instanceIndex < 0)
                 throw IllegalStateException("No active Room")
 
@@ -149,9 +160,8 @@ class Room private constructor() : Composite(Room) {
                 throw IllegalStateException("No Room found")
             if (activeRoomKey.instanceIndex < 0)
                 throw IllegalStateException("No active Room")
-            val player = Player.findFirstActive()
-                ?: throw IllegalStateException("No Player found")
 
+            val player = Player.findFirstActive()
             pauseRoom()
             val activeRoom = Room[activeRoomKey]
             val startGameCallback: OperationCallback = {

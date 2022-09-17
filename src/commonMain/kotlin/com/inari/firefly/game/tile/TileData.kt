@@ -1,6 +1,8 @@
 package com.inari.firefly.game.tile
 
+import com.inari.firefly.core.Asset
 import com.inari.firefly.core.CReference
+import com.inari.firefly.core.Component
 import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.game.tile.TileUtils.TILE_ASPECT_GROUP
@@ -190,8 +192,13 @@ class TileMapData {
 }
 
 class TileSetAssetMapping {
-    var tileSetRef = CReference(TileSet)
+    var tileSetAssetRef = CReference(Asset)
     val tileSetIndex: Int
-        get() = tileSetRef.targetKey.instanceIndex
+        get() {
+            val asset = Asset[tileSetAssetRef.targetKey]
+            if (!asset.loaded)
+                Asset.load(tileSetAssetRef.targetKey)
+            return asset.assetIndex
+        }
     var codeOffset = 1
 }
