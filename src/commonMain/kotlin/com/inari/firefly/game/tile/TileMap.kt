@@ -9,6 +9,7 @@ import com.inari.firefly.graphics.view.View.Companion.BASE_VIEW_KEY
 import com.inari.firefly.graphics.view.ViewLayerAware
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.IntFrameAnimation
+import com.inari.firefly.physics.animation.IntFrameAnimationControl
 import com.inari.firefly.physics.contact.EContact
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_CONTACT_TYPE
 import com.inari.util.*
@@ -38,11 +39,11 @@ class TileMap private constructor(): ComponentNode(TileMap) {
     override fun load() {
         super.load()
         // load all involved assets (texture assets, tile set assets)
-        tileMapData.forEach {
-            it.tileSetMapping.forEach { tileMap ->
-                Asset.activate(tileMap.tileSetAssetRef.targetKey)
-            }
-        }
+//        tileMapData.forEach {
+//            it.tileSetMapping.forEach { tileMap ->
+//                Asset.activate(tileMap.tileSetAssetRef.targetKey)
+//            }
+//        }
 
         // TODO create inactive entities for decoration
     }
@@ -76,11 +77,11 @@ class TileMap private constructor(): ComponentNode(TileMap) {
 
     override fun dispose() {
         // disposes all involved assets
-        tileMapData.forEach {
-            it.tileSetMapping.forEach { tileMap ->
-                Asset.dispose(tileMap.tileSetAssetRef.targetKey)
-            }
-        }
+//        tileMapData.forEach {
+//            it.tileSetMapping.forEach { tileMap ->
+//                Asset.dispose(tileMap.tileSetAssetRef.targetKey)
+//            }
+//        }
 
         super.dispose()
     }
@@ -97,8 +98,8 @@ class TileMap private constructor(): ComponentNode(TileMap) {
         data.tileSetMapping.forEach { mapping ->
             var codeIndex = mapping.codeOffset
             val tileSet = TileSet[mapping.tileSetIndex]
-            if (!tileSet.loaded)
-                TileSet.load(mapping.tileSetIndex)
+            if (!tileSet.active)
+                TileSet.activate(mapping.tileSetIndex)
 
             var it = 0
             while (it < tileSet.tiles.capacity) {
@@ -141,6 +142,7 @@ class TileMap private constructor(): ComponentNode(TileMap) {
                     }
 
                     if (tile.animationData != null) {
+                        IntFrameAnimationControl
                         withComponent(EAnimation) {
                             withAnimation(IntFrameAnimation) {
                                 animatedProperty = ETile.PropertyAccessor.SPRITE

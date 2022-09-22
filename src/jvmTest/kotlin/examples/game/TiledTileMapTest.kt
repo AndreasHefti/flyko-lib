@@ -97,11 +97,11 @@ fun initPlayerTasks() {
                     blendMode = BlendMode.NORMAL_ALPHA
                 }
                 withComponent(EMovement) {
-                    mass = 50f
+                    mass = 80f
                     maxVelocityWest = 50f
                     maxVelocityEast = 50f
                     maxVelocityNorth = 200f
-                    maxVelocitySouth = 100f
+                    maxVelocitySouth = 200f
                     withIntegrator(VelocityVerletIntegrator) {
                         massFactor = 1.5f
                     }
@@ -315,10 +315,6 @@ class TestGameObject : Composite(TestGameObject) {
             textureRef("tileSetAtlas_bluTerrain_tileSetAsset")
             textureRegion(7 * 16, 1 * 16, 16, 16)
         }
-    }
-
-    override fun activate() {
-        super.activate()
         entityId = Entity {
             autoActivation = true
             withComponent(ETransform) {
@@ -338,14 +334,10 @@ class TestGameObject : Composite(TestGameObject) {
         }
     }
 
-    override fun deactivate() {
-        super.deactivate()
-        Entity.deactivate(entityId)
-    }
-
     override fun dispose() {
         super.dispose()
-        Entity.dispose(entityId)
+        Entity.delete(entityId)
+        Sprite.delete(spriteId)
     }
 
     companion object : ComponentSubTypeBuilder<Composite, TestGameObject>(Composite, "TestGameObject") {

@@ -6,7 +6,7 @@ import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
 import kotlin.jvm.JvmField
 
-class TileSet private constructor(): ComponentNode(TileSet) {
+open class TileSet: ComponentNode(TileSet) {
 
     @JvmField val textureRef = CReference(Texture)
     val textureIndex: Int
@@ -31,15 +31,17 @@ class TileSet private constructor(): ComponentNode(TileSet) {
             textureRef.reset()
     }
 
-    override fun load() {
+    override fun activate() {
         super.load()
-        // load all sprites
+
+        // make sure texture for sprite set is defined and loaded
         if (!textureRef.exists)
             throw IllegalStateException("textureRef missing")
-
         val texture = Texture[textureRef.targetKey]
         if (!texture.loaded)
             Texture.load(textureRef.targetKey)
+
+        // load all sprites on low level
         val textureIndex = texture.assetIndex
         tileTemplates.forEach { tileTemplate ->
             val spriteTemplate = tileTemplate.spriteTemplate
@@ -54,7 +56,7 @@ class TileSet private constructor(): ComponentNode(TileSet) {
         }
     }
 
-    override fun dispose() {
+    override fun deactivate() {
         for (i in 0 until tileTemplates.capacity) {
             val tileTemplate = tileTemplates[i] ?: continue
             Engine.graphics.disposeSprite(tileTemplate.spriteTemplate.spriteIndex)

@@ -13,6 +13,7 @@ import com.inari.firefly.graphics.sprite.SpriteGroupRenderer
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.text.Font
 import com.inari.firefly.graphics.text.SimpleTextRenderer
+import com.inari.firefly.graphics.tile.SimpleTileGridRenderer
 import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
 import kotlin.math.roundToInt
@@ -61,6 +62,7 @@ class DesktopApp(
         Layer
 
         // init base renderer pipeline
+        SimpleTileGridRenderer.init()
         MultiPositionSpriteRenderer.init()
         SpriteGroupRenderer.init()
         SimpleSpriteRenderer.init()
@@ -70,9 +72,7 @@ class DesktopApp(
         InariIntro.show {
             ComponentSystem.clearSystems()
             loadSystemFont()
-            ComponentSystem.dumpInfo()
             initializer(this)
-
             val runtime = Runtime.getRuntime()
             val usedMemInMB=(runtime.totalMemory() - runtime.freeMemory()) / 1048576L
             val maxHeapSizeInMB=runtime.maxMemory() / 1048576L
@@ -82,6 +82,7 @@ class DesktopApp(
             println("maxHeapSizeInMB: : $maxHeapSizeInMB")
             println("availHeapSizeInMB: : $availHeapSizeInMB")
             println("*************************************************************************")
+            ComponentSystem.dumpInfo()
         }
     }
 

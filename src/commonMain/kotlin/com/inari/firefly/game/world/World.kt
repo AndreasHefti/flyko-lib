@@ -117,7 +117,6 @@ class Room private constructor() : Composite(Room) {
             val startGameCall: OperationCallback = { resumeRoom() }
             // activate new room and player
             Room.activate(roomIndex)
-            //activateRoom(roomIndex)
             val activeRoom = Room[activeRoomKey]
             Player.activate(playerIndex)
             val player = Player[playerIndex]
@@ -174,7 +173,7 @@ class Room private constructor() : Composite(Room) {
                 deactivateRoom()
 
                 // activate new room and player
-                activateRoom(playerOrientation.roomKey.instanceIndex)
+                Room.activate(playerOrientation.roomKey.instanceIndex)
                 player.playerPosition(playerOrientation.playerPosition)
                 Player.activate(player.index)
                 pauseRoom()

@@ -127,7 +127,8 @@ abstract class Component protected constructor(
     internal fun iActivate() = activate()
     internal fun iDeactivate() = deactivate()
     internal fun iDispose() = dispose()
-    internal fun iDelete() = disposeIndex()
+    internal fun iDelete() = delete()
+    internal fun iDisposeIndex() = disposeIndex()
 
     protected open fun initialize() {}
     protected open fun load() {}
@@ -145,7 +146,11 @@ abstract class Component protected constructor(
     }
 
     override fun toString(): String =
-        "${componentType.aspectName}($index, $name, l:$loaded, a:$active)"
+        "${componentType.aspectName}${ 
+            if(componentType.aspectName != componentType.subTypeName) 
+                ":${componentType.subTypeName}" 
+            else "" }" +
+                "($index, $name, l:$loaded, a:$active)"
 
     companion object {
         @JvmField internal val COMPONENT_TYPE_ASPECTS = IndexedAspectType("COMPONENT_ASPECTS")

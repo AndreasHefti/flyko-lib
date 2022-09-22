@@ -25,6 +25,9 @@ class PlatformerHMoveController private constructor() : SystemControl(Player) {
 
     override fun update(index: Int) {}
     override fun matchForControl(key: ComponentKey): Boolean {
+        if (key.type.subTypeName != Player.subTypeName)
+            return false
+
         player = Player[key]
         return this.index in player.controllerReferences
     }
@@ -86,6 +89,8 @@ class PlatformerJumpController private constructor(): SystemControl(Player) {
 
     override fun update(index: Int) {}
     override fun matchForControl(key: ComponentKey): Boolean {
+        if (key.type.subTypeName != Player.subTypeName)
+            return false
         player = Player[key]
         return this.index in player.controllerReferences
     }

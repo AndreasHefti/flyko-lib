@@ -146,9 +146,9 @@ abstract class ComponentSystem<C : Component>(
         get() = !ACTIVE_COMPONENT_MAPPING.isEmpty
 
     override fun toString(): String =
-        "Name: $typeName\n" +
-                "Key Mapping: ${COMPONENT_KEY_MAPPING.values}\n" +
-                "Component Mapping: ${mappingToString()}\n"
+        "System: $typeName" +
+        "\n  Key Mapping: ${COMPONENT_KEY_MAPPING.values}\n" +
+        "  Component Mapping: ${mappingToString()}\n"
 
     fun mappingToString(): String {
         val builder = StringBuilder()
@@ -362,6 +362,7 @@ abstract class ComponentSystem<C : Component>(
         comp.onStateChange = false
         send(comp.key, ComponentEventType.DELETED)
         unregisterComponent(index)
+        comp.iDisposeIndex()
         comp.stateChangeProcessing(Apply.AFTER, ComponentEventType.DELETED)
     }
 
@@ -369,7 +370,6 @@ abstract class ComponentSystem<C : Component>(
         if (index < 0)
             println("!!! No component instance defined (index < 0) $typeName - $subTypeName. Ignore it !!!")
         return (index >= 0)
-            //throw IllegalArgumentException("No component instance defined (index < 0) $typeName - $subTypeName")
     }
 
     // **** ComponentKey handling ****
@@ -457,9 +457,7 @@ abstract class ComponentSystem<C : Component>(
         
         fun dumpInfo() {
             println("---- System Info ---------------------------------------------------------------------------------")
-            COMPONENT_SYSTEM_MAPPING.forEach {
-                println("System: $it")
-            }
+            COMPONENT_SYSTEM_MAPPING.values.forEach { println(it) }
             println("--------------------------------------------------------------------------------------------------")
         }
     }
@@ -533,6 +531,12 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
         system.registerComponent(comp)
         system.initComponent(comp)
         return comp
+    }
+
+    override fun toString(): String {
+        val result = StringBuilder("SubTypeSystem: $subTypeName\n  Component Mapping:\n")
+        forEachDo { result.append( "    $it\n") }
+        return result.toString()
     }
 
     abstract fun create(): CC

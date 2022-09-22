@@ -1,12 +1,10 @@
 package com.inari.firefly.game.tile
 
 import com.inari.firefly.TestApp
-import com.inari.firefly.core.Asset
 import com.inari.firefly.core.ComponentSystem
 import com.inari.firefly.core.Entity
-import com.inari.firefly.game.json.TiledTileSetAsset
+import com.inari.firefly.game.json.TiledTileSet
 import com.inari.firefly.graphics.sprite.Texture
-import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.View.Companion.BASE_VIEW_KEY
 import com.inari.util.geom.BitMask
 import kotlin.test.*
@@ -25,7 +23,7 @@ class TestTiledTileSetAsset {
 
     @Test
     fun testLoad_Activate_Deactivate() {
-        TiledTileSetAsset {
+        TiledTileSet {
             name = "testTileSet"
             resourceName = "tiles/outline_full.json"
         }
@@ -36,20 +34,20 @@ class TestTiledTileSetAsset {
             viewRef(BASE_VIEW_KEY)
             withTileLayer {
                 withTileSetMapping {
-                    tileSetAssetRef("testTileSet")
+                    tileSetRef("testTileSet")
                     codeOffset = 1
                 }
             }
         }
 
 
-        assertTrue(TiledTileSetAsset.exists("testTileSet"))
-        assertFalse(TiledTileSetAsset["testTileSet"].loaded)
+        assertTrue(TiledTileSet.exists("testTileSet"))
+        assertFalse(TiledTileSet["testTileSet"].loaded)
 
         TileMap.load("tileMap")
 
         // check all expected assets and components are created correctly
-        val tiledTileSetAsset = TiledTileSetAsset["testTileSet"]
+        val tiledTileSetAsset = TiledTileSet["testTileSet"]
         assertNotNull(tiledTileSetAsset)
         val textureAssetName = "tileSetAtlas_${tiledTileSetAsset.name}"
         assertTrue { Texture.exists(textureAssetName) }

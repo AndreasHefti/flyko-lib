@@ -3,7 +3,6 @@ package com.inari.firefly.game.json
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.game.tile.TileMap
-import com.inari.firefly.game.tile.TileSet
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewSystemRenderer
 import com.inari.firefly.physics.contact.SimpleContactMap
@@ -48,13 +47,13 @@ class TiledTileMapAsset private constructor() : Asset(TiledTileMapAsset) {
             val tilesetResource = tileSetProps[1]
 
             // activate existing tileset or create new one and activate
-            if (!TileSet.exists(tileSetAssetName))
-                TiledTileSetAsset {
+            if (!TiledTileSet.exists(tileSetAssetName))
+                TiledTileSet {
                     autoActivation = true
                     name = tileSetAssetName
                     resourceName = tilesetResource
                 }
-            TileSet.load(tileSetAssetName)
+            TiledTileSet.load(tileSetAssetName)
             tileSetAssetToCodeOffsetMapping[tileSetName] = tileMapJson.tilesets[index].firstgid
         }
 
@@ -130,7 +129,7 @@ class TiledTileMapAsset private constructor() : Asset(TiledTileMapAsset) {
             val tileSetNames = layerTileSets.split(COMMA)
             tileSetNames.forEach { tileSetName ->
                 withTileSetMapping {
-                    tileSetAssetRef("${tileSetName}${TILE_SET_ASSET_NAME_SUFFIX}")
+                    tileSetRef("${tileSetName}${TILE_SET_ASSET_NAME_SUFFIX}")
                     codeOffset = this@TiledTileMapAsset.tileSetAssetToCodeOffsetMapping[tileSetName] ?: 0
                 }
             }
@@ -144,9 +143,8 @@ class TiledTileMapAsset private constructor() : Asset(TiledTileMapAsset) {
         // dispose the tile map
         TileMap.delete(assetIndex)
         // dispose all tile set assets
-
         tileSetAssetToCodeOffsetMapping.keys.forEach{ tileSetName ->
-            TiledTileSetAsset.deactivate("${tileSetName}${TILE_SET_ASSET_NAME_SUFFIX}")
+            TiledTileSet.deactivate("${tileSetName}${TILE_SET_ASSET_NAME_SUFFIX}")
         }
         tileSetAssetToCodeOffsetMapping.clear()
         assetIndex = -1

@@ -61,18 +61,18 @@ class PlatformerCollisionResolver : CollisionResolver() {
     @JvmField var looseGroundContactCallback: (Int) -> Unit = VOID_INT_CONSUMER
     @JvmField var onSlopeCallback: (Int, Int, FullContactScan) -> Unit = VOID_ON_SLOPE_CALLBACK
     @JvmField val fullContactConstraintRef = CLooseReference(ContactConstraint)
-    @JvmField val terrainContactConstraintRef = CLooseReference(ContactConstraint)
+    @JvmField val terrainContactConstraintRef = CLooseReference(ContactConstraint) { initTerrainContact() }
 
     fun withFullContactCallback(
         material: Aspect = UNDEFINED_MATERIAL,
         contact: Aspect = UNDEFINED_CONTACT_TYPE,
         callback: (FullContactScan) -> Boolean) = fullContactCallbacks.add(CollisionCallback(material, contact, callback))
 
+
     fun withTerrainContactConstraint(gapSouth: Int = 5, configure: (ContactConstraint.() -> Unit)): ComponentKey {
         this.gapSouth = gapSouth
         val result = ContactConstraint.build(configure)
         terrainContactConstraintRef(result)
-        initTerrainContact()
         return result
     }
 
@@ -80,7 +80,6 @@ class PlatformerCollisionResolver : CollisionResolver() {
         this.gapSouth = gapSouth
         val result = ContactConstraint[constraintName]
         terrainContactConstraintRef(result)
-        initTerrainContact()
         return ContactConstraint.getKey(result.index)
     }
 

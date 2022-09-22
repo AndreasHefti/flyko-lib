@@ -192,13 +192,13 @@ class TileMapData {
 }
 
 class TileSetAssetMapping {
-    var tileSetAssetRef = CReference(Asset)
+    var tileSetRef = CReference(TileSet)
     val tileSetIndex: Int
         get() {
-            val asset = Asset[tileSetAssetRef.targetKey]
-            if (!asset.loaded)
-                Asset.load(tileSetAssetRef.targetKey)
-            return asset.assetIndex
+            val tileSet = TileSet[tileSetRef.targetKey]
+            if (!tileSet.loaded)
+                TileSet.load(tileSetRef.targetKey)
+            return tileSet.index
         }
     var codeOffset = 1
 }

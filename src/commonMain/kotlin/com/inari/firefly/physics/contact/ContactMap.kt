@@ -91,7 +91,7 @@ abstract class ContactMap protected constructor() : ComponentNode(ContactMap), V
         }
 
         private val entityListener: ComponentEventListener = { key, type ->
-            val entity = Entity[key.instanceIndex]
+            val entity =  Entity[key.instanceIndex]
             if (EContact in entity.aspects && ETile !in entity.aspects) {
                 when (type) {
                     ComponentEventType.ACTIVATED -> COMPONENT_MAPPING.forEach {

@@ -28,10 +28,6 @@ abstract class Control protected constructor() : Component(Control) {
     companion object : ComponentSystem<Control>("Control") {
         override fun allocateArray(size: Int): Array<Control?> = arrayOfNulls(size)
         override fun create() = throw UnsupportedOperationException("Control is abstract use sub type builder instead")
-
-//        internal val CONTROLLED: DynArray<BitSet> = DynArray.of()
-//        fun isControlledBy(controllerIndex: Int, componentKey: ComponentKey)
-//            = CONTROLLED[componentKey.type.aspectIndex]?.get(controllerIndex) ?: false
     }
 }
 
@@ -80,6 +76,9 @@ abstract class SystemControl protected constructor(
 class ControllerReferences(val componentType: ComponentType<out Component>) {
 
     private var indexes: BitSet? = null
+
+    fun clear() = indexes?.clear()
+    operator fun contains(index: Int) = indexes?.get(index) ?: false
     internal fun register(key: ComponentKey) {
         if (key === Component.NO_COMPONENT_KEY)
             throw IllegalStateException("Illegal control key, NO_COMPONENT_KEY")
@@ -90,16 +89,11 @@ class ControllerReferences(val componentType: ComponentType<out Component>) {
         if (componentType.aspectIndex != control.controlledType.aspectIndex)
             throw IllegalStateException("Illegal control key, control type mismatch: ${control.controlledType.subTypeName} : ${componentType.typeName}")
 
-        register(key.instanceIndex)
-    }
-    internal fun register(index: Int) {
         if (indexes == null)
             indexes = BitSet()
-        indexes?.set(index, true)
+        indexes?.set(key.instanceIndex, true)
     }
     internal fun dispose(index: Int) = indexes?.set(index, false)
-    fun clear() = indexes?.clear()
-    operator fun contains(index: Int) = indexes?.get(index) ?: false
 }
 
 interface Controlled {
@@ -110,23 +104,6 @@ interface Controlled {
     fun withControl(key: ComponentKey) = controllerReferences.register(key)
     fun <CTRL : SystemControl> withControl(builder: ComponentBuilder<CTRL>, configure: (CTRL.() -> Unit)) =
         controllerReferences.register(builder.build(configure))
-
-//    private fun register(key: ComponentKey) {
-//        if (key === Component.NO_COMPONENT_KEY)
-//            throw IllegalStateException("Illegal control key, NO_COMPONENT_KEY")
-//        if (key.instanceIndex < 0)
-//            throw IllegalStateException("Control key has no instance yet")
-//
-//        val control = Control[key] as SystemControl
-//        if (componentType.aspectIndex != control.controlledType.aspectIndex)
-//            throw IllegalStateException("Illegal control key, control type mismatch: ${control.controlledType.subTypeName} : ${componentType.typeName}")
-//
-//        controllerReferences.register(key.instanceIndex)
-////        if (componentType.aspectIndex !in CONTROLLED)
-////            CONTROLLED[componentType.aspectIndex] = BitSet()
-////
-////        CONTROLLED[componentType.aspectIndex]?.set(key.instanceIndex, true)
-//    }
 
 }
 
