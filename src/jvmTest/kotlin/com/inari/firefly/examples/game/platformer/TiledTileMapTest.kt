@@ -51,9 +51,13 @@ fun initControl() {
     keyInput1.mapKeyInput(ButtonType.BUTTON_0, GLFW.GLFW_KEY_P)
     keyInput1.mapKeyInput(ButtonType.QUIT, GLFW.GLFW_KEY_ESCAPE)
 
+//    VelocityVerletIntegrator.buildAndActivate {
+//        name = "moveIntegrator"
+//        massFactor = 1.5f
+//    }
     SimpleVelocityStepIntegrator.buildAndActivate {
         name = "moveIntegrator"
-        //gravityVec(0f,0f)
+        massFactor = 3f
     }
 }
 
@@ -111,12 +115,11 @@ fun initPlayerTasks() {
                 }
                 withComponent(EMovement) {
                     integrator("moveIntegrator")
-                    mass = 25f
+                    mass = 50f
                     maxVelocityWest = 50f
                     maxVelocityEast = 50f
                     maxVelocityNorth = 200f
                     maxVelocitySouth = 100f
-                    //force(0.0f, -8.8f)
                 }
                 withComponent(EContact) {
                     val fullContactId = withConstraint(ContactConstraint) {

@@ -157,8 +157,7 @@ class TiledTileSetJSONAsset private constructor() : Asset() {
         FFContext.delete(tileSetId)
         tileSetId = NO_COMP_ID
         textureAssetId = NO_COMP_ID
-
-                    }
+    }
 
     override fun componentType() = Companion
     companion object : SystemComponentSubType<Asset, TiledTileSetJSONAsset>(Asset, TiledTileSetJSONAsset::class) {

@@ -82,15 +82,6 @@ class ControllerInputTest : DesktopApp() {
         FFContext.input.createOrAdapter("KeyInput", "KeyInput1", "KeyInput2")
         FFContext.input.createOrAdapter("AllInput", "KeyInput", "ControllerInput")
 
-//        //val controller = keyInput3.controllerDefinitions
-//        if (controller.isNotEmpty()) {
-//            keyInput3.slot = 0
-//            FFContext.input.createOrAdapter("KeyInputOr", "KeyInput1", "KeyInput2")
-//            FFContext.input.createOrAdapter("KeyInput", "KeyInputOr", "KeyInput3")
-//        } else {
-//            FFContext.input.createOrAdapter("KeyInput", "KeyInput1", "KeyInput2")
-//        }
-
         textId = Entity.buildAndActivate {
             withComponent(ETransform) {
                 position(100, 100)

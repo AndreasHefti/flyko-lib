@@ -10,6 +10,8 @@ import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.TextureAsset
 import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.sprite.SpriteAsset
+import com.inari.firefly.info.FFInfoSystem
+import com.inari.firefly.info.FrameRateInfo
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.EasedFloatAnimation
 import com.inari.util.geom.Easing
@@ -19,6 +21,11 @@ fun main(args: Array<String>) {
 
         // This is called from the API at startup to do all the initialization setup
         override fun init() {
+
+            FFInfoSystem
+                .addInfo(FrameRateInfo)
+                .activate()
+
             // Create a TextureAsset and register it to the AssetSystem but not loading yet.
             //
             // WIth this method you are able to define all your assets in one place without

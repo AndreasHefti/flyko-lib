@@ -16,6 +16,7 @@ import com.inari.firefly.entity.EMultiplier
 import com.inari.firefly.entity.Entity
 import com.inari.firefly.graphics.ETransform
 import com.inari.firefly.graphics.rendering.Renderer
+import com.inari.firefly.graphics.sprite.SpriteSetAsset
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGrid
 import com.inari.firefly.graphics.tile.TileGridSystem
@@ -322,7 +323,7 @@ class TileMap private constructor() : SystemComponent(TileMap::class.simpleName!
     class TileSetAssetMapping {
         @JvmField internal var tileSetAssetRef = -1
 
-        var tileSetAsset = ComponentRefResolver(Asset) { index -> tileSetAssetRef = index }
+        var tileSetAsset = ComponentRefResolver(SpriteSetAsset) { index -> tileSetAssetRef = index }
         var codeOffset = 1
     }
 

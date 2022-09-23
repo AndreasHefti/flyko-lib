@@ -35,8 +35,5 @@ class SimpleTileGridRenderer private constructor() : Renderer() {
     override fun componentType() = Companion
     companion object : SingletonComponent<Renderer, SimpleTileGridRenderer>(Renderer, SimpleTileGridRenderer::class) {
         override fun create() = SimpleTileGridRenderer()
-        private val MATCHING_ASPECTS = EntityComponent.ENTITY_COMPONENT_ASPECTS.createAspects(
-            ETransform, ETile
-        )
     }
 }

@@ -20,22 +20,21 @@ class ControllerTest : DesktopApp() {
     private var textId3 = NO_COMP_ID
 
 
-
     private val updateCall: Call = {
-        val bytes: ByteBuffer = GLFW.glfwGetJoystickButtons(GLFW.GLFW_JOYSTICK_1)!!
-        val axes: FloatBuffer = GLFW.glfwGetJoystickAxes(GLFW.GLFW_JOYSTICK_1)!!
-        val hats: ByteBuffer = GLFW.glfwGetJoystickHats(GLFW.GLFW_JOYSTICK_1)!!
-        val bytesArray = ByteArray(bytes.remaining())
-        val floatArray = FloatArray(axes.remaining())
-        val hatsArray = ByteArray(hats.remaining())
-        bytes.get(bytesArray, 0, bytesArray.size)
-        axes.get(floatArray, 0, floatArray.size)
-        hats.get(hatsArray, 0, hatsArray.size)
-        text1.clear().append(bytesArray.contentToString())
-        text2.clear().append(floatArray.contentToString())
-        if (hats.hasRemaining())
-            text3.clear().append(hats[0])
-
+        val bytes: ByteBuffer? = GLFW.glfwGetJoystickButtons(GLFW.GLFW_JOYSTICK_1)
+        val axes: FloatBuffer? = GLFW.glfwGetJoystickAxes(GLFW.GLFW_JOYSTICK_1)
+        val hats: ByteBuffer? = GLFW.glfwGetJoystickHats(GLFW.GLFW_JOYSTICK_1)
+        if (bytes != null && axes != null && hats != null) {
+            val bytesArray = ByteArray(bytes.remaining())
+            val floatArray = FloatArray(axes.remaining())
+            val hatsArray = ByteArray(hats.remaining())
+            bytes.get(bytesArray, 0, bytesArray.size)
+            axes.get(floatArray, 0, floatArray.size)
+            hats.get(hatsArray, 0, hatsArray.size)
+            text1.clear().append(bytesArray.contentToString())
+            text2.clear().append(floatArray.contentToString())
+            text3.clear().append(hats.get(0))
+        }
     }
 
     override fun init() {

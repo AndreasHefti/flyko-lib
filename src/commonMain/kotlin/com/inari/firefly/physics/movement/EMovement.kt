@@ -21,7 +21,7 @@ class EMovement private constructor() : EntityComponent(EMovement::class.simpleN
 
     @JvmField var active = true
     @JvmField val integrator = ComponentRefResolver(Integrator) { index-> integratorRef = index }
-    @JvmField var mass = ZERO_FLOAT
+    @JvmField var mass = 1f
     @JvmField val force = Vector2f(0f, 0f)
     @JvmField val acceleration = Vector2f(0f, 0f)
     @JvmField val velocity = Vector2f(0f, 0f)

@@ -89,14 +89,3 @@ object ShaderTest1 {
         }
     }
 }
-
-object ShaderTest2 {
-    @JvmStatic fun main(args: Array<String>) {
-        object : DesktopRunner("ShaderTest2", 600, 400) {
-            override fun init() {
-                dispose()
-                DesktopAppAdapter.exit()
-            }
-        }
-    }
-}

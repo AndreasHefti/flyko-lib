@@ -150,8 +150,6 @@ class RoomMetaJson(
     @JvmField val attributes: Map<String, String> = emptyMap()
 )
 
-
-
 class TiledTileMap(
     @JvmField val width: Int,
     @JvmField val height: Int,

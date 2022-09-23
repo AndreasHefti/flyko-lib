@@ -12,8 +12,7 @@ import com.inari.util.geom.Vector4i
 
 class FullTileGridRenderer private constructor() : Renderer() {
 
-    override fun match(entity: Entity): Boolean =
-        entity.components.include(MATCHING_ASPECTS)
+    override fun match(entity: Entity): Boolean = false
 
     override fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i) {
         val tileGridList = TileGridSystem[viewIndex, layerIndex] ?: return
