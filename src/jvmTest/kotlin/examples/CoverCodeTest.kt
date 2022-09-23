@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
     DesktopApp( "CoverCodeTest", 800, 600) {
 
         // Create a TextureAsset and register it to the AssetSystem but not loading yet.
-        Texture.build {
+        Texture {
             name = "logoTexture"
             resourceName = "firefly/logo.png"
             // Create and activate/load a SpriteAsset with reference to the TextureAsset.
@@ -30,7 +30,7 @@ fun main(args: Array<String>) {
         }
         // Create an Entity positioned on the base View on x=50/y=150, and the formerly
         // created sprite with a tint color. This also automatically loads the needed assets if not already done
-        val entityId = Entity {
+        Entity {
             // automatically activate after creation
             autoActivation = true
             // add a transform component to the entity that defines the orientation of the Entity
