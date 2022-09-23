@@ -8,8 +8,8 @@ import com.inari.firefly.core.api.InputAPIImpl
 import com.inari.firefly.game.PlatformerCollisionResolver
 import com.inari.firefly.game.json.AreaJsonAsset
 import com.inari.firefly.game.tile.TileMaterialType
+import com.inari.firefly.game.json.TiledTileMapData
 import com.inari.firefly.game.json.TiledTileMap
-import com.inari.firefly.game.json.TiledTileMapAsset
 import com.inari.firefly.game.tile.TileContactFormType
 import com.inari.firefly.game.tile.TileMap
 import com.inari.firefly.game.world.*
@@ -146,12 +146,12 @@ fun initAreaTasks() {
             Room.forEachDo { room ->
                 if (room.parent.name == area.name) {
                     // load room tiled resource and create tile set asset for the room
-                    TiledTileMapAsset {
-                        name = "${room.name}_MapAsset"
+                    TiledTileMap {
+                        name = "${room.name}_TileMap"
                         viewRef("testView")
                         resourceSupplier = {
                             val tiledMapFile = room.getAttribute("tiledRoomResource")!!
-                            Engine.resourceService.loadJSONResource(tiledMapFile, TiledTileMap::class) }
+                            Engine.resourceService.loadJSONResource(tiledMapFile, TiledTileMapData::class) }
                     }
                 }
             }
@@ -187,9 +187,7 @@ fun initRoomTasks() {
             println("activateRoom -> ${Room[id]}")
 
             val roomName = Room[id].name
-
-            Asset.load("${roomName}_MapAsset")
-            TileMap.activate(Asset["${roomName}_MapAsset"].assetIndex)
+            TiledTileMap.activate("${roomName}_TileMap")
             Player.load("player1")
 
             // connect player to camera
@@ -203,8 +201,7 @@ fun initRoomTasks() {
             println("deactivateRoom -> $id")
 
             val roomName = Room[id].name
-            TileMap.deactivate(Asset["${roomName}_MapAsset"].assetIndex)
-            Asset.dispose("${roomName}_MapAsset")
+            TiledTileMap.dispose("${roomName}_TileMap")
         }
     }
     Task {

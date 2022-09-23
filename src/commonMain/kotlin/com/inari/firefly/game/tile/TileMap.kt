@@ -17,7 +17,7 @@ import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 import kotlin.math.floor
 
-class TileMap private constructor(): ComponentNode(TileMap) {
+open class TileMap : ComponentNode(TileMap) {
 
     val viewIndex: Int
         get() = viewRef.targetKey.instanceIndex
@@ -34,18 +34,6 @@ class TileMap private constructor(): ComponentNode(TileMap) {
         val instance = TileMapData()
         instance.also(configure)
         tileMapData[instance.layerIndex] = instance
-    }
-
-    override fun load() {
-        super.load()
-        // load all involved assets (texture assets, tile set assets)
-//        tileMapData.forEach {
-//            it.tileSetMapping.forEach { tileMap ->
-//                Asset.activate(tileMap.tileSetAssetRef.targetKey)
-//            }
-//        }
-
-        // TODO create inactive entities for decoration
     }
 
     override fun activate() {
@@ -73,17 +61,6 @@ class TileMap private constructor(): ComponentNode(TileMap) {
             deactivateTileSetsForLayer(data)
         }
         super.deactivate()
-    }
-
-    override fun dispose() {
-        // disposes all involved assets
-//        tileMapData.forEach {
-//            it.tileSetMapping.forEach { tileMap ->
-//                Asset.dispose(tileMap.tileSetAssetRef.targetKey)
-//            }
-//        }
-
-        super.dispose()
     }
 
     fun getTileEntityIndex(code: Int, layerKey: ComponentKey): Int =

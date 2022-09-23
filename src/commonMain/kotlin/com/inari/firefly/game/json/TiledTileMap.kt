@@ -3,28 +3,20 @@ package com.inari.firefly.game.json
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.game.tile.TileMap
-import com.inari.firefly.graphics.view.View
 import com.inari.firefly.graphics.view.ViewSystemRenderer
 import com.inari.firefly.physics.contact.SimpleContactMap
 import com.inari.util.COLON
 import com.inari.util.COMMA
-import com.inari.util.NO_NAME
 import com.inari.util.geom.GeomUtils
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
-class TiledTileMapAsset private constructor() : Asset(TiledTileMapAsset) {
+class TiledTileMap private constructor() : TileMap() {
 
-    @JvmField var resourceSupplier: () -> TiledTileMap = { throw RuntimeException() }
+    @JvmField var resourceSupplier: () -> TiledTileMapData = { throw RuntimeException() }
     @JvmField var encryptionKey: String? = null
     @JvmField var defaultBlend = BlendMode.NONE
     @JvmField var defaultTint = Vector4f(1f, 1f, 1f, 1f)
-    @JvmField var viewRef = CReference(View)
-    var resourceName: String = NO_NAME
-        set(value) {
-            field = value
-            resourceSupplier = { Engine.resourceService.loadJSONResource(value, TiledTileMap::class, encryptionKey) }
-        }
 
     private val tileSetAssetToCodeOffsetMapping = mutableMapOf<String, Int>()
 
@@ -57,28 +49,22 @@ class TiledTileMapAsset private constructor() : Asset(TiledTileMapAsset) {
             tileSetAssetToCodeOffsetMapping[tileSetName] = tileMapJson.tilesets[index].firstgid
         }
 
-        // build TileMap
-        assetIndex = TileMap {
-            name = tileMapJson.mappedProperties[PROP_NAME_NAME]?.stringValue ?: super.name
-            viewRef(this@TiledTileMapAsset.viewRef)
-            tileMapJson.layers.forEach { layerJson ->
-                if (layerJson.type == PROP_NAME_TILE_LAYER)
-                    this@TiledTileMapAsset.loadTileLayer(this, tileMapJson, layerJson)
-                else if (layerJson.type == PROP_NAME_OBJECT_LAYER)
-                    this@TiledTileMapAsset.loadObjectLayer(this, tileMapJson, layerJson)
-            }
-        }.instanceIndex
+        tileMapJson.layers.forEach { layerJson ->
+            if (layerJson.type == PROP_NAME_TILE_LAYER)
+                this@TiledTileMap.loadTileLayer(this, tileMapJson, layerJson)
+            else if (layerJson.type == PROP_NAME_OBJECT_LAYER)
+                this@TiledTileMap.loadObjectLayer(this, tileMapJson, layerJson)
+        }
     }
 
-    private fun loadObjectLayer(tileMap: TileMap, tileMapJson: TiledTileMap, layerJson: TiledLayer) {
+    private fun loadObjectLayer(tileMap: TileMap, tileMapJson: TiledTileMapData, layerJson: TiledLayer) {
 
         if (layerJson.mappedProperties.containsKey(PROP_NAME_ADD_CONTACT_MAP)) {
             val contactMap = SimpleContactMap.build {
-                viewRef(this@TiledTileMapAsset.viewRef)
+                viewRef(this@TiledTileMap.viewRef)
                 layerRef(layerJson.name)
             }
             tileMap.withChild(contactMap)
-            //tileMap.compositeIds + contactMap
         }
 
         layerJson.objects!!.forEach { tiledObject ->
@@ -101,7 +87,7 @@ class TiledTileMapAsset private constructor() : Asset(TiledTileMapAsset) {
         }
     }
 
-    private fun loadTileLayer(tileMap: TileMap, tileMapJson: TiledTileMap, layerJson: TiledLayer) {
+    private fun loadTileLayer(tileMap: TileMap, tileMapJson: TiledTileMapData, layerJson: TiledLayer) {
         val layerTileSets = layerJson.mappedProperties[PROP_NAME_TILE_SETS]?.stringValue
             ?: throw RuntimeException("Missing tile sets for layer")
 
@@ -130,28 +116,29 @@ class TiledTileMapAsset private constructor() : Asset(TiledTileMapAsset) {
             tileSetNames.forEach { tileSetName ->
                 withTileSetMapping {
                     tileSetRef("${tileSetName}${TILE_SET_ASSET_NAME_SUFFIX}")
-                    codeOffset = this@TiledTileMapAsset.tileSetAssetToCodeOffsetMapping[tileSetName] ?: 0
+                    codeOffset = this@TiledTileMap.tileSetAssetToCodeOffsetMapping[tileSetName] ?: 0
                 }
             }
         }
     }
 
     override fun dispose() {
-        if (assetIndex < 0)
-            return
-
-        // dispose the tile map
-        TileMap.delete(assetIndex)
-        // dispose all tile set assets
         tileSetAssetToCodeOffsetMapping.keys.forEach{ tileSetName ->
             TiledTileSet.deactivate("${tileSetName}${TILE_SET_ASSET_NAME_SUFFIX}")
         }
         tileSetAssetToCodeOffsetMapping.clear()
-        assetIndex = -1
+        val tileMapJson = resourceSupplier()
+        tileMapJson.layers.forEach { layerJson ->
+            layerJson.objects?.forEach { tiledObject ->
+                if (tiledObject.type.startsWith(COMPOSITE_OBJECT_NAME_PREFIX))
+                    Composite.delete(tiledObject.name)
+            }
+        }
+
         super.dispose()
     }
 
-    companion object : ComponentSubTypeBuilder<Asset, TiledTileMapAsset>(Asset,"TiledTileMapAsset") {
-        override fun create() = TiledTileMapAsset()
+    companion object : ComponentSubTypeBuilder<TileMap, TiledTileMap>(TileMap,"TiledTileMapAsset") {
+        override fun create() = TiledTileMap()
     }
 }

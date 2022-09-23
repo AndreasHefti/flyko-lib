@@ -58,7 +58,7 @@ class RoomData(
     @JvmField val attributes: Map<String, String> = emptyMap()
 )
 
-class TiledTileMap(
+class TiledTileMapData(
     @JvmField val width: Int,
     @JvmField val height: Int,
     @JvmField val tilewidth: Int,

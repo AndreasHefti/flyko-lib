@@ -1,8 +1,6 @@
 package com.inari.firefly.game.tile
 
-import com.inari.firefly.core.Asset
 import com.inari.firefly.core.CReference
-import com.inari.firefly.core.Component
 import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.game.tile.TileUtils.TILE_ASPECT_GROUP
@@ -165,7 +163,7 @@ class TileDecoration {
 class TileMapData {
 
     @JvmField internal val entityCodeMapping = DynIntArray(100, -1, 100)
-    @JvmField internal val tileSetMapping = DynArray.of<TileSetAssetMapping>(5, 5)
+    @JvmField internal val tileSetMapping = DynArray.of<TileSetMapping>(5, 5)
     @JvmField internal var tileGridIndex = -1
 
     @JvmField var renderer: EntityRenderer? = null
@@ -184,14 +182,14 @@ class TileMapData {
     val layerIndex: Int
         get() = if (layer.targetKey.instanceIndex >= 0) layer.targetKey.instanceIndex else 0
 
-    val withTileSetMapping: (TileSetAssetMapping.() -> Unit) -> Unit = { configure ->
-        val instance = TileSetAssetMapping()
+    val withTileSetMapping: (TileSetMapping.() -> Unit) -> Unit = { configure ->
+        val instance = TileSetMapping()
         instance.also(configure)
         tileSetMapping.add(instance)
     }
 }
 
-class TileSetAssetMapping {
+class TileSetMapping {
     var tileSetRef = CReference(TileSet)
     val tileSetIndex: Int
         get() {

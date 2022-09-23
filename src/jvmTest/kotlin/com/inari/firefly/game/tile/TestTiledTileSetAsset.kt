@@ -40,11 +40,13 @@ class TestTiledTileSetAsset {
             }
         }
 
+        TileMap.load("tileMap")
 
         assertTrue(TiledTileSet.exists("testTileSet"))
         assertFalse(TiledTileSet["testTileSet"].loaded)
+        assertTrue{ TileMap.getTileEntityIndex(1) == -1 }
 
-        TileMap.load("tileMap")
+        TileMap.activate("tileMap")
 
         // check all expected assets and components are created correctly
         val tiledTileSetAsset = TiledTileSet["testTileSet"]
@@ -54,7 +56,6 @@ class TestTiledTileSetAsset {
         val textureAsset = Texture[textureAssetName]
         assertNotNull(textureAsset)
         assertTrue { textureAsset.loaded }
-        //assertEquals("tiles/outline_16_16.png", GraphicsMock._loadedAssets[0])
 
         assertTrue { TileSet.exists("testTileSet") }
         val tileSet = TileSet["testTileSet"]
@@ -276,7 +277,7 @@ class TestTiledTileSetAsset {
 
 
         // test tile map activation
-        assertTrue{ TileMap.getTileEntityIndex(1) == -1 }
+        assertTrue{ TileMap.getTileEntityIndex(1) != -1 }
         TileMap.activate("tileMap")
 
         var entityRefId = TileMap.getTileEntityIndex(1)
