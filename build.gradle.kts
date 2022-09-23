@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.inari.firefly"
-version = "2.0-SNAPSHOT"
+version = "0.3"
 
 repositories {
     mavenCentral()
