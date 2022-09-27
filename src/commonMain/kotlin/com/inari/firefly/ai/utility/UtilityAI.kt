@@ -106,8 +106,8 @@ class Intention private constructor() : UtilityAI() {
     fun withConsideration(key: ComponentKey) {
         considerations[key.instanceIndex] = true
     }
-    fun <A : Consideration> withConsideration(cBuilder: ComponentBuilder<A>, configure: (A.() -> Unit)): ComponentKey {
-        val result = cBuilder.build(configure)
+    fun withConsideration(configure: (Consideration.() -> Unit)): ComponentKey {
+        val result = Consideration.build(configure)
         considerations.set(result.instanceIndex)
         return result
     }
@@ -140,8 +140,8 @@ class UtilityAction private constructor() : UtilityAI() {
     fun withConsideration(key: ComponentKey) {
         considerations[key.instanceIndex] = true
     }
-    fun <A : Consideration> withConsideration(cBuilder: ComponentBuilder<A>, configure: (A.() -> Unit)): ComponentKey {
-        val result = cBuilder.build(configure)
+    fun withConsideration(configure: (Consideration.() -> Unit)): ComponentKey {
+        val result = Consideration.build(configure)
         considerations.set(result.instanceIndex)
         return result
     }

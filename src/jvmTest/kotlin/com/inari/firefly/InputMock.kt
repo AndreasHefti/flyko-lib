@@ -50,7 +50,7 @@ object InputMock : InputAPI {
         TODO("Not yet implemented")
     }
 
-    override fun setButtonCallback(device: String, callback: ButtonCallback) {
+    override fun setButtonCallback(deviceName: String, callback: ButtonCallback) {
         TODO("Not yet implemented")
     }
 

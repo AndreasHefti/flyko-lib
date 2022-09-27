@@ -1,7 +1,6 @@
 package com.inari.firefly.physics.animation
 
 import com.inari.firefly.core.*
-import com.inari.util.ZERO_FLOAT
 import com.inari.util.collection.DynArray
 import com.inari.util.geom.CubicBezierCurve.Companion.bezierCurveAngleX
 import com.inari.util.geom.CubicBezierCurve.Companion.bezierCurvePoint
@@ -21,25 +20,15 @@ abstract class Animation<D : AnimatedData>(
         super.dispose()
     }
 
-    override fun update() =
-        animatedData.forEach { update(it) }
+    override fun update() = animatedData.forEach {
+        if (it.active)
+            update(it)
+        else if (it.condition(it))
+            it.active = true
+    }
 
     protected abstract fun update(data: D)
     protected abstract fun accept(data: AnimatedData): D?
-
-    protected fun applyTimeStep(timeStep: Float, data: AnimatedData): Boolean {
-        data.normalizedTime += timeStep
-        if (data.normalizedTime >= 1.0f) {
-            data.normalizedTime = 0.0f
-            // animation step finished
-            if (data.looping) {
-                if (data.inverseOnLoop)
-                    data.inversed = !data.inversed
-            } else
-                return false
-        }
-        return true
-    }
 
     private fun entityListener(key: ComponentKey, type: ComponentEventType) {
         if (type == ComponentEventType.ACTIVATED) notifyActivation(Entity[key])
@@ -80,19 +69,12 @@ object DefaultFloatEasing : Animation<EasedFloatAnimation>(DynArray.of(5, 10)) {
 
     override fun update(data: EasedFloatAnimation) {
         val timeStep = Engine.timer.timeElapsed.toFloat() / data.duration
-        if (applyTimeStep(timeStep, data))
+        if (data.applyTimeStep(timeStep))
             // calc and apply eased value
             if (data.inversed)
                 data.accessor(GeomUtils.lerp(data.endValue, data.startValue, data.easing(data.normalizedTime)))
             else
                 data.accessor(GeomUtils.lerp(data.startValue, data.endValue, data.easing(data.normalizedTime)))
-        else {
-            // animation finished
-            if (data.resetOnFinish)
-                data.accessor(data.startValue)
-            animatedData.remove(data)
-            data.callback()
-        }
     }
 
     override fun accept(data: AnimatedData): EasedFloatAnimation? =
@@ -109,7 +91,7 @@ object BezierCurveAnimationControl: Animation<BezierCurveAnimation>(DynArray.of(
 
     override fun update(data: BezierCurveAnimation) {
         val timeStep = Engine.timer.timeElapsed.toFloat() / data.duration
-        if (applyTimeStep(timeStep, data))
+        if (data.applyTimeStep(timeStep))
             if (data.inversed) {
                 val pos = bezierCurvePoint(data.curve, data.easing(data.normalizedTime), true)
                 data.accessorX(pos.x)
@@ -121,15 +103,6 @@ object BezierCurveAnimationControl: Animation<BezierCurveAnimation>(DynArray.of(
                 data.accessorY(pos.y)
                 data.accessorRot(GeomUtils.radToDeg(bezierCurveAngleX(data.curve, data.easing(data.normalizedTime))))
             }
-        else {
-            if (data.resetOnFinish) {
-                data.accessorX(data.curve.p0.x)
-                data.accessorY(data.curve.p0.y)
-                data.accessorRot(ZERO_FLOAT)
-            }
-            animatedData.remove(data)
-            data.callback()
-        }
     }
 
     override fun accept(data: AnimatedData): BezierCurveAnimation? =
@@ -147,7 +120,7 @@ object BezierSplineAnimationControl : Animation<BezierSplineAnimation>(DynArray.
 
     override fun update(data: BezierSplineAnimation) {
         val timeStep = Engine.timer.timeElapsed.toFloat() / data.duration
-        if (applyTimeStep(timeStep, data)) {
+        if (data.applyTimeStep(timeStep)) {
             if (data.inversed) {
                 val normTime = 1f - data.normalizedTime
                 val curveSegment = data.spline.getAtNormalized(normTime)
@@ -164,16 +137,6 @@ object BezierSplineAnimationControl : Animation<BezierSplineAnimation>(DynArray.
                 data.accessorY(pos.y)
                 data.accessorRot(GeomUtils.radToDeg(bezierCurveAngleX(curveSegment.curve, curveSegment.easing(segmentNormTime))))
             }
-        } else {
-            if (data.resetOnFinish) {
-                data.spline.getAtNormalized(ZERO_FLOAT).curve.also {
-                    data.accessorX(it.p0.x)
-                    data.accessorY(it.p0.y)
-                    data.accessorRot(GeomUtils.radToDeg(bezierCurveAngleX(it, ZERO_FLOAT)))
-                }
-            }
-            animatedData.remove(data)
-            data.callback()
         }
     }
 
@@ -191,7 +154,7 @@ object IntFrameAnimationControl : Animation<IntFrameAnimation>(DynArray.of(5, 10
 
     override fun update(data: IntFrameAnimation) {
         val timeStep = Engine.timer.timeElapsed.toFloat() / data.duration
-        if (applyTimeStep(timeStep, data)) {
+        if (data.applyTimeStep(timeStep)) {
             var t = 0f
             var i = if (data.inversed) data.timeline.size else  -1
             while (t <= data.normalizedTime && i < data.timeline.size - 1) {
@@ -199,12 +162,6 @@ object IntFrameAnimationControl : Animation<IntFrameAnimation>(DynArray.of(5, 10
                 t += data.timeline[i].timeInterval / data.duration.toFloat()
             }
             data.accessor(data.timeline[i].value)
-        } else {
-            // animation finished
-            if (data.resetOnFinish)
-                data.accessor(data.timeline[0].value)
-            animatedData.remove(data)
-            data.callback()
         }
     }
 

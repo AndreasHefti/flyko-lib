@@ -17,7 +17,16 @@ class EAnimation private constructor() : EntityComponent(EAnimation) {
 
     override fun activate() {
         super.activate()
-        animations.forEach { it.activate(entityIndex) }
+        animations.forEach {
+            it.init(entityIndex)
+            if (it.condition(it))
+                it.active = true
+        }
+    }
+
+    override fun deactivate() {
+        animations.forEach { it.active = false }
+        super.deactivate()
     }
 
     override fun reset() {

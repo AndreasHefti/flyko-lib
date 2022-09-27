@@ -150,7 +150,7 @@ abstract class ContactMap protected constructor() : ComponentNode(ContactMap), V
 
 class SimpleContactMap private constructor(): ContactMap() {
 
-    override fun update(entityId: Int, transform: ETransform, collision: EContact) {
+    override fun update(entityIndex: Int, transform: ETransform, collision: EContact) {
         // not needed here since this is just an ordinary list
     }
 

@@ -1,12 +1,9 @@
 package com.inari.firefly.physics.animation
 
-import com.inari.util.FloatPropertyAccessor
-import com.inari.util.IntPropertyAccessor
-import com.inari.util.VOID_CALL
-import com.inari.util.VOID_FLOAT_PROPERTY_ACCESSOR_PROVIDER
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.Control
+import com.inari.util.*
 import com.inari.util.geom.*
 import kotlin.jvm.JvmField
 
@@ -16,17 +13,59 @@ interface AnimatedDataBuilder<D : AnimatedData> {
 
 abstract class AnimatedData {
 
+    var entityIndex = -1
+        internal set
+    var active = false
+        internal set
+
     @JvmField var duration = 0L
     @JvmField var normalizedTime = 0f
+    @JvmField var suspend = false
     @JvmField var looping = false
     @JvmField var inverseOnLoop = false
     @JvmField var resetOnFinish = true
     @JvmField var inversed = false
+    @JvmField var nextAnimation: AnimatedData? = null
+    @JvmField var condition: (AnimatedData) -> Boolean = TRUE_PREDICATE
     @JvmField var callback: () -> Unit = VOID_CALL
-
     @JvmField val animationController = CReference(Control)
 
-    abstract fun activate(entityIndex: Int)
+    fun <AD : AnimatedData> withNextAnimation(builder: AnimatedDataBuilder<AD>, configure: AD.() -> Unit) {
+        val result = builder.create()
+        result.also(configure)
+        nextAnimation = result
+    }
+
+    internal fun init(entityIndex: Int) {
+        this.entityIndex = entityIndex
+        initialize()
+    }
+
+    internal fun applyTimeStep(timeStep: Float): Boolean {
+        normalizedTime += timeStep
+        if (normalizedTime >= 1.0f) {
+            normalizedTime = 0.0f
+            if (suspend || !looping) {
+                finish()
+                nextAnimation?.active = true
+                return false
+            } else {
+                if (inverseOnLoop)
+                    inversed = !inversed
+            }
+        }
+        return true
+    }
+
+    private fun finish() {
+        if (resetOnFinish)
+            reset()
+        active = false
+        callback()
+    }
+
+    abstract fun initialize()
+    protected abstract fun reset()
 }
 
 @ComponentDSL
@@ -43,9 +82,12 @@ class EasedFloatAnimation private constructor() : AnimatedData() {
         override fun create() = EasedFloatAnimation()
     }
 
-    override fun activate(entityIndex: Int) {
+    override fun initialize() {
         accessor = animatedProperty(entityIndex)
     }
+
+    override fun reset() = accessor(startValue)
+
 }
 
 abstract class CurveAnimation protected constructor() : AnimatedData() {
@@ -58,7 +100,7 @@ abstract class CurveAnimation protected constructor() : AnimatedData() {
     internal lateinit var accessorY: FloatPropertyAccessor
     internal lateinit var accessorRot: FloatPropertyAccessor
 
-    override fun activate(entityIndex: Int) {
+    override fun initialize() {
         accessorX = animatedXProperty(entityIndex)
         accessorY = animatedYProperty(entityIndex)
         accessorRot = animatedRotationProperty(entityIndex)
@@ -75,6 +117,12 @@ class BezierCurveAnimation private constructor() : CurveAnimation() {
     companion object : AnimatedDataBuilder<BezierCurveAnimation> {
         override fun create() = BezierCurveAnimation()
     }
+
+    override fun reset() {
+        accessorX(curve.p0.x)
+        accessorY(curve.p0.y)
+        accessorRot(ZERO_FLOAT)
+    }
 }
 
 @ComponentDSL
@@ -88,6 +136,14 @@ class BezierSplineAnimation private constructor() : CurveAnimation() {
 
     companion object : AnimatedDataBuilder<BezierSplineAnimation> {
         override fun create() = BezierSplineAnimation()
+    }
+
+    override fun reset() {
+        spline.getAtNormalized(ZERO_FLOAT).curve.also {
+            accessorX(it.p0.x)
+            accessorY(it.p0.y)
+            accessorRot(GeomUtils.radToDeg(CubicBezierCurve.bezierCurveAngleX(it, ZERO_FLOAT)))
+        }
     }
 }
 
@@ -104,9 +160,11 @@ class IntFrameAnimation private constructor() : AnimatedData() {
 
     internal lateinit var accessor: IntPropertyAccessor
 
-    override fun activate(entityIndex: Int) {
+    override fun initialize() {
         accessor = animatedProperty(entityIndex)
     }
+
+    override fun reset() = accessor(timeline[0].value)
 
     companion object : AnimatedDataBuilder<IntFrameAnimation> {
         override fun create() = IntFrameAnimation()

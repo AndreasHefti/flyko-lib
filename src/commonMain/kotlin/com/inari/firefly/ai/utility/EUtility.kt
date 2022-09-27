@@ -25,8 +25,8 @@ class EUtility  private constructor() : EntityComponent(EUtility) {
     fun withIntention(key: ComponentKey) {
         intentions[key.instanceIndex] = true
     }
-    fun <A : Intention> withIntention(cBuilder: ComponentBuilder<A>, configure: (A.() -> Unit)): ComponentKey {
-        val result = cBuilder.build(configure)
+    fun withIntention(configure: (Intention.() -> Unit)): ComponentKey {
+        val result = Intention.build(configure)
         intentions.set(result.instanceIndex)
         return result
     }
@@ -37,8 +37,8 @@ class EUtility  private constructor() : EntityComponent(EUtility) {
     fun withAction(key: ComponentKey) {
         actions[key.instanceIndex] = true
     }
-    fun <A : UtilityAction> withAction(cBuilder: ComponentBuilder<A>, configure: (A.() -> Unit)): ComponentKey {
-        val result = cBuilder.build(configure)
+    fun withAction(configure: (UtilityAction.() -> Unit)): ComponentKey {
+        val result = UtilityAction.build(configure)
         actions.set(result.instanceIndex)
         return result
     }

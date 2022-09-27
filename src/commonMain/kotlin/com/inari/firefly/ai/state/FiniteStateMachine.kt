@@ -29,16 +29,16 @@ class StateChange internal constructor() {
 
     @JvmField
     val withDisposeStateTaskRef = CReference(Task)
-    fun <A : Task> withDisposeStateTask(cBuilder: ComponentBuilder<A>, configure: (A.() -> Unit)): ComponentKey {
-        val key = cBuilder.build(configure)
+    fun withDisposeStateTask(configure: (Task.() -> Unit)): ComponentKey {
+        val key = Task.build(configure)
         withDisposeStateTaskRef(key)
         return key
     }
 
     @JvmField
     val withInitStateTaskRef = CReference(Task)
-    fun <A : Task> withInitStateTask(cBuilder: ComponentBuilder<A>, configure: (A.() -> Unit)): ComponentKey {
-        val key = cBuilder.build(configure)
+    fun withInitStateTask(configure: (Task.() -> Unit)): ComponentKey {
+        val key = Task.build(configure)
         withInitStateTaskRef(key)
         return key
     }

@@ -8,6 +8,7 @@ import com.inari.util.NO_NAME
 import kotlin.collections.HashMap
 
 
+@ThreadLocal
 actual object InputAPIImpl : InputAPI {
 
     actual override val xpos: Int

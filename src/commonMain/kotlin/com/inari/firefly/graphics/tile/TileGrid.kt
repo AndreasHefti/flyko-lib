@@ -330,7 +330,7 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
             ITERATOR_POOL.add(this)
         }
 
-        private inline fun calcWorldPosition() {
+        private fun calcWorldPosition() {
             worldPosition(
                 tileGrid.position.x + clip.x * tileGrid.cellDim.v0,
                 tileGrid.position.y + clip.y * tileGrid.cellDim.v1

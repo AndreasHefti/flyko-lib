@@ -11,6 +11,7 @@ import com.inari.firefly.graphics.view.ViewSystemRenderer.NO_VIRTUAL_VIEW_PORTS
 import com.inari.util.collection.DynArray
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
+import kotlin.native.concurrent.ThreadLocal
 
 @Suppress("VARIABLE_IN_SINGLETON_WITHOUT_THREAD_LOCAL")
 object FFInfoSystem : System {
@@ -136,6 +137,7 @@ object FFInfoSystem : System {
     }
 }
 
+@ThreadLocal
 object FrameRateInfo : FFInfoSystem.SysInfo {
 
     private var lastSecondTime = -1L
