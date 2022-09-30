@@ -17,6 +17,8 @@ abstract class AnimatedData {
         internal set
     var active = false
         internal set
+    var finished = false
+        internal set
 
     @JvmField var duration = 0L
     @JvmField var normalizedTime = 0f
@@ -26,7 +28,7 @@ abstract class AnimatedData {
     @JvmField var resetOnFinish = true
     @JvmField var inversed = false
     @JvmField var nextAnimation: AnimatedData? = null
-    @JvmField var condition: (AnimatedData) -> Boolean = TRUE_PREDICATE
+    @JvmField var condition: (AnimatedData) -> Boolean = { !finished }
     @JvmField var callback: () -> Unit = VOID_CALL
     @JvmField val animationController = CReference(Control)
 
@@ -58,9 +60,10 @@ abstract class AnimatedData {
     }
 
     private fun finish() {
+        active = false
+        finished = true
         if (resetOnFinish)
             reset()
-        active = false
         callback()
     }
 
