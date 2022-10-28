@@ -1,6 +1,6 @@
 
 
-<img width="240" height="80" style="display: block; margin: 0 auto" src="https://github.com/AndreasHefti/flyko-lib/blob/master/fireflyLogo1.png"></img>
+<img width="240" height="80" style="display: block; margin: 0 auto" align="center" src="https://github.com/AndreasHefti/flyko-lib/blob/master/fireflyLogo1.png"></img>
 
 <p align="center">Simple but powerful 2D ECS Game API for Kotlin Multiplatform</p>
 
