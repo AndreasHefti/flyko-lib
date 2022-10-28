@@ -39,7 +39,6 @@ class Texture private constructor() : Asset(Texture), TextureData {
 
     override fun dispose() {
         if (assetIndex < 0) return
-        println("*********** dispose texture: $name")
         Engine.graphics.disposeTexture(assetIndex)
         assetIndex = -1
         width = -1

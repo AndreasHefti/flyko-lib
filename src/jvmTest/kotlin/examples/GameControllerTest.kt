@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
-fun main(args: Array<String>) {
+fun main() {
     DesktopApp("GameControllerTest", 800, 600) {
         var text1 = StringBuilder("")
         var text2 = StringBuilder("")

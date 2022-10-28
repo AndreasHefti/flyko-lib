@@ -13,7 +13,7 @@ import com.inari.firefly.graphics.view.ETransform
 import org.lwjgl.glfw.GLFW
 
 
-fun main(args: Array<String>) {
+fun main() {
 
     var text = StringBuilder("")
     var textId = Component.NO_COMPONENT_KEY

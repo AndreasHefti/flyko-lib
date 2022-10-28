@@ -12,7 +12,7 @@ import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.EasedFloatAnimation
 import com.inari.util.geom.Easing
 
-fun main(args: Array<String>) {
+fun main() {
     DesktopApp( "CoverCodeTest", 800, 600) {
 
         // Create a TextureAsset and register it to the AssetSystem but not loading yet.

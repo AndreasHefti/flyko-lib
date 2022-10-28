@@ -16,8 +16,8 @@ import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.EasedFloatAnimation
 import com.inari.firefly.util.geom.EasingTest
 
-fun main(args: Array<String>) {
-    DesktopApp( "CoverCodeTest", 800, 900) {
+fun main() {
+    DesktopApp( "Easing Test", 800, 900) {
 
             FFInfoSystem
                 .addInfo(FrameRateInfo)

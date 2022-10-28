@@ -17,7 +17,7 @@ val LIGHT_COLOR = Vector4f(1f, .5f, .5f, 1f)
 val AMBIENT_COLOR = Vector4f(0.6f, 0.6f, 1f, 0.5f)
 val FALLOFF = Vector3f(.4f, 10f, 20f)
 
-fun main(args: Array<String>) {
+fun main() {
     DesktopApp("NormalMapTest", 400, 400) {
 
         val pos = Vector3f( 0.0f, 0.0f, DEFAULT_LIGHT_Z)

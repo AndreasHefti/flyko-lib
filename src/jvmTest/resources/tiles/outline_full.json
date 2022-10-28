@@ -12,7 +12,7 @@
         }],
  "spacing":0,
  "tilecount":40,
- "tiledversion":"1.7.1",
+ "tiledversion":"1.7.2",
  "tileheight":16,
  "tiles":[
         {
@@ -21,6 +21,32 @@
         }, 
         {
          "id":1,
+         "properties":[
+                {
+                 "name":"animation",
+                 "type":"string",
+                 "value":"200:1:0:rgba\n200:2:0:rgba"
+                }, 
+                {
+                 "name":"atlasref",
+                 "type":"string",
+                 "value":"1:0"
+                }, 
+                {
+                 "name":"material",
+                 "type":"string",
+                 "value":"terrain"
+                }, 
+                {
+                 "name":"orientation",
+                 "type":"string",
+                 "value":"sw"
+                }, 
+                {
+                 "name":"tint",
+                 "type":"color",
+                 "value":""
+                }],
          "type":"terrain_slope:half:se_1:0"
         }, 
         {

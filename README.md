@@ -1,8 +1,11 @@
+
+
+<img width="240" height="80" style="display: block; margin: 0 auto" src="C:\Users\anhef\Projects\flyKo\fireflyLogo1.png"></img>
+
+<p align="center">Simple but powerful 2D ECS Game API for Kotlin Multiplatform</p>
+
+
 # FlyKo-Lib
-
-Firefly API for Kotlin multiplatform library
- 
-
 Introduction
 ------------
 

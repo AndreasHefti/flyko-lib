@@ -41,7 +41,7 @@ private const val DEFAULT_FRAGMENT_SHADER =
 //        "  gl_FragColor = mix(texture2D(u_texture, v_texCoords), texture2D(my_texture, v_texCoords), v_color) ;\n" +
     "}\n"
 
-fun main(args: Array<String>) {
+fun main() {
     DesktopApp("ShaderTest1", 600, 400) {
 
             val tex1Id = Texture {

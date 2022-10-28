@@ -13,7 +13,7 @@ import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.animation.*
 import com.inari.util.geom.*
 
-fun main(args: Array<String>) {
+fun main() {
     DesktopApp("BezierAnimationTest", 400, 400) {
 
         FFInfoSystem

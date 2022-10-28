@@ -13,7 +13,7 @@ import com.inari.util.geom.BezierSpline
 import com.inari.util.geom.BezierSplineSegment
 import com.inari.util.geom.Vector2f
 
-fun main(args: Array<String>) {
+fun main() {
     DesktopApp("BezierSplineAnimationTest", 400, 400) {
 
         FFInfoSystem

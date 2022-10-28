@@ -10,7 +10,7 @@ import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.View
 import com.inari.util.BLACK
 
-fun main(args: Array<String>) {
+fun main() {
     DesktopApp("ViewTest", 800, 600) {
         Texture.build {
             name = "logoTexture"
@@ -38,7 +38,7 @@ fun main(args: Array<String>) {
         }
 
 
-        val entityId = Entity {
+        Entity {
             autoActivation = true
             withComponent(ETransform) {
                 viewRef(viewKey)
