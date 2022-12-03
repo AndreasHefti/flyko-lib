@@ -1,13 +1,12 @@
 
 
-<img width="240" height="80" style="display: block; margin: 0 auto" src="C:\Users\anhef\Projects\flyKo\fireflyLogo1.png"></img>
-
+<p align="center">
+<img width="240" height="80" style="display: block; margin: 0 auto" src="https://github.com/AndreasHefti/flyko-lib/blob/master/fireflyLogo1.png"></img>
+</p>
 <p align="center">Simple but powerful 2D ECS Game API for Kotlin Multiplatform</p>
 
 
 # FlyKo-Lib
-Introduction
-------------
 
 Firefly is a top-level 2D game framework. Focusing on intuitive API and build within stringent architecture and design 
 principles like Component-Entity-System, Builder/DSL and component indexing for fast access.
