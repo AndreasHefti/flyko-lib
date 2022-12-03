@@ -167,3 +167,21 @@ class EMultiplier private constructor() : EntityComponent(EMultiplier) {
         override fun create() = EMultiplier()
     }
 }
+
+class EAttribute private constructor() : EntityComponent(EAttribute) {
+
+    @JvmField internal val attributes = mutableMapOf<String, String>()
+
+    fun setAttribute(name: String, value: String) { attributes[name] = value }
+    fun getAttribute(name: String): String? = attributes[name]
+    fun getAttributeFloat(name: String): Float? = attributes[name]?.toFloat()
+
+    override fun reset() {
+        attributes.clear()
+    }
+
+    override val componentType = Companion
+    companion object : EntityComponentBuilder<EAttribute>("EAttribute") {
+        override fun create() = EAttribute()
+    }
+}

@@ -31,7 +31,7 @@ import java.nio.ByteOrder
 
 actual object GraphicsAPIImpl : GraphicsAPI {
 
-    private const val DEFAULT_VERTEX_SHADER =
+    const val DEFAULT_VERTEX_SHADER =
             "attribute vec4 a_position;\n" +
              "attribute vec4 a_color;\n" +
              "attribute vec2 a_texCoord0;\n" +
@@ -44,7 +44,7 @@ actual object GraphicsAPIImpl : GraphicsAPI {
              "    gl_Position = u_projTrans * a_position;\n" +
              "}\n"
 
-    private const val DEFAULT_FRAGMENT_SHADER =
+    const val DEFAULT_FRAGMENT_SHADER =
             "#ifdef GL_ES\n" +
             "precision mediump float;\n" +
             "#endif\n" +

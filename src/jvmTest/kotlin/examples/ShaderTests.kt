@@ -3,8 +3,11 @@ package examples
 import com.inari.firefly.*
 import com.inari.firefly.core.Entity
 import com.inari.firefly.core.api.BlendMode
+import com.inari.firefly.core.api.GraphicsAPIImpl
 import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.graphics.shape.EShape
+import com.inari.firefly.graphics.sprite.ESprite
+import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.Shader
@@ -52,37 +55,57 @@ fun main() {
 
             val shaderId = Shader {
                 name = "ShaderEffect1"
-                vertexShaderProgram = DEFAULT_VERTEX_SHADER
-                fragmentShaderResourceName = "firefly/fragShaderTest1.glsl"
+               //vertexShaderResourceName = "firefly/vertScanline.glsl"
+               fragmentShaderResourceName = "firefly/fragScanline.glsl"
+                vertexShaderProgram = GraphicsAPIImpl.DEFAULT_VERTEX_SHADER
+                //fragmentShaderProgram = GraphicsAPIImpl.DEFAULT_FRAGMENT_SHADER
+
                 shaderInit =  { adapter ->
-                    adapter.bindTexture("my_texture", Texture[tex1Id].assetIndex)
+                    //adapter.bindTexture("my_texture", Texture[tex1Id].assetIndex)
                 }
             }
 
             val viewId = View {
                 autoActivation = true
                 name = "View1"
-                bounds(100, 100, 100, 100)
+                bounds(0, 0, 100, 100)
                 clearColor(BLACK)
                 blendMode = BlendMode.NONE
-                tintColor(1f,0f,0f,1f)          // this is the v_color
+                //tintColor(0f,0f,0f,1f)          // this is the v_color
                 shader(shaderId)
-                zoom = 5f
+                zoom = 1f
+            }
+
+            Texture {
+                name = "logoTexture"
+                resourceName = "firefly/logo.png"
+                // Create and activate/load a SpriteAsset with reference to the TextureAsset.
+                // This also implicitly loads the TextureAsset if it is not already loaded.
+                withChild(Sprite) {
+                    name = "inariSprite"
+                    textureBounds(0, 0, 32, 32)
+                    hFlip = false
+                    vFlip = false
+                }
             }
 
             Entity {
                 autoActivation = true
                 withComponent(ETransform) {
-                    position(10, 10)
+                    position(0, 0)
                     viewRef(viewId)
-                    scale(5f, 5f)
+                    scale(3f, 3f)
                 }
-                withComponent(EShape) {
-                    color(1f, 0f, 0f, 1f)         // this color is on the u_texture shape
-                    type = ShapeType.RECTANGLE
-                    fill = true
-                    vertices = floatArrayOf( 10f, 10f, 50f, 50f)
+                withComponent(ESprite) {
+                    spriteRef("inariSprite")
                 }
+//                withComponent(EShape) {
+//                    color(1f, 0f, 0f, 1f)         // this color is on the u_texture shape
+//                    type = ShapeType.RECTANGLE
+//                    fill = true
+//                    vertices = floatArrayOf( 0f, 0f, 100f, 100f)
+//                }
+
             }
         }
 }
