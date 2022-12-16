@@ -3,7 +3,7 @@
 <p align="center">
 <img style="display: block; margin: 0 auto" src="https://github.com/AndreasHefti/flyko-lib/blob/master/fireflyLogo2.png">
 </p>
-<p align="center">Simple but powerful 2D ECS Game API for Kotlin Multiplatform</p>
+<p align="center"><b>Simple but powerful 2D ECS Game API for Kotlin Multiplatform</b></p>
 
 
 # FlyKo-Lib
