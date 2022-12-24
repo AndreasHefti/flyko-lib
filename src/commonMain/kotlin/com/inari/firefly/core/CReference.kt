@@ -43,51 +43,6 @@ class CLooseReference internal constructor(
     }
 }
 
-//class CLooseReferences internal constructor(
-//    val targetType: ComponentType<*>
-//) {
-//
-//    lateinit var refKeys: DynArray<ComponentKey>
-//        internal set
-//
-//    private var initialized = false
-//    private fun init() {
-//        if (initialized) return
-//        refKeys = DynArray.of(1,2)
-//        initialized = true
-//    }
-//
-//    fun withReference(named: Named) = withReference(named.name)
-//    fun withReference(name: String) {
-//        init()
-//        if (name === NO_NAME) return
-//        refKeys + ComponentSystem[targetType].getOrCreateKey(name)
-//    }
-//
-//    fun withReference(key: ComponentKey) {
-//        if (key.name == NO_NAME)
-//            throw IllegalArgumentException("Key needs a name to be used as loose reference")
-//        init()
-//        refKeys + key
-//    }
-//
-//    fun removeReference(name: String) {
-//        refKeys.forEach { key ->
-//            if (key.name == name)
-//                refKeys.remove(key)
-//            refKeys.trim()
-//        }
-//    }
-//
-//    fun reset() {
-//        refKeys.clear()
-//        initialized = false
-//    }
-//
-//    fun contains(index: Int): Boolean =
-//        refKeys.find { it.instanceIndex == index }?.let { true } ?: false
-//}
-
 class CReference internal constructor(
     val targetType: ComponentType<*>,
     val init: (ComponentKey) -> Unit = VOID_CONSUMER

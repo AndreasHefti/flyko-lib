@@ -1,0 +1,77 @@
+Firefly Library API Reference
+
+- Introduction
+
+  - What is Firefly and Flyko-Lib
+
+  - What is implemented and ready to use so far
+
+  - Set up an empty JVM based Project
+
+  - Contributions
+
+    - Documentation
+
+    - Code
+
+
+- Overall Architecture
+
+   - Low-Level Interface and Implementations
+
+      - Resources IO
+      - Audio
+      - Graphics
+      - Input
+      - Timer
+
+   - The Builder DSL
+
+- Components Systems and Controls
+
+    - Component
+
+       - Component
+       - ComponentNode
+       - Composite
+
+    - System
+
+    - Control
+
+- Global Components and Systems
+
+  - View / Layer
+
+  - Task and Trigger
+
+  - Asset
+
+  - Workflow / State
+
+  - Animation
+
+  - Sound
+
+  - Entity
+
+- Entity-Components and Systems
+
+  - Transform
+  - Sprites / Tiles
+  - Shapes
+  - Particles
+  - Text
+
+  - Animation
+  - Movement
+  - Contact / Collision Detection
+
+  - Behavior AI
+  - Utility AI
+
+  - How to create new specific Entity-Components and Systems
+
+- Rendering and Entity Renderer
+
+  - How to create specific Renderer for Entities
