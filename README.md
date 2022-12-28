@@ -20,7 +20,9 @@ Firefly also intent to be as less restrictive as possible to make it easy to int
 your own path for particular section if you want to do so. Firefly shall help you with that and not strain you with
 stupid conventions.
 
+<p align="center">
 <img style="display: block; margin: 0 auto" src="https://github.com/AndreasHefti/flyko-lib/blob/master/docs/images/architecture1.png">
+</p>
 
 Firefly's Entity-Component-System is implemented on-top of a small set of interfaces that defines the API to the
 lower-level libraries that can be used to render graphics, play sounds or gather or poll input events.
