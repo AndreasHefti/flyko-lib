@@ -17,8 +17,8 @@ on keeping the game code-base as flexible as possible for changes. Since almost 
 to create them is following always the very same builder DSL while business-code stays in their System(s). 
 This leads to more flexibility when content or behavior must be changed or need to be extended. 
 Firefly also intent to be as less restrictive as possible to make it easy to integrate other libraries or just go
-your own path for particular section if you want to do so. Firefly shall help you with that and not strain you with
-stupid conventions.
+your own path in particular if you want to do so. Firefly shall help you with that and not strain you with
+rigid conventions.
 
 <p align="center">
 <img style="display: block; margin: 0 auto" src="https://github.com/AndreasHefti/flyko-lib/blob/master/docs/images/architecture1.png">
