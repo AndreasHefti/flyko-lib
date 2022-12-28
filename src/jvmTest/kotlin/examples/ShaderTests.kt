@@ -55,9 +55,9 @@ fun main() {
 
             val shaderId = Shader {
                 name = "ShaderEffect1"
-               //vertexShaderResourceName = "firefly/vertScanline.glsl"
-               fragmentShaderResourceName = "firefly/fragScanline.glsl"
-                vertexShaderProgram = GraphicsAPIImpl.DEFAULT_VERTEX_SHADER
+               vertexShaderResourceName = "firefly/vertBloom.glsl"
+               fragmentShaderResourceName = "firefly/fragBloom.glsl"
+                //vertexShaderProgram = GraphicsAPIImpl.DEFAULT_VERTEX_SHADER
                 //fragmentShaderProgram = GraphicsAPIImpl.DEFAULT_FRAGMENT_SHADER
 
                 shaderInit =  { adapter ->
