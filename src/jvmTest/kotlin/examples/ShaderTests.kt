@@ -60,7 +60,8 @@ fun main() {
                 //vertexShaderProgram = GraphicsAPIImpl.DEFAULT_VERTEX_SHADER
                 //fragmentShaderProgram = GraphicsAPIImpl.DEFAULT_FRAGMENT_SHADER
 
-                shaderInit =  { adapter ->
+
+                shaderUpdate =  { adapter ->
                     //adapter.bindTexture("my_texture", Texture[tex1Id].assetIndex)
                 }
             }
@@ -68,6 +69,7 @@ fun main() {
             val viewId = View {
                 autoActivation = true
                 name = "View1"
+                renderPassTo(View.BASE_VIEW_KEY)
                 bounds(0, 0, 100, 100)
                 clearColor(BLACK)
                 blendMode = BlendMode.NONE

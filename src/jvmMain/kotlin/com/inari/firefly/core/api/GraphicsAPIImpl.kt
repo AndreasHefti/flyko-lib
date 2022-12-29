@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.GdxRuntimeException
+import com.inari.firefly.core.Engine
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
 import com.inari.firefly.core.api.ShapeType.*
@@ -58,7 +59,6 @@ actual object GraphicsAPIImpl : GraphicsAPI {
 
     private val viewports: DynArray<ViewportFBO> = DynArray.of(10, 10)
     private val textures: DynArray<Texture> = DynArray.of(30, 50)
-    private val backBuffers: DynArray<BackBufferFBO> = DynArray.of(5, 5)
     private val shaders: DynArray<Shader> = DynArray.of(5, 5)
     private val sprites: DynArray<TextureRegion> = DynArray.of(200, 300)
 
@@ -194,21 +194,12 @@ actual object GraphicsAPIImpl : GraphicsAPI {
             throw RuntimeException("com.inari.firefly.core.api.ShaderData failed to compile:" + shaderProgram.log)
         }
 
-        val shader = Shader(shaderProgram, data.shaderInit)
-
+        val shader = Shader(shaderProgram, data.shaderUpdate)
         return shaders + shader
     }
 
     actual override fun disposeShader(shaderId: Int) {
         shaders.remove(shaderId)?.dispose()
-    }
-
-    actual override fun createFrameBuffer(data: FrameBufferData): Int {
-        return backBuffers.add(BackBufferFBO(data))
-    }
-
-    actual override fun disposeFrameBuffer(frameBufferId: Int) {
-        backBuffers.remove(frameBufferId)?.dispose()
     }
 
     actual override fun startViewportRendering(view: ViewData, clear: Boolean) {
@@ -220,20 +211,6 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         val activeViewport = viewports[view.index]
         activeViewport?.activate(spriteBatch, shapeRenderer, view, clear)
         activeViewportId = view.index
-        spriteBatch.begin()
-    }
-
-    actual override fun startFrameBufferRendering(frameBufferId: Int, posX: Int, posY: Int, clear: Boolean) {
-        if (activeBackBufferId >= 0)
-            throw IllegalStateException("Back-buffer rendering is on")
-        if (activeViewportId >= 0)
-            throw IllegalStateException("Viewport rendering is on")
-
-        val backBuffer = backBuffers[frameBufferId]
-        if (backBuffer != null) {
-            backBuffer.activate(posX, posY, clear)
-            activeBackBufferId = frameBufferId
-        }
         spriteBatch.begin()
     }
 
@@ -565,15 +542,6 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         shapeRenderer.identity()
     }
 
-    actual override fun endFrameBufferRendering(frameBufferId: Int) {
-        if (activeBackBufferId < 0)
-            throw IllegalStateException("No back-buffer rendering active")
-
-        spriteBatch.flush()
-        backBuffers[activeBackBufferId]?.deactivate()
-        activeBackBufferId = -1
-    }
-
     actual override fun endViewportRendering(view: ViewData) {
         if (activeViewportId < 0)
             throw IllegalStateException("No viewport rendering active")
@@ -591,14 +559,21 @@ actual object GraphicsAPIImpl : GraphicsAPI {
     actual override fun flush(virtualViews: DynArrayRO<ViewData>) {
         if (!virtualViews.isEmpty) {
             var i = 0
+            var targetId = -1
             while (i < virtualViews.capacity) {
+
                 val virtualView = virtualViews[i++] ?: continue
+                if (virtualView.renderPassIndex < 0) continue
+
                 val viewport = viewports[virtualView.index] ?: continue
-                val bounds = virtualView.bounds
+                val target = viewports[virtualView.renderPassIndex] ?: continue
 
-                // then activate the base view port and render the virtual viewport to it
-                baseViewport?.activate(spriteBatch, shapeRenderer, baseView!!, true)
+                // activate the target viewport and render the source viewport to it
+                target.activate(spriteBatch, shapeRenderer, baseView!!, true)
 
+                // TODO batching can be optimizes if draws to the same target comes as batch too
+                //      views shall be sorted within the target as well as the z axis
+                //      then begin an end batching on target change
                 spriteBatch.begin()
 
                 setColorAndBlendMode(virtualView.tintColor, virtualView.blendMode)
@@ -606,11 +581,15 @@ actual object GraphicsAPIImpl : GraphicsAPI {
 
                 spriteBatch.draw(
                     viewport.fboTexture,
-                    bounds.x.toFloat(), bounds.y.toFloat(),
-                    bounds.width.toFloat(), bounds.height.toFloat()
+                    virtualView.bounds.x.toFloat(),
+                    virtualView.bounds.y.toFloat(),
+                    virtualView.bounds.width.toFloat(),
+                    virtualView.bounds.height.toFloat()
                 )
+
+                spriteBatch.end()
+                target.deactivate()
             }
-            spriteBatch.end()
         }
 
         spriteBatch.flush()
@@ -725,61 +704,71 @@ actual object GraphicsAPIImpl : GraphicsAPI {
 
     private class Shader (
         val program: ShaderProgram,
-        val shaderInit: ShaderInit = {}
-    ) {
+        val shaderInit: (ShaderUpdate) -> Unit
+    ) : ShaderUpdate {
+
+        private var texNum = 1
+        private val updates = DynArray.of<() -> Unit>(0, 5)
+
         fun activate() {
             spriteBatch.shader = program
-            val initAdapter = GDXShaderInitAdapter(program)
-            shaderInit(initAdapter)
-            initAdapter.finish()
+            shaderInit(this)
+            update()
+            Gdx.graphics.gL20.glActiveTexture(GL20.GL_TEXTURE0)
+            if (!updates.isEmpty)
+                Engine.registerListener(Engine.UPDATE_EVENT_TYPE, ::update)
         }
         fun dispose() {
+            if (!updates.isEmpty)
+                Engine.disposeListener(Engine.UPDATE_EVENT_TYPE, ::update)
+            spriteBatch.shader = null
+
             // ???
         }
-    }
 
-    private class BackBufferFBO(val data: FrameBufferData) {
-
-        val camera = OrthographicCamera(
-            data.bounds.width.toFloat(),
-            data.bounds.height.toFloat()
-        )
-        val frameBuffer = FrameBuffer(
-            Pixmap.Format.RGBA8888,
-            (data.bounds.width * data.fboScale).toInt(),
-            (data.bounds.height * data.fboScale).toInt(),
-            false
-        )
-        val fboTexture = TextureRegion(frameBuffer.colorBufferTexture)
-
-        fun activate(posX: Int, posY: Int, clear: Boolean) {
-            fboTexture.flip(false, false)
-
-            val zoom = data.zoom
-            val clearColor = data.clearColor
-
-            camera.setToOrtho(true, data.bounds.width * zoom, data.bounds.height * zoom)
-            camera.position.x = camera.position.x + posX
-            camera.position.y = camera.position.y + posY
-            camera.update()
-            spriteBatch.projectionMatrix = camera.combined
-            shapeRenderer.projectionMatrix = camera.combined
-
-            frameBuffer.begin() // this also binds the FBO
-
-            if (clear) {
-                Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a)
-                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
-            }
+        override fun setUniformFloat(bindingName: String, value: Float) =
+            program.setUniformf(bindingName, value)
+        override fun setUniformVec2(bindingName: String, position: Vector2f) =
+            program.setUniformf(bindingName, position.x, position.y)
+        override fun setUniformVec3(bindingName: String, v: Vector3f) =
+            program.setUniformf(bindingName, v.v0, v.v1, v.v2)
+        override fun setUniformColorVec4(bindingName: String, color: Vector4f) =
+            program.setUniformf(bindingName, color.r, color.g, color.b, color.a)
+        override fun bindTexture(bindingName: String, textureId: Int) {
+            program.setUniformi(bindingName, texNum)
+            textures[textureId]?.bind(texNum)
+            texNum++
+        }
+        override fun bindViewTexture(bindingName: String, backBufferId: Int) {
+            viewports[backBufferId]?.bindToShader(program, bindingName, texNum++)
         }
 
-        fun bindToShader(program: ShaderProgram, binding: String, num: Int) {
-            program.setUniformi(binding, num)
-            fboTexture.texture.bind(num)
+        override fun setUniformFloat(bindingName: String, supplier: () -> Float) {
+            updates.add { setUniformFloat(bindingName, supplier.invoke()) }
+        }
+        override fun setUniformVec2(bindingName: String, supplier: () -> Vector2f) {
+            updates.add { setUniformVec2(bindingName, supplier.invoke()) }
+        }
+        override fun setUniformVec3(bindingName: String, supplier: () -> Vector3f) {
+            updates.add { setUniformVec3(bindingName, supplier.invoke()) }
         }
 
-        fun deactivate() = frameBuffer.end()
-        fun dispose() = frameBuffer.dispose()
+        override fun setUniformColorVec4(bindingName: String, supplier: () -> Vector4f) {
+            updates.add { setUniformColorVec4(bindingName, supplier.invoke()) }
+        }
+
+        override fun bindTexture(bindingName: String, supplier: () -> Int) {
+            val textureNumber = texNum++
+            textures[supplier.invoke()]?.bind(textureNumber)
+            updates.add { program.setUniformi(bindingName, textureNumber) }
+        }
+
+        override fun bindViewTexture(bindingName: String, supplier: () -> Int) {
+            val textureNumber = texNum++
+            updates.add {viewports[supplier()]?.bindToShader(program, bindingName, textureNumber) }
+        }
+
+        override fun update() = updates.forEach { it() }
     }
 
     private class ViewportFBO constructor(
@@ -813,37 +802,42 @@ actual object GraphicsAPIImpl : GraphicsAPI {
             }
         }
 
+        fun bindToShader(program: ShaderProgram, binding: String, num: Int) {
+            program.setUniformi(binding, num)
+            fboTexture?.texture?.bind(num)
+        }
+
         fun deactivate() = frameBuffer?.end()
         fun dispose() = frameBuffer?.dispose()
     }
 
-    private class GDXShaderInitAdapter(val program: ShaderProgram) : ShaderInitAdapter {
-
-        private var texNum = 1
-
-        override fun setUniformFloat(bindingName: String, value: Float) =
-            program.setUniformf(bindingName, value)
-        override fun setUniformVec2(bindingName: String, position: Vector2f) =
-            program.setUniformf(bindingName, position.x, position.y)
-        override fun setUniformVec2(bindingName: String, position: Vector2i) =
-            program.setUniformf(bindingName, position.x.toFloat(), position.y.toFloat())
-        override fun setUniformVec3(bindingName: String, v: Vector3f) {
-            program.setUniformf(bindingName, v.v0, v.v1, v.v2)
-        }
-
-        override fun setUniformColorVec4(bindingName: String, color: Vector4f) =
-            program.setUniformf(bindingName, color.r, color.g, color.b, color.a)
-
-        override fun bindTexture(bindingName: String, textureId: Int) {
-            program.setUniformi(bindingName, texNum)
-            textures[textureId]?.bind(texNum)
-            texNum++
-        }
-
-        override fun bindBackBuffer(bindingName: String, backBufferId: Int) {
-            backBuffers[backBufferId]?.bindToShader(program, bindingName, texNum++)
-        }
-
-        fun finish() = Gdx.graphics.gL20.glActiveTexture(GL20.GL_TEXTURE0)
-    }
+//    private class GDXShaderInitAdapter(val program: ShaderProgram) : ShaderInitAdapter {
+//
+//        private var texNum = 1
+//
+//        override fun setUniformFloat(bindingName: String, value: Float) =
+//            program.setUniformf(bindingName, value)
+//        override fun setUniformVec2(bindingName: String, position: Vector2f) =
+//            program.setUniformf(bindingName, position.x, position.y)
+//        override fun setUniformVec2(bindingName: String, position: Vector2i) =
+//            program.setUniformf(bindingName, position.x.toFloat(), position.y.toFloat())
+//        override fun setUniformVec3(bindingName: String, v: Vector3f) {
+//            program.setUniformf(bindingName, v.v0, v.v1, v.v2)
+//        }
+//
+//        override fun setUniformColorVec4(bindingName: String, color: Vector4f) =
+//            program.setUniformf(bindingName, color.r, color.g, color.b, color.a)
+//
+//        override fun bindTexture(bindingName: String, textureId: Int) {
+//            program.setUniformi(bindingName, texNum)
+//            textures[textureId]?.bind(texNum)
+//            texNum++
+//        }
+//
+//        override fun bindViewTexture(bindingName: String, backBufferId: Int) {
+//            viewports[backBufferId]?.bindToShader(program, bindingName, texNum++)
+//        }
+//
+//        fun finish() = Gdx.graphics.gL20.glActiveTexture(GL20.GL_TEXTURE0)
+//    }
 }

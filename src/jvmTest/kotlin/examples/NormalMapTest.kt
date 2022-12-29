@@ -25,6 +25,7 @@ fun main() {
         View {
             autoActivation = true
             name = "View1"
+            renderPassTo(View.BASE_VIEW_KEY)
             bounds(30, 30, 16, 16)
             blendMode = BlendMode.NONE
             tintColor(1f, 1f, 1f, 1f)
@@ -43,7 +44,7 @@ fun main() {
             withShader {
                 name = "NormalShader"
                 fragmentShaderResourceName = "firefly/normalFragShader.glsl"
-                shaderInit =  { adapter ->
+                shaderUpdate =  { adapter ->
                     Texture.activate(texId)
                     adapter.bindTexture("normal_texture", Texture[texId].assetIndex)
                     adapter.setUniformVec2("Resolution", Vector2f(Engine.graphics.screenWidth, Engine.graphics.screenHeight))

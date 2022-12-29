@@ -59,6 +59,7 @@ fun initView() {
     View {
         autoActivation = true
         name = "testView"
+        renderPassTo(View.BASE_VIEW_KEY)
         fboScale = 2f
         bounds(0, 0, 640, 640)
         zoom = .5f

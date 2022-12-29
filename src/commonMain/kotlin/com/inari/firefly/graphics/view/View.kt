@@ -13,6 +13,10 @@ class View private constructor(): ComponentNode(View), ViewData, Controlled {
 
     override var isBase = false
         internal set
+
+    override val renderPassIndex: Int
+        get() = renderPassTo.targetKey.instanceIndex
+    @JvmField val renderPassTo = CReference(View)
     @JvmField var zPosition = 0
     override val bounds = Vector4i()
     override val  worldPosition = Vector2f()
@@ -27,6 +31,13 @@ class View private constructor(): ComponentNode(View), ViewData, Controlled {
         internal set
 
     override val controllerReferences = ControllerReferences(View)
+
+    override fun initialize() {
+        super.initialize()
+        // for default none base view, set render pass to base view
+        //if (!isBase)
+            //renderPassTo(BASE_VIEW_KEY)
+    }
 
     override fun load() {
         if (shader.targetKey !== NO_COMPONENT_KEY)

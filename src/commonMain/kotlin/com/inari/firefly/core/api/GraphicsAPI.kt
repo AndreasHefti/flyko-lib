@@ -79,21 +79,6 @@ interface GraphicsAPI {
      */
     fun disposeShader(shaderId: Int)
 
-    /** This is called from firefly API whenever a framebuffer is created and a low-level FBO (for example)
-     * id needed to represent this frame buffer.
-     *
-     * @param data [FrameBufferData] defining all properties for the low-level representation (FBO)
-     * @return A instance identifier of the low-level frame buffer representation
-     */
-    fun createFrameBuffer(data: FrameBufferData): Int
-
-    /** This is called by the firefly API whenever a given and loaded frame-buffer is disposed.
-     * This shall release all low-level API representation data for the frame-buffer (FBO for example)
-     *
-     * @param frameBufferId The instance identifier of the low-level frame-buffer representation
-     */
-    fun disposeFrameBuffer(frameBufferId: Int)
-
     /** Set the active sprite rendering shader. Note that the shader program must have been created before with createShader.
      * @param shaderId The instance identifier of the shader.
      */
@@ -106,16 +91,6 @@ interface GraphicsAPI {
      * @param clear indicates whether the [ViewData] should be cleared with the vies clear-color before rendering or not
      */
     fun startViewportRendering(view: ViewData, clear: Boolean)
-
-    /** This is called form the firefly API before rendering to a given frame-buffer (FBO) and must
-     * prepare all the stuff needed to render the that frame-buffer on following renderXXX calls.
-     *
-     * @param frameBufferId the instance id of the previous created [FrameBufferData] that is starting to be rendered
-     * @param posX the world (rendering) position of the frame-buffers upper left corner
-     * @param posY the world (rendering) position of the frame-buffers upper left corner
-     * @param clear indicates whether the frame-buffer should be cleared with the views clear-color before rendering or not
-     */
-    fun startFrameBufferRendering(frameBufferId: Int, posX: Int, posY: Int, clear: Boolean)
 
     /** This is called form the firefly API to render a created texture on specified position to the actual [ViewData]
      *
@@ -187,14 +162,6 @@ interface GraphicsAPI {
      */
     fun renderShape(data: ShapeData, transform: TransformData, xOffset: Float, yOffset: Float)
 
-    /** This is called form the firefly API to notify the end of rendering for a specified frame-buffer.
-     * The graphics context shall unbind the current frame-buffer and bind the actual [ViewData] again
-     * for further rendering.
-     *
-     * @param frameBufferId the instance id of the previous created [FrameBufferData] that is starting to be rendered
-     */
-    fun endFrameBufferRendering(frameBufferId: Int)
-
     /** This is called form the firefly API to notify the end of rendering for a specified [ViewData].
      * @param view [ViewData] that is ending to be rendered
      */
@@ -217,10 +184,7 @@ expect object GraphicsAPIImpl {
     fun disposeSprite(spriteId: Int)
     fun createShader(data: ShaderData): Int
     fun disposeShader(shaderId: Int)
-    fun createFrameBuffer(data: FrameBufferData): Int
-    fun disposeFrameBuffer(frameBufferId: Int)
     fun startViewportRendering(view: ViewData, clear: Boolean)
-    fun startFrameBufferRendering(frameBufferId: Int, posX: Int, posY: Int, clear: Boolean)
     fun setActiveShader(shaderId: Int)
     fun renderTexture(textureId: Int, posX: Float, posY: Float, scaleX: Float = 1f, scaleY: Float = 1f, rotation: Float = 0f, flipX: Boolean = false, flipY: Boolean = false, tintColor: Vector4f = Vector4f(1f, 1f, 1f, 1f), blendMode: BlendMode = BlendMode.NONE)
     fun renderSprite(renderableSprite: SpriteRenderable, xOffset: Float, yOffset: Float)
@@ -229,7 +193,6 @@ expect object GraphicsAPIImpl {
     fun renderShape(data: ShapeData, xOffset: Float = 0f, yOffset: Float = 0f)
     fun renderShape(data: ShapeData, transform: TransformData)
     fun renderShape(data: ShapeData, transform: TransformData, xOffset: Float, yOffset: Float)
-    fun endFrameBufferRendering(frameBufferId: Int)
     fun endViewportRendering(view: ViewData)
     fun flush(virtualViews: DynArrayRO<ViewData>)
     fun getScreenshotPixels(area: Vector4i): ByteArray

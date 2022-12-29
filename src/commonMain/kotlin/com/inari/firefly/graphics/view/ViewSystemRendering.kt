@@ -30,7 +30,7 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
             ViewSystemRenderer.sortRenderingChain()
         }
 
-    private val entities: DynArray<DynArray<DynArray<Entity>>> = DynArray.of(10, 2) // { size -> arrayOfNulls(size) }
+    private val entities: DynArray<DynArray<DynArray<Entity>>> = DynArray.of(10, 2)
 
     private fun entityListener(key: ComponentKey, type: ComponentEventType) {
         if (type == ACTIVATED) registerEntity(key.instanceIndex)
@@ -51,7 +51,7 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
             entities[transform.viewIndex] = DynArray.of(10, 2)
         val views = entities[transform.viewIndex]!!
         if (transform.layerIndex !in views)
-            views[transform.layerIndex] = DynArray.of() // DynArray(100, 50) { size -> arrayOfNulls(size) }
+            views[transform.layerIndex] = DynArray.of()
         val layer = views[transform.layerIndex]!!
         layer.add(entity)
         sort(layer)

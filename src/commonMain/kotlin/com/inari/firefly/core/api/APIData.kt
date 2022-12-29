@@ -60,6 +60,7 @@ interface ViewData {
     val zoom: Float
     val fboScale: Float
     val index: Int
+    val renderPassIndex: Int
     val isBase: Boolean
 }
 
@@ -84,18 +85,25 @@ interface ShaderData {
     val vertexShaderProgram: String
     val fragmentShaderResourceName: String
     val fragmentShaderProgram: String
-    val shaderInit: ShaderInit
+    val shaderUpdate: (ShaderUpdate) -> Unit
 }
 
-typealias ShaderInit = (ShaderInitAdapter) -> Unit
-interface ShaderInitAdapter {
+interface ShaderUpdate {
     fun setUniformFloat(bindingName: String, value: Float)
-    fun setUniformVec2(bindingName: String, position: Vector2f)
-    fun setUniformVec2(bindingName: String, position: Vector2i)
-    fun setUniformVec3(bindingName: String, v: Vector3f)
-    fun setUniformColorVec4(bindingName: String, color: Vector4f)
-    fun bindTexture(bindingName: String, textureId: Int)
-    fun bindBackBuffer(bindingName: String, backBufferId: Int)
+    fun setUniformVec2(bindingName: String, value: Vector2f)
+    fun setUniformVec3(bindingName: String, value: Vector3f)
+    fun setUniformColorVec4(bindingName: String, value:Vector4f)
+    fun bindTexture(bindingName: String, value: Int)
+    fun bindViewTexture(bindingName: String, value: Int)
+
+    fun setUniformFloat(bindingName: String, supplier: () -> Float)
+    fun setUniformVec2(bindingName: String, supplier: () -> Vector2f)
+    fun setUniformVec3(bindingName: String, supplier: () -> Vector3f)
+    fun setUniformColorVec4(bindingName: String, supplier: () -> Vector4f)
+    fun bindTexture(bindingName: String, supplier: () -> Int)
+    fun bindViewTexture(bindingName: String, supplier: () -> Int)
+
+    fun update()
 }
 
 interface TextureData {

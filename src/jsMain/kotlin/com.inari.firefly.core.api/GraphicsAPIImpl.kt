@@ -44,23 +44,11 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         TODO("Not yet implemented")
     }
 
-    actual override fun createFrameBuffer(data: FrameBufferData): Int {
-        TODO("Not yet implemented")
-    }
-
-    actual override fun disposeFrameBuffer(frameBufferId: Int) {
-        TODO("Not yet implemented")
-    }
-
     actual override fun setActiveShader(shaderId: Int) {
         TODO("Not yet implemented")
     }
 
     actual override fun startViewportRendering(view: ViewData, clear: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    actual override fun startFrameBufferRendering(frameBufferId: Int, posX: Int, posY: Int, clear: Boolean) {
         TODO("Not yet implemented")
     }
 
@@ -100,10 +88,6 @@ actual object GraphicsAPIImpl : GraphicsAPI {
     }
 
     actual override fun renderShape(data: ShapeData, transform: TransformData) {
-        TODO("Not yet implemented")
-    }
-
-    actual override fun endFrameBufferRendering(frameBufferId: Int) {
         TODO("Not yet implemented")
     }
 

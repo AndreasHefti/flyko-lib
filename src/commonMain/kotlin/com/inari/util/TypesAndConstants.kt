@@ -15,6 +15,7 @@ const val EMPTY_STRING = ""
 const val COMMA = ","
 const val VALUE_SEPARATOR = ','
 const val VALUE_SEPARATOR_STRING = ","
+const val LINE_BRAKE = '\n'
 
 const val KEY_VALUE_SEPARATOR = '='
 const val KEY_VALUE_SEPARATOR_STRING = "="

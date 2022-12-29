@@ -74,7 +74,7 @@ abstract class Engine protected constructor(
         val POST_RENDER_EVENT_TYPE = Event.EventType("PostRenderEvent")
 
         internal val updateEvent = UpdateEvent(UPDATE_EVENT_TYPE)
-        internal val renderEvent = UpdateEvent(RENDER_EVENT_TYPE)
+        internal val renderEvent = RenderingEvent(RENDER_EVENT_TYPE)
         internal val postRenderEvent = UpdateEvent(POST_RENDER_EVENT_TYPE)
     }
 
@@ -84,7 +84,7 @@ abstract class Engine protected constructor(
     }
 
     @Suppress("OVERRIDE_BY_INLINE")
-    class RenderingEvent private constructor(override val eventType: EventType) : Event<() -> Unit>() {
+    class RenderingEvent(override val eventType: EventType) : Event<() -> Unit>() {
         override inline fun notify(listener: () -> Unit) = listener()
     }
 
