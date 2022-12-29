@@ -8,10 +8,10 @@
 ___
 # FlyKo-Lib
 
-<p>Firefly is a top-level 2D game framework. Focusing on intuitive API and build within stringent architecture and design 
+<p style="text-align: justify">Firefly is a top-level 2D game framework. Focusing on intuitive API and build within stringent architecture and design 
 principles like Component-Entity-System, Builder/DSL and component indexing for fast access.</p>
 
-<p>The main goal of Firefly framework is to have a top-level 2D game API that comes with an in-build Component-Entity-System 
+<p style="text-align: justify">The main goal of Firefly framework is to have a top-level 2D game API that comes with an in-build Component-Entity-System 
 architecture that helps to organize all the game-objects, data and assets in a well-defined form and helps a lot 
 on keeping the game code-base as flexible as possible for changes. Since almost everything in Firefly is a component,
 to create them is following always the very same builder DSL while business-code stays in their System(s). 
@@ -24,17 +24,17 @@ rigid conventions.</p>
 <img style="display: block; margin: 0 auto" src="https://github.com/AndreasHefti/flyko-lib/blob/master/docs/images/architecture1.png">
 </p>
 
-Firefly's Entity-Component-System is implemented on-top of a small set of interfaces that defines the API to the
+<p style="text-align: justify">Firefly's Entity-Component-System is implemented on-top of a small set of interfaces that defines the API to the
 lower-level libraries that can be used to render graphics, play sounds or gather or poll input events.
-This is a Kotlin multiplatform library project with the usual four main modules:
+This is a Kotlin multiplatform library project with the usual four main modules:</p>
 
 - **common**: where the Firefly framework lives
 - **js**: Kotlin JavaScript implementation (not done yet)
 - **jvm**: Kotlin implementation to run on a JVM for desktop or mobile (done for desktop with lwjgl/libgdx as lower level framework)
 - **native**: Kotlin native implementations (not done yet)
 
-Currently, only the JVM part for desktop (Windows/Mac/Linux) is implemented and fully working and 
-building and packaging apps and games for desktop (Win, Mac and Linux) is currently supported
+<p style="text-align: justify">Currently, only the JVM part for desktop (Windows/Mac/Linux) is implemented and fully working and 
+building and packaging apps and games for desktop (Win, Mac and Linux) is currently supported</p>
 
 
 Key Features
@@ -184,8 +184,8 @@ dependencies {
 License
 --------
 
-Firefly is licensed under the Apache 2 License, meaning you can use it free of charge, 
-without strings attached in commercial and non-commercial projects.
+<p style="text-align: justify">Firefly is licensed under the Apache 2 License, meaning you can use it free of charge, 
+without strings attached in commercial and non-commercial projects.</p>
 
 
 
