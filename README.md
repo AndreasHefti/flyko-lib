@@ -8,8 +8,6 @@
 
 # FlyKo-Lib
 
----
-
 Firefly is a top-level 2D game framework. Focusing on intuitive API and build within stringent architecture and design 
 principles like Component-Entity-System, Builder/DSL and component indexing for fast access.
 
@@ -41,7 +39,6 @@ building and packaging apps and games for desktop (Win, Mac and Linux) is curren
 
 Key Features
 ---
-___
 
 **Firefly framework (Kotlin common)**
 
@@ -72,7 +69,6 @@ ___
 
 Code Example
 --------------
-___
 
 <div align="center"><img src="https://github.com/Inari-Soft/flyKo/raw/master/wiki/example1.gif" alt="Result of Code Example"></div>
 
@@ -141,16 +137,16 @@ fun main(args: Array<String>) {
 
 Let's Get Started with Fly-Ko
 ------------------------------
-___
+
 - <a href="https://flyko-lib-doc.readthedocs.io/en/latest/index.html"> Documentation</a> - API documentation and reference
 
 - <a href="https://flyko-lib-doc.readthedocs.io/en/latest/introduction.html#setting-up-an-empty-jvm-based-project-as-a-start"> Quickstart</a> - setting up a JVM based project
 
 - <a href="https://flyko-lib-doc.readthedocs.io/en/latest/index.html"> Tutorial </a>- create a and publish a sample game with Fly-Ko-Lib
-___
+
 Usage
--------
-___
+---
+
 *Create project for a JVM based application for desktop (Win,Mac,Linux)*
 
 #### Maven
@@ -187,7 +183,7 @@ dependencies {
 
 License
 --------
-___
+
 Firefly is licensed under the Apache 2 License, meaning you can use it free of charge, 
 without strings attached in commercial and non-commercial projects.
 
