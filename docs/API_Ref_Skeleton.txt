@@ -6,7 +6,7 @@ Firefly Library API Reference
 
   - What is implemented and ready to use so far
 
-  - Set up an empty JVM based Project
+  - Quick setup an empty JVM based Project
 
   - Contributions
 
