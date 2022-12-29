@@ -61,11 +61,11 @@ Key Features
 
 **Kotlin JS implementation**
 
-- TODO
+- Not implemented yet. If you like to contribute please open an issue.
 
 **Kotlin Natives implementation**
 
-- TODO
+- Not implemented yet. If you like to contribute please open an issue.
 
 Code Example
 --------------
