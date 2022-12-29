@@ -8,17 +8,17 @@
 ___
 # FlyKo-Lib
 
-Firefly is a top-level 2D game framework. Focusing on intuitive API and build within stringent architecture and design 
-principles like Component-Entity-System, Builder/DSL and component indexing for fast access.
+<p>Firefly is a top-level 2D game framework. Focusing on intuitive API and build within stringent architecture and design 
+principles like Component-Entity-System, Builder/DSL and component indexing for fast access.</p>
 
-The main goal of Firefly framework is to have a top-level 2D game API that comes with an in-build Component-Entity-System 
+<p>The main goal of Firefly framework is to have a top-level 2D game API that comes with an in-build Component-Entity-System 
 architecture that helps to organize all the game-objects, data and assets in a well-defined form and helps a lot 
 on keeping the game code-base as flexible as possible for changes. Since almost everything in Firefly is a component,
 to create them is following always the very same builder DSL while business-code stays in their System(s). 
 This leads to more flexibility when content or behavior must be changed or need to be extended. 
 Firefly also intent to be as less restrictive as possible to make it easy to integrate other libraries or just go
 your own path in particular if you want to do so. Firefly shall help you with that and not strain you with
-rigid conventions.
+rigid conventions.</p>
 
 <p align="center">
 <img style="display: block; margin: 0 auto" src="https://github.com/AndreasHefti/flyko-lib/blob/master/docs/images/architecture1.png">
