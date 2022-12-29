@@ -5,7 +5,7 @@
 </p>
 <p align="center"><b>Simple but powerful 2D ECS Game API for Kotlin Multiplatform</b></p>
 
-
+___
 # FlyKo-Lib
 
 Firefly is a top-level 2D game framework. Focusing on intuitive API and build within stringent architecture and design 
