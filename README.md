@@ -57,7 +57,7 @@ Key Features
 
 - Ready to use JVM implementation available over Jitpack
 - JVM implementation that can be used for Desktop apps (Win,Mac,Linux)
-- TODO: JVM implementation that can be used for Android development
+- JVM implementation for Android - Not implemented yet. If you like to contribute please open an issue.
 
 **Kotlin JS implementation**
 
