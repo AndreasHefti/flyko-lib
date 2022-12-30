@@ -140,7 +140,7 @@ Let's Get Started with Fly-Ko
 
 - <a href="https://flyko-lib-doc.readthedocs.io/en/latest/index.html"> Documentation</a> - API documentation and reference
 
-- <a href="https://flyko-lib-doc.readthedocs.io/en/latest/introduction.html#setting-up-an-empty-jvm-based-project-as-a-start"> Quickstart</a> - setting up a JVM based project
+- <a href="https://flyko-lib-doc.readthedocs.io/en/latest/setup_jvm.html"> Quickstart</a> - setting up a JVM based project
 
 - <a href="https://flyko-lib-doc.readthedocs.io/en/latest/index.html"> Tutorial </a>- create a and publish a sample game with Fly-Ko-Lib
 
