@@ -33,10 +33,13 @@ fun main() {
             autoActivation = true
             name = "mainView"
             bounds(0, 0, 100, 100)
+            zoom = .5f
             withShader {
                 name = "shaderA"
-                vertexShaderProgram = GraphicsAPIImpl.DEFAULT_VERTEX_SHADER
-                fragmentShaderProgram = GraphicsAPIImpl.DEFAULT_FRAGMENT_SHADER
+                vertexShaderResourceName = "firefly/vertBloom.glsl"
+                fragmentShaderResourceName = "firefly/fragBloom.glsl"
+                //vertexShaderProgram = GraphicsAPIImpl.DEFAULT_VERTEX_SHADER
+                //fragmentShaderProgram = GraphicsAPIImpl.DEFAULT_FRAGMENT_SHADER
             }
             excludeFromEntityRendering = true
             asRenderTargetOf {
@@ -44,10 +47,10 @@ fun main() {
                 bounds(0, 0, 100, 100)
                 withShader {
                     name = "shaderB"
-                    //vertexShaderResourceName = "firefly/vertBloom.glsl"
-                    //fragmentShaderResourceName = "firefly/fragBloom.glsl"
-                    vertexShaderProgram = GraphicsAPIImpl.DEFAULT_VERTEX_SHADER
-                    fragmentShaderProgram = GraphicsAPIImpl.DEFAULT_FRAGMENT_SHADER
+                    vertexShaderResourceName = "firefly/vertBloom.glsl"
+                    fragmentShaderResourceName = "firefly/fragBloom.glsl"
+                    //vertexShaderProgram = GraphicsAPIImpl.DEFAULT_VERTEX_SHADER
+                    //fragmentShaderProgram = GraphicsAPIImpl.DEFAULT_FRAGMENT_SHADER
                 }
             }
         }

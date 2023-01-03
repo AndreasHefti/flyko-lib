@@ -173,10 +173,12 @@ abstract class ComponentNode protected constructor(componentType: ComponentType<
     @JvmField var disposePolicy = ApplyPolicies.DEFAULT_DISPOSE
     @JvmField var deletePolicy = ApplyPolicies.DEFAULT_DELETE
 
-    public var parent: ComponentKey = NO_COMPONENT_KEY
+    var parent: ComponentKey = NO_COMPONENT_KEY
         protected set
+
     val children: DynArrayRO<ComponentKey>?
         get() = writableChildren
+
     protected var writableChildren : DynArray<ComponentKey>? = null
 
     protected open fun setParentComponent(key: ComponentKey) {
@@ -184,9 +186,9 @@ abstract class ComponentNode protected constructor(componentType: ComponentType<
     }
     fun withChild(key: ComponentKey): ComponentKey {
         if (children == null)
-            writableChildren = DynArray.of()
-        writableChildren!!.add(key)
+            writableChildren = DynArray.of(5, 5)
 
+        writableChildren!!.add(key)
         return key
     }
 
