@@ -29,6 +29,21 @@ const val PROP_NAME_TILE_LAYER = "tilelayer"
 const val PROP_NAME_OBJECT_LAYER = "objectgroup"
 const val PROP_NAME_TILE_SETS = "tilesets"
 
+class PropertyJson(
+    @JvmField val name: String,
+    @JvmField val type: String,
+    @JvmField val value: Any
+) {
+    val stringValue: String
+        get() = value.toString()
+    val intValue: Int
+        get() = value as Int
+}
+
+class TilesetCodeOffsets(
+    @JvmField val firstgid: Int,
+)
+
 class AreaData(
     @JvmField val name: String,
     @JvmField val orientationType: WorldOrientationType = WorldOrientationType.COUNT,
@@ -112,21 +127,6 @@ class TiledObject(
     val mappedProperties: Map<String, PropertyJson>
         get() = properties.associateBy(PropertyJson::name)
 }
-
-class PropertyJson(
-    @JvmField val name: String,
-    @JvmField val type: String,
-    @JvmField val value: Any
-) {
-    val stringValue: String
-        get() = value.toString()
-    val intValue: Int
-        get() = value as Int
-}
-
-class TilesetCodeOffsets(
-    @JvmField val firstgid: Int,
-)
 
 class TileSetJson(
     @JvmField val name: String,

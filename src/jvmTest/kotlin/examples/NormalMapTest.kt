@@ -25,7 +25,6 @@ fun main() {
         View {
             autoActivation = true
             name = "View1"
-            renderPassTo(View.BASE_VIEW_KEY)
             bounds(30, 30, 16, 16)
             blendMode = BlendMode.NONE
             tintColor(1f, 1f, 1f, 1f)

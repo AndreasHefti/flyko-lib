@@ -101,11 +101,15 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
 
 object ViewSystemRenderer : Renderer() {
 
-    internal val NO_VIRTUAL_VIEW_PORTS: DynArrayRO<ViewData> = DynArray.of(0,0)
     private val RENDERING_CHAIN = mutableListOf<ViewRenderer>()
-    private val SORTED_VIEWS = DynArray.of<ViewData>()
-    private val VIEW_LAYER_MAPPING = DynArray.of<Pair<ViewData, DynIntArray>>()
     private val CLIP = Vector4i()
+
+    // TODO why is this really needed?
+    internal val NO_VIRTUAL_VIEW_PORTS: DynArrayRO<ViewData> = DynArray.of(0,0)
+    private val VIEW_LAYER_MAPPING = DynArray.of<Pair<View, DynIntArray>>(5, 10)
+    private val SORTED_RENDER_TO_BASE = DynArray.of<ViewData>(5, 10)
+    private val FOR_ENTITY_RENDERING = DynArray.of<ViewData>(5, 10)
+
     private val VIEW_COMPARATOR = Comparator<ViewData?> { a, b ->
         val p1 = if (a != null) View[a.index].zPosition else 0
         val p2 = if (b != null) View[b.index].zPosition else 0
@@ -123,14 +127,14 @@ object ViewSystemRenderer : Renderer() {
     private fun viewListener(key: ComponentKey, type: ComponentEventType) {
         if (type == ACTIVATED) VIEW_LAYER_MAPPING[key.instanceIndex] = Pair(View[key.instanceIndex], DynIntArray())
         else if (type == DEACTIVATED) VIEW_LAYER_MAPPING.remove(key.instanceIndex)
-        sort()
+        updateReferences()
     }
 
     private fun layerListener(key: ComponentKey, type: ComponentEventType) {
         val viewIndex = Layer[key.instanceIndex].view.targetKey.instanceIndex
         if (type == ACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.add(key.instanceIndex)
         else if (type == DEACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.remove(key.instanceIndex)
-        sort()
+        updateReferences()
     }
 
     init {
@@ -139,13 +143,19 @@ object ViewSystemRenderer : Renderer() {
         Layer.registerComponentListener(this::layerListener)
     }
 
-    private fun sort() {
-        SORTED_VIEWS.clear()
+    private fun updateReferences() {
+        SORTED_RENDER_TO_BASE.clear()
+        FOR_ENTITY_RENDERING.clear()
         VIEW_LAYER_MAPPING.forEach {
             it.second.sort(LAYER_COMPARATOR)
-            SORTED_VIEWS.add(it.first)
+            if (it.first.renderToBase)
+                SORTED_RENDER_TO_BASE.add(it.first)
+            if (!it.first.excludeFromEntityRendering)
+                FOR_ENTITY_RENDERING.add(it.first)
         }
-        SORTED_VIEWS.sort(VIEW_COMPARATOR)
+        SORTED_RENDER_TO_BASE.trim()
+        SORTED_RENDER_TO_BASE.sort(VIEW_COMPARATOR)
+        FOR_ENTITY_RENDERING.trim()
     }
 
     internal fun sortRenderingChain() {
@@ -173,8 +183,8 @@ object ViewSystemRenderer : Renderer() {
             renderViewport(View[View.BASE_VIEW_KEY])
             Engine.graphics.flush(NO_VIRTUAL_VIEW_PORTS)
         } else {
-            SORTED_VIEWS.forEach { renderViewport(it) }
-            Engine.graphics.flush(SORTED_VIEWS)
+            FOR_ENTITY_RENDERING.forEach { renderViewport(it) }
+            Engine.graphics.flush(SORTED_RENDER_TO_BASE)
         }
     }
 
@@ -187,7 +197,7 @@ object ViewSystemRenderer : Renderer() {
             data.bounds.height
         )
 
-        Engine.graphics.startViewportRendering(data, true)
+        Engine.graphics.startViewportRendering(data)
         val layers = VIEW_LAYER_MAPPING[data.index]?.second
         if (layers != null && !layers.isEmpty) {
             val layerIterator = layers.iterator()

@@ -67,6 +67,10 @@ object GraphicsMock : GraphicsAPI {
         TODO("Not yet implemented")
     }
 
+    override fun clearView(view: ViewData) {
+        TODO("Not yet implemented")
+    }
+
     override fun startViewportRendering(view: ViewData, clear: Boolean) {
         _log.add("startRendering::$view")
     }

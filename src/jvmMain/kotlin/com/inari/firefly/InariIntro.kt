@@ -25,8 +25,8 @@ object InariIntro {
     private var callback: () -> Unit = {}
     private var disposing = false
 
-    private val pngWidth = 520
-    private val pngHeight = 139
+    private const val pngWidth = 520
+    private const val pngHeight = 139
 
     internal fun show(callback: () -> Unit) {
         this.callback = callback
@@ -79,9 +79,14 @@ object InariIntro {
     }
 
     private fun dispose() {
+
         if (!disposing) {
+            println("dispose")
             disposing = true
+            Entity.delete(entityId)
             Asset.delete(textureAssetName)
+            entityId = NO_COMPONENT_KEY
+            Engine.graphics.clearView(View[View.BASE_VIEW_KEY])
             Engine.input.resetInputCallbacks()
             callback()
         }

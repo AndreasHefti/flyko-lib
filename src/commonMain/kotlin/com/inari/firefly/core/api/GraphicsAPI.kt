@@ -84,6 +84,14 @@ interface GraphicsAPI {
      */
     fun setActiveShader(shaderId: Int)
 
+    /** Clears the given view with its defined clear color.
+     *
+     * @param view the [ViewData] to clear color and other buffers
+     */
+    fun clearView(view: ViewData)
+
+    fun startViewportRendering(view: ViewData) = startViewportRendering(view, view.clearBeforeStartRendering)
+
     /** This is called form the firefly API before rendering to a given [ViewData] and must
      * prepare all the stuff needed to render the that [ViewData] on following renderXXX calls.
      *
@@ -184,6 +192,7 @@ expect object GraphicsAPIImpl {
     fun disposeSprite(spriteId: Int)
     fun createShader(data: ShaderData): Int
     fun disposeShader(shaderId: Int)
+    fun clearView(view: ViewData)
     fun startViewportRendering(view: ViewData, clear: Boolean)
     fun setActiveShader(shaderId: Int)
     fun renderTexture(textureId: Int, posX: Float, posY: Float, scaleX: Float = 1f, scaleY: Float = 1f, rotation: Float = 0f, flipX: Boolean = false, flipY: Boolean = false, tintColor: Vector4f = Vector4f(1f, 1f, 1f, 1f), blendMode: BlendMode = BlendMode.NONE)

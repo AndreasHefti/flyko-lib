@@ -28,9 +28,9 @@ object FFInfoSystem : System {
     private val graphics = Engine.graphics
 
     private val postRenderListener: () -> Unit = {
-        graphics.startViewportRendering( View[View.BASE_VIEW_KEY], false )
+        graphics.startViewportRendering(View[View.BASE_VIEW_KEY], false)
         renderSystemInfoDisplay()
-        graphics.endViewportRendering( View[View.BASE_VIEW_KEY] )
+        graphics.endViewportRendering(View[View.BASE_VIEW_KEY])
         graphics.flush(NO_VIRTUAL_VIEW_PORTS)
     }
 

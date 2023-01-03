@@ -5,6 +5,7 @@ import com.inari.util.IntPropertyAccessor
 import com.inari.util.StringUtils
 import com.inari.util.VALUE_SEPARATOR
 import kotlin.jvm.JvmField
+import kotlin.math.absoluteValue
 import kotlin.math.sqrt
 
 class ImmutableVector2i constructor(
@@ -46,6 +47,8 @@ open class Vector2i constructor(
         override fun invoke(): Int = v1
     }
 
+    open val length: Int
+        get() = v0.absoluteValue + v1.absoluteValue
     inline var x: Int
         get() = v0
         set(value) { v0 = value }
@@ -177,6 +180,8 @@ open class Vector3i constructor(
     inline var radius: Int
         get() = v2
         set(value) { v2 = value }
+    override val length: Int
+        get() = super.length + v2.absoluteValue
 
     fun normalized(v: Vector3f) {
         val m = GeomUtils.magnitude(this)
@@ -320,6 +325,8 @@ class Vector4i constructor(
         override fun invoke(): Int = v3
     }
 
+    override val length: Int
+        get() = super.length + v3.absoluteValue
     var width: Int
         get() = v2
         set(value) { v2 = value }

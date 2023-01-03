@@ -1,7 +1,6 @@
 package com.inari.firefly.core.api
 
 import com.inari.util.ZERO_FLOAT
-import com.inari.util.ZERO_INT
 import com.inari.util.geom.*
 
 enum class BlendMode constructor(val source: Int, val dest: Int) {
@@ -54,13 +53,19 @@ interface ViewData {
     val bounds: Vector4i
     val worldPosition: Vector2f
     val clearColor: Vector4f
+    val clearBeforeStartRendering: Boolean
     val tintColor: Vector4f
     val blendMode: BlendMode
     val shaderIndex: Int
     val zoom: Float
     val fboScale: Float
     val index: Int
-    val renderPassIndex: Int
+    val renderTargetOf1: Int
+    val renderTargetOf2: Int
+    val renderTargetOf3: Int
+    val isRenderTarget: Boolean
+        get() = renderTargetOf1 >= 0 || renderTargetOf2 >= 0 || renderTargetOf3 >= 0
+    val renderToBase: Boolean
     val isBase: Boolean
 }
 

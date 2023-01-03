@@ -14,29 +14,45 @@ class View private constructor(): ComponentNode(View), ViewData, Controlled {
     override var isBase = false
         internal set
 
-    override val renderPassIndex: Int
-        get() = renderPassTo.targetKey.instanceIndex
-    @JvmField val renderPassTo = CReference(View)
+    override val clearBeforeStartRendering = true
     @JvmField var zPosition = 0
     override val bounds = Vector4i()
-    override val  worldPosition = Vector2f()
-    override val  clearColor = Vector4f( 0f, 0f, 0f, 1f )
+    override val worldPosition = Vector2f()
+    override val clearColor = Vector4f( 0f, 0f, 0f, 1f )
     override val tintColor = Vector4f( 1f, 1f, 1f, 1f )
-    override var  blendMode = BlendMode.NONE
-    @JvmField val shader = CReference(Shader)
+    override var blendMode = BlendMode.NONE
     override var zoom = 1.0f
     override var  fboScale = 1.0f
 
     override var shaderIndex = -1
         internal set
+    @JvmField val shader = CLooseReference(Shader)
+
+    @JvmField var excludeFromEntityRendering = false
+    override var renderTargetOf1 = -1
+        internal set
+    override var renderTargetOf2 = -1
+        internal set
+    override var renderTargetOf3 = -1
+        internal set
+    override var renderToBase = true
+        set(value) {
+            val reload = field != value && active
+            field = value
+            if (reload) {
+                View.deactivate(this)
+                View.activate(this)
+            }
+        }
+
+
 
     override val controllerReferences = ControllerReferences(View)
 
-    override fun initialize() {
-        super.initialize()
-        // for default none base view, set render pass to base view
-        //if (!isBase)
-            //renderPassTo(BASE_VIEW_KEY)
+    override fun setParentComponent(key: ComponentKey) {
+        super.setParentComponent(key)
+        if (key.type == View)
+            this.renderToBase = false
     }
 
     override fun load() {
@@ -54,6 +70,26 @@ class View private constructor(): ComponentNode(View), ViewData, Controlled {
 
     fun withLayer(configure: (Layer.() -> Unit)): ComponentKey =
         withChild(Layer, configure)
+    
+    fun asRenderTargetOf(configure: (View.() -> Unit)) : ComponentKey {
+        if (renderTargetOf1 < 0) {
+            val key = withChild(View, configure)
+            renderTargetOf1 = key.instanceIndex
+            return key
+        }
+        if (renderTargetOf2 < 0) {
+            val key = withChild(View, configure)
+            renderTargetOf2 = key.instanceIndex
+            return key
+        }
+        if (renderTargetOf3 < 0) {
+            val key = withChild(View, configure)
+            renderTargetOf3 = key.instanceIndex
+            return key
+        }
+        throw IllegalStateException("All three render targets are already set.")
+    }
+
 
     fun withShader(configure: (Shader.() -> Unit)): ComponentKey {
         val key = withChild(Shader, configure)

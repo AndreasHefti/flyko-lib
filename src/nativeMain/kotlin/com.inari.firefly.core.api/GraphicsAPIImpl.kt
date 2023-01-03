@@ -43,6 +43,10 @@ actual object GraphicsAPIImpl : GraphicsAPI {
     actual override fun disposeShader(shaderId: Int) {
     }
 
+    actual override fun clearView(view: ViewData) {
+        TODO("Not yet implemented")
+    }
+
     actual override fun startViewportRendering(view: ViewData, clear: Boolean) {
         TODO("Not yet implemented")
     }

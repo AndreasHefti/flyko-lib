@@ -28,7 +28,6 @@ fun main() {
         val viewKey = View {
             autoActivation = true
             name = "view1"
-            renderPassTo(View.BASE_VIEW_KEY)
             bounds(0, 0, 100, 100)
             clearColor(BLACK)
             blendMode = BlendMode.NORMAL_ALPHA

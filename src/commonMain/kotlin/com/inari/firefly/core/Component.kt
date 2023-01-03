@@ -173,7 +173,7 @@ abstract class ComponentNode protected constructor(componentType: ComponentType<
     @JvmField var disposePolicy = ApplyPolicies.DEFAULT_DISPOSE
     @JvmField var deletePolicy = ApplyPolicies.DEFAULT_DELETE
 
-    var parent: ComponentKey = NO_COMPONENT_KEY
+    public var parent: ComponentKey = NO_COMPONENT_KEY
         protected set
     val children: DynArrayRO<ComponentKey>?
         get() = writableChildren

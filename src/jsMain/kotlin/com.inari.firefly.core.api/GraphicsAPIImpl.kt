@@ -48,6 +48,10 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         TODO("Not yet implemented")
     }
 
+    actual override fun clearView(view: ViewData) {
+        TODO("Not yet implemented")
+    }
+
     actual override fun startViewportRendering(view: ViewData, clear: Boolean) {
         TODO("Not yet implemented")
     }

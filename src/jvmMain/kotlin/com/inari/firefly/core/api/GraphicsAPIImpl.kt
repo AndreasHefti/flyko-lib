@@ -20,6 +20,7 @@ import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
 import com.inari.firefly.core.api.ShapeType.*
 import com.inari.firefly.filter.ColorFilteredTextureData
+import com.inari.firefly.graphics.view.View
 import com.inari.util.NO_PROGRAM
 import com.inari.util.NULL_INT_FUNCTION
 import com.inari.util.geom.*
@@ -107,7 +108,8 @@ actual object GraphicsAPIImpl : GraphicsAPI {
     }
 
     actual override fun disposeView(viewId: Int) {
-        viewports.remove(viewId)?.dispose()
+        if (viewId != View.BASE_VIEW_KEY.instanceIndex)
+            viewports.remove(viewId)?.dispose()
     }
 
     actual override fun createTexture(data: TextureData): Triple<Int, Int, Int> {
@@ -202,6 +204,10 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         shaders.remove(shaderId)?.dispose()
     }
 
+    actual override fun clearView(view: ViewData) {
+        viewports[view.index]?.activate(spriteBatch, shapeRenderer, view, true)
+    }
+
     actual override fun startViewportRendering(view: ViewData, clear: Boolean) {
         if (activeBackBufferId >= 0)
             throw IllegalStateException("Back-buffer rendering is on")
@@ -240,7 +246,6 @@ actual object GraphicsAPIImpl : GraphicsAPI {
             }
         activeShapeShaderId = shaderId
     }
-
 
     actual override fun renderTexture(
         textureId: Int,
@@ -559,21 +564,17 @@ actual object GraphicsAPIImpl : GraphicsAPI {
     actual override fun flush(virtualViews: DynArrayRO<ViewData>) {
         if (!virtualViews.isEmpty) {
             var i = 0
-            var targetId = -1
             while (i < virtualViews.capacity) {
-
                 val virtualView = virtualViews[i++] ?: continue
-                if (virtualView.renderPassIndex < 0) continue
-
                 val viewport = viewports[virtualView.index] ?: continue
-                val target = viewports[virtualView.renderPassIndex] ?: continue
 
-                // activate the target viewport and render the source viewport to it
-                target.activate(spriteBatch, shapeRenderer, baseView!!, true)
+                // if we have a render pipeline applied to this view, render it first
+                if (virtualView.isRenderTarget)
+                    renderPipeline(virtualView)
 
-                // TODO batching can be optimizes if draws to the same target comes as batch too
-                //      views shall be sorted within the target as well as the z axis
-                //      then begin an end batching on target change
+                // then activate the base view port and render the virtual viewport to it
+                baseViewport?.activate(spriteBatch, shapeRenderer, baseView!!, true)
+
                 spriteBatch.begin()
 
                 setColorAndBlendMode(virtualView.tintColor, virtualView.blendMode)
@@ -581,20 +582,50 @@ actual object GraphicsAPIImpl : GraphicsAPI {
 
                 spriteBatch.draw(
                     viewport.fboTexture,
-                    virtualView.bounds.x.toFloat(),
-                    virtualView.bounds.y.toFloat(),
-                    virtualView.bounds.width.toFloat(),
-                    virtualView.bounds.height.toFloat()
+                    virtualView.bounds.x.toFloat(), virtualView.bounds.y.toFloat(),
+                    virtualView.bounds.width.toFloat(), virtualView.bounds.height.toFloat()
                 )
-
-                spriteBatch.end()
-                target.deactivate()
             }
+            spriteBatch.end()
         }
 
         spriteBatch.flush()
         activeBlend = BlendMode.NONE
         setActiveShader(-1)
+    }
+
+    private fun renderPipeline(targetViewPort: ViewData) {
+        if (targetViewPort.renderTargetOf1 >= 0)
+            renderPipeline(targetViewPort, viewports[targetViewPort.renderTargetOf1])
+        if (targetViewPort.renderTargetOf2 >= 0)
+            renderPipeline(targetViewPort, viewports[targetViewPort.renderTargetOf2])
+        if (targetViewPort.renderTargetOf3 >= 0)
+            renderPipeline(targetViewPort, viewports[targetViewPort.renderTargetOf3])
+    }
+
+    private fun renderPipeline(targetViewPort: ViewData, source: ViewportFBO?) {
+        if (source != null) {
+            val viewport = viewports[targetViewPort.index] ?: return
+            // recursively go up to the root render source
+            if (source.viewData.isRenderTarget)
+                renderPipeline(source.viewData)
+            // then render the source to the target
+            viewport.activate(spriteBatch, shapeRenderer, targetViewPort, targetViewPort.clearBeforeStartRendering)
+            spriteBatch.begin()
+
+            setColorAndBlendMode(source.viewData.tintColor, source.viewData.blendMode)
+            setActiveShader(source.viewData.shaderIndex)
+
+            spriteBatch.draw(
+                source.fboTexture,
+                source.viewData.bounds.x.toFloat(), source.viewData.bounds.y.toFloat(),
+                source.viewData.bounds.width.toFloat(), source.viewData.bounds.height.toFloat()
+            )
+
+            spriteBatch.flush()
+            viewport.deactivate()
+            spriteBatch.end()
+        }
     }
 
     actual override fun getScreenshotPixels(area: Vector4i): ByteArray {
@@ -620,21 +651,10 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         return inverseArray
     }
 
-    private fun createBaseViewport(viewPort: ViewData): ViewportFBO {
-        return ViewportFBO(
-            OrthographicCamera(
-                viewPort.bounds.width.toFloat(),
-                viewPort.bounds.height.toFloat()
-            ),
-            null, null
-        )
-    }
+    private fun createBaseViewport(viewPort: ViewData): ViewportFBO =
+        ViewportFBO(viewPort, null, null)
 
     private fun createVirtualViewport(viewPort: ViewData): ViewportFBO {
-        val camera = OrthographicCamera(
-            viewPort.bounds.width.toFloat(),
-            viewPort.bounds.height.toFloat()
-        )
         val frameBuffer = FrameBuffer(
             Pixmap.Format.RGBA8888,
             (viewPort.bounds.width * viewPort.fboScale).toInt(),
@@ -644,7 +664,7 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         val textureRegion = TextureRegion(frameBuffer.colorBufferTexture)
         textureRegion.flip(false, false)
 
-        return ViewportFBO(camera, frameBuffer, textureRegion)
+        return ViewportFBO(viewPort, frameBuffer, textureRegion)
     }
 
 
@@ -722,8 +742,6 @@ actual object GraphicsAPIImpl : GraphicsAPI {
             if (!updates.isEmpty)
                 Engine.disposeListener(Engine.UPDATE_EVENT_TYPE, ::update)
             spriteBatch.shader = null
-
-            // ???
         }
 
         override fun setUniformFloat(bindingName: String, value: Float) =
@@ -772,20 +790,28 @@ actual object GraphicsAPIImpl : GraphicsAPI {
     }
 
     private class ViewportFBO constructor(
-        val camera: OrthographicCamera,
+        var viewData: ViewData,
         val frameBuffer: FrameBuffer?,
         val fboTexture: TextureRegion?) {
+
+        val camera: OrthographicCamera = OrthographicCamera(
+            viewData.bounds.width.toFloat(),
+            viewData.bounds.height.toFloat()
+        )
 
         fun activate(
             spriteBatch: PolygonSpriteBatch,
             shapeRenderer: ShapeRenderer,
-            view: ViewData,
-            clear: Boolean
+            view: ViewData? = null,
+            clear: Boolean = true
         ) {
-            val worldPosition = view.worldPosition
-            val zoom = view.zoom
-            val clearColor = view.clearColor
-            val bounds = view.bounds
+            if (view != null)
+                viewData = view
+
+            val worldPosition = viewData.worldPosition
+            val zoom = viewData.zoom
+            val clearColor = viewData.clearColor
+            val bounds = viewData.bounds
 
             camera.setToOrtho(true, bounds.width * zoom, bounds.height * zoom)
             camera.position.x = camera.position.x + worldPosition.x
@@ -810,34 +836,4 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         fun deactivate() = frameBuffer?.end()
         fun dispose() = frameBuffer?.dispose()
     }
-
-//    private class GDXShaderInitAdapter(val program: ShaderProgram) : ShaderInitAdapter {
-//
-//        private var texNum = 1
-//
-//        override fun setUniformFloat(bindingName: String, value: Float) =
-//            program.setUniformf(bindingName, value)
-//        override fun setUniformVec2(bindingName: String, position: Vector2f) =
-//            program.setUniformf(bindingName, position.x, position.y)
-//        override fun setUniformVec2(bindingName: String, position: Vector2i) =
-//            program.setUniformf(bindingName, position.x.toFloat(), position.y.toFloat())
-//        override fun setUniformVec3(bindingName: String, v: Vector3f) {
-//            program.setUniformf(bindingName, v.v0, v.v1, v.v2)
-//        }
-//
-//        override fun setUniformColorVec4(bindingName: String, color: Vector4f) =
-//            program.setUniformf(bindingName, color.r, color.g, color.b, color.a)
-//
-//        override fun bindTexture(bindingName: String, textureId: Int) {
-//            program.setUniformi(bindingName, texNum)
-//            textures[textureId]?.bind(texNum)
-//            texNum++
-//        }
-//
-//        override fun bindViewTexture(bindingName: String, backBufferId: Int) {
-//            viewports[backBufferId]?.bindToShader(program, bindingName, texNum++)
-//        }
-//
-//        fun finish() = Gdx.graphics.gL20.glActiveTexture(GL20.GL_TEXTURE0)
-//    }
 }
