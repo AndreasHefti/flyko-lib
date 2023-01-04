@@ -7,32 +7,35 @@ varying vec2 v_texCoords;
 uniform sampler2D u_texture;
 uniform vec2 u_res;
 
+float scanlines = 2;
+float scanlineShadow1 =  .85;
+float scanlineShadow2 =  .55;
+
+float tricolor = 3;
+float onColorFactor = 1.2;
+float offColorFactor = .8;
+vec4 tricolorFactorRed = vec4(onColorFactor, offColorFactor, offColorFactor, 1);
+vec4 tricolorFactorGreen = vec4(offColorFactor, onColorFactor, offColorFactor, 1);
+vec4 tricolorFactorBlue = vec4(offColorFactor, offColorFactor, onColorFactor, 1);
+
 void main(){
   vec2 realCoords = floor(u_res * v_texCoords);
-  float ym = floor(mod(realCoords.y, 2));
-  float xm = floor(mod(realCoords.x, 3.00));
-  float iy = 1;
-  float ix = 1;
-  if (ym < 1.0) { iy = .75; } else if (ym < 2.0) { iy = .85; }
-  //if (xm < 1.0) { ix = .95; } else if (xm < 2.0) { ix = .98; }
-  gl_FragColor = v_color * texture2D(u_texture, v_texCoords) * iy;
+  float ym = floor(mod(realCoords.y, scanlines));
+  float xm = floor(mod(realCoords.x, tricolor));
+  float scanlineShadow = 1;
 
-  float fact = 0.8;
+  if (ym < 1.0) {
+    scanlineShadow = scanlineShadow1;
+  } else if (ym < 2.0) {
+    scanlineShadow = scanlineShadow2;
+  }
+
   if (xm == 1) {
-    gl_FragColor.g = gl_FragColor.g * fact;
-    gl_FragColor.b = gl_FragColor.b * fact;
+    gl_FragColor = v_color * texture2D(u_texture, v_texCoords) * scanlineShadow * tricolorFactorRed;
+  } else if (xm == 2) {
+    gl_FragColor = v_color * texture2D(u_texture, v_texCoords) * scanlineShadow * tricolorFactorGreen;
+  } else {
+    gl_FragColor = v_color * texture2D(u_texture, v_texCoords) * scanlineShadow * tricolorFactorBlue;
   }
-  else if (xm == 2) {
-    gl_FragColor.r = gl_FragColor.r * fact;
-    gl_FragColor.b = gl_FragColor.b * fact;
-  }
-  else {
-    gl_FragColor.r = gl_FragColor.r * fact;
-    gl_FragColor.g = gl_FragColor.g * fact;
-  }
-
-//  if (xm < 1.0) { gl_FragColor.r = gl_FragColor.r * 1.5; }
-//  else if (xm < 2.0) { gl_FragColor.g = gl_FragColor.g * 1.5; }
-//  else { gl_FragColor.b = gl_FragColor.b * 1.5; }
 
 }
