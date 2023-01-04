@@ -5,7 +5,7 @@ import com.inari.util.event.EventDispatcher
 
 object TestApp : FFApp(
     { EventDispatcher() },
-    { GraphicsMock },
+    { GraphicsAPIMock },
     { AudioMock },
     { InputMock },
     { TestTimer },

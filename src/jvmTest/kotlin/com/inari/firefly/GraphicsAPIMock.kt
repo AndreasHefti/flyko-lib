@@ -8,7 +8,7 @@ import com.inari.util.collection.DynArrayRO
 import com.inari.util.geom.Vector4f
 import com.inari.util.geom.Vector4i
 
-object GraphicsMock : GraphicsAPI {
+object GraphicsAPIMock : GraphicsAPI {
 
     val _loadedAssets: DynArray<String> = DynArray.of(20, 10)
     val _views = ArrayList<ComponentKey>()

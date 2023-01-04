@@ -16,18 +16,15 @@ import com.inari.firefly.graphics.text.SimpleTextRenderer
 import com.inari.firefly.graphics.tile.SimpleTileGridRenderer
 import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
-import kotlin.math.roundToInt
 
 
 class DesktopApp(
-    val title: String,
+    private val title: String,
     private val defaultWidth: Int = 800,
     private val defaultHeight: Int = 600,
     resizable: Boolean = true,
     vsync: Boolean = true,
     icon: String? = null,
-    private val fitBaseViewPortToScreen: Boolean = true,
-    private val centerCamera: Boolean = true,
     val initializer: (DesktopApp) -> Unit
 ) : ApplicationAdapter() {
 
@@ -45,6 +42,7 @@ class DesktopApp(
             t.printStackTrace()
         }
     }
+
 
     override fun create() {
         Gdx.graphics.setTitle(title)
@@ -112,34 +110,10 @@ class DesktopApp(
     override fun render() = DesktopAppAdapter.update()
 
     override fun resize(width: Int, height: Int) {
-        if (fitBaseViewPortToScreen)
-            fitBaseViewportToScreen(width, height, defaultWidth, defaultHeight, centerCamera)
+        if (View.fitBaseViewPortToScreen)
+            View.notifyScreenSizeChange(width, height, defaultWidth, defaultHeight)
     }
 
-    fun fitBaseViewportToScreen(width: Int, height: Int, baseWidth: Int, baseHeight: Int, centerCamera: Boolean) {
-        if (width <= 0 || height <= 0)
-            return
-        val baseView = View[View.BASE_VIEW_KEY]
-        val bounds = baseView.bounds
-        val worldPosition = baseView.worldPosition
-        val targetRatio = height.toFloat() / width
-        val sourceRatio = baseHeight.toFloat() / baseWidth
-        val fitToWidth = targetRatio > sourceRatio
-        val zoom = baseView.zoom
-
-        if (fitToWidth) {
-            bounds.width = baseWidth
-            bounds.height = (baseHeight / sourceRatio * targetRatio).roundToInt()
-        } else {
-            bounds.width = (baseWidth / targetRatio * sourceRatio).roundToInt()
-            bounds.height = baseHeight
-        }
-
-        if (centerCamera) {
-            worldPosition.x = -(bounds.width - baseWidth).toFloat() / 2 * zoom
-            worldPosition.y = -(bounds.height - baseHeight).toFloat() / 2 * zoom
-        }
-    }
 
     fun addExitKeyTrigger(key: Int) {
         Trigger

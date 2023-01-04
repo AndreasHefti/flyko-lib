@@ -4,7 +4,7 @@ import com.inari.firefly.core.Engine
 import com.inari.firefly.core.api.ResourceServiceAPIImpl
 
 object TestApp : Engine(
-    { GraphicsMock },
+    { GraphicsAPIMock },
     { AudioMock },
     { InputMock },
     { TestTimer },

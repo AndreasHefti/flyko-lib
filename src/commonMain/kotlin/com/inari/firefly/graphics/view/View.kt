@@ -4,10 +4,12 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.ViewData
 import com.inari.util.event.Event
+import com.inari.util.geom.ImmutableVector3f
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4f
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
+import kotlin.math.roundToInt
 
 class View private constructor(): ComponentNode(View), ViewData, Controlled {
 
@@ -104,6 +106,58 @@ class View private constructor(): ComponentNode(View), ViewData, Controlled {
         val VIEW_CHANGE_EVENT_TYPE = Event.EventType("ViewChangeEvent")
         private val viewChangeEvent = ViewChangeEvent(VIEW_CHANGE_EVENT_TYPE)
 
+        val BASE_VIEW_KEY = View {
+            autoActivation = true
+            name = "BASE_VIEW$STATIC_COMPONENT_MARKER"
+            bounds(0, 0, Engine.graphics.screenWidth, Engine.graphics.screenHeight)
+            isBase = true
+        }
+
+        val BASE_VIEW = View[BASE_VIEW_KEY]
+
+        init {
+            ViewSystemRenderer  // initialize the view system rendering
+        }
+
+        var fitBaseViewPortToScreen: Boolean = true
+        var centerCamera: Boolean = true
+        val baseViewPortProjectionSize = Vector2f(
+            Engine.graphics.screenWidth,
+            Engine.graphics.screenHeight)
+
+        fun notifyScreenSizeChange(
+            width: Int,
+            height: Int,
+            baseWidth: Int,
+            baseHeight: Int) {
+
+            if (width <= 0 || height <= 0)
+                return
+            val bounds = BASE_VIEW.bounds
+            val worldPosition = BASE_VIEW.worldPosition
+            val targetRatio = height.toFloat() / width
+            val sourceRatio = baseHeight.toFloat() / baseWidth
+            val fitToWidth = targetRatio > sourceRatio
+            val zoom = BASE_VIEW.zoom
+
+            if (fitToWidth) {
+                bounds.width = baseWidth
+                bounds.height = (baseHeight / sourceRatio * targetRatio).roundToInt()
+                baseViewPortProjectionSize.v0 = Engine.graphics.screenWidth.toFloat()
+                baseViewPortProjectionSize.v1 = Engine.graphics.screenWidth * sourceRatio
+            } else {
+                bounds.width = (baseWidth / targetRatio * sourceRatio).roundToInt()
+                bounds.height = baseHeight
+                baseViewPortProjectionSize.v0 = Engine.graphics.screenHeight / sourceRatio
+                baseViewPortProjectionSize.v1 = Engine.graphics.screenHeight.toFloat()
+            }
+
+            if (centerCamera) {
+                worldPosition.x = -(bounds.width - baseWidth).toFloat() / 2 * zoom
+                worldPosition.y = -(bounds.height - baseHeight).toFloat() / 2 * zoom
+            }
+        }
+
         fun notifyViewChangeEvent(viewIndex: Int, type: ViewChangeEvent.Type, pixelPerfect: Boolean) {
             viewChangeEvent.viewIndex = viewIndex
             viewChangeEvent.type = type
@@ -117,17 +171,6 @@ class View private constructor(): ComponentNode(View), ViewData, Controlled {
             viewChangeEvent.type = type
             viewChangeEvent.pixelPerfect = pixelPerfect
             return viewChangeEvent
-        }
-
-        val BASE_VIEW_KEY = View {
-            autoActivation = true
-            name = "BASE_VIEW$STATIC_COMPONENT_MARKER"
-            bounds(0, 0, Engine.graphics.screenWidth, Engine.graphics.screenHeight)
-            isBase = true
-        }
-
-        init {
-            ViewSystemRenderer  // initialize the view system rendering
         }
     }
 
@@ -143,7 +186,6 @@ class View private constructor(): ComponentNode(View), ViewData, Controlled {
             internal set
 
         override fun notify(listener: (ViewChangeEvent) -> Unit) = listener(this)
-
     }
 
 }

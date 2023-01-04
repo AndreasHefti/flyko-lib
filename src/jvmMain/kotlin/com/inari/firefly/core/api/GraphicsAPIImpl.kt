@@ -746,19 +746,19 @@ actual object GraphicsAPIImpl : GraphicsAPI {
 
         override fun setUniformFloat(bindingName: String, value: Float) =
             program.setUniformf(bindingName, value)
-        override fun setUniformVec2(bindingName: String, position: Vector2f) =
-            program.setUniformf(bindingName, position.x, position.y)
-        override fun setUniformVec3(bindingName: String, v: Vector3f) =
-            program.setUniformf(bindingName, v.v0, v.v1, v.v2)
-        override fun setUniformColorVec4(bindingName: String, color: Vector4f) =
-            program.setUniformf(bindingName, color.r, color.g, color.b, color.a)
-        override fun bindTexture(bindingName: String, textureId: Int) {
+        override fun setUniformVec2(bindingName: String, value: Vector2f) =
+            program.setUniformf(bindingName, value.x, value.y)
+        override fun setUniformVec3(bindingName: String, value: Vector3f) =
+            program.setUniformf(bindingName, value.v0, value.v1, value.v2)
+        override fun setUniformColorVec4(bindingName: String, value: Vector4f) =
+            program.setUniformf(bindingName, value.r, value.g, value.b, value.a)
+        override fun bindTexture(bindingName: String, value: Int) {
             program.setUniformi(bindingName, texNum)
-            textures[textureId]?.bind(texNum)
+            textures[value]?.bind(texNum)
             texNum++
         }
-        override fun bindViewTexture(bindingName: String, backBufferId: Int) {
-            viewports[backBufferId]?.bindToShader(program, bindingName, texNum++)
+        override fun bindViewTexture(bindingName: String, value: Int) {
+            viewports[value]?.bindToShader(program, bindingName, texNum++)
         }
 
         override fun setUniformFloat(bindingName: String, supplier: () -> Float) {

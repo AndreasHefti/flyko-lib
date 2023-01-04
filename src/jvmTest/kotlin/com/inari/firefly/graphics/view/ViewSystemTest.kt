@@ -1,6 +1,6 @@
 package com.inari.firefly.graphics.view
 
-import com.inari.firefly.GraphicsMock
+import com.inari.firefly.GraphicsAPIMock
 import com.inari.firefly.TestApp
 import com.inari.firefly.core.ComponentSystem
 import com.inari.firefly.core.Control
@@ -15,7 +15,7 @@ class ViewSystemTest {
     @BeforeTest
     fun init() {
         TestApp
-        GraphicsMock.clearLogs()
+        GraphicsAPIMock.clearLogs()
         ComponentSystem.clearSystems()
     }
 
@@ -23,7 +23,7 @@ class ViewSystemTest {
     fun testSystemInit() {
 
         assertTrue(View.exists(BASE_VIEW_KEY))
-        assertTrue(GraphicsMock._views.size == 1)
+        assertTrue(GraphicsAPIMock._views.size == 1)
     }
 
     @Test
