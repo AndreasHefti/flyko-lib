@@ -8,6 +8,7 @@ import com.inari.util.aspect.AspectType
 import com.inari.util.collection.BitSet
 import com.inari.util.collection.DynArray
 import com.inari.util.event.Event
+import kotlin.native.concurrent.ThreadLocal
 
 interface System {
     fun clearSystem()
@@ -35,7 +36,6 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
         checkKey(keyForName)
         return get(keyForName.instanceIndex)
     }
-    operator fun get(ref: CLooseReference): C  = get(checkKey(ref.targetKey).instanceIndex)
     operator fun get(ref: CReference): C  = get(checkKey(ref.targetKey).instanceIndex)
     operator fun get(key: ComponentKey): C  = get(checkKey(key).instanceIndex)
     operator fun get(index: Int): C
@@ -222,9 +222,11 @@ abstract class ComponentSystem<C : Component>(
     // **** Component Handling ****
     // ****************************
     internal open fun registerComponent(c: C): ComponentKey {
-        if (checkComponentNameClash(c.name)) {
-            c.iDelete()
-            throw IllegalArgumentException("Key with same name already exists")
+        // check name clash
+        if (c.name != NO_NAME && c.name in COMPONENT_KEY_MAPPING) {
+            val key = COMPONENT_KEY_MAPPING[c.name]!!
+            if (key.instanceIndex >= 0 && key.instanceIndex != c.index)
+                throw IllegalArgumentException("Key with same name already exists. Name: ${c.name}")
         }
 
         COMPONENT_MAPPING[c.index] = c
@@ -269,7 +271,7 @@ abstract class ComponentSystem<C : Component>(
     internal open fun unregisterComponent(index: Int) {
         val removed = COMPONENT_MAPPING.remove(index)
         if (removed != null && removed.name != NO_NAME)
-            COMPONENT_KEY_MAPPING[removed.name]?.instanceIndex = -1
+            COMPONENT_KEY_MAPPING.remove(removed.name)?.clearKey()
     }
 
     override fun getNextIndex(fromIndex: Int): Int = COMPONENT_MAPPING.nextIndex(fromIndex)
@@ -280,21 +282,28 @@ abstract class ComponentSystem<C : Component>(
 
     override fun exists(index: Int): Boolean = COMPONENT_MAPPING.contains(index)
     override fun load(index: Int) {
+
+        // DEBUG  println("--> load: ${aspectName}:${index}")
+
         if (!checkIndex(index)) return
         val comp =  this[index]
         if (!comp.initialized) throw IllegalStateException("Component in illegal state to load")
         if (comp.onStateChange || comp.loaded) return
 
         comp.onStateChange = true
-        comp.stateChangeProcessing(Apply.BEFORE, ComponentEventType.LOADED)
         comp.iLoad()
         comp.loaded = true
         comp.onStateChange = false
         send(comp.key, ComponentEventType.LOADED)
-        comp.stateChangeProcessing(Apply.AFTER, ComponentEventType.LOADED)
+
+        // DEBUG  println("<-- load: ${aspectName}:${index}")
+
     }
 
     override fun activate(index: Int) {
+
+        // DEBUG  println("--> activate: ${aspectName}:${index}")
+
         if (!checkIndex(index)) return
         val comp = this[index]
         if (!comp.initialized) throw IllegalStateException("Component in illegal state to activate")
@@ -304,32 +313,38 @@ abstract class ComponentSystem<C : Component>(
             load(index)
 
         comp.onStateChange = true
-        comp.stateChangeProcessing(Apply.BEFORE, ComponentEventType.ACTIVATED)
         comp.iActivate()
         comp.active = true
         comp.onStateChange = false
         ACTIVE_COMPONENT_MAPPING[index] = true
         send(comp.key, ComponentEventType.ACTIVATED)
-        comp.stateChangeProcessing(Apply.AFTER, ComponentEventType.ACTIVATED)
+
+        // DEBUG  println("<-- activate: ${aspectName}:${index}")
     }
 
     override fun deactivate(index: Int) {
+
+        // DEBUG  println("--> deactivate: ${aspectName}:${index}")
+
         if (!checkIndex(index)) return
         val comp = this[index]
         if (!comp.initialized) throw IllegalStateException("Component in illegal state to activate")
         if (comp.onStateChange || !comp.active) return
 
         comp.onStateChange = true
-        comp.stateChangeProcessing(Apply.BEFORE, ComponentEventType.DEACTIVATED)
         comp.iDeactivate()
         comp.active = false
         comp.onStateChange = false
         ACTIVE_COMPONENT_MAPPING[index] = false
         send(comp.key, ComponentEventType.DEACTIVATED)
-        comp.stateChangeProcessing(Apply.AFTER, ComponentEventType.DEACTIVATED)
+
+        // DEBUG  println("<-- deactivate: ${aspectName}:${index}")
     }
 
     override fun dispose(index: Int) {
+
+        // DEBUG  println("--> dispose: ${aspectName}:${index}")
+
         if (!checkIndex(index)) return
         val comp = this[index]
         if (!comp.initialized) throw IllegalStateException("Component in illegal state to dispose")
@@ -339,15 +354,18 @@ abstract class ComponentSystem<C : Component>(
             deactivate(index)
 
         comp.onStateChange = true
-        comp.stateChangeProcessing(Apply.BEFORE, ComponentEventType.DISPOSED)
         comp.iDispose()
         comp.loaded = false
         comp.onStateChange = false
         send(comp.key, ComponentEventType.DISPOSED)
-        comp.stateChangeProcessing(Apply.AFTER, ComponentEventType.DISPOSED)
+
+        // DEBUG  println("<-- dispose: ${aspectName}:${index}")
     }
 
     override fun delete(index: Int) {
+
+        // DEBUG  println("--> delete: ${aspectName}:${index}")
+
         if (!checkIndex(index)) return
         val comp = this[index]
         if (comp.onStateChange) return
@@ -356,14 +374,14 @@ abstract class ComponentSystem<C : Component>(
             dispose(index)
 
         comp.onStateChange = true
-        comp.stateChangeProcessing(Apply.BEFORE, ComponentEventType.DELETED)
         comp.iDelete()
         comp.initialized = false
         comp.onStateChange = false
         send(comp.key, ComponentEventType.DELETED)
         unregisterComponent(index)
         comp.iDisposeIndex()
-        comp.stateChangeProcessing(Apply.AFTER, ComponentEventType.DELETED)
+
+        // DEBUG  println("<-- delete: ${aspectName}:${index}")
     }
 
     fun checkIndex(index: Int): Boolean  {
@@ -399,9 +417,6 @@ abstract class ComponentSystem<C : Component>(
 
     override fun getKey(index: Int): ComponentKey =
         COMPONENT_MAPPING[index]?.key ?: NO_COMPONENT_KEY
-
-    private fun checkComponentNameClash(name: String): Boolean =
-        (COMPONENT_KEY_MAPPING[name]?.instanceIndex ?: -1) != -1
 
     // **** Event Handling ****
     // ************************
@@ -453,7 +468,7 @@ abstract class ComponentSystem<C : Component>(
         fun dispose(key: ComponentKey) = this[key.type].dispose(key)
         fun delete(key: ComponentKey) = this[key.type].delete(key)
 
-        fun clearSystems() = COMPONENT_SYSTEM_MAPPING.forEach { it.value.clearSystem() }
+        fun clearSystems() = HashMap(COMPONENT_SYSTEM_MAPPING).forEach { it.value.clearSystem() }
         
         fun dumpInfo() {
             println("---- System Info ---------------------------------------------------------------------------------")

@@ -26,11 +26,6 @@ interface RoomSupplier {
 
 class Area private constructor() : Composite(Area) {
 
-    override fun initialize() {
-        super.initialize()
-        activationPolicy = ApplyPolicies.PARENT_BEFORE
-    }
-
     @JvmField var orientationType: WorldOrientationType = WorldOrientationType.COUNT
     @JvmField val orientation: Vector4i = Vector4i()
 
@@ -48,10 +43,10 @@ class Room private constructor() : Composite(Room) {
     @JvmField var areaOrientationType: WorldOrientationType = WorldOrientationType.SECTION
     @JvmField val areaOrientation: Vector4i = Vector4i()
 
-    @JvmField val activationScene = CLooseReference(Scene)
-    @JvmField val deactivationScene = CLooseReference(Scene)
-    @JvmField val pauseTask = CLooseReference(Task)
-    @JvmField val resumeTask = CLooseReference(Task)
+    @JvmField val activationScene = CReference(Scene)
+    @JvmField val deactivationScene = CReference(Scene)
+    @JvmField val pauseTask = CReference(Task)
+    @JvmField val resumeTask = CReference(Task)
 
     @JvmField var roomSupplier: RoomSupplier = DefaultSelectionBasedRoomSupplier()
 
@@ -109,7 +104,7 @@ class Room private constructor() : Composite(Room) {
 
             val activeRoom = Room[activeRoomKey]
             if (activeRoom.pauseTask.exists)
-                Task[activeRoom.pauseTask](activeRoom.index)
+                Task[activeRoom.pauseTask](activeRoom.key)
             paused = true
         }
 
@@ -136,7 +131,7 @@ class Room private constructor() : Composite(Room) {
 
             val activeRoom = Room[activeRoomKey]
             if (activeRoom.resumeTask.exists)
-                Task[activeRoom.resumeTask](activeRoom.index)
+                Task[activeRoom.resumeTask](activeRoom.key)
             paused = false
         }
 

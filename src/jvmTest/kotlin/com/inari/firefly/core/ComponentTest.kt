@@ -49,7 +49,7 @@ class ComponentTest {
             }
             fail("Exception expected here")
         } catch (e:Exception) {
-            assertEquals("Key with same name already exists", e.message)
+            assertEquals("Key with same name already exists. Name: testName", e.message)
         }
 
         val newCompKey = TestComponent.build {
@@ -97,11 +97,11 @@ class ComponentTest {
         val parentKey = TestParent.build {
             name = "parent1"
             ptest1 = "ptest1"
-            withChild(TestChild) {
+            withChild {
                 name = "child1"
                 cest1 = "cest1"
             }
-            withChild(TestChild) {
+            withChild {
                 name = "child2"
                 cest1 = "cest2"
             }
@@ -168,9 +168,60 @@ class ComponentTest {
 
     }
 
-    class TestParent : ComponentNode(TestParent) {
+    class TestParent : Composite(TestParent) {
         @JvmField var ptest1: String = NO_NAME
         @JvmField var ptest2: String = NO_NAME
+
+        fun withChild(configure: (TestChild.() -> Unit)): ComponentKey {
+            val child = TestChild.buildAndGet(configure)
+            child.parentRef(earlyKeyAccess())
+            return child.key
+        }
+
+        override fun load() {
+            super.load()
+
+            TestChild.forEachDo {
+                if (it.parentRef.exists && it.parentRef.targetKey == key)
+                    TestChild.load(it)
+            }
+        }
+
+        override fun activate() {
+            super.activate()
+
+            TestChild.forEachDo {
+                if (it.parentRef.exists && it.parentRef.targetKey == key)
+                    TestChild.activate(it)
+            }
+        }
+
+        override fun deactivate() {
+            TestChild.forEachDo {
+                if (it.parentRef.exists && it.parentRef.targetKey == key)
+                    TestChild.deactivate(it)
+            }
+
+            super.deactivate()
+        }
+
+        override fun dispose() {
+            TestChild.forEachDo {
+                if (it.parentRef.exists && it.parentRef.targetKey == key)
+                    TestChild.dispose(it)
+            }
+
+            super.dispose()
+        }
+
+        override fun delete() {
+            TestChild.forEachDo {
+                if (it.parentRef.exists && it.parentRef.targetKey == key)
+                    TestChild.delete(it)
+            }
+
+            super.delete()
+        }
 
         companion object : ComponentSystem<TestParent>("TestParent") {
             override fun allocateArray(size: Int): Array<TestParent?> = arrayOfNulls(size)
@@ -178,10 +229,12 @@ class ComponentTest {
         }
     }
 
-    class TestChild : ComponentNode(TestChild) {
+    class TestChild : Composite(TestChild) {
 
+        @JvmField val parentRef = CReference(TestParent)
         @JvmField var cest1: String = NO_NAME
         @JvmField var cest2: String = NO_NAME
+
 
         companion object : ComponentSystem<TestChild>("TestChild") {
             override fun allocateArray(size: Int): Array<TestChild?> = arrayOfNulls(size)

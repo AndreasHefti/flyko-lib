@@ -75,6 +75,10 @@ object GraphicsAPIMock : GraphicsAPI {
         _log.add("startRendering::$view")
     }
 
+    override fun applyViewportOffset(x: Float, y: Float) {
+        _log.add("applyViewportOffset::$x $y")
+    }
+
     override fun renderTexture(
         textureId: Int,
         posX: Float,
@@ -163,6 +167,15 @@ object GraphicsAPIMock : GraphicsAPI {
 
         builder.append("]")
     }
+
+    override fun getTexturePixels(textureId: Int): ByteArray {
+        null!!
+    }
+
+    override fun setTexturePixels(textureId: Int, region: Vector4i, pixels: ByteArray) {
+        TODO("Not yet implemented")
+    }
+
 
     override fun getScreenshotPixels(area: Vector4i): ByteArray {
         null!!

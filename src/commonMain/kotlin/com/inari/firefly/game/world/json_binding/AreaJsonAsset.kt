@@ -1,8 +1,9 @@
-package com.inari.firefly.game.json
+package com.inari.firefly.game.world.json_binding
 
 import com.inari.firefly.core.*
 import com.inari.firefly.game.world.Area
 import com.inari.firefly.game.world.Room
+import com.inari.util.Attributes
 import com.inari.util.NO_NAME
 import kotlin.jvm.JvmField
 
@@ -42,23 +43,24 @@ class AreaJsonAsset private constructor() : Asset(AreaJsonAsset) {
             name = data.name
             orientationType = data.orientationType
             orientation(data.orientation)
-            attributes.putAll(data.attributes)
-            onLoadTask(data.onLoadTasks)
-            onActivationTask(data.onActivationTasks)
-            onDeactivationTask(data.onDeactivationTasks)
-            onDisposeTask(data.onDisposeTasks)
+            attributes = Attributes(data.attributes)
+            // TODO refactoring
+//            onLoadTask(data.onLoadTasks)
+//            onActivationTask(data.onActivationTasks)
+//            onDeactivationTask(data.onDeactivationTasks)
+//            onDisposeTask(data.onDisposeTasks)
 
-            if (withChildAreas && !data.areasData.isEmpty()) {
-                data.areasData.forEach {
-                    withChild(this@AreaJsonAsset.buildArea(it, withChildAreas, withRooms))
-                }
-            }
-
-            if (withRooms && !data.roomsData.isEmpty()) {
-                data.roomsData.forEach {
-                    withChild(this@AreaJsonAsset.buildRoom(it))
-                }
-            }
+//            if (withChildAreas && !data.areasData.isEmpty()) {
+//                data.areasData.forEach {
+//                    withChild(this@AreaJsonAsset.buildArea(it, withChildAreas, withRooms))
+//                }
+//            }
+//
+//            if (withRooms && !data.roomsData.isEmpty()) {
+//                data.roomsData.forEach {
+//                    withChild(this@AreaJsonAsset.buildRoom(it))
+//                }
+//            }
         }
     }
 
@@ -71,11 +73,12 @@ class AreaJsonAsset private constructor() : Asset(AreaJsonAsset) {
             roomOrientation(data.roomOrientation)
             areaOrientationType = data.areaOrientationType
             areaOrientation(data.areaOrientation)
-            attributes.putAll(data.attributes)
-            onLoadTask(data.onLoadTasks)
-            onActivationTask(data.onActivationTasks)
-            onDeactivationTask(data.onDeactivationTasks)
-            onDisposeTask(data.onDisposeTasks)
+            attributes = Attributes(data.attributes)
+            // TODO refactoring
+//            onLoadTask(data.onLoadTasks)
+//            onActivationTask(data.onActivationTasks)
+//            onDeactivationTask(data.onDeactivationTasks)
+//            onDisposeTask(data.onDisposeTasks)
             pauseTask(data.pauseTask)
             resumeTask(data.resumeTask)
             activationScene(data.activationScene)

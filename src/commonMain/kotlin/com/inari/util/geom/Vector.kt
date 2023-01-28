@@ -225,19 +225,19 @@ open class Vector3i constructor(
     }
 
     operator fun plus(v: Vector3i): Vector3i {
-        super.invoke(v)
+        super.plus(v)
         this.v2 += v.v2
         return this
     }
 
     operator fun minus(v: Vector3i): Vector3i {
-        super.invoke(v)
+        super.plus(v)
         this.v2 -= v.v2
         return this
     }
 
     operator fun times(v: Vector3i): Vector3i {
-        super.invoke(v)
+        super.times(v)
         this.v2 *= v.v2
         return this
     }

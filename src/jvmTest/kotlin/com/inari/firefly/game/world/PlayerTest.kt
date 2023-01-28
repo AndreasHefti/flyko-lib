@@ -19,6 +19,7 @@ class PlayerTest {
     }
 
     @Test
+    @Ignore
     fun testCreationWithLoosReference() {
         TestApp
         ComponentSystem.clearSystems()

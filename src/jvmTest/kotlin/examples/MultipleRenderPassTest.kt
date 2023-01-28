@@ -2,9 +2,7 @@ package examples
 
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.core.Entity
-import com.inari.firefly.core.api.GraphicsAPIImpl
 import com.inari.firefly.graphics.sprite.ESprite
-import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.View
@@ -15,7 +13,7 @@ fun main() {
         Texture.build {
             name = "logoTexture"
             resourceName = "firefly/logo.png"
-            withChild(Sprite) {
+            withSprite {
                 name = "inariSprite"
                 textureBounds(0, 0, 32, 32)
                 hFlip = false
@@ -38,8 +36,6 @@ fun main() {
                 name = "shaderA"
                 vertexShaderResourceName = "firefly/vertBloom.glsl"
                 fragmentShaderResourceName = "firefly/fragBloom.glsl"
-                //vertexShaderProgram = GraphicsAPIImpl.DEFAULT_VERTEX_SHADER
-                //fragmentShaderProgram = GraphicsAPIImpl.DEFAULT_FRAGMENT_SHADER
             }
             excludeFromEntityRendering = true
             asRenderTargetOf {
@@ -49,8 +45,6 @@ fun main() {
                     name = "shaderB"
                     vertexShaderResourceName = "firefly/vertBloom.glsl"
                     fragmentShaderResourceName = "firefly/fragBloom.glsl"
-                    //vertexShaderProgram = GraphicsAPIImpl.DEFAULT_VERTEX_SHADER
-                    //fragmentShaderProgram = GraphicsAPIImpl.DEFAULT_FRAGMENT_SHADER
                 }
             }
         }

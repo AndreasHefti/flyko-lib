@@ -103,7 +103,19 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         TODO("Not yet implemented")
     }
 
-    actual override fun getScreenshotPixels(area: Vector4i): ByteArray {
+    actual override fun getTexturePixels(textureId: Int): ByteArray {
+        TODO("Not yet implemented")
+    }
+
+    actual override fun setTexturePixels(textureId: Int, region: Vector4i, pixels: ByteArray) {
+        TODO("Not yet implemented")
+    }
+
+    actual override fun getScreenshotPixels(region: Vector4i): ByteArray {
+        TODO("Not yet implemented")
+    }
+
+    actual override fun applyViewportOffset(x: Float, y: Float) {
         TODO("Not yet implemented")
     }
 

@@ -100,15 +100,6 @@ interface ShaderUpdate {
     fun setUniformColorVec4(bindingName: String, value:Vector4f)
     fun bindTexture(bindingName: String, value: Int)
     fun bindViewTexture(bindingName: String, value: Int)
-
-    fun setUniformFloat(bindingName: String, supplier: () -> Float)
-    fun setUniformVec2(bindingName: String, supplier: () -> Vector2f)
-    fun setUniformVec3(bindingName: String, supplier: () -> Vector3f)
-    fun setUniformColorVec4(bindingName: String, supplier: () -> Vector4f)
-    fun bindTexture(bindingName: String, supplier: () -> Int)
-    fun bindViewTexture(bindingName: String, supplier: () -> Int)
-
-    fun update()
 }
 
 interface TextureData {

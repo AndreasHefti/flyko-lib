@@ -24,7 +24,7 @@ class EActor private constructor() : EntityComponent(EActor) {
         get() = encounterConstraint.targetKey.instanceIndex
     @JvmField val encounterConstraint = CReference(ContactConstraint)
     val hitConstraintIndex: Int
-        get() =hitConstraint.targetKey.instanceIndex
+        get() = hitConstraint.targetKey.instanceIndex
     @JvmField val hitConstraint = CReference(ContactConstraint)
 
     override fun reset() {

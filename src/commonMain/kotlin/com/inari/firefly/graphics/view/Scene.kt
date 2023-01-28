@@ -35,7 +35,7 @@ class Scene private constructor(): Control() {
     companion object : ComponentSubTypeBuilder<Control, Scene>(Control,"Scene") {
         override fun create() = Scene()
 
-        fun runScene(reference: CLooseReference, callback: OperationCallback) = runScene(reference.targetKey, callback)
+        fun runScene(reference: CReference, callback: OperationCallback) = runScene(reference.targetKey, callback)
         fun runScene(name: String, callback: OperationCallback) = runScene(Scene.system[name].index, callback)
         fun runScene(key: ComponentKey, callback: OperationCallback) = runScene(key.instanceIndex, callback)
         fun runScene(index: Int, callback: OperationCallback) {

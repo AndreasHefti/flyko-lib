@@ -22,8 +22,9 @@ class ETile private constructor(): EntityComponent(ETile), SpriteRenderable {
     @JvmField val spriteRef = CReference(Sprite)
     @JvmField val spriteSetRef = CReference(SpriteSet)
 
-
     override fun activate() {
+        if (tileGridRef.exists)
+            TileGrid.load(tileGridRef.targetKey)
         if (spriteRef.exists)
             spriteIndex = Asset.resolveAssetIndex(spriteRef.targetKey)
         if (spriteSetRef.exists)

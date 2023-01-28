@@ -3,7 +3,6 @@ package examples
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.core.Entity
 import com.inari.firefly.graphics.sprite.ESprite
-import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.View
@@ -21,7 +20,7 @@ fun main() {
             resourceName = "firefly/logo.png"
             // Create and activate/load a SpriteAsset with reference to the TextureAsset.
             // This also implicitly loads the TextureAsset if it is not already loaded.
-            withChild(Sprite) {
+            withSprite {
                 name = "inariSprite"
                 textureBounds(0, 0, 32, 32)
                 hFlip = false

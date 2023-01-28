@@ -4,6 +4,7 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.SpriteRenderable
 import com.inari.util.FloatPropertyAccessor
+import com.inari.util.IntPropertyAccessor
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
@@ -21,6 +22,11 @@ class ESprite private constructor() : EntityComponent(ESprite), SpriteRenderable
             spriteIndex = Asset.resolveAssetIndex(spriteRef.targetKey)
         if (spriteSetRef.exists)
             spriteIndex = Asset.resolveAssetIndex(spriteSetRef.targetKey)
+    }
+
+    fun getSpriteIndexPropertyAccessor(): IntPropertyAccessor = object : IntPropertyAccessor {
+        override fun invoke(value: Int) { spriteIndex = value }
+        override fun invoke(): Int = spriteIndex
     }
 
     override fun deactivate() {
@@ -42,6 +48,8 @@ class ESprite private constructor() : EntityComponent(ESprite), SpriteRenderable
         fun getTintColorGreen(index: Int) = getTintColor(index).getV1PropertyAccessor()
         fun getTintColorBlue(index: Int) = getTintColor(index).getV2PropertyAccessor()
         fun getTintColorAlpha(index: Int) = getTintColor(index).getV3PropertyAccessor()
+        fun getSpriteIndex(index: Int) = getInstance(index).getSpriteIndexPropertyAccessor()
+        @JvmField val SPRITE_INDEX = this::getSpriteIndex
         @JvmField val TINT_COLOR_RED: (Int) -> FloatPropertyAccessor = this::getTintColorRed
         @JvmField val TINT_COLOR_GREEN: (Int) -> FloatPropertyAccessor = this::getTintColorGreen
         @JvmField val TINT_COLOR_BLUE: (Int) -> FloatPropertyAccessor = this::getTintColorBlue

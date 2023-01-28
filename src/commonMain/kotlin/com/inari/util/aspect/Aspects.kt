@@ -52,6 +52,11 @@ class Aspects internal constructor(
         return this
     }
 
+    operator fun plus(aspectName: String): Aspects {
+        type.createAspect(aspectName)
+        return this
+    }
+
     operator fun minus(aspect: Aspect): Aspects {
         checkType(aspect)
         bitSet[aspect.aspectIndex] = false

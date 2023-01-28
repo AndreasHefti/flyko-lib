@@ -259,9 +259,6 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
         @JvmField internal var tileGrid: TileGrid = NULL_TILE_GRID
         @JvmField internal var hasNext: Boolean = false
 
-        val worldXPos: Float get() = worldPosition.x
-        val worldYPos: Float get() = worldPosition.y
-
         override fun hasNext(): Boolean = hasNext
         override fun nextInt(): Int {
             val result = tileGrid[clip]
@@ -293,13 +290,13 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
 
         private fun mapWorldClipToTileGridClip(worldClip: Vector4i, tileGrid: TileGrid, result: Vector4i) {
             tmpClip(
-                floor((worldClip.x.toDouble() - tileGrid.position.x) / tileGrid.cellDim.v0).toInt(),
-                floor((worldClip.y.toDouble() - tileGrid.position.y) / tileGrid.cellDim.v1).toInt()
+                floor((worldClip.x - tileGrid.position.x) / tileGrid.cellDim.v0).toInt(),
+                floor((worldClip.y - tileGrid.position.y) / tileGrid.cellDim.v1).toInt()
             )
             val x2 =
-                ceil((worldClip.x.toDouble() - tileGrid.position.x + worldClip.width) / tileGrid.cellDim.v0).toInt()
+                ceil((worldClip.x - tileGrid.position.x + worldClip.width) / tileGrid.cellDim.v0).toInt()
             val y2 =
-                ceil((worldClip.y.toDouble() - tileGrid.position.y + worldClip.height) / tileGrid.cellDim.v1).toInt()
+                ceil((worldClip.y - tileGrid.position.y + worldClip.height) / tileGrid.cellDim.v1).toInt()
             tmpClip.width = x2 - tmpClip.x
             tmpClip.height = y2 - tmpClip.y
             GeomUtils.intersection(tmpClip, tileGrid.normalisedWorldBounds, result)
@@ -332,8 +329,8 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
 
         private fun calcWorldPosition() {
             worldPosition(
-                tileGrid.position.x + clip.x * tileGrid.cellDim.v0,
-                tileGrid.position.y + clip.y * tileGrid.cellDim.v1
+                clip.x * tileGrid.cellDim.v0,
+                clip.y * tileGrid.cellDim.v1
             )
         }
     }

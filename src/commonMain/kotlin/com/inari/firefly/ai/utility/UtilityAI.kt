@@ -40,7 +40,7 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
 
                 if (utility.runningActionIndex >= 0) {
                     val action = this[utility.runningActionIndex] as UtilityAction
-                    val result = action.actionOperation(entity.index, action.operationArg2, action.operationArg3)
+                    val result = action.callAction(entity.index)
                     if (result != OperationResult.RUNNING)
                         utility.runningActionIndex = -1
                 }
@@ -135,6 +135,7 @@ class UtilityAction private constructor() : UtilityAI() {
     @JvmField var actionOperation: TaskOperation = SUCCESS_TASK_OPERATION
     @JvmField var operationArg2 = -1
     @JvmField var operationArg3 = -1
+    @JvmField var attributes: Dictionary = EMPTY_DICTIONARY
     @JvmField val considerations = BitSet()
 
     fun withConsideration(key: ComponentKey) {
@@ -158,6 +159,9 @@ class UtilityAction private constructor() : UtilityAI() {
         }
         return result
     }
+
+    fun callAction(entityId: Int): OperationResult =
+        actionOperation(Entity.getKey(entityId), attributes)
 
     companion object : ComponentSubTypeBuilder<UtilityAI, UtilityAction>(UtilityAI, "UtilityAction") {
         override fun create() = UtilityAction()

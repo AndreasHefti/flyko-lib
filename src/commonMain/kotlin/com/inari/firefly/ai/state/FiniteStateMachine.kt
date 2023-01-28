@@ -22,24 +22,19 @@ class StateChange internal constructor() {
     @JvmField var toState: String = NO_NAME
     @JvmField var condition: () -> Boolean = FALSE_SUPPLIER
 
-    internal var disposeStateTaskIndex: Int = -1
-        get() = withDisposeStateTaskRef.targetKey.instanceIndex
-    internal var initStateTaskIndex: Int = -1
-        get() = withInitStateTaskRef.targetKey.instanceIndex
-
     @JvmField
-    val withDisposeStateTaskRef = CReference(Task)
+    val disposeStateTaskRef = CReference(Task)
     fun withDisposeStateTask(configure: (Task.() -> Unit)): ComponentKey {
         val key = Task.build(configure)
-        withDisposeStateTaskRef(key)
+        disposeStateTaskRef(key)
         return key
     }
 
     @JvmField
-    val withInitStateTaskRef = CReference(Task)
+    val initStateTaskRef = CReference(Task)
     fun withInitStateTask(configure: (Task.() -> Unit)): ComponentKey {
         val key = Task.build(configure)
-        withInitStateTaskRef(key)
+        initStateTaskRef(key)
         return key
     }
 
@@ -115,13 +110,13 @@ class FiniteStateMachine : Control() {
         while (i < currentStateChanges.capacity) {
             val stateChange = currentStateChanges[i++] ?: continue
             if (stateChange.condition()) {
-                if (stateChange.disposeStateTaskIndex != -1)
-                    Task[stateChange.disposeStateTaskIndex](stateChange.disposeStateTaskIndex, this.index)
+                if (stateChange.disposeStateTaskRef.exists)
+                    Task[stateChange.disposeStateTaskRef.targetKey](this.key)
 
                 currentState = stateChange.toState
 
-                if (stateChange.initStateTaskIndex != -1)
-                    Task[stateChange.initStateTaskIndex](stateChange.initStateTaskIndex, this.index)
+                if (stateChange.initStateTaskRef.exists)
+                    Task[stateChange.initStateTaskRef.targetKey](this.key)
 
                 if (stateChange.toState !== NO_STATE)
                     sendEvent(

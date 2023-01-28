@@ -58,18 +58,13 @@ class SpriteFrame : IntFrameAnimation.IntFrame {
     }
 }
 
-open class SpriteSet protected constructor(): Asset(SpriteSet) {
+class SpriteSet private constructor(): Asset(SpriteSet) {
 
     @JvmField val textureRef = CReference(Texture)
 
     protected val spriteData = DynArray.of<SpriteTemplate>()
     val sprites: DynArrayRO<SpriteTemplate>
         get() = spriteData
-
-    override fun setParentComponent(key: ComponentKey) {
-        super.setParentComponent(key)
-        textureRef(key)
-    }
 
     override fun assetIndex(at: Int) =
         spriteData[at]?.spriteIndex ?: -1

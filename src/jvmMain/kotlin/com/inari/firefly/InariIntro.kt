@@ -34,7 +34,7 @@ object InariIntro {
         Texture.build {
             name = textureAssetName
             resourceName = "firefly/inari.png"
-            withChild(Sprite) {
+            withSprite {
                 name = spriteAssetName
                 textureBounds( 0, 0, pngWidth, pngHeight )
             }
@@ -81,7 +81,6 @@ object InariIntro {
     private fun dispose() {
 
         if (!disposing) {
-            println("dispose")
             disposing = true
             Entity.delete(entityId)
             Asset.delete(textureAssetName)

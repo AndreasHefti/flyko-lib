@@ -3,7 +3,6 @@ package examples
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.core.Entity
 import com.inari.firefly.graphics.sprite.ESprite
-import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.View
@@ -14,7 +13,7 @@ fun main() {
         Texture.build {
             name = "Into"
             resourceName = "firefly/inari.png"
-            withChild(Sprite) {
+            withSprite {
                 name = "IntroSprite"
                 textureBounds( 0, 0, 520, 139)
             }
@@ -28,8 +27,8 @@ fun main() {
                 name = "ShaderEffect1"
                 vertexShaderResourceName = "firefly/vertRetro.glsl"
                 fragmentShaderResourceName = "firefly/fragRetro.glsl"
-                shaderUpdate =  { adapter ->
-                    adapter.setUniformVec2("u_res") { View.baseViewPortProjectionSize }
+                shaderUpdate = { adapter ->
+                    adapter.setUniformVec2("u_res", View.baseViewPortProjectionSize)
                 }
             }
             clearColor(.1f, .1f, .1f, 1f)

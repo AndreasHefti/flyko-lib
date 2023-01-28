@@ -1,10 +1,9 @@
 package com.inari.firefly.core
 
-abstract class Asset protected constructor(assetType: ComponentType<out Asset>) : ComponentNode(assetType) {
+abstract class Asset protected constructor(assetType: ComponentType<out Asset>) : Composite(assetType) {
 
     var assetIndex: Int = -1
         protected set
-
     open fun assetIndex(at: Int) = assetIndex
 
     companion object : ComponentSystem<Asset>("Asset") {

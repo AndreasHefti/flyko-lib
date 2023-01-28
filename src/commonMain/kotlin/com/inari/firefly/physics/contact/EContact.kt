@@ -58,8 +58,6 @@ class EContact private constructor() : EntityComponent(EContact) {
     override fun reset() {
         collisionResolverRef.reset()
         contactBounds.clear()
-        //bounds(0, 0, 0, 0)
-        //mask.clearMask()
         material = UNDEFINED_MATERIAL
         contactType = UNDEFINED_CONTACT_TYPE
         contactScans.clear()

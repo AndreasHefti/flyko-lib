@@ -131,7 +131,7 @@ object ViewSystemRenderer : Renderer() {
     }
 
     private fun layerListener(key: ComponentKey, type: ComponentEventType) {
-        val viewIndex = Layer[key.instanceIndex].view.targetKey.instanceIndex
+        val viewIndex = Layer[key.instanceIndex].viewRef.targetKey.instanceIndex
         if (type == ACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.add(key.instanceIndex)
         else if (type == DEACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.remove(key.instanceIndex)
         updateReferences()
@@ -191,8 +191,8 @@ object ViewSystemRenderer : Renderer() {
     private fun renderViewport(data: ViewData) {
 
         CLIP(
-            floor(data.worldPosition.x.toDouble()).toInt(),
-            floor(data.worldPosition.y.toDouble()).toInt(),
+            floor(data.worldPosition.x).toInt(),
+            floor(data.worldPosition.y).toInt(),
             data.bounds.width,
             data.bounds.height
         )
@@ -203,8 +203,24 @@ object ViewSystemRenderer : Renderer() {
             val layerIterator = layers.iterator()
             while (layerIterator.hasNext()) {
                 val layerIndex = layerIterator.next()
-                Engine.graphics.setActiveShader(Layer[layerIndex].shaderIndex)
+                val layer = Layer[layerIndex]
+
+                // apply layer offset
+                Engine.graphics.applyViewportOffset(-layer.position.x, -layer.position.y)
+                CLIP.x -= layer.position.x.toInt()
+                CLIP.y -= layer.position.y.toInt()
+
+                // apply layer shader
+                if (layer.shaderIndex >= 0)
+                    Engine.graphics.setActiveShader(layer.shaderIndex)
+
+                // render layer
                 render(data.index, layerIndex, CLIP)
+
+                // reset layer offset
+                Engine.graphics.applyViewportOffset(layer.position.x, layer.position.y)
+                CLIP.x += layer.position.x.toInt()
+                CLIP.y += layer.position.y.toInt()
             }
         } else
             render(data.index, 0, CLIP)

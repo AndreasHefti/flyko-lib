@@ -4,14 +4,13 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.ViewData
 import com.inari.util.event.Event
-import com.inari.util.geom.ImmutableVector3f
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4f
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 import kotlin.math.roundToInt
 
-class View private constructor(): ComponentNode(View), ViewData, Controlled {
+class View private constructor(): Composite(View), ViewData, Controlled {
 
     override var isBase = false
         internal set
@@ -25,10 +24,9 @@ class View private constructor(): ComponentNode(View), ViewData, Controlled {
     override var blendMode = BlendMode.NONE
     override var zoom = 1.0f
     override var  fboScale = 1.0f
-
+    @JvmField val shader = CReference(Shader)
     override var shaderIndex = -1
         internal set
-    @JvmField val shader = CLooseReference(Shader)
 
     @JvmField var excludeFromEntityRendering = false
     override var renderTargetOf1 = -1
@@ -47,56 +45,80 @@ class View private constructor(): ComponentNode(View), ViewData, Controlled {
             }
         }
 
+    fun withLayer(configure: (Layer.() -> Unit)): ComponentKey  {
+        val layer = Layer.buildAndGet(configure)
+        layer.viewRef(earlyKeyAccess())
+        return layer.key
+    }
 
+    fun withShader(configure: (Shader.() -> Unit)): ComponentKey {
+        shader(Shader.build(configure))
+        return shader.targetKey
+    }
+
+    fun asRenderTargetOf(configure: (View.() -> Unit)) : ComponentKey {
+        val c = View.buildAndGet(configure)
+        c.renderToBase = false
+        if (renderTargetOf1 < 0) {
+            renderTargetOf1 = c.key.instanceIndex
+            return c.key
+        }
+        if (renderTargetOf2 < 0) {
+            renderTargetOf2 = c.key.instanceIndex
+            return key
+        }
+        if (renderTargetOf3 < 0) {
+            renderTargetOf3 = c.key.instanceIndex
+            return key
+        }
+        View.delete(c)
+        throw IllegalStateException("All three render targets are already set.")
+    }
 
     override val controllerReferences = ControllerReferences(View)
-
-    override fun setParentComponent(key: ComponentKey) {
-        super.setParentComponent(key)
-        if (key.type == View)
-            this.renderToBase = false
-    }
 
     override fun load() {
         if (shader.targetKey !== NO_COMPONENT_KEY)
             shaderIndex = Asset.resolveAssetIndex(shader.targetKey)
         Engine.graphics.createView(this)
         super.load()
+
+        // load dependent layers
+        Layer.forEachDo {
+            if (it.viewRef.targetKey == this.key)
+                Layer.load(it)
+        }
+    }
+
+    override fun deactivate() {
+        // deactivate dependent layers first
+        Layer.forEachDo {
+            if (it.viewRef.targetKey == this.key)
+                Layer.deactivate(it)
+        }
+
+        super.deactivate()
     }
 
     override fun dispose() {
+        // dispose dependent layers first
+        Layer.forEachDo {
+            if (it.viewRef.targetKey == this.key)
+                Layer.dispose(it)
+        }
+
         shaderIndex = -1
         Engine.graphics.disposeView(this.index)
         super.dispose()
     }
 
-    fun withLayer(configure: (Layer.() -> Unit)): ComponentKey =
-        withChild(Layer, configure)
-    
-    fun asRenderTargetOf(configure: (View.() -> Unit)) : ComponentKey {
-        if (renderTargetOf1 < 0) {
-            val key = withChild(View, configure)
-            renderTargetOf1 = key.instanceIndex
-            return key
+    override fun delete() {
+        // delete dependent layers first
+        Layer.forEachDo {
+            if (it.viewRef.targetKey == this.key)
+                Layer.delete(it)
         }
-        if (renderTargetOf2 < 0) {
-            val key = withChild(View, configure)
-            renderTargetOf2 = key.instanceIndex
-            return key
-        }
-        if (renderTargetOf3 < 0) {
-            val key = withChild(View, configure)
-            renderTargetOf3 = key.instanceIndex
-            return key
-        }
-        throw IllegalStateException("All three render targets are already set.")
-    }
-
-
-    fun withShader(configure: (Shader.() -> Unit)): ComponentKey {
-        val key = withChild(Shader, configure)
-        shader(key)
-        return key
+        super.delete()
     }
 
     companion object : ComponentSystem<View>("View") {

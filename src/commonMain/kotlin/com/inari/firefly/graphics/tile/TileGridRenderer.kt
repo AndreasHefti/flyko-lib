@@ -24,14 +24,17 @@ object SimpleTileGridRenderer : EntityRenderer("SimpleTileGridRenderer") {
             val tileGrid = TileGrid[tileGridIndex]
             if (!tileGrid.active) continue
             if (tileGrid.viewIndex != viewIndex || tileGrid.layerIndex != layerIndex) continue
-                val iterator = tileGrid.tileGridIterator(clip)
-                while (iterator.hasNext()) {
-                    graphics.renderSprite(
-                        Entity[iterator.next()][ETile],
-                        iterator.worldXPos,
-                        iterator.worldYPos
-                    )
-                }
+
+            val iterator = tileGrid.tileGridIterator(clip)
+            Engine.graphics.applyViewportOffset(-tileGrid.position.x, -tileGrid.position.y)
+            while (iterator.hasNext()) {
+                graphics.renderSprite(
+                    Entity[iterator.next()][ETile],
+                    iterator.worldPosition.x,
+                    iterator.worldPosition.y
+                )
+            }
+            Engine.graphics.applyViewportOffset(tileGrid.position.x, tileGrid.position.y)
             tileGridIndex = tileGrids.nextSetBit(tileGridIndex + 1)
         }
     }
@@ -56,8 +59,10 @@ object FullTileGridRenderer : EntityRenderer("FullTileGridRenderer") {
         while (gridIndex >= 0) {
             val tileGrid = TileGrid[gridIndex]
             if (!tileGrid.active) continue
+
             if (tileGrid.renderer == this) {
                 val iterator = tileGrid.tileGridIterator(clip)
+                Engine.graphics.applyViewportOffset(-tileGrid.position.x, -tileGrid.position.y)
                 while (iterator.hasNext()) {
                     val entity = Entity[iterator.next()]
 
@@ -65,6 +70,7 @@ object FullTileGridRenderer : EntityRenderer("FullTileGridRenderer") {
                     transformCollector + iterator.worldPosition
                     graphics.renderSprite(entity[ETile], transformCollector.data)
                 }
+                Engine.graphics.applyViewportOffset(tileGrid.position.x, tileGrid.position.y)
             }
             gridIndex = tileGrids.nextSetBit(gridIndex + 1)
         }

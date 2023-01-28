@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.8" tiledversion="1.9.2" class="firefly_tilemap" orientation="orthogonal" renderorder="right-down" width="20" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="1">
+ <editorsettings>
+  <export target="example_map1.json" format="json"/>
+ </editorsettings>
+ <properties>
+  <property name="name" value="map1"/>
+  <property name="tasks" type="class" propertytype="tasks">
+   <properties>
+    <property name="AFTER_ACTIVATION" value="afterActivateTileMap"/>
+    <property name="AFTER_LOAD" value="afterLoadTileMap"/>
+    <property name="BEFORE_ACTIVATION" value="beforeActivateTileMap"/>
+   </properties>
+  </property>
+  <property name="tileset_refs" value="blueGrid1616"/>
+ </properties>
+ <tileset firstgid="1" source="../tiled_tileset_example/tiled_tileset.json"/>
+ <layer id="2" name="background1" class="firefly_maplayer" width="20" height="10" opacity="0.5" offsetx="-15" offsety="-10" parallaxx="0.9" parallaxy="0.9">
+  <properties>
+   <property name="blend_mode" propertytype="blend" value="NORMAL_ALPHA"/>
+   <property name="layer_tilesets" value="blueGrid1616"/>
+   <property name="tint_color" type="color" value=""/>
+  </properties>
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,2,32,22,12,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,2,32,9,9,22,12,0,0,0,0,0,0,
+0,0,0,0,0,0,0,2,32,39,0,0,29,22,12,0,0,0,0,0,
+0,0,0,0,0,0,2,32,0,0,19,19,0,0,22,12,0,0,0,0,
+0,0,0,0,0,2,32,0,0,0,0,0,0,0,0,22,12,0,0,0,
+0,0,0,0,2,32,0,0,0,0,0,0,0,0,0,0,22,12,0,0,
+0,0,0,2,32,0,0,0,0,0,0,0,0,0,0,0,0,22,12,0,
+0,0,2,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,12,
+0,2,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="1" name="main_layer" class="firefly_maplayer" width="20" height="10">
+  <properties>
+   <property name="layer_tilesets" value="blueGrid1616"/>
+  </properties>
+  <data encoding="csv">
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,1,
+1,0,0,0,13,0,0,0,40,0,0,0,0,0,0,1,1,1,1,1,
+1,5,0,0,1,14,13,0,1,0,0,0,0,0,0,0,0,0,0,1,
+1,6,0,0,1,1,1,0,22,1,1,21,21,11,11,0,2,1,1,1,
+1,1,5,0,0,0,0,0,0,0,0,0,0,0,0,0,23,33,1,1,
+1,1,6,0,0,3,7,13,0,3,4,14,13,3,13,0,3,13,36,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+</data>
+ </layer>
+</map>

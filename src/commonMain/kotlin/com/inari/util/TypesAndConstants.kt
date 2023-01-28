@@ -1,5 +1,8 @@
 package com.inari.util
 
+import com.inari.firefly.core.Component
+import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
+import com.inari.firefly.core.ComponentKey
 import com.inari.firefly.core.api.ButtonType
 import com.inari.util.geom.ImmutableVector2f
 import com.inari.util.geom.ImmutableVector2i
@@ -79,6 +82,13 @@ interface Clearable {
     fun clear()
 }
 
+interface Dictionary : Iterable<String> {
+    operator fun contains(name: String): Boolean
+    operator fun invoke(name: String): String?
+    fun names(): Iterator<String>
+    override fun iterator(): Iterator<String> = names()
+}
+
 interface IntIterator {
     operator fun hasNext(): Boolean
     operator fun next(): Int
@@ -112,22 +122,28 @@ enum class OperationResult {
     FAILED
 }
 
+//typealias AttributeMap = (String) -> String?
 typealias Operation = () -> OperationResult
 typealias OperationCallback = (OperationResult) -> Unit
-typealias TaskOperation = (Int, Int, Int) -> OperationResult
-typealias TaskCallback = (Int, OperationResult) -> Unit
+typealias TaskOperation = (ComponentKey, Dictionary) -> OperationResult
+typealias TaskCallback = (ComponentKey, Dictionary, OperationResult) -> Unit
 typealias ConditionalOperation = (Int, Int, Int) -> Boolean
 typealias NormalOperation = (Int, Int, Int) -> Float
 /** { entityId, velocity, button -> } */
 typealias MoveCallback = (Int, Float, ButtonType) -> Unit
+val EMPTY_DICTIONARY: Dictionary = object : Dictionary {
+    override fun contains(name: String): Boolean = false
+    override fun invoke(name: String): String? = null
+    override fun names(): Iterator<String> = emptyList<String>().iterator()
+}
 val VOID_MOVE_CALLBACK: MoveCallback = { _, _, _ -> }
-val VOID_TASK_CALLBACK: TaskCallback = { _, _, -> }
+val VOID_TASK_CALLBACK: TaskCallback = { _, _, _ -> }
 val RUNNING_OPERATION: Operation = { OperationResult.RUNNING }
 val SUCCESS_OPERATION: Operation = { OperationResult.SUCCESS }
 val FAILED_OPERATION: Operation = { OperationResult.FAILED }
-val RUNNING_TASK_OPERATION: TaskOperation = {  _, _, _ -> OperationResult.RUNNING }
-val SUCCESS_TASK_OPERATION: TaskOperation = {  _, _, _ -> OperationResult.SUCCESS }
-val FAILED_TASK_OPERATION: TaskOperation = {  _, _, _ -> OperationResult.FAILED }
+val RUNNING_TASK_OPERATION: TaskOperation = {  _, _ -> OperationResult.RUNNING }
+val SUCCESS_TASK_OPERATION: TaskOperation = {  _, _ -> OperationResult.SUCCESS }
+val FAILED_TASK_OPERATION: TaskOperation = {  _, _ -> OperationResult.FAILED }
 val TRUE_OPERATION: ConditionalOperation = { _, _, _ -> true }
 val FALSE_OPERATION: ConditionalOperation = { _, _, _ -> false }
 @JvmField val ZERO_OP: NormalOperation = { _, _, _ -> 0f }
@@ -136,9 +152,14 @@ val FALSE_OPERATION: ConditionalOperation = { _, _, _ -> false }
 operator fun ConditionalOperation.invoke() = this(-1, -1, -1)
 operator fun ConditionalOperation.invoke(entityId: Int) = this(entityId, -1, -1)
 operator fun ConditionalOperation.invoke(entityId1: Int, entityId2: Int) = this(entityId1, entityId2, -1)
-operator fun TaskOperation.invoke() = this(-1, -1, -1)
-operator fun TaskOperation.invoke(entityId: Int) = this(entityId, -1, -1)
-operator fun TaskOperation.invoke(entityId1: Int, entityId2: Int) = this(entityId1, entityId2, -1)
+operator fun TaskOperation.invoke() = this(NO_COMPONENT_KEY, EMPTY_DICTIONARY)
+operator fun TaskOperation.invoke(key: ComponentKey) = this(key, EMPTY_DICTIONARY)
 operator fun NormalOperation.invoke() = this(-1, -1, -1)
 operator fun NormalOperation.invoke(entityId: Int) = this(entityId, -1, -1)
 operator fun NormalOperation.invoke(entityId1: Int, entityId2: Int) = this(entityId1, entityId2, -1)
+
+class Attributes(val map: Map<String, String>) : Dictionary {
+    override fun contains(name: String): Boolean = map.containsKey(name)
+    override fun invoke(name: String): String? = map[name]
+    override fun names(): Iterator<String> = map.keys.iterator()
+}

@@ -17,9 +17,11 @@ interface AspectType {
     val name: String
     fun createAspects(): Aspects
     fun createAspects(vararg aspects: Aspect): Aspects
+    fun createAspect(name: String): Aspect
     fun typeCheck(aspect: Aspect): Boolean
     operator fun get(name: String): Aspect?
     operator fun get(index: Int): Aspect?
+
 }
 
 class IndexedAspectType(
@@ -52,7 +54,7 @@ class IndexedAspectType(
         aspect.aspectType === this
 
 
-    fun createAspect(name: String): Aspect {
+    override fun createAspect(name: String): Aspect {
         val aspect = get(name)
         if (aspect != null)
             return aspect

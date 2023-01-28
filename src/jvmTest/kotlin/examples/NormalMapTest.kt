@@ -22,6 +22,11 @@ fun main() {
 
         val pos = Vector3f( 0.0f, 0.0f, DEFAULT_LIGHT_Z)
 
+        val texId = Texture {
+            autoActivation = true
+            name = "TextureAsset"
+            resourceName = "firefly/normalMapTest.png"
+        }
         View {
             autoActivation = true
             name = "View1"
@@ -29,22 +34,11 @@ fun main() {
             blendMode = BlendMode.NONE
             tintColor(1f, 1f, 1f, 1f)
 
-            // sprite and texture definition
-            val texId = withChild(Texture) {
-                name = "TextureAsset"
-                resourceName = "firefly/normalMapTest.png"
-                withChild(Sprite) {
-                    name = "Sprite"
-                    textureRegion(0, 0, 16, 16)
-                }
-            }
-
             // the shader definition
             withShader {
                 name = "NormalShader"
                 fragmentShaderResourceName = "firefly/normalFragShader.glsl"
                 shaderUpdate =  { adapter ->
-                    Texture.activate(texId)
                     adapter.bindTexture("normal_texture", Texture[texId].assetIndex)
                     adapter.setUniformVec2("Resolution", Vector2f(Engine.graphics.screenWidth, Engine.graphics.screenHeight))
                     adapter.setUniformColorVec4("LightColor", LIGHT_COLOR)

@@ -1,20 +1,12 @@
 package com.inari.firefly.core
 
-import com.inari.firefly.core.ComponentEventType.*
-import com.inari.firefly.core.Apply.*
-import com.inari.firefly.graphics.view.Layer
-import com.inari.firefly.graphics.view.View
-import com.inari.firefly.graphics.view.ViewLayerAware
+import com.inari.util.EMPTY_DICTIONARY
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.IndexedAspectType
 import com.inari.util.indexed.AbstractIndexed
 import kotlin.jvm.JvmField
 import com.inari.util.NO_NAME
 import com.inari.util.Named
-import com.inari.util.collection.BitSet
-import com.inari.util.collection.DynArray
-import com.inari.util.collection.DynArrayRO
-import com.inari.util.geom.Vector2f
 
 /** Defines the component based builder DSL marker */
 @DslMarker annotation class ComponentDSL
@@ -30,28 +22,18 @@ enum class ComponentEventType {
     DELETED
 }
 
-enum class Apply {
-    NONE,
-    BEFORE,
-    AFTER
-}
-
-interface ApplyPolicy {
-    val parentPolicy: Apply
-    val childPolicy: Apply
-}
-
-enum class ApplyPolicies(
-    override val parentPolicy: Apply,
-    override val childPolicy: Apply) : ApplyPolicy {
-
-    DEFAULT_LOAD(BEFORE, AFTER),
-    DEFAULT_ACTIVATE(BEFORE, AFTER),
-    DEFAULT_DEACTIVATE(NONE, BEFORE),
-    DEFAULT_DISPOSE(NONE, BEFORE),
-    DEFAULT_DELETE(NONE, BEFORE),
-
-    PARENT_BEFORE(BEFORE, NONE)
+enum class LifecycleTaskType {
+    AFTER_INIT,
+    BEFORE_LOAD,
+    AFTER_LOAD,
+    BEFORE_ACTIVATION,
+    AFTER_ACTIVATION,
+    BEFORE_DEACTIVATION,
+    AFTER_DEACTIVATION,
+    BEFORE_DISPOSE,
+    AFTER_DISPOSE,
+    BEFORE_DELETE,
+    AFTER_DELETE
 }
 
 interface ComponentType<C : Component> : Aspect {
@@ -65,10 +47,20 @@ sealed interface ComponentId {
 }
 
 class ComponentKey internal constructor (
-    val name: String,
+    name: String,
     override val type: ComponentType<*>
 ) : ComponentId {
 
+    init {
+        // DEBUG  println("-> new ComponentKey: $name : ${type.typeName} : ${type.subTypeName}")
+    }
+
+    internal constructor(index: Int, type: ComponentType<*>) : this(NO_NAME, type) {
+        instanceIndex = index
+    }
+
+    var name: String = name
+        private set
     override var instanceIndex: Int = -1
         internal set
 
@@ -82,6 +74,12 @@ class ComponentKey internal constructor (
         if (name != other.name) return false
         if (type.aspectName != other.type.aspectName) return false
         return true
+    }
+
+    internal fun clearKey() {
+        // DEBUG  println("-> clear ComponentKey: $name $type")
+        name = NO_NAME
+        instanceIndex = -1
     }
 
     override fun hashCode(): Int {
@@ -107,10 +105,24 @@ abstract class Component protected constructor(
 
     var key = NO_COMPONENT_KEY
         internal set
+    internal fun earlyKeyAccess(): ComponentKey {
+        // DEBUG  println("--> earlyKeyAccess: $this")
+        if (key != NO_COMPONENT_KEY) return key
+        return if (name != NO_NAME) {
+            key = ComponentSystem[componentType].getOrCreateKey(name)
+            key.instanceIndex = this.index
+            key
+        }
+        else
+            ComponentKey(this.index, componentType)
+    }
+
     override var name: String = NO_NAME
         set(value) {
             if (value === NO_NAME || name !== NO_NAME)
                 throw IllegalStateException("An illegal reassignment of name: $value to: $name")
+            if (this.key != NO_COMPONENT_KEY && this.key.name != value)
+                throw IllegalStateException("An illegal reassignment of name, key already set: $value to: $name key: $key")
             field = value
         }
 
@@ -122,13 +134,13 @@ abstract class Component protected constructor(
     var active: Boolean = false
         internal set
 
-    internal fun iInitialize() = initialize()
-    internal fun iLoad() = load()
-    internal fun iActivate() = activate()
-    internal fun iDeactivate() = deactivate()
-    internal fun iDispose() = dispose()
-    internal fun iDelete() = delete()
-    internal fun iDisposeIndex() = disposeIndex()
+    internal open fun iInitialize() = initialize()
+    internal open fun iLoad() = load()
+    internal open fun iActivate() = activate()
+    internal open fun iDeactivate() = deactivate()
+    internal open fun iDispose() = dispose()
+    internal open fun iDelete() = delete()
+    internal open fun iDisposeIndex() = disposeIndex()
 
     protected open fun initialize() {}
     protected open fun load() {}
@@ -136,8 +148,6 @@ abstract class Component protected constructor(
     protected open fun deactivate() {}
     protected open fun dispose() {}
     protected open fun delete() {}
-
-    internal open fun stateChangeProcessing(apply: Apply, type: ComponentEventType) {}
 
     protected fun <T> checkNotLoaded(value: T, s: String): T {
         if (loaded)
@@ -165,176 +175,65 @@ abstract class Component protected constructor(
     }
 }
 
-abstract class ComponentNode protected constructor(componentType: ComponentType<*>) : Component(componentType) {
-
-    @JvmField var loadPolicy = ApplyPolicies.DEFAULT_LOAD
-    @JvmField var activationPolicy = ApplyPolicies.DEFAULT_ACTIVATE
-    @JvmField var deactivationPolicy = ApplyPolicies.DEFAULT_DEACTIVATE
-    @JvmField var disposePolicy = ApplyPolicies.DEFAULT_DISPOSE
-    @JvmField var deletePolicy = ApplyPolicies.DEFAULT_DELETE
-
-    var parent: ComponentKey = NO_COMPONENT_KEY
-        protected set
-
-    val children: DynArrayRO<ComponentKey>?
-        get() = writableChildren
-
-    protected var writableChildren : DynArray<ComponentKey>? = null
-
-    protected open fun setParentComponent(key: ComponentKey) {
-        parent = key
-    }
-    fun withChild(key: ComponentKey): ComponentKey {
-        if (children == null)
-            writableChildren = DynArray.of(5, 5)
-
-        writableChildren!!.add(key)
-        return key
-    }
-
-    fun <C : ComponentNode> withChild(
-        cBuilder: ComponentBuilder<C>,
-        configure: (C.() -> Unit)): ComponentKey {
-        if (children == null)
-            writableChildren = DynArray.of()
-
-        val child = cBuilder.buildAndGet(configure)
-        val key = ComponentSystem[child.componentType].getKey(child.name)
-        writableChildren!!.add(key)
-        return  key
-    }
-
-    override fun initialize() {
-        super.initialize()
-        children?.forEach {
-            ComponentSystem.get<ComponentNode>(it).setParentComponent(this.key)
-        }
-    }
-
-    fun removeChild(key: ComponentKey) {
-        if (children == null || key !in children!!) return
-        writableChildren?.remove(key)
-        val child: ComponentNode = ComponentSystem[key]
-        child.setParentComponent(NO_COMPONENT_KEY)
-    }
-
-    private fun updateReferences() {
-        if (parent != NO_COMPONENT_KEY && parent.instanceIndex < 0)
-            parent = NO_COMPONENT_KEY
-        children?.forEach {
-            if (it.instanceIndex < 0)
-                writableChildren?.remove(it)
-        }
-        writableChildren?.trim()
-    }
-
-    override fun stateChangeProcessing(apply: Apply, type: ComponentEventType) {
-        updateReferences()
-        val policy: ApplyPolicies
-        val process: (ComponentKey) -> Unit
-        when (type) {
-            LOADED -> {
-                policy = loadPolicy
-                process = ComponentSystem.Companion::load
-            }
-            ACTIVATED -> {
-                policy = activationPolicy
-                process = ComponentSystem.Companion::activate
-            }
-            DEACTIVATED -> {
-                policy = deactivationPolicy
-                process = ComponentSystem.Companion::deactivate
-            }
-            DISPOSED -> {
-                policy = disposePolicy
-                process = ComponentSystem.Companion::dispose
-            }
-            DELETED -> {
-                policy = deletePolicy
-                process = ComponentSystem.Companion::delete
-            }
-            else -> return
-        }
-
-        if (apply == BEFORE && policy.childPolicy == BEFORE)
-            children?.forEach(process)
-        if (apply == BEFORE && parent != NO_COMPONENT_KEY && policy.parentPolicy == BEFORE)
-            process(parent)
-        if (apply == AFTER && policy.childPolicy == AFTER)
-            children?.forEach(process)
-        if (apply == AFTER && parent != NO_COMPONENT_KEY && policy.parentPolicy == AFTER)
-            process(parent)
-    }
-}
-
 open class Composite protected constructor(
     subType: ComponentType<out Composite>
-) : ComponentNode(subType), ViewLayerAware {
+) : Component(subType) {
 
-    @JvmField val onInitTask = CLooseReference(Task)
-    @JvmField val onLoadTask = CLooseReference(Task)
-    @JvmField val onActivationTask = CLooseReference(Task)
-    @JvmField val onDeactivationTask = CLooseReference(Task)
-    @JvmField val onDisposeTask = CLooseReference(Task)
-    @JvmField val onDeleteTask = CLooseReference(Task)
+    private val tasks: Array<ComponentKey?> = arrayOfNulls(LifecycleTaskType.values().size)
 
-    fun withInitTask(configure: (Task.() -> Unit)) = onInitTask.setKey(Task(configure))
-    fun withLoadTask(configure: (Task.() -> Unit)) = onLoadTask.setKey(Task(configure))
-    fun withActivationTask(configure: (Task.() -> Unit)) = onActivationTask.setKey(Task(configure))
-    fun withDeactivationTask(configure: (Task.() -> Unit)) = onDeactivationTask.setKey(Task(configure))
-    fun withDisposeTask(configure: (Task.() -> Unit)) = onDisposeTask.setKey(Task(configure))
-    fun withDeleteTask(configure: (Task.() -> Unit)) = onDeleteTask.setKey(Task(configure))
+    @JvmField var attributes = EMPTY_DICTIONARY
 
-    override val viewIndex: Int
-        get() = viewRef.targetKey.instanceIndex
-    override val layerIndex: Int
-        get() = layerRef.targetKey.instanceIndex
-
-    @JvmField var viewRef = CReference(View)
-    @JvmField var layerRef = CReference(Layer)
-    @JvmField val position = Vector2f()
-
-    @JvmField internal val attributes = mutableMapOf<String, String>()
-
-    fun setAttribute(name: String, value: String) { attributes[name] = value }
-    fun getAttribute(name: String): String? = attributes[name]
-    fun getAttributeFloat(name: String): Float? = attributes[name]?.toFloat()
-
-    override fun initialize() {
-        super.initialize()
-        if (onInitTask.exists)
-            Task[onInitTask](this.index)
+    fun withTask(apply: LifecycleTaskType, taskKey: ComponentKey) {
+        if (taskKey.type != Task) throw IllegalArgumentException("Key mismatch taskKey is not of expected type Task")
+        tasks[apply.ordinal] = taskKey
+    }
+    fun withTask(apply: LifecycleTaskType, name: String) {
+        tasks[apply.ordinal] = Task.getOrCreateKey(name)
+    }
+    fun withTask(apply: LifecycleTaskType, configure: (Task.() -> Unit)) {
+        tasks[apply.ordinal] = Task(configure)
     }
 
-    override fun load() {
-        super.load()
-        if (onLoadTask.exists)
-            Task[onLoadTask](this.index)
+    override fun iInitialize() {
+        super.iInitialize()
+        runTaskIfDefined(LifecycleTaskType.AFTER_INIT)
     }
 
-    override fun activate() {
-        super.activate()
-        if (onActivationTask.exists)
-            Task[onActivationTask](this.index)
+    override fun iLoad() {
+        runTaskIfDefined(LifecycleTaskType.BEFORE_LOAD)
+        super.iLoad()
+        runTaskIfDefined(LifecycleTaskType.AFTER_LOAD)
     }
 
-    override fun deactivate() {
-        if (onDeactivationTask.exists)
-            Task[onDeactivationTask](this.index)
-        super.deactivate()
+    override fun iActivate() {
+        runTaskIfDefined(LifecycleTaskType.BEFORE_ACTIVATION)
+        super.iActivate()
+        runTaskIfDefined(LifecycleTaskType.AFTER_ACTIVATION)
     }
 
-    override fun dispose() {
-        if (onDisposeTask.exists)
-            Task[onDisposeTask](this.index)
-        super.dispose()
+    override fun iDeactivate() {
+        runTaskIfDefined(LifecycleTaskType.BEFORE_DEACTIVATION)
+        super.iDeactivate()
+        runTaskIfDefined(LifecycleTaskType.AFTER_DEACTIVATION)
     }
 
-    override fun delete() {
-        if (onDeleteTask.exists)
-            Task[onDeleteTask](this.index)
-        super.delete()
+    override fun iDispose() {
+        runTaskIfDefined(LifecycleTaskType.BEFORE_DISPOSE)
+        super.iDispose()
+        runTaskIfDefined(LifecycleTaskType.AFTER_DISPOSE)
     }
+
+    override fun iDelete() {
+        runTaskIfDefined(LifecycleTaskType.BEFORE_DELETE)
+        super.iDelete()
+        runTaskIfDefined(LifecycleTaskType.AFTER_DELETE)
+    }
+
+    private fun runTaskIfDefined(type: LifecycleTaskType) =
+        tasks[type.ordinal]?.apply {
+            if (this.instanceIndex >= 0)
+                Task[this](this@Composite.key, attributes)
+        }
 
     companion object : ComponentSystem<Composite>("Composite") {
         override fun allocateArray(size: Int): Array<Composite?> = arrayOfNulls(size)

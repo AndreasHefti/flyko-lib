@@ -10,36 +10,36 @@ class Task private constructor(): Component(Task) {
     @JvmField var operation: TaskOperation = SUCCESS_TASK_OPERATION
     @JvmField var callback: TaskCallback = VOID_TASK_CALLBACK
 
-    fun withSimpleOperation(op: (Int) -> Unit) {
-        operation = { i1, _, _ ->
+    fun withSimpleOperation(op: (ComponentKey) -> Unit) {
+        operation = { i1, _ ->
             op(i1)
             OperationResult.SUCCESS
         }
     }
     fun withVoidOperation(op: () -> Unit) {
-        operation = { _, _, _ ->
+        operation = { _, _ ->
             op()
             OperationResult.SUCCESS
         }
     }
 
+    operator fun invoke(
+        compKey: ComponentKey = NO_COMPONENT_KEY,
+        attributes: Dictionary = EMPTY_DICTIONARY): OperationResult {
 
-    operator fun invoke(compId1: Int = -1, compId2: Int = -1, compId3: Int = -1): OperationResult {
         return if (noneBlocking) {
             startParallelTask(
                 name,
-                { operation(compId1, compId2, compId3) },
+                { operation(compKey, attributes) },
                 { _, r ->
-                    if (r)
-                        callback(this.index, OperationResult.SUCCESS)
-                    else
-                        callback(this.index, OperationResult.FAILED)
+                    if (r) callback(compKey, attributes, OperationResult.SUCCESS)
+                    else callback(compKey, attributes, OperationResult.FAILED)
                 }
             )
             if (deleteAfterRun) Task.delete(this)
             OperationResult.RUNNING
         } else {
-            val result = operation(compId1, compId2, compId3)
+            val result = operation(compKey, attributes)
             if (deleteAfterRun) Task.delete(this)
             result
         }

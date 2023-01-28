@@ -165,7 +165,7 @@ class ActionNode private constructor() : BehaviorNode() {
 
     @JvmField var actionOperation: TaskOperation = SUCCESS_TASK_OPERATION
 
-    override fun tick(entityId: Int): OperationResult = actionOperation(entityId)
+    override fun tick(entityId: Int): OperationResult = actionOperation(Entity.getKey(entityId))
 
     companion object : ComponentSubTypeBuilder<BehaviorNode, ActionNode>(BehaviorNode, "ActionNode") {
         override fun create() = ActionNode()

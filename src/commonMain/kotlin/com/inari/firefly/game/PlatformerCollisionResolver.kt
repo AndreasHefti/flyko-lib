@@ -1,6 +1,6 @@
 package com.inari.firefly.game
 
-import com.inari.firefly.core.CLooseReference
+import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentKey
 import com.inari.firefly.core.ComponentSubTypeBuilder
 import com.inari.firefly.core.Entity
@@ -60,8 +60,8 @@ class PlatformerCollisionResolver : CollisionResolver() {
     @JvmField var touchGroundCallback: (Int) -> Unit = VOID_INT_CONSUMER
     @JvmField var looseGroundContactCallback: (Int) -> Unit = VOID_INT_CONSUMER
     @JvmField var onSlopeCallback: (Int, Int, FullContactScan) -> Unit = VOID_ON_SLOPE_CALLBACK
-    @JvmField val fullContactConstraintRef = CLooseReference(ContactConstraint)
-    @JvmField val terrainContactConstraintRef = CLooseReference(ContactConstraint) { initTerrainContact() }
+    @JvmField val fullContactConstraintRef = CReference(ContactConstraint)
+    @JvmField val terrainContactConstraintRef = CReference(ContactConstraint) { initTerrainContact() }
 
     fun withFullContactCallback(
         material: Aspect = UNDEFINED_MATERIAL,

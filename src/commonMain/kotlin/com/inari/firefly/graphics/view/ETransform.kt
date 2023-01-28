@@ -27,6 +27,10 @@ class ETransform private constructor() : EntityComponent(ETransform), TransformD
         // if view is not defined yet, set the base view for default
         if (!viewRef.defined)
             viewRef(View.BASE_VIEW_KEY)
+        else if (viewRef.exists)
+            View.activate(viewRef.targetKey)
+        if (layerRef.exists)
+            Layer.activate(layerRef.targetKey)
     }
 
     fun getRotationPropertyAccessor(): FloatPropertyAccessor = object : FloatPropertyAccessor {

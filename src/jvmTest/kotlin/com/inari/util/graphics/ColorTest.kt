@@ -5,10 +5,18 @@ import com.inari.util.geom.GeomUtils.hasAlpha
 import com.inari.util.geom.GeomUtils.rgB8888
 import com.inari.util.geom.GeomUtils.rgbA8888
 import com.inari.util.geom.Vector4f
+import kotlin.experimental.and
 import kotlin.test.*
 
 
 class ColorTest {
+
+    @Test
+    fun testBytes() {
+        val array = ByteArray(1)
+        array[0] = -1
+        println(array[0].toInt() and 0xff)
+    }
 
     @Test
     fun testCreation() {

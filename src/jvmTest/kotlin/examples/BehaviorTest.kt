@@ -14,7 +14,6 @@ import com.inari.firefly.graphics.FrameRateInfo
 import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.movement.EMovement
-import com.inari.firefly.physics.movement.Movement
 import com.inari.util.OperationResult.*
 import kotlin.random.Random
 
@@ -34,8 +33,8 @@ fun main(args: Array<String>) {
                     name = "X"
                     node(ActionNode) {
                         name="GoRight"
-                        actionOperation = { entityId, _, _ ->
-                            val entity = Entity[entityId]
+                        actionOperation = { entityKey, _ ->
+                            val entity = Entity[entityKey]
                             val mov = entity[EMovement]
                             if (mov.velocity.x < 0)
                                 SUCCESS
@@ -48,8 +47,8 @@ fun main(args: Array<String>) {
                     }
                     node(ActionNode) {
                         name="GoLeft"
-                        actionOperation =  { entityId, _, _ ->
-                            val entity = Entity[entityId]
+                        actionOperation =  { entityKey, _ ->
+                            val entity = Entity[entityKey]
                             val mov = entity[EMovement]
                             if (mov.velocity.x > 0)
                                 SUCCESS
@@ -65,8 +64,8 @@ fun main(args: Array<String>) {
                     name = "Y"
                     node(ActionNode) {
                         name="GoDown"
-                        actionOperation =  { entityId, _, _ ->
-                            val entity = Entity[entityId]
+                        actionOperation =  { entityKey, _ ->
+                            val entity = Entity[entityKey]
                             val mov = entity[EMovement]
                             if (mov.velocity.y < 0)
                                 SUCCESS
@@ -79,8 +78,8 @@ fun main(args: Array<String>) {
                     }
                     node(ActionNode) {
                         name="GoUp"
-                        actionOperation =  { entityId, _, _ ->
-                            val entity = Entity[entityId]
+                        actionOperation =  { entityKey, _ ->
+                            val entity = Entity[entityKey]
                             val mov = entity[EMovement]
                             if (mov.velocity.y > 0)
                                 SUCCESS

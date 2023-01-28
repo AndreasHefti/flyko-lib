@@ -6,7 +6,7 @@ import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
 import kotlin.jvm.JvmField
 
-open class TileSet: ComponentNode(TileSet) {
+open class TileSet: Composite(TileSet) {
 
     @JvmField val textureRef = CReference(Texture)
     val textureIndex: Int
@@ -21,14 +21,6 @@ open class TileSet: ComponentNode(TileSet) {
         tile.also(configure)
         tileTemplates.add(tile)
         tile
-    }
-
-    override fun setParentComponent(key: ComponentKey) {
-        super.setParentComponent(key)
-        if (key.type.aspectIndex == Asset.aspectIndex)
-            textureRef(key)
-        else
-            textureRef.reset()
     }
 
     override fun activate() {

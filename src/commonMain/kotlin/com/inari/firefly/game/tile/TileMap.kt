@@ -4,9 +4,8 @@ import com.inari.firefly.core.*
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGrid
 import com.inari.firefly.graphics.view.ETransform
+import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
-import com.inari.firefly.graphics.view.View.Companion.BASE_VIEW_KEY
-import com.inari.firefly.graphics.view.ViewLayerAware
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.IntFrameAnimation
 import com.inari.firefly.physics.animation.IntFrameAnimationControl
@@ -17,33 +16,43 @@ import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 import kotlin.math.floor
 
-open class TileMap : ComponentNode(TileMap) {
+open class TileMap : Composite(TileMap) {
 
-    val viewIndex: Int
-        get() = viewRef.targetKey.instanceIndex
     @JvmField var viewRef = CReference(View)
+    @JvmField var autoCreateLayer = true
+    @JvmField var autoActivateLayer =  true
 
-    private val tileMapData = DynArray.of<TileMapData>(5, 5)
+    private val tileMapLayerData = DynArray.of<TileMapLayerData>(5, 5)
     private var parallax = false
 
-    fun withTileSet(
-        cBuilder: ComponentBuilder<TileSet>,
-        configure: (TileSet.() -> Unit)): ComponentKey  = withChild(cBuilder, configure)
+    fun withTileSet(configure: (TileSet.() -> Unit)): ComponentKey
+        = TileSet.build(configure)
 
-    val withTileLayer: (TileMapData.() -> Unit) -> Unit = { configure ->
-        val instance = TileMapData()
+    val withTileLayer: (TileMapLayerData.() -> Unit) -> Unit = { configure ->
+        val instance = TileMapLayerData()
         instance.also(configure)
-        tileMapData[instance.layerIndex] = instance
+
+        if (autoCreateLayer && !instance.layerRef.exists) {
+            Layer {
+                name = instance.layerRef.targetKey.name
+                this@Layer.viewRef(this@TileMap.viewRef.targetKey)
+                position(instance.position)
+            }
+        }
+        if (autoActivateLayer)
+            Layer.activate(instance.layerRef.refIndex)
+
+        tileMapLayerData[instance.layerRef.refIndex] = instance
     }
 
     override fun activate() {
         super.activate()
-        tileMapData.forEach { data ->
-            buildTileGrid(data)
-            activateTileSetForLayer(data)
-            fillTileGrid(data)
+        tileMapLayerData.forEach { layerData ->
+            layerData.tileGridData.forEach { buildTileGrid(layerData, it) }
+            activateTileSetForLayer(layerData)
+            layerData.tileGridData.forEach { fillTileGrid(layerData, it) }
 
-            if (data.parallaxFactorX >= 0f || data.parallaxFactorY >= 0f)
+            if (layerData.parallaxFactorX >= 0f || layerData.parallaxFactorY >= 0f)
                 parallax = true
         }
 
@@ -56,109 +65,116 @@ open class TileMap : ComponentNode(TileMap) {
             Engine.disposeListener(View.VIEW_CHANGE_EVENT_TYPE, parallaxListener)
         parallax = false
 
-        tileMapData.forEach { data ->
-            deleteTileGrid(data)
-            deactivateTileSetsForLayer(data)
+        tileMapLayerData.forEach { data ->
+            data.tileGridData.forEach { deleteTileGrid(it) }
+            deactivateTileSets()
         }
         super.deactivate()
     }
 
-    fun getTileEntityIndex(code: Int, layerKey: ComponentKey): Int =
-        getTileEntityIndex(code, layerKey.instanceIndex)
-    fun getTileEntityIndex(code: Int, viewLayer: ViewLayerAware): Int =
-        getTileEntityIndex(code, viewLayer.layerIndex)
-    fun getTileEntityIndex(code: Int, layerIndex: Int = 0): Int =
-        tileMapData[layerIndex]?.entityCodeMapping?.get(code) ?: -1
+    fun getTileEntityIndex(layerName: String, code: Int): Int =
+        getTileEntityIndex(Layer[layerName].index, code)
+    fun getTileEntityIndex(layerId: Int, code: Int): Int =
+        tileMapLayerData[layerId]?.entityCodeMapping?.get(code) ?: -1
 
-    private fun activateTileSetForLayer(data: TileMapData) {
+    private fun activateTileSetForLayer(layerData: TileMapLayerData) {
 
-        data.tileSetMapping.forEach { mapping ->
-            var codeIndex = mapping.codeOffset
-            val tileSet = TileSet[mapping.tileSetIndex]
-            if (!tileSet.active)
-                TileSet.activate(mapping.tileSetIndex)
+        layerData.tileGridData.forEach { tileGridData ->
+            tileGridData.tileSetMapping.forEach { mapping ->
+                var codeIndex = mapping.codeOffset
+                val tileSet = TileSet[mapping.tileSetIndex]
+                if (!tileSet.active)
+                    TileSet.activate(mapping.tileSetIndex)
 
-            var it = 0
-            while (it < tileSet.tiles.capacity) {
-                val tile = tileSet.tiles[it++] ?: continue
+                var it = 0
+                while (it < tileSet.tiles.capacity) {
+                    val tile = tileSet.tiles[it++] ?: continue
 
-                val spriteId = tile.spriteTemplate.spriteIndex
-                if (spriteId < 0)
-                    throw IllegalStateException("Missing sprite id for tile: ${tile.name} in TileSet: ${tileSet.name}")
+                    val spriteId = tile.spriteTemplate.spriteIndex
+                    if (spriteId < 0)
+                        throw IllegalStateException("Missing sprite id for tile: ${tile.name} in TileSet: ${tileSet.name}")
 
-                val entityId = Entity {
-                    autoActivation = true
-                    name = "tile_${tile.name}_view:${this@TileMap.viewIndex}_layer:${data.layerIndex}"
+                    val entityId = Entity {
+                        autoActivation = true
+                        if (tile.name != NO_NAME)
+                            name = "${tile.name}_view:${this@TileMap.viewRef.refIndex}_layer:${layerData.layerRef.refIndex}"
 
-                    withComponent(ETransform) {
-                        viewRef(this@TileMap.viewIndex)
-                        layerRef(data.layerIndex)
-                    }
+                        withComponent(ETransform) {
+                            viewRef(this@TileMap.viewRef)
+                            layerRef(layerData.layerRef)
+                        }
 
-                    withComponent(ETile) {
-                        spriteIndex = spriteId
-                        tintColor(tile.tintColor ?: data.tint)
-                        blendMode = tile.blendMode ?: data.blend
-                        tileGridRef(data.tileGridIndex)
-                    }
+                        withComponent(ETile) {
+                            spriteIndex = spriteId
+                            tintColor(tile.tintColor ?: layerData.tint)
+                            blendMode = tile.blendMode ?: layerData.blend
+                            tileGridRef(tileGridData.tileGridIndex)
+                        }
 
-                    withComponent(EMultiplier) {}
+                        withComponent(EMultiplier) {}
 
-                    if (tile.hasContactComp) {
-                        withComponent(EContact) {
-                            if (tile.contactType !== UNDEFINED_CONTACT_TYPE) {
-                                contactBounds(0,0,
-                                    tile.spriteTemplate.textureBounds.width,
-                                    tile.spriteTemplate.textureBounds.height)
-                                contactType = tile.contactType
+                        if (tile.hasContactComp) {
+                            withComponent(EContact) {
+                                if (tile.contactType !== UNDEFINED_CONTACT_TYPE) {
+                                    contactBounds(
+                                        0, 0,
+                                        tile.spriteTemplate.textureBounds.width,
+                                        tile.spriteTemplate.textureBounds.height
+                                    )
+                                    contactType = tile.contactType
+                                    material = tile.material
+                                    contactBounds(tile.contactMask)
+                                }
                                 material = tile.material
-                                contactBounds(tile.contactMask)
                             }
-                            material = tile.material
+                        }
+
+                        if (tile.animationData != null) {
+                            withComponent(EAnimation) {
+                                withAnimation(IntFrameAnimation) {
+                                    animatedProperty = ETile.PropertyAccessor.SPRITE
+                                    looping = true
+                                    timeline = tile.animationData!!.frames.toArray()
+                                    animationController(IntFrameAnimationControl)
+                                }
+                            }
                         }
                     }
 
-                    if (tile.animationData != null) {
-                        IntFrameAnimationControl
-                        withComponent(EAnimation) {
-                            withAnimation(IntFrameAnimation) {
-                                animatedProperty = ETile.PropertyAccessor.SPRITE
-                                looping = true
-                                timeline = tile.animationData!!.frames.toArray()
-                            }
-                        }
-                    }
+                    if (layerData.entityCodeMapping[codeIndex] >= 0)
+                        throw IllegalStateException("Entity code mapping already exists, please check! code: $codeIndex")
+
+                    layerData.entityCodeMapping[codeIndex] = entityId.instanceIndex
+                    codeIndex++
                 }
-                data.entityCodeMapping[codeIndex] = entityId.instanceIndex
-                codeIndex++
             }
         }
     }
 
-    private fun buildTileGrid(data: TileMapData) {
-        data.tileGridIndex = TileGrid {
+    private fun buildTileGrid(layerData: TileMapLayerData, gridData: TileMapGridData) {
+        gridData.tileGridIndex = TileGrid {
             autoActivation = true
-            name = "tilegrid_${this@TileMap.name}_${data.layerIndex}"
-            viewRef(this@TileMap.viewIndex)
-            layerRef(data.layerIndex)
-            if (data.renderer != null)
-                renderer = data.renderer!!
-            gridWidth = data.mapWidth
-            gridHeight = data.mapHeight
-            cellWidth = data.tileWidth
-            cellHeight = data.tileHeight
-            position(data.position)
-            spherical = data.spherical
+            //name = "tilegrid_${this@TileMap.name}_${layerData.layerIndex}"
+            viewRef(this@TileMap.viewRef)
+            layerRef(layerData.layerRef)
+            if (gridData.renderer != null)
+                renderer = gridData.renderer!!
+            gridWidth = gridData.mapWidth
+            gridHeight = gridData.mapHeight
+            cellWidth = gridData.tileWidth
+            cellHeight = gridData.tileHeight
+            position(gridData.position)
+            spherical = gridData.spherical
         }.instanceIndex
     }
 
-    private fun fillTileGrid(data: TileMapData) {
-        val tileGrid = TileGrid[data.tileGridIndex]
-        val codeIterator = data.mapCodes.iterator()
+    private fun fillTileGrid(layerData: TileMapLayerData, gridData: TileMapGridData) {
+        val tileGrid = TileGrid[gridData.tileGridIndex]
+        val codeIterator = gridData.mapCodes.iterator()
         var x = 0
         var y = 0
         while (codeIterator.hasNext()) {
-            tileGrid[x, y] = data.entityCodeMapping[codeIterator.nextInt()]
+            tileGrid[x, y] = layerData.entityCodeMapping[codeIterator.nextInt()]
             x++
             if (x >= tileGrid.gridWidth) {
                 y++
@@ -167,28 +183,30 @@ open class TileMap : ComponentNode(TileMap) {
         }
     }
 
-    private fun deactivateTileSetsForLayer(data: TileMapData) {
-        val iterator = data.entityCodeMapping.iterator()
-        while (iterator.hasNext())
-            Entity.delete(iterator.nextInt())
+    private fun deactivateTileSets() {
+        tileMapLayerData.forEach { mapLayer ->
+            val iterator = mapLayer.entityCodeMapping.iterator()
+            while (iterator.hasNext())
+                Entity.delete(iterator.nextInt())
 
-        data.entityCodeMapping.clear()
+            mapLayer.entityCodeMapping.clear()
+        }
     }
 
-    private fun deleteTileGrid(data: TileMapData) =
-        TileGrid.delete(data.tileGridIndex)
+    private fun deleteTileGrid(gridData: TileMapGridData) =
+        TileGrid.delete(gridData.tileGridIndex)
 
     private val parallaxListener: (View.ViewChangeEvent) -> Unit = { event ->
-        if (event.type == View.ViewChangeEvent.Type.ORIENTATION && event.viewIndex == viewIndex)
+        if (event.type == View.ViewChangeEvent.Type.ORIENTATION && event.viewIndex == viewRef.refIndex)
             updateParallaxLayer(event.pixelPerfect)
     }
 
     private fun updateParallaxLayer(pixelPerfect: Boolean) {
-        val viewPos = View[viewIndex].worldPosition
+        val viewPos = View[viewRef].worldPosition
 
-        tileMapData.forEach { mapLayer ->
+        tileMapLayerData.forEach { mapLayer ->
             if (mapLayer.parallaxFactorX != ZERO_FLOAT || mapLayer.parallaxFactorY != ZERO_FLOAT) {
-                TileGrid[mapLayer.tileGridIndex].position(
+                Layer[mapLayer.layerRef].position(
                     if (pixelPerfect) floor(-viewPos.x * mapLayer.parallaxFactorX) else -viewPos.x * mapLayer.parallaxFactorX,
                     if (pixelPerfect) floor(-viewPos.y * mapLayer.parallaxFactorY) else -viewPos.y * mapLayer.parallaxFactorY)
             }
@@ -202,7 +220,7 @@ open class TileMap : ComponentNode(TileMap) {
         private val viewListener: ComponentEventListener = { key, type ->
             when(type) {
                 ComponentEventType.DELETED ->  TileMap.forEachDo { tileMap ->
-                    if (tileMap.viewIndex == key.instanceIndex)
+                    if (tileMap.viewRef.refIndex == key.instanceIndex)
                         TileMap.delete(tileMap.index)
                 }
                 else -> DO_NOTHING
@@ -213,15 +231,10 @@ open class TileMap : ComponentNode(TileMap) {
             View.registerComponentListener(viewListener)
         }
 
-        fun getTileEntityIndex(code: Int, view: ComponentKey, layer: ComponentKey): Int =
-            getTileEntityIndex(code, view.instanceIndex, layer.instanceIndex)
+        fun getTileEntityIndex(tileMapName: String, layerName: String, code: Int): Int =
+            TileMap[tileMapName].getTileEntityIndex(layerName, code)
+        fun getTileEntityIndex(tileMapIndex: Int, layerIndex: Int, code: Int): Int =
+            TileMap[tileMapIndex].getTileEntityIndex(layerIndex, code)
 
-        fun getTileEntityIndex(code: Int, viewLayer: ViewLayerAware): Int =
-            getTileEntityIndex(code, viewLayer.viewIndex, viewLayer.layerIndex)
-
-        fun getTileEntityIndex(code: Int, viewIndex: Int = View[BASE_VIEW_KEY].index, layerIndex: Int = 0): Int =
-            TileMap.findFirst {
-               it.active && it.viewIndex == viewIndex
-            }?.getTileEntityIndex(code, layerIndex) ?: -1
     }
 }

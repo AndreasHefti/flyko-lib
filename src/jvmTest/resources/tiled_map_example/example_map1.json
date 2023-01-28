@@ -1,0 +1,114 @@
+{ "class":"firefly_tilemap",
+ "compressionlevel":-1,
+ "height":10,
+ "infinite":false,
+ "layers":[
+        {
+         "class":"firefly_maplayer",
+         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 32, 22, 12, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 32, 9, 9, 22, 12, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 2, 32, 39, 0, 0, 29, 22, 12, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 2, 32, 0, 0, 19, 19, 0, 0, 22, 12, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 2, 32, 0, 0, 0, 0, 0, 0, 0, 0, 22, 12, 0, 0, 0,
+            0, 0, 0, 0, 2, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 12, 0, 0,
+            0, 0, 0, 2, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 12, 0,
+            0, 0, 2, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 12,
+            0, 2, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            2, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "height":10,
+         "id":2,
+         "name":"background1",
+         "offsetx":-15,
+         "offsety":-10,
+         "opacity":0.5,
+         "parallaxx":0.9,
+         "parallaxy":0.9,
+         "properties":[
+                {
+                 "name":"blend_mode",
+                 "propertytype":"blend",
+                 "type":"string",
+                 "value":"NORMAL_ALPHA"
+                }, 
+                {
+                 "name":"layer_tilesets",
+                 "type":"string",
+                 "value":"blueGrid1616"
+                }, 
+                {
+                 "name":"tint_color",
+                 "type":"color",
+                 "value":""
+                }],
+         "type":"tilelayer",
+         "visible":true,
+         "width":20,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "class":"firefly_maplayer",
+         "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1,
+            1, 0, 0, 0, 13, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
+            1, 5, 0, 0, 1, 14, 13, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 6, 0, 0, 1, 1, 1, 0, 22, 1, 1, 21, 21, 11, 11, 0, 2, 1, 1, 1,
+            1, 1, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 33, 1, 1,
+            1, 1, 6, 0, 0, 3, 7, 13, 0, 3, 4, 14, 13, 3, 13, 0, 3, 13, 36, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+         "height":10,
+         "id":1,
+         "name":"main_layer",
+         "opacity":1,
+         "properties":[
+                {
+                 "name":"layer_tilesets",
+                 "type":"string",
+                 "value":"blueGrid1616"
+                }],
+         "type":"tilelayer",
+         "visible":true,
+         "width":20,
+         "x":0,
+         "y":0
+        }],
+ "nextlayerid":4,
+ "nextobjectid":1,
+ "orientation":"orthogonal",
+ "properties":[
+        {
+         "name":"name",
+         "type":"string",
+         "value":"map1"
+        }, 
+        {
+         "name":"tasks",
+         "propertytype":"tasks",
+         "type":"class",
+         "value":
+            {
+             "AFTER_ACTIVATION":"afterActivateTileMap",
+             "AFTER_LOAD":"afterLoadTileMap",
+             "BEFORE_ACTIVATION":"beforeActivateTileMap"
+            }
+        }, 
+        {
+         "name":"tileset_refs",
+         "type":"string",
+         "value":"blueGrid1616"
+        }],
+ "renderorder":"right-down",
+ "tiledversion":"1.9.2",
+ "tileheight":16,
+ "tilesets":[
+        {
+         "firstgid":1,
+         "source":"..\/tiled_tileset_example\/tiled_tileset.json"
+        }],
+ "tilewidth":16,
+ "type":"map",
+ "version":"1.8",
+ "width":20
+}

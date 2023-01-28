@@ -2,7 +2,6 @@ package com.inari.firefly.core.api
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.badlogic.gdx.graphics.Texture.TextureWrap
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
@@ -15,14 +14,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.GdxRuntimeException
-import com.inari.firefly.core.Engine
-import com.inari.util.collection.DynArray
-import com.inari.util.collection.DynArrayRO
 import com.inari.firefly.core.api.ShapeType.*
 import com.inari.firefly.filter.ColorFilteredTextureData
 import com.inari.firefly.graphics.view.View
+import com.inari.util.NO_NAME
 import com.inari.util.NO_PROGRAM
 import com.inari.util.NULL_INT_FUNCTION
+import com.inari.util.collection.DynArray
+import com.inari.util.collection.DynArrayRO
 import com.inari.util.geom.*
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL12
@@ -168,8 +167,9 @@ actual object GraphicsAPIImpl : GraphicsAPI {
             vertexShader = try {
                 Gdx.files.internal(data.vertexShaderResourceName).readString()
             } catch (e: Exception) {
-                System.err.println("Failed to load vertex shader from resource: ${data.vertexShaderResourceName}")
-                println("Use default vertex shader")
+                if (data.vertexShaderResourceName != NO_NAME)
+                    System.err.println("Failed to load vertex shader from resource: ${data.vertexShaderResourceName}")
+                // DEBUG  println("--> Use default vertex shader")
                 DEFAULT_VERTEX_SHADER
             }
         }
@@ -178,15 +178,16 @@ actual object GraphicsAPIImpl : GraphicsAPI {
             fragmentShader = try {
                 Gdx.files.internal(data.fragmentShaderResourceName).readString()
             } catch (e: Exception) {
-                System.err.println("Failed to load fragment shader from resource: ${data.fragmentShaderResourceName}")
-                println("Use default fragment shader")
+                if (data.fragmentShaderResourceName != NO_NAME)
+                    System.err.println("Failed to load fragment shader from resource: ${data.fragmentShaderResourceName}")
+                // DEBUG  println("--> Use default fragment shader")
                 DEFAULT_FRAGMENT_SHADER
             }
         }
 
         val shaderProgram = ShaderProgram(vertexShader, fragmentShader)
         if (shaderProgram.isCompiled)
-            println("Shader Compiled: ${shaderProgram.log}")
+            // DEBUG  println("--> Shader Compiled: ${shaderProgram.log}")
         else {
             System.err.println("Shader program failed to compile:")
             System.err.println("Vertex Shader:")
@@ -218,6 +219,11 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         activeViewport?.activate(spriteBatch, shapeRenderer, view, clear)
         activeViewportId = view.index
         spriteBatch.begin()
+    }
+
+    actual override fun applyViewportOffset(x: Float, y: Float) {
+        if (activeViewportId < 0) return
+        viewports[activeViewportId]?.offset(x, y)
     }
 
     actual override fun setActiveShader(shaderId: Int) {
@@ -585,8 +591,9 @@ actual object GraphicsAPIImpl : GraphicsAPI {
                     virtualView.bounds.x.toFloat(), virtualView.bounds.y.toFloat(),
                     virtualView.bounds.width.toFloat(), virtualView.bounds.height.toFloat()
                 )
+
+                spriteBatch.end()
             }
-            spriteBatch.end()
         }
 
         spriteBatch.flush()
@@ -628,23 +635,69 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         }
     }
 
-    actual override fun getScreenshotPixels(area: Vector4i): ByteArray {
-        val flippedY = screenHeight - area.height + area.y
-        val size = area.width * area.height * 3
+    actual override fun getTexturePixels(textureId: Int): ByteArray {
+        val texture = this.textures[textureId] ?: return ByteArray(0)
+        texture.textureData.prepare()
+        val pixmap = texture.textureData.consumePixmap()
+
+        val byteBuf = if (pixmap.format != Pixmap.Format.RGBA8888) {
+            // convert to RGBA8888
+            val newPixmap = Pixmap(pixmap.width, pixmap.height, Pixmap.Format.RGBA8888)
+            newPixmap.drawPixmap(pixmap, 0, 0)
+            newPixmap.pixels
+        } else
+            pixmap.pixels
+
+        pixmap.pixels
+
+        val byteArray = ByteArray(byteBuf.capacity())
+        byteBuf.get(byteArray)
+        return byteArray
+    }
+
+    actual override fun setTexturePixels(textureId: Int, region: Vector4i, pixels: ByteArray) {
+        val texture = this.textures[textureId] ?: return
+        texture.textureData.prepare()
+        val pixmap = texture.textureData.consumePixmap()
+
+        val bi = pixels.iterator()
+        for (y in region.y until region.y + region.height) {
+            for (x in region.x until region.x + region.width) {
+                pixmap.drawPixel(x, y,
+                    ((bi.nextByte().toInt() and 0xff) shl 24) or
+                    ((bi.nextByte().toInt() and 0xff) shl 16) or
+                    ((bi.nextByte().toInt() and 0xff) shl 8) or
+                    (bi.nextByte().toInt() and 0xff)
+                )
+            }
+        }
+
+        // create new texture from
+        this.textures[textureId] = Texture(pixmap)
+        // update all active sprites that uses the old texture.
+        this.sprites.forEach {
+            if (it.texture == texture)
+                it.texture = this.textures[textureId]
+        }
+    }
+
+    actual override fun getScreenshotPixels(region: Vector4i): ByteArray {
+        val flippedY = screenHeight - region.height + region.y
+        val size = region.width * region.height * 3
         val screenContents = ByteBuffer.allocateDirect(size).order(ByteOrder.LITTLE_ENDIAN)
-        GL11.glReadPixels(area.x, flippedY, area.width, area.height, GL12.GL_BGR, GL11.GL_UNSIGNED_BYTE, screenContents)
+        GL11.glReadPixels(region.x, flippedY, region.width, region.height, GL12.GL_BGR, GL11.GL_UNSIGNED_BYTE, screenContents)
         val array = ByteArray(size)
         val inverseArray = ByteArray(size)
         screenContents.get(array)
 
         var y = 0
-        while (y < area.height) {
+        while (y < region.height) {
             System.arraycopy(
                 array,
-                GeomUtils.getFlatArrayIndex(0, area.height - y - 1, area.width * 3),
+                GeomUtils.getFlatArrayIndex(0, region.height - y - 1, region.width * 3),
                 inverseArray,
-                GeomUtils.getFlatArrayIndex(0, y, area.width * 3),
-                area.width * 3
+                GeomUtils.getFlatArrayIndex(0, y, region.width * 3),
+                region.width * 3
             )
             y++
         }
@@ -728,19 +781,13 @@ actual object GraphicsAPIImpl : GraphicsAPI {
     ) : ShaderUpdate {
 
         private var texNum = 1
-        private val updates = DynArray.of<() -> Unit>(0, 5)
 
         fun activate() {
             spriteBatch.shader = program
             shaderInit(this)
-            update()
             Gdx.graphics.gL20.glActiveTexture(GL20.GL_TEXTURE0)
-            if (!updates.isEmpty)
-                Engine.registerListener(Engine.UPDATE_EVENT_TYPE, ::update)
         }
         fun dispose() {
-            if (!updates.isEmpty)
-                Engine.disposeListener(Engine.UPDATE_EVENT_TYPE, ::update)
             spriteBatch.shader = null
         }
 
@@ -760,33 +807,6 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         override fun bindViewTexture(bindingName: String, value: Int) {
             viewports[value]?.bindToShader(program, bindingName, texNum++)
         }
-
-        override fun setUniformFloat(bindingName: String, supplier: () -> Float) {
-            updates.add { setUniformFloat(bindingName, supplier.invoke()) }
-        }
-        override fun setUniformVec2(bindingName: String, supplier: () -> Vector2f) {
-            updates.add { setUniformVec2(bindingName, supplier.invoke()) }
-        }
-        override fun setUniformVec3(bindingName: String, supplier: () -> Vector3f) {
-            updates.add { setUniformVec3(bindingName, supplier.invoke()) }
-        }
-
-        override fun setUniformColorVec4(bindingName: String, supplier: () -> Vector4f) {
-            updates.add { setUniformColorVec4(bindingName, supplier.invoke()) }
-        }
-
-        override fun bindTexture(bindingName: String, supplier: () -> Int) {
-            val textureNumber = texNum++
-            textures[supplier.invoke()]?.bind(textureNumber)
-            updates.add { program.setUniformi(bindingName, textureNumber) }
-        }
-
-        override fun bindViewTexture(bindingName: String, supplier: () -> Int) {
-            val textureNumber = texNum++
-            updates.add {viewports[supplier()]?.bindToShader(program, bindingName, textureNumber) }
-        }
-
-        override fun update() = updates.forEach { it() }
     }
 
     private class ViewportFBO constructor(
@@ -826,6 +846,14 @@ actual object GraphicsAPIImpl : GraphicsAPI {
                 Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a)
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
             }
+        }
+
+        fun offset(x: Float, y: Float) {
+            camera.position.x = camera.position.x + x
+            camera.position.y = camera.position.y + y
+            camera.update()
+            spriteBatch.projectionMatrix = camera.combined
+            shapeRenderer.projectionMatrix = camera.combined
         }
 
         fun bindToShader(program: ShaderProgram, binding: String, num: Int) {

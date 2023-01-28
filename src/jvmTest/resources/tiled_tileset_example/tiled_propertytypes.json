@@ -1,0 +1,339 @@
+[
+    {
+        "id": 18,
+        "name": "blend",
+        "storageType": "string",
+        "type": "enum",
+        "values": [
+            "NONE",
+            "NORMAL_ALPHA",
+            "ADDITIVE",
+            "ADDITIVE_ALPHA",
+            "MULT",
+            "CLEAR",
+            "SRC",
+            "DEST",
+            "SRC_OVER_DEST",
+            "DEST_OVER_SRC",
+            "SRC_IN_DEST",
+            "DEST_IN_SRC",
+            "SRC_OUT_DEST",
+            "DEST_OUT_SRC",
+            "SRC_ATOP_DEST",
+            "DEST_ATOP_SRC",
+            "SRC_XOR_DEST"
+        ],
+        "valuesAsFlags": false
+    },
+    {
+        "id": 16,
+        "name": "contact_type",
+        "storageType": "string",
+        "type": "enum",
+        "values": [
+            "contact_type_1",
+            "contact_type_2",
+            "contact_type_3",
+            "..."
+        ],
+        "valuesAsFlags": false
+    },
+    {
+        "color": "#ffa0a0a4",
+        "id": 21,
+        "members": [
+            {
+                "name": "blend_mode",
+                "propertyType": "blend",
+                "type": "string",
+                "value": "NORMAL_ALPHA"
+            },
+            {
+                "name": "layer_tilesets",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "renderer",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "tint_color",
+                "type": "color",
+                "value": ""
+            }
+        ],
+        "name": "firefly_maplayer",
+        "type": "class",
+        "useAs": [
+            "property",
+            "layer"
+        ]
+    },
+    {
+        "color": "#ffa0a0a4",
+        "id": 10,
+        "members": [
+            {
+                "name": "atlas_position",
+                "propertyType": "position",
+                "type": "class",
+                "value": {
+                }
+            },
+            {
+                "name": "atlas_sprite_flip",
+                "propertyType": "flip",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "blend_mode",
+                "propertyType": "blend",
+                "type": "string",
+                "value": "NORMAL_ALPHA"
+            },
+            {
+                "name": "material",
+                "propertyType": "material",
+                "type": "class",
+                "value": {
+                    "contact_mask_x": -1,
+                    "contact_mask_y": -1
+                }
+            },
+            {
+                "name": "name",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "tile_aspect",
+                "propertyType": "tile_aspect",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "tint_color",
+                "type": "string",
+                "value": ""
+            }
+        ],
+        "name": "firefly_tile",
+        "type": "class",
+        "useAs": [
+            "property",
+            "tile"
+        ]
+    },
+    {
+        "color": "#ffa0a0a4",
+        "id": 19,
+        "members": [
+            {
+                "name": "name",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "tasks",
+                "propertyType": "tasks",
+                "type": "class",
+                "value": {
+                }
+            },
+            {
+                "name": "tileset_refs",
+                "type": "string",
+                "value": ""
+            }
+        ],
+        "name": "firefly_tilemap",
+        "type": "class",
+        "useAs": [
+            "property",
+            "map"
+        ]
+    },
+    {
+        "color": "#ffa0a0a4",
+        "id": 13,
+        "members": [
+            {
+                "name": "atlas_file_path",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "collision_bitmask_file_path",
+                "type": "string",
+                "value": ""
+            }
+        ],
+        "name": "firefly_tileset",
+        "type": "class",
+        "useAs": [
+            "property",
+            "tileset"
+        ]
+    },
+    {
+        "id": 11,
+        "name": "flip",
+        "storageType": "string",
+        "type": "enum",
+        "values": [
+            "horizontal",
+            "vertical"
+        ],
+        "valuesAsFlags": true
+    },
+    {
+        "color": "#ffa0a0a4",
+        "id": 14,
+        "members": [
+            {
+                "name": "contact_full_rect",
+                "type": "bool",
+                "value": false
+            },
+            {
+                "name": "contact_mask_x",
+                "type": "int",
+                "value": 0
+            },
+            {
+                "name": "contact_mask_y",
+                "type": "int",
+                "value": 0
+            },
+            {
+                "name": "contact_type",
+                "propertyType": "contact_type",
+                "type": "string",
+                "value": "contact_type_1"
+            },
+            {
+                "name": "material_type",
+                "propertyType": "material_type",
+                "type": "string",
+                "value": "NONE"
+            }
+        ],
+        "name": "material",
+        "type": "class",
+        "useAs": [
+            "property"
+        ]
+    },
+    {
+        "id": 15,
+        "name": "material_type",
+        "storageType": "string",
+        "type": "enum",
+        "values": [
+            "NONE",
+            "TERRAIN",
+            "PROJECTILE",
+            "WATER",
+            "LADDER",
+            "ROPE",
+            "INTERACTIVE",
+            "..."
+        ],
+        "valuesAsFlags": false
+    },
+    {
+        "color": "#ffa0a0a4",
+        "id": 12,
+        "members": [
+            {
+                "name": "x",
+                "type": "int",
+                "value": 0
+            },
+            {
+                "name": "y",
+                "type": "int",
+                "value": 0
+            }
+        ],
+        "name": "position",
+        "type": "class",
+        "useAs": [
+            "property"
+        ]
+    },
+    {
+        "id": 17,
+        "name": "tile_aspect",
+        "storageType": "string",
+        "type": "enum",
+        "values": [
+            "tile_aspect_1",
+            "tile_aspect_2",
+            "tile_aspect_3",
+            "..."
+        ],
+        "valuesAsFlags": true
+    },
+    {
+        "color": "#ffa0a0a4",
+        "id": 22,
+        "members": [
+            {
+                "name": "AFTER_ACTIVATION",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "AFTER_DEACTIVATION",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "AFTER_DISPOSE",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "AFTER_LOAD",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "BEFORE_ACTIVATION",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "BEFORE_DEACTIVATION",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "BEFORE_DELETE",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "BEFORE_DISPOSE",
+                "type": "string",
+                "value": ""
+            }
+        ],
+        "name": "tasks",
+        "type": "class",
+        "useAs": [
+            "property",
+            "map",
+            "layer",
+            "object",
+            "tile",
+            "tileset",
+            "wangcolor",
+            "wangset"
+        ]
+    }
+]

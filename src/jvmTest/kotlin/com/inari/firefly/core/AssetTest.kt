@@ -1,7 +1,6 @@
 package com.inari.firefly.core
 
 import com.inari.firefly.TestApp
-import com.inari.firefly.game.json.AreaJsonAsset
 import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.physics.sound.Music
@@ -123,7 +122,7 @@ class AssetTest {
             Param1 = "parent"
             Param2 = 1.45f
 
-            withChild(TestAsset) {
+            withChild {
                 name = "childAsset"
                 Param1 = "child"
                 Param2 = 1.45f
@@ -141,6 +140,7 @@ class AssetTest {
 
         Asset.activate("childAsset")
         assertEquals(
+
             "|index=1:childAsset:INITIALIZED" +
                     "|index=0:parentAsset:INITIALIZED" +
                     "|index=0:parentAsset:LOADED" +
@@ -215,14 +215,55 @@ class TestAsset private constructor(
     var Param2: Float = 0.0f
 ) : Asset(TestAsset) {
 
+    val parent = CReference(Asset)
+
+    fun withChild(configure: (TestAsset.() -> Unit)): ComponentKey {
+        val child = TestAsset.buildAndGet(configure)
+        child.parent(earlyKeyAccess())
+        return child.key
+    }
+
     override fun load() {
+        if (parent.targetKey != NO_COMPONENT_KEY)
+            Asset.load(parent.targetKey)
+
         super.load()
         assetIndex = 0
     }
 
+    override fun activate() {
+        if (parent.targetKey != NO_COMPONENT_KEY)
+            Asset.activate(parent.targetKey)
+
+        super.activate()
+    }
+
+    override fun deactivate() {
+        TestAsset.forEachDo {
+            if (it.parent.exists && it.parent.targetKey == this.key)
+                TestAsset.deactivate(it)
+        }
+
+        super.deactivate()
+    }
+
     override fun dispose() {
+        TestAsset.forEachDo {
+            if (it.parent.exists && it.parent.targetKey == this.key)
+                TestAsset.dispose(it)
+        }
+
         assetIndex = -1
         super.dispose()
+    }
+
+    override fun delete() {
+        TestAsset.forEachDo {
+            if (it.parent.exists && it.parent.targetKey == this.key)
+                TestAsset.delete(it)
+        }
+
+        super.delete()
     }
 
     override fun toString(): String {

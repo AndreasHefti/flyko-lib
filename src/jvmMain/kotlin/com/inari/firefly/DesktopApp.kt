@@ -16,6 +16,8 @@ import com.inari.firefly.graphics.text.SimpleTextRenderer
 import com.inari.firefly.graphics.tile.SimpleTileGridRenderer
 import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
+import com.inari.util.VOID_CONSUMER
+import org.lwjgl.glfw.GLFW
 
 
 class DesktopApp(
@@ -25,8 +27,11 @@ class DesktopApp(
     resizable: Boolean = true,
     vsync: Boolean = true,
     icon: String? = null,
+    private val debug: Boolean = false,
     val initializer: (DesktopApp) -> Unit
 ) : ApplicationAdapter() {
+
+    var onDispose: (DesktopApp) -> Unit = VOID_CONSUMER
 
     init {
         try {
@@ -42,7 +47,6 @@ class DesktopApp(
             t.printStackTrace()
         }
     }
-
 
     override fun create() {
         Gdx.graphics.setTitle(title)
@@ -71,16 +75,19 @@ class DesktopApp(
             ComponentSystem.clearSystems()
             loadSystemFont()
             initializer(this)
-            val runtime = Runtime.getRuntime()
-            val usedMemInMB=(runtime.totalMemory() - runtime.freeMemory()) / 1048576L
-            val maxHeapSizeInMB=runtime.maxMemory() / 1048576L
-            val availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB
-            println("*************************************************************************")
-            println("usedMemInMB: : $usedMemInMB")
-            println("maxHeapSizeInMB: : $maxHeapSizeInMB")
-            println("availHeapSizeInMB: : $availHeapSizeInMB")
-            println("*************************************************************************")
-            ComponentSystem.dumpInfo()
+
+            if (debug) {
+                val runtime = Runtime.getRuntime()
+                val usedMemInMB = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L
+                val maxHeapSizeInMB = runtime.maxMemory() / 1048576L
+                val availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB
+                println("*************************************************************************")
+                println("usedMemInMB: : $usedMemInMB")
+                println("maxHeapSizeInMB: : $maxHeapSizeInMB")
+                println("availHeapSizeInMB: : $availHeapSizeInMB")
+                println("*************************************************************************")
+                ComponentSystem.dumpInfo()
+            }
         }
     }
 
@@ -89,7 +96,7 @@ class DesktopApp(
             name = Engine.SYSTEM_FONT_ASSET
             resourceName = "firefly/fireflyMicroFont.png"
 
-            withChild(Font) {
+            withFont {
                 name = Engine.SYSTEM_FONT
                 charWidth = 8
                 charHeight = 16
@@ -114,12 +121,13 @@ class DesktopApp(
             View.notifyScreenSizeChange(width, height, defaultWidth, defaultHeight)
     }
 
+    override fun dispose() = onDispose(this)
 
     fun addExitKeyTrigger(key: Int) {
         Trigger
         UpdateEventTrigger.build {
+            autoActivation = true
             call = {
-                dispose()
                 DesktopAppAdapter.exit()
                 true
             }

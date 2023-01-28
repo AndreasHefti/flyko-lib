@@ -21,7 +21,6 @@ class ViewSystemTest {
 
     @Test
     fun testSystemInit() {
-
         assertTrue(View.exists(BASE_VIEW_KEY))
         assertTrue(GraphicsAPIMock._views.size == 1)
     }

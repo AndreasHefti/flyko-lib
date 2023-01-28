@@ -17,14 +17,6 @@ class Sprite private constructor(): Asset(Sprite), SpriteData {
     override var hFlip: Boolean = false
     override var vFlip: Boolean = false
 
-    override fun setParentComponent(key: ComponentKey) {
-        super.setParentComponent(key)
-        if (key.type.aspectIndex == Texture.aspectIndex)
-            textureRef(key)
-        else
-            textureRef.reset()
-    }
-
     override fun load() {
         super.load()
         if (assetIndex >= 0) return

@@ -30,11 +30,6 @@ class Font private constructor(): Asset(Font) {
         override val vFlip = false
     }
 
-    override fun setParentComponent(key: ComponentKey) {
-        super.setParentComponent(key)
-        textureRef(key)
-    }
-
     override fun load() {
         tmpSpriteData.textureIndex = resolveAssetIndex(textureRef.targetKey)
         tmpSpriteData.textureBounds(0, 0, charWidth, charHeight)

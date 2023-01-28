@@ -17,6 +17,10 @@ class EText private constructor() : EntityComponent(EText) {
     @JvmField var tint: Vector4f = Vector4f(1f, 1f, 1f, 1f)
     @JvmField var blend: BlendMode = BlendMode.NONE
 
+    override fun activate() {
+        if (fontRef.exists)
+            Font.load(fontRef.targetKey)
+    }
 
     override fun reset() {
         renderer = SimpleTextRenderer

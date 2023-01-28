@@ -3,11 +3,7 @@ package examples
 import com.inari.firefly.*
 import com.inari.firefly.core.Entity
 import com.inari.firefly.core.api.BlendMode
-import com.inari.firefly.core.api.GraphicsAPIImpl
-import com.inari.firefly.core.api.ShapeType
-import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.sprite.ESprite
-import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.Shader
@@ -82,7 +78,7 @@ fun main() {
                 resourceName = "firefly/logo.png"
                 // Create and activate/load a SpriteAsset with reference to the TextureAsset.
                 // This also implicitly loads the TextureAsset if it is not already loaded.
-                withChild(Sprite) {
+                withSprite {
                     name = "inariSprite"
                     textureBounds(0, 0, 32, 32)
                     hFlip = false
