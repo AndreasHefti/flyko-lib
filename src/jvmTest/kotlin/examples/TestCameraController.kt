@@ -3,14 +3,21 @@ package examples
 import com.inari.firefly.core.*
 import com.inari.firefly.graphics.view.View
 
-class TestCameraController private constructor() : SystemControl(View) {
+class TestCameraController private constructor() : SingleComponentControl<View>(View) {
 
-    private lateinit var view: View
+
     private lateinit var viewChangeEvent: View.ViewChangeEvent
     private var up = false
     private var right = false
     private var down = false
     private var left = false
+
+    override fun init(key: ComponentKey) {
+        viewChangeEvent = View.createViewChangeEvent(
+            key.componentIndex,
+            View.ViewChangeEvent.Type.ORIENTATION,
+            false)
+    }
 
     override fun initialize() {
         super.initialize()
@@ -24,22 +31,12 @@ class TestCameraController private constructor() : SystemControl(View) {
         }
     }
 
-    override fun update(index: Int) {
-        if (up) view.worldPosition.y -= 1f
-        if (right) view.worldPosition.x += 1f
-        if (down) view.worldPosition.y += 1f
-        if (left) view.worldPosition.x -= 1f
+    override fun update(c: View) {
+        if (up) c.worldPosition.y -= 1f
+        if (right) c.worldPosition.x += 1f
+        if (down) c.worldPosition.y += 1f
+        if (left) c.worldPosition.x -= 1f
         Engine.notify(viewChangeEvent)
-    }
-
-    override fun matchForControl(key: ComponentKey): Boolean {
-        val comp = View[key]
-        if (this.index in comp.controllerReferences) {
-            this.view = View[key]
-            viewChangeEvent = View.createViewChangeEvent(view.index, View.ViewChangeEvent.Type.ORIENTATION, false)
-            return true
-        }
-        return false
     }
 
     companion object : ComponentSubTypeBuilder<Control, TestCameraController>(Control, "TestCameraController") {

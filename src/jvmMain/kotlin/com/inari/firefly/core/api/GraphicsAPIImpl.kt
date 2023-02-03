@@ -17,9 +17,9 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import com.inari.firefly.core.api.ShapeType.*
 import com.inari.firefly.filter.ColorFilteredTextureData
 import com.inari.firefly.graphics.view.View
+import com.inari.util.INT_FUNCTION_IDENTITY
 import com.inari.util.NO_NAME
 import com.inari.util.NO_PROGRAM
-import com.inari.util.NULL_INT_FUNCTION
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
 import com.inari.util.geom.*
@@ -107,14 +107,14 @@ actual object GraphicsAPIImpl : GraphicsAPI {
     }
 
     actual override fun disposeView(viewId: Int) {
-        if (viewId != View.BASE_VIEW_KEY.instanceIndex)
+        if (viewId != View.BASE_VIEW_KEY.componentIndex)
             viewports.remove(viewId)?.dispose()
     }
 
     actual override fun createTexture(data: TextureData): Triple<Int, Int, Int> {
         val colorConverter = data.colorConverter
 
-        val texture = if (colorConverter != NULL_INT_FUNCTION)
+        val texture = if (colorConverter != INT_FUNCTION_IDENTITY)
             Texture(ColorFilteredTextureData(data.resourceName, colorConverter))
         else
             Texture( Gdx.files.internal(data.resourceName), data.isMipmap )

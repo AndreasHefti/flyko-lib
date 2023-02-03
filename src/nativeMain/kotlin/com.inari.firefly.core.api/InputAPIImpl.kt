@@ -5,6 +5,7 @@ import com.inari.firefly.core.api.InputDevice.Companion.ACTION_PRESS
 import com.inari.firefly.core.api.InputDevice.Companion.ACTION_TYPED
 import com.inari.firefly.core.api.InputDevice.Companion.VOID_INPUT_DEVICE
 import com.inari.util.NO_NAME
+import com.inari.util.VOID_CALL
 import kotlin.collections.HashMap
 
 
@@ -62,7 +63,7 @@ actual object InputAPIImpl : InputAPI {
     }
 
     @Suppress("VARIABLE_IN_SINGLETON_WITHOUT_THREAD_LOCAL")
-    private var buttonCallbackUpdate: () -> Unit = {}
+    private var buttonCallbackUpdate: () -> Unit = VOID_CALL
     actual override fun setButtonCallback(deviceName: String, callback: ButtonCallback) {
         if (deviceName in devices) {
             val device = devices[deviceName]!!

@@ -1,6 +1,7 @@
 package com.inari.firefly.core
 
 import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.NO_NAME
 import com.inari.util.TRUE_PREDICATE
 import com.inari.util.aspect.Aspect
@@ -8,19 +9,19 @@ import com.inari.util.aspect.AspectType
 import com.inari.util.collection.BitSet
 import com.inari.util.collection.DynArray
 import com.inari.util.event.Event
-import kotlin.native.concurrent.ThreadLocal
 
 interface System {
     fun clearSystem()
 }
 
-interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C>, System {
+interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C>, System, Iterable<C> {
     val systemName: String
     val hasComponents: Boolean
     val hasActiveComponents: Boolean
 
-    fun getNextIndex(fromIndex: Int): Int
-    fun getNextActiveIndex(fromIndex: Int): Int
+    fun indexIterator(): IntIterator
+    fun activeIndexIterator(): IntIterator
+    fun activeIterator(): Iterator<C>
 
     fun createKey(name: String): ComponentKey
     fun hasKey(name: String): Boolean
@@ -34,39 +35,39 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
         val keyForName = getKey(name)
         if (keyForName == NO_COMPONENT_KEY) throw IllegalArgumentException("No component for name: $name found on system: $systemName")
         checkKey(keyForName)
-        return get(keyForName.instanceIndex)
+        return get(keyForName.componentIndex)
     }
-    operator fun get(ref: CReference): C  = get(checkKey(ref.targetKey).instanceIndex)
-    operator fun get(key: ComponentKey): C  = get(checkKey(key).instanceIndex)
+    operator fun get(ref: CReference): C  = get(checkKey(ref.targetKey).componentIndex)
+    operator fun get(key: ComponentKey): C  = get(checkKey(key).componentIndex)
     operator fun get(index: Int): C
 
-    fun exists(name: String): Boolean = getKey(name).instanceIndex >= 0
-    fun exists(key: ComponentKey): Boolean = exists(checkKey(key).instanceIndex)
+    fun exists(name: String): Boolean = getKey(name).componentIndex >= 0
+    fun exists(key: ComponentKey): Boolean = exists(checkKey(key).componentIndex)
     fun exists(index: Int): Boolean
 
     fun load(c: C) = load(c.index)
-    fun load(name: String) = load(getKey(name).instanceIndex)
-    fun load(key: ComponentKey) = load(key.instanceIndex)
+    fun load(name: String) = load(getKey(name).componentIndex)
+    fun load(key: ComponentKey) = load(key.componentIndex)
     fun load(index: Int)
 
     fun activate(c: C) = activate(c.index)
-    fun activate(name: String) = activate(getKey(name).instanceIndex)
-    fun activate(key: ComponentKey) = activate(key.instanceIndex)
+    fun activate(name: String) = activate(getKey(name).componentIndex)
+    fun activate(key: ComponentKey) = activate(key.componentIndex)
     fun activate(index: Int)
 
     fun deactivate(c: C) = deactivate(c.index)
-    fun deactivate(name: String) = deactivate(getKey(name).instanceIndex)
-    fun deactivate(key: ComponentKey) = deactivate(key.instanceIndex)
+    fun deactivate(name: String) = deactivate(getKey(name).componentIndex)
+    fun deactivate(key: ComponentKey) = deactivate(key.componentIndex)
     fun deactivate(index: Int)
 
     fun dispose(c: C) = dispose(c.index)
-    fun dispose(name: String) = dispose(getKey(name).instanceIndex)
-    fun dispose(key: ComponentKey) = dispose(key.instanceIndex)
+    fun dispose(name: String) = dispose(getKey(name).componentIndex)
+    fun dispose(key: ComponentKey) = dispose(key.componentIndex)
     fun dispose(index: Int)
 
     fun delete(c: C) = delete(c.index)
-    fun delete(name: String) = delete(getKey(name).instanceIndex)
-    fun delete(key: ComponentKey) = delete(checkKey(key).instanceIndex)
+    fun delete(name: String) = delete(getKey(name).componentIndex)
+    fun delete(key: ComponentKey) = delete(checkKey(key).componentIndex)
     fun delete(index: Int)
 
     val componentEventType: Event.EventType
@@ -76,11 +77,10 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
         Engine.disposeListener(componentEventType, listener)
 
     fun findFirst(filter: (C) -> Boolean): C? {
-        var index = getNextIndex(0)
-        while (index >= 0) {
-            val c = this[index]
+        val iter = indexIterator()
+        while (iter.hasNext()) {
+            val c = this[iter.next()]
             if (filter(c)) return c
-            index = getNextIndex(index + 1)
         }
         return null
     }
@@ -89,12 +89,11 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
         filter: (C) -> Boolean = TRUE_PREDICATE,
         process: (C) -> Unit
     ) {
-        var index = getNextIndex(0)
-        while (index >= 0) {
-            val c = this[index]
+        val iter = iterator()
+        while (iter.hasNext()) {
+            val c = iter.next()
             if (filter(c))
                 process(c)
-            index = getNextIndex(index + 1)
         }
     }
 
@@ -102,12 +101,11 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
         filter: (C) -> Boolean = TRUE_PREDICATE,
         process: (C) -> Unit
     ) {
-        var i = getNextActiveIndex(0)
-        while (i >= 0) {
-            val component = this[i]
-            if (filter(component))
-                process(component)
-            i = getNextActiveIndex(i + 1)
+        val iter = activeIterator()
+        while (iter.hasNext()) {
+            val c = iter.next()
+            if (filter(c))
+                process(c)
         }
     }
 
@@ -129,7 +127,7 @@ abstract class ComponentSystem<C : Component>(
     final override val aspectName: String = typeAspect.aspectName
     final override val aspectType: AspectType = typeAspect.aspectType
 
-    init { ComponentSystem.registerSystem(this) }
+    init { registerSystem(this) }
 
     internal val COMPONENT_KEY_MAPPING: MutableMap<String, ComponentKey> =  HashMap()
     internal val COMPONENT_MAPPING: DynArray<C> = DynArray(50, 100) { size -> allocateArray(size) }
@@ -201,21 +199,19 @@ abstract class ComponentSystem<C : Component>(
     override fun clearSystem() {
 
         COMPONENT_MAPPING.forEach {
-            if (!it.name.contains(STATIC_COMPONENT_MARKER) && it.index >= 0)
+            if (!it.name.contains(STATIC_COMPONENT_MARKER) && it.index > NULL_COMPONENT_INDEX)
                 this.delete(it.index)
         }
 
-
         try {
             val keys = COMPONENT_KEY_MAPPING
-                .filter { it.value.instanceIndex < 0 }
+                .filter { it.value.componentIndex < 0 }
                 .map { it.key }
             keys.forEach { COMPONENT_KEY_MAPPING.remove(it) }
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        ACTIVE_COMPONENT_MAPPING.clear()
         EVENT_POOL.clear()
     }
 
@@ -225,7 +221,7 @@ abstract class ComponentSystem<C : Component>(
         // check name clash
         if (c.name != NO_NAME && c.name in COMPONENT_KEY_MAPPING) {
             val key = COMPONENT_KEY_MAPPING[c.name]!!
-            if (key.instanceIndex >= 0 && key.instanceIndex != c.index)
+            if (key.componentIndex >= 0 && key.componentIndex != c.index)
                 throw IllegalArgumentException("Key with same name already exists. Name: ${c.name}")
         }
 
@@ -244,7 +240,7 @@ abstract class ComponentSystem<C : Component>(
             }
         }
 
-        key.instanceIndex = c.index
+        key.componentIndex = c.index
         c.key = key
         return key
     }
@@ -274,8 +270,16 @@ abstract class ComponentSystem<C : Component>(
             COMPONENT_KEY_MAPPING.remove(removed.name)?.clearKey()
     }
 
-    override fun getNextIndex(fromIndex: Int): Int = COMPONENT_MAPPING.nextIndex(fromIndex)
-    override fun getNextActiveIndex(fromIndex: Int) = ACTIVE_COMPONENT_MAPPING.nextSetBit(fromIndex)
+    override fun indexIterator(): IntIterator = COMPONENT_MAPPING.indexIterator()
+    override fun activeIndexIterator(): IntIterator = ACTIVE_COMPONENT_MAPPING.iterator()
+    override fun iterator(): Iterator<C> = COMPONENT_MAPPING.iterator()
+    override fun activeIterator(): Iterator<C> {
+        return object : Iterator<C> {
+            private val iter = activeIndexIterator()
+            override fun hasNext(): Boolean = iter.hasNext()
+            override fun next(): C = COMPONENT_MAPPING[iter.next()]!!
+        }
+    }
 
     override operator fun get(index: Int): C = COMPONENT_MAPPING[index]
         ?: throw IllegalArgumentException("No component for index: $index on system: $typeName")
@@ -468,8 +472,12 @@ abstract class ComponentSystem<C : Component>(
         fun dispose(key: ComponentKey) = this[key.type].dispose(key)
         fun delete(key: ComponentKey) = this[key.type].delete(key)
 
-        fun clearSystems() = HashMap(COMPONENT_SYSTEM_MAPPING).forEach { it.value.clearSystem() }
-        
+        fun clearSystems() {
+            val iter = HashMap(COMPONENT_SYSTEM_MAPPING).values.iterator()
+            while (iter.hasNext())
+                iter.next().clearSystem()
+        }
+
         fun dumpInfo() {
             println("---- System Info ---------------------------------------------------------------------------------")
             COMPONENT_SYSTEM_MAPPING.values.forEach { println(it) }
@@ -497,27 +505,48 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
     final override val aspectName: String = system.aspectName
     final override val aspectType: AspectType = system.aspectType
 
-    init { ComponentSystem.registerSystem(this) }
+    init {
+        @Suppress("LeakingThis")
+        ComponentSystem.registerSystem(this)
+    }
 
     override val componentEventType: Event.EventType = system.componentEventType
     override val hasComponents: Boolean
-        get() = getNextActiveIndex(0) >= 0
+        get() = !system.COMPONENT_MAPPING.isEmpty
     override val hasActiveComponents: Boolean
-        get() = getNextActiveIndex(0) >= 0
+        get() = !system.ACTIVE_COMPONENT_MAPPING.isEmpty
 
-    override fun clearSystem() = system.forEachDo(subTypeFilter) { system.delete(it) }
-    override fun getNextIndex(fromIndex: Int): Int {
-        var index = system.getNextIndex(fromIndex)
-        while (index >= 0 && !subTypeFilter(system[index]))
-            index = system.getNextIndex(index + 1)
-        return index
+    override fun indexIterator(): IntIterator = system.indexIterator()
+    override fun activeIndexIterator(): IntIterator = system.activeIndexIterator()
+    override fun iterator(): Iterator<CC> = SubTypeIterator(indexIterator())
+    override fun activeIterator(): Iterator<CC> = SubTypeIterator(activeIndexIterator())
+    inner class SubTypeIterator<CC : Component>(private val iter: IntIterator): Iterator<CC> {
+        private var next = findNext()
+        override fun hasNext(): Boolean = next >= 0
+        override fun next(): CC {
+            @Suppress("UNCHECKED_CAST")
+            val ret = system[next] as CC
+            next = findNext()
+            return ret
+        }
+        private fun findNext(): Int {
+            var n = iter.next()
+            while(n >= 0) {
+                if (subTypeFilter(system[n]))
+                    return n
+                n = iter.next()
+            }
+            return n
+        }
     }
 
-    override fun getNextActiveIndex(fromIndex: Int): Int {
-        var index = system.getNextActiveIndex(fromIndex)
-        while (index >= 0 && !subTypeFilter(system[index]))
-            index = system.getNextActiveIndex(index + 1)
-        return index
+    override fun clearSystem() {
+        val iter = system.iterator()
+        while (iter.hasNext()) {
+            val c = iter.next()
+            if (subTypeFilter.invoke(c))
+                system.delete(c)
+        }
     }
 
     override fun createKey(name: String) = system.createKey(name)

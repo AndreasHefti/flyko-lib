@@ -17,19 +17,16 @@ object SpriteParticleRenderer : EntityRenderer("SpriteParticleRenderer") {
 
     override fun render(entities: DynArray<Entity>) {
         val graphics = Engine.graphics
-        var i = 0
-        while (i < entities.capacity) {
-            val entity = entities[i++]
-                ?: continue
+
+        val iter = entities.iterator()
+        while (iter.hasNext()) {
+            val entity = iter.next()
 
             val spriteParticle = entity[EParticle].particles
             val transform = entity[ETransform]
-
-            var ii = 0
-            while (ii < spriteParticle.capacity) {
-                val particle = spriteParticle[ii++]
-                    ?: continue
-
+            val iterP = spriteParticle.iterator()
+            while (iterP.hasNext()) {
+                val particle = iterP.next()
                 if (particle !is SpriteParticle)
                     continue
 

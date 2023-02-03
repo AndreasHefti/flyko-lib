@@ -1,0 +1,20 @@
+{ 
+ "class":"firefly_tileset",
+ "columns":10,
+ "atlasfile":"tiled_tileset_example/atlas1616.png",
+ "bitmaskfile":"tiled_tileset_example/atlas1616.png",
+ "margin":0,
+ "name":"tileset_example",
+ "spacing":0,
+ "tilecount":40,
+ "tileheight":16,
+ "tilewidth":16,
+ "tiles":[{
+    	"id":0,
+	"name":"tile1",
+	"atlasposition":"[x],[y],[v],[h]",
+	"renderprops":"NORMAL_ALPHA,[tintcolor]",
+	"tileaspect":"tile_aspect_1,tile_aspect_2,tile_aspect_3",
+	"material":"TERRAIN,[[x],[y]|full|no]"
+	}]
+}

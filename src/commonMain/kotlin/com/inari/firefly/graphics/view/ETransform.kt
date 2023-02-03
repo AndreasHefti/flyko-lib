@@ -11,9 +11,9 @@ import kotlin.jvm.JvmField
 class ETransform private constructor() : EntityComponent(ETransform), TransformData, ViewLayerAware {
 
     override val viewIndex: Int
-        get() = viewRef.targetKey.instanceIndex
+        get() = viewRef.targetKey.componentIndex
     override val layerIndex: Int
-        get() = if (layerRef.exists) layerRef.targetKey.instanceIndex else 0
+        get() = if (layerRef.exists) layerRef.targetKey.componentIndex else 0
     val viewRef = CReference(View)
     val layerRef = CReference(Layer)
 

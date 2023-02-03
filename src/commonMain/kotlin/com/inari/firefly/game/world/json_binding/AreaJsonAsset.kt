@@ -3,8 +3,8 @@ package com.inari.firefly.game.world.json_binding
 import com.inari.firefly.core.*
 import com.inari.firefly.game.world.Area
 import com.inari.firefly.game.world.Room
-import com.inari.util.Attributes
 import com.inari.util.NO_NAME
+import com.inari.util.collection.Attributes
 import kotlin.jvm.JvmField
 
 class AreaJsonAsset private constructor() : Asset(AreaJsonAsset) {

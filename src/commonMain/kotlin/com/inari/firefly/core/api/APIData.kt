@@ -1,7 +1,45 @@
 package com.inari.firefly.core.api
 
+import com.inari.util.VOID_CONSUMER_3
 import com.inari.util.ZERO_FLOAT
+import com.inari.util.collection.Dictionary
 import com.inari.util.geom.*
+import kotlin.jvm.JvmField
+
+const val NULL_COMPONENT_INDEX = -1
+const val NULL_BINDING_INDEX = -1
+
+//typealias ComponentIndex = Int
+//typealias EntityIndex = Int
+//typealias BindingIndex = Int
+
+enum class OperationResult {
+    SUCCESS,
+    RUNNING,
+    FAILED
+}
+typealias Action = (Int) -> OperationResult
+typealias ActionCallback = (Int, OperationResult) -> Unit
+operator fun ActionCallback.invoke() = this(NULL_COMPONENT_INDEX, OperationResult.SUCCESS)
+operator fun ActionCallback.invoke(result: OperationResult) = this(NULL_COMPONENT_INDEX, result)
+@JvmField val SUCCESS_ACTION: Action = { _ -> OperationResult.SUCCESS }
+@JvmField val FAILED_ACTION: Action = { _ -> OperationResult.FAILED }
+@JvmField val RUNNING_ACTION: Action = { _ -> OperationResult.RUNNING }
+@JvmField val NO_ACTION: Action = FAILED_ACTION
+
+
+typealias NormalOperation = (Int, Int, Int) -> Float
+@JvmField val ZERO_OP: NormalOperation = { _, _, _ -> 0f }
+@JvmField val ONE_OP : NormalOperation = { _, _, _ -> 1f }
+
+typealias SimpleTask = (Int) -> Unit
+typealias TaskOperation = (Int, Dictionary, TaskCallback) -> Unit
+typealias TaskCallback = (Int, Dictionary, OperationResult) -> Unit
+@JvmField val VOID_TASK_OPERATION: TaskOperation = VOID_CONSUMER_3
+@JvmField val VOID_TASK_CALLBACK: TaskCallback = VOID_CONSUMER_3
+
+typealias MoveCallback = (Int, Float, ButtonType) -> Unit
+@JvmField val VOID_MOVE_CALLBACK: MoveCallback = VOID_CONSUMER_3
 
 enum class BlendMode constructor(val source: Int, val dest: Int) {
     /** No blending. Disables blending  */
@@ -75,14 +113,14 @@ interface TransformData {
     val scale: Vector2f
     val rotation: Float
     val hasRotation: Boolean get() = rotation != ZERO_FLOAT
-    val hasScale: Boolean get() = scale.v0 != 1.0f || scale.v1 != 1.0f
+    val hasScale: Boolean get() = scale.v0 != ZERO_FLOAT || scale.v1 != ZERO_FLOAT
 }
 
 class TransformDataImpl() : TransformData {
     override val position = Vector2f()
     override val pivot = Vector2f()
     override val scale = Vector2f()
-    override var rotation = 1.0f
+    override var rotation = ZERO_FLOAT
 }
 
 interface ShaderData {
@@ -126,7 +164,7 @@ interface SpriteRenderable {
 }
 
 class SpriteRenderableImpl : SpriteRenderable {
-    override var spriteIndex = -1
+    override var spriteIndex: Int = NULL_BINDING_INDEX
     override val tintColor = Vector4f(1f, 1f, 1f, 1f)
     override var blendMode = BlendMode.NORMAL_ALPHA
 }

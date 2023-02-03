@@ -18,6 +18,11 @@ object SimpleShapeRenderer : EntityRenderer("SimpleShapeRenderer") {
 
     override fun render(entities: DynArray<Entity>) {
         val graphics = Engine.graphics
+//        val iter = entities.iterator()
+//        while (iter.hasNext()) {
+//            val entity = iter.next()
+//            graphics.renderShape(entity[EShape], entity[ETransform])
+//        }
         var i = 0
         while (i < entities.capacity) {
             val entity = entities[i++] ?: continue

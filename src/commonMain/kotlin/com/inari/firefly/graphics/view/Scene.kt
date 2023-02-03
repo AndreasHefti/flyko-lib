@@ -1,20 +1,24 @@
 package com.inari.firefly.graphics.view
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.Action
+import com.inari.firefly.core.api.ActionCallback
+import com.inari.firefly.core.api.OperationResult.*
+import com.inari.firefly.core.api.RUNNING_ACTION
 import com.inari.util.*
 import kotlin.jvm.JvmField
 
 class Scene private constructor(): Control() {
 
-    @JvmField internal var updateOperation: Operation = RUNNING_OPERATION
-    @JvmField internal var callback: OperationCallback = VOID_CONSUMER
+    @JvmField internal var updateOperation: Action = RUNNING_ACTION
+    @JvmField internal var callback: ActionCallback = VOID_CONSUMER_2
     @JvmField var deleteAfterRun: Boolean = false
 
-    fun withCallback(callback: OperationCallback) {
+    fun withCallback(callback: ActionCallback) {
         this.callback = callback
     }
 
-    fun withUpdate(update: Operation) {
+    fun withUpdate(update: Action) {
         updateOperation = update
     }
 
@@ -22,12 +26,12 @@ class Scene private constructor(): Control() {
         if (!scheduler.needsUpdate())
             return
 
-        val result = updateOperation()
-        if (result == OperationResult.RUNNING)
+        val result = updateOperation(index)
+        if (result == RUNNING)
             return
 
         stopScene(index)
-        callback(result)
+        callback(index, result)
         if (deleteAfterRun)
             Scene.system.delete(index)
     }
@@ -35,10 +39,10 @@ class Scene private constructor(): Control() {
     companion object : ComponentSubTypeBuilder<Control, Scene>(Control,"Scene") {
         override fun create() = Scene()
 
-        fun runScene(reference: CReference, callback: OperationCallback) = runScene(reference.targetKey, callback)
-        fun runScene(name: String, callback: OperationCallback) = runScene(Scene.system[name].index, callback)
-        fun runScene(key: ComponentKey, callback: OperationCallback) = runScene(key.instanceIndex, callback)
-        fun runScene(index: Int, callback: OperationCallback) {
+        fun runScene(reference: CReference, callback: ActionCallback) = runScene(reference.targetKey, callback)
+        fun runScene(name: String, callback: ActionCallback) = runScene(Scene.system[name].index, callback)
+        fun runScene(key: ComponentKey, callback: ActionCallback) = runScene(key.componentIndex, callback)
+        fun runScene(index: Int, callback: ActionCallback) {
             checkIndex(index)
             val scene = system[index] as Scene
             scene.withCallback(callback)

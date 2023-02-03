@@ -7,6 +7,7 @@ import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.SpriteRenderable
 import com.inari.firefly.core.api.TransformDataImpl
 import com.inari.firefly.graphics.sprite.Sprite
+import com.inari.util.ZERO_FLOAT
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
@@ -26,8 +27,8 @@ abstract class Particle protected constructor() {
     var rotation: Float
         get() = transformData.rotation
         set(value) { transformData.rotation = value }
-    @JvmField var xVelocity: Float  = 0f
-    @JvmField var yVelocity: Float  = 0f
+    @JvmField var xVelocity: Float  = ZERO_FLOAT
+    @JvmField var yVelocity: Float  = ZERO_FLOAT
     @JvmField var mass: Float  = 1f
 
     interface ParticleBuilder<P : Particle> {

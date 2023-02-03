@@ -33,8 +33,8 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
     private val entities: DynArray<DynArray<DynArray<Entity>>> = DynArray.of(10, 2)
 
     private fun entityListener(key: ComponentKey, type: ComponentEventType) {
-        if (type == ACTIVATED) registerEntity(key.instanceIndex)
-        else if (type == DEACTIVATED) disposeEntity(key.instanceIndex)
+        if (type == ACTIVATED) registerEntity(key.componentIndex)
+        else if (type == DEACTIVATED) disposeEntity(key.componentIndex)
     }
 
     override fun init() {
@@ -89,7 +89,7 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
         val parentTransform = parent[ETransform]
         transformCollector + parentTransform
         if (EChild in parent.aspects)
-            collectTransformData(parent[EChild].parent.targetKey.instanceIndex, transformCollector)
+            collectTransformData(parent[EChild].parent.targetKey.componentIndex, transformCollector)
     }
 
     override fun dispose() {
@@ -125,15 +125,15 @@ object ViewSystemRenderer : Renderer() {
     private val onlyBaseView: Boolean get() = VIEW_LAYER_MAPPING.size <= 0
 
     private fun viewListener(key: ComponentKey, type: ComponentEventType) {
-        if (type == ACTIVATED) VIEW_LAYER_MAPPING[key.instanceIndex] = Pair(View[key.instanceIndex], DynIntArray())
-        else if (type == DEACTIVATED) VIEW_LAYER_MAPPING.remove(key.instanceIndex)
+        if (type == ACTIVATED) VIEW_LAYER_MAPPING[key.componentIndex] = Pair(View[key.componentIndex], DynIntArray())
+        else if (type == DEACTIVATED) VIEW_LAYER_MAPPING.remove(key.componentIndex)
         updateReferences()
     }
 
     private fun layerListener(key: ComponentKey, type: ComponentEventType) {
-        val viewIndex = Layer[key.instanceIndex].viewRef.targetKey.instanceIndex
-        if (type == ACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.add(key.instanceIndex)
-        else if (type == DEACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.remove(key.instanceIndex)
+        val viewIndex = Layer[key.componentIndex].viewRef.targetKey.componentIndex
+        if (type == ACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.add(key.componentIndex)
+        else if (type == DEACTIVATED) VIEW_LAYER_MAPPING[viewIndex]!!.second.remove(key.componentIndex)
         updateReferences()
     }
 

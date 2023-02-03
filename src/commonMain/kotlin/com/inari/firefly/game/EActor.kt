@@ -21,10 +21,10 @@ class EActor private constructor() : EntityComponent(EActor) {
     @JvmField var maxHealth: Int = -1
     @JvmField var hitPower: Int = 0
     val encounterConstraintIndex: Int
-        get() = encounterConstraint.targetKey.instanceIndex
+        get() = encounterConstraint.targetKey.componentIndex
     @JvmField val encounterConstraint = CReference(ContactConstraint)
     val hitConstraintIndex: Int
-        get() = hitConstraint.targetKey.instanceIndex
+        get() = hitConstraint.targetKey.componentIndex
     @JvmField val hitConstraint = CReference(ContactConstraint)
 
     override fun reset() {

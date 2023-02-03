@@ -3,7 +3,7 @@ package com.inari.firefly.ai.behavior
 import com.inari.firefly.core.*
 import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.api.FFTimer
-import com.inari.util.OperationResult
+import com.inari.firefly.core.api.OperationResult.*
 import kotlin.jvm.JvmField
 
 class EBehavior private constructor() : EntityComponent(EBehavior) {
@@ -12,19 +12,19 @@ class EBehavior private constructor() : EntityComponent(EBehavior) {
 
     @JvmField val behaviorTreeRef = CReference(BehaviorNode)
     val treeIndex: Int
-        get() = behaviorTreeRef.targetKey.instanceIndex
+        get() = behaviorTreeRef.targetKey.componentIndex
     @JvmField var repeat: Boolean = true
     @JvmField var active: Boolean = true
     var updateResolution: Float
         get() = scheduler.resolution
         set(value) { scheduler = Engine.timer.createUpdateScheduler(value) }
-    var treeState: OperationResult = OperationResult.SUCCESS
+    var treeState = SUCCESS
         internal set
 
     override fun reset() {
         behaviorTreeRef.reset()
         repeat = true
-        treeState = OperationResult.SUCCESS
+        treeState = SUCCESS
     }
 
     override val componentType = Companion

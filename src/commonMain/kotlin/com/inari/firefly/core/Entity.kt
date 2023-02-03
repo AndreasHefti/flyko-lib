@@ -1,5 +1,6 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.aspect.*
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynFloatArray
@@ -21,7 +22,7 @@ abstract class EntityComponent protected constructor(
     entityComponentType: EntityComponentType<*>
 ) : AbstractIndexed(entityComponentType.typeName) {
 
-    var entityIndex: Int = -1
+    var entityIndex: Int = NULL_COMPONENT_INDEX
         internal set
 
     internal fun iActivate() = activate()
@@ -38,7 +39,6 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
     internal val components: AspectSet<EntityComponent> = AspectSet.of(ENTITY_COMPONENT_ASPECTS)
     /** The Aspects that reflects the EntityComponent types that are hold by this Entity */
     override val aspects: Aspects = components.aspects
-    override val controllerReferences = ControllerReferences(Entity)
 
     override fun activate() = components.forEach { components.get(it)?.iActivate() }
     override fun deactivate()  = components.forEach { components.get(it)?.iDeactivate() }
@@ -140,7 +140,7 @@ class EChild private constructor() : EntityComponent(EChild) {
 
     @JvmField val parent = CReference(Entity)
     val parentIndex: Int
-        get() = parent.targetKey.instanceIndex
+        get() = parent.targetKey.componentIndex
     @JvmField var zPos: Int = -1
 
     override fun reset() {

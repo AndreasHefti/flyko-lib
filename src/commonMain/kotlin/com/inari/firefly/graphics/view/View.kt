@@ -60,22 +60,22 @@ class View private constructor(): Composite(View), ViewData, Controlled {
         val c = View.buildAndGet(configure)
         c.renderToBase = false
         if (renderTargetOf1 < 0) {
-            renderTargetOf1 = c.key.instanceIndex
+            renderTargetOf1 = c.key.componentIndex
             return c.key
         }
         if (renderTargetOf2 < 0) {
-            renderTargetOf2 = c.key.instanceIndex
+            renderTargetOf2 = c.key.componentIndex
             return key
         }
         if (renderTargetOf3 < 0) {
-            renderTargetOf3 = c.key.instanceIndex
+            renderTargetOf3 = c.key.componentIndex
             return key
         }
         View.delete(c)
         throw IllegalStateException("All three render targets are already set.")
     }
 
-    override val controllerReferences = ControllerReferences(View)
+    //override val controllerReferences = ControllerReferences(View)
 
     override fun load() {
         if (shader.targetKey !== NO_COMPONENT_KEY)

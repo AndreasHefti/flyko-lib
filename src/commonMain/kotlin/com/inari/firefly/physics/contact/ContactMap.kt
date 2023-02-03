@@ -5,6 +5,7 @@ import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.view.*
 import com.inari.firefly.physics.movement.Movement
 import com.inari.util.DO_NOTHING
+import com.inari.util.VOID_CALL
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
@@ -12,9 +13,9 @@ import kotlin.jvm.JvmField
 abstract class ContactMap protected constructor() : Composite(ContactMap), ViewLayerAware  {
 
     override val viewIndex: Int
-        get() = viewRef.targetKey.instanceIndex
+        get() = viewRef.targetKey.componentIndex
     override val layerIndex: Int
-        get() = layerRef.targetKey.instanceIndex
+        get() = layerRef.targetKey.componentIndex
     @JvmField val viewRef = CReference(View)
     @JvmField val layerRef = CReference(Layer)
 
@@ -91,16 +92,16 @@ abstract class ContactMap protected constructor() : Composite(ContactMap), ViewL
         }
 
         private val entityListener: ComponentEventListener = { key, type ->
-            val entity =  Entity[key.instanceIndex]
+            val entity =  Entity[key.componentIndex]
             if (EContact in entity.aspects && ETile !in entity.aspects) {
                 when (type) {
                     ComponentEventType.ACTIVATED -> COMPONENT_MAPPING.forEach {
                         it.notifyEntityActivation(entity)
                     }
                     ComponentEventType.DEACTIVATED -> COMPONENT_MAPPING.forEach {
-                        it.notifyEntityDeactivation(key.instanceIndex)
+                        it.notifyEntityDeactivation(key.componentIndex)
                     }
-                    else -> {}
+                    else -> VOID_CALL
                 }
             }
         }
@@ -109,8 +110,8 @@ abstract class ContactMap protected constructor() : Composite(ContactMap), ViewL
             when(type) {
                 ComponentEventType.DELETED -> {
                     COMPONENT_MAPPING.forEach {
-                        if (it.viewIndex == key.instanceIndex)
-                            delete(key.instanceIndex)
+                        if (it.viewIndex == key.componentIndex)
+                            delete(key.componentIndex)
                     }
                 }
                 else -> DO_NOTHING

@@ -2,9 +2,11 @@ package com.inari.firefly.ai.behavior
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
-import com.inari.util.*
-
-import com.inari.util.OperationResult.*
+import com.inari.firefly.core.api.Action
+import com.inari.firefly.core.api.OperationResult
+import com.inari.firefly.core.api.OperationResult.*
+import com.inari.firefly.core.api.SUCCESS_ACTION
+import com.inari.util.DO_NOTHING
 import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
 
@@ -19,13 +21,17 @@ abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
 
         private val entityIds = BitSet()
         private val entityListener: ComponentEventListener = { key, type ->
-            val entity = Entity[key.instanceIndex]
+            val entity = Entity[key.componentIndex]
             if (EBehavior in entity.aspects) {
                 when (type) {
-                    ComponentEventType.ACTIVATED -> entityIds[key.instanceIndex] = true
-                    ComponentEventType.DEACTIVATED -> entityIds[key.instanceIndex] = false
+                    ComponentEventType.ACTIVATED -> entityIds[key.componentIndex] = true
+                    ComponentEventType.DEACTIVATED -> entityIds[key.componentIndex] = false
                     else -> {}
                 }
+//                if (type == ComponentEventType.ACTIVATED)
+//                    entityIds[key.componentIndex] = true
+//                else if (type == ComponentEventType.DEACTIVATED)
+//                    entityIds[key.componentIndex] = false
             }
         }
 
@@ -67,7 +73,7 @@ abstract class BranchNode internal constructor() : BehaviorNode() {
 
     fun <C : BehaviorNode> node(cBuilder: ComponentBuilder<C>, configure: (C.() -> Unit)): ComponentKey {
         val key = cBuilder.build(configure)
-        childrenNodes[key.instanceIndex] = true
+        childrenNodes[key.componentIndex] = true
         return key
     }
 }
@@ -91,6 +97,9 @@ class ParallelNode private constructor() : BranchNode() {
                 SUCCESS -> successCount++
                 FAILED -> failuresCount++
             }
+//            val result = BehaviorNode[i].tick(entityId)
+//            if (result == SUCCESS) successCount++
+//            else if (result == FAILED) failuresCount++
             i = childrenNodes.nextSetBit(i + 1)
         }
 
@@ -99,6 +108,10 @@ class ParallelNode private constructor() : BranchNode() {
             failuresCount > 0 -> FAILED
             else -> RUNNING
         }
+
+//        return if (successCount >= threshold) SUCCESS
+//        else if (failuresCount > 0 ) FAILED
+//        else RUNNING
     }
 
     companion object : ComponentSubTypeBuilder<BehaviorNode, ParallelNode>(BehaviorNode, "ParallelNode") {
@@ -116,6 +129,9 @@ class SelectionNode private constructor() : BranchNode() {
                 SUCCESS -> return SUCCESS
                 FAILED -> DO_NOTHING
             }
+//            val result = BehaviorNode[i].tick(entityId)
+//            if (result != FAILED)
+//                return result
             i = childrenNodes.nextSetBit(i + 1)
         }
         return FAILED
@@ -136,9 +152,12 @@ class SequenceNode private constructor() : BranchNode() {
                 FAILED -> return FAILED
                 SUCCESS -> DO_NOTHING
             }
+//            val result = BehaviorNode[i].tick(entityId)
+//            if (result != SUCCESS)
+//                return result
             i = childrenNodes.nextSetBit(i + 1)
         }
-        return OperationResult.SUCCESS
+        return SUCCESS
     }
 
     companion object : ComponentSubTypeBuilder<BehaviorNode, SequenceNode>(BehaviorNode, "SequenceNode") {
@@ -146,26 +165,22 @@ class SequenceNode private constructor() : BranchNode() {
     }
 }
 
-class ConditionNode private constructor() : BehaviorNode() {
-
-    @JvmField var condition: ConditionalOperation = TRUE_OPERATION
-
-    override fun tick(entityId: Int): OperationResult =
-        when (condition(entityId)) {
-            true -> SUCCESS
-            false -> FAILED
-        }
-
-    companion object : ComponentSubTypeBuilder<BehaviorNode, ConditionNode>(BehaviorNode, "ConditionNode") {
-        override fun create() = ConditionNode()
-    }
-}
+//class ConditionNode private constructor() : BehaviorNode() {
+//
+//    @JvmField var condition: Action = SUCCESS_ACTION
+//
+//    override fun tick(entityId: Int): OperationResult = condition(entityId)
+//
+//    companion object : ComponentSubTypeBuilder<BehaviorNode, ConditionNode>(BehaviorNode, "ConditionNode") {
+//        override fun create() = ConditionNode()
+//    }
+//}
 
 class ActionNode private constructor() : BehaviorNode() {
 
-    @JvmField var actionOperation: TaskOperation = SUCCESS_TASK_OPERATION
+    @JvmField var actionOperation: Action = SUCCESS_ACTION
 
-    override fun tick(entityId: Int): OperationResult = actionOperation(Entity.getKey(entityId))
+    override fun tick(entityId: Int): OperationResult = actionOperation(entityId)
 
     companion object : ComponentSubTypeBuilder<BehaviorNode, ActionNode>(BehaviorNode, "ActionNode") {
         override fun create() = ActionNode()

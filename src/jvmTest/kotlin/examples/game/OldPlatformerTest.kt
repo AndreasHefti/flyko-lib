@@ -5,12 +5,12 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.api.InputAPIImpl
+import com.inari.firefly.core.api.OperationResult
 import com.inari.firefly.game.PlatformerCollisionResolver
 import com.inari.firefly.game.world.json_binding.AreaJsonAsset
 import com.inari.firefly.game.tile.TileMaterialType
 
 import com.inari.firefly.game.tile.tiled_binding.TiledTileMap
-import com.inari.firefly.game.tile.tiled_binding.TiledTileMapJson
 import com.inari.firefly.game.world.*
 import com.inari.firefly.graphics.FFInfoSystem
 import com.inari.firefly.graphics.FrameRateInfo
@@ -24,7 +24,6 @@ import com.inari.firefly.physics.contact.EContact
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.Movement
 import com.inari.firefly.physics.movement.VelocityVerletIntegrator
-import com.inari.util.OperationResult
 import org.lwjgl.glfw.GLFW
 
 
@@ -76,8 +75,8 @@ fun initView() {
 fun initPlayerTasks() {
     Task {
         name = "LoadPlayer"
-        withSimpleOperation { id ->
-            println("create Player Entity $id")
+        simpleTask = {
+            println("create Player Entity $it")
             Entity.build {
                 name = "player1"
                 withComponent(ETransform) {
@@ -124,6 +123,7 @@ fun initPlayerTasks() {
                     }
                 }
             }
+            OperationResult.SUCCESS
         }
     }
 }
@@ -131,17 +131,17 @@ fun initPlayerTasks() {
 fun initAreaTasks() {
     Task {
         name = "AreaLoadTask"
-        withSimpleOperation { id ->
-            println("loadArea -> $id")
+        simpleTask = {
+            println("loadArea -> $it")
         }
     }
 
     Task {
         name = "AreaActivationTask"
-        withSimpleOperation { id ->
-            println("activateArea -> $id")
+        simpleTask = {
+            println("activateArea -> $it")
 
-            val area = Area[id]
+            val area = Area[it]
             Room.forEachDo { room ->
 //                if (room.parent.name == area.name) {
 //                    // load room tiled resource and create tile set asset for the room
@@ -160,15 +160,15 @@ fun initAreaTasks() {
 
     Task {
         name = "AreaDeactivationTask"
-        withSimpleOperation { id ->
-            println("deactivateArea -> $id")
+        simpleTask = {
+            println("deactivateArea -> $it")
         }
     }
 
     Task {
         name = "AreaDisposeTask"
-        withSimpleOperation { id ->
-            println("disposeArea -> $id")
+        simpleTask = {
+            println("disposeArea -> $it")
         }
     }
 }
@@ -176,17 +176,17 @@ fun initAreaTasks() {
 fun initRoomTasks() {
     Task {
         name = "RoomLoadTask"
-        withSimpleOperation { id ->
-            println("loadRoom -> ${Room[id]}")
+        simpleTask = {
+            println("loadRoom -> ${Room[it]}")
         }
     }
 
     Task {
         name = "RoomActivationTask"
-        withSimpleOperation { id ->
-            println("activateRoom -> ${Room[id]}")
+        simpleTask = {
+            println("activateRoom -> ${Room[it]}")
 
-            val roomName = Room[id].name
+            val roomName = Room[it].name
             TiledTileMap.activate("${roomName}_TileMap")
             Player.load("player1")
 
@@ -197,25 +197,25 @@ fun initRoomTasks() {
 
     Task {
         name = "RoomDeactivationTask"
-        withSimpleOperation { id ->
-            println("deactivateRoom -> $id")
+        simpleTask = {
+            println("deactivateRoom -> $it")
 
-            val roomName = Room[id].name
+            val roomName = Room[it].name
             TiledTileMap.dispose("${roomName}_TileMap")
         }
     }
     Task {
         name = "RoomDisposeTask"
-        withSimpleOperation { id -> println("disposeRoom -> $id") }
+        simpleTask = { println("disposeRoom -> $it") }
     }
 
     Task {
         name = "RoomPauseTask"
-        withSimpleOperation { id -> println("pauseRoom -> $id") }
+        simpleTask = { println("pauseRoom -> $it") }
     }
     Task {
         name = "RoomResumeTask"
-        withSimpleOperation { id -> println("pauseResume -> $id") }
+        simpleTask = { println("pauseResume -> $it") }
     }
 }
 
@@ -227,7 +227,7 @@ fun initScenes() {
             println("RoomActivationScene Update")
             OperationResult.SUCCESS
         }
-        withCallback {
+        withCallback { _, _ ->
             println("RoomActivationScene Finished")
         }
     }
@@ -239,7 +239,7 @@ fun initScenes() {
             println("Room1DeactivationScene Update")
             OperationResult.SUCCESS
         }
-        withCallback {
+        withCallback { _, _ ->
             println("Room1DeactivationScene Finished")
         }
     }
@@ -294,7 +294,7 @@ fun main(args: Array<String>) {
         // activate area
         Area.activate("TiledMapTestArea")
         // start game in Room1
-        Room.startRoom(playerId.instanceIndex, 4 * 16, 4 * 16, Room["Room1"].index)
+        Room.startRoom(playerId.componentIndex, 4 * 16, 4 * 16, Room["Room1"].index)
     }
 }
 

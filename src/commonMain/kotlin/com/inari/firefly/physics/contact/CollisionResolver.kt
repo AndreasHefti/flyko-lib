@@ -28,11 +28,11 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
         private val entitiesWithScan = BitSet()
 
         private fun entityListener(key: ComponentKey, type: ComponentEventType) {
-            if (!entityMatch(key.instanceIndex)) return
+            if (!entityMatch(key.componentIndex)) return
             if (type == ComponentEventType.ACTIVATED )
-                entitiesWithScan[key.instanceIndex] = true
+                entitiesWithScan[key.componentIndex] = true
             else if (type == ComponentEventType.DEACTIVATED)
-                entitiesWithScan[key.instanceIndex] = false
+                entitiesWithScan[key.componentIndex] = false
         }
 
         private fun entityMatch(index: Int) : Boolean {

@@ -10,7 +10,7 @@ open class TileSet: Composite(TileSet) {
 
     @JvmField val textureRef = CReference(Texture)
     val textureIndex: Int
-        get() = textureRef.targetKey.instanceIndex
+        get() = textureRef.targetKey.componentIndex
 
     protected val tileTemplates = DynArray.of<TileTemplate>()
     val tiles: DynArrayRO<TileTemplate>

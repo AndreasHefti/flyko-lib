@@ -6,7 +6,7 @@ import kotlin.jvm.JvmField
 
 class Sound private constructor(): Play(Sound), Controlled, TriggeredComponent {
 
-    override val controllerReferences = ControllerReferences(Sound)
+    //override val controllerReferences = ControllerReferences(Sound)
 
     var pitch: Float = 1.0f
         set(value) {

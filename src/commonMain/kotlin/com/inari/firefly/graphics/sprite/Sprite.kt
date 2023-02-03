@@ -1,6 +1,7 @@
 package com.inari.firefly.graphics.sprite
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.core.api.SpriteData
 import com.inari.util.ZERO_INT
 import com.inari.util.geom.Vector4i
@@ -8,7 +9,7 @@ import kotlin.jvm.JvmField
 
 class Sprite private constructor(): Asset(Sprite), SpriteData {
 
-    override var textureIndex: Int = -1
+    override var textureIndex = NULL_COMPONENT_INDEX
         internal set
     @JvmField val textureRef = CReference(Texture)
     val textureRegion: Vector4i

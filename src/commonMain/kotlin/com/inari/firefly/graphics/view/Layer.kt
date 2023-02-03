@@ -6,7 +6,7 @@ import kotlin.jvm.JvmField
 
 class Layer private constructor(): Composite(Layer), Controlled {
 
-    override val controllerReferences = ControllerReferences(Layer)
+    //override val controllerReferences = ControllerReferences(Layer)
 
     @JvmField val viewRef = CReference(View)
     @JvmField var zPosition = 0

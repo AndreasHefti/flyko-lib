@@ -1,12 +1,13 @@
 package com.inari.firefly.core
 
-import com.inari.util.EMPTY_DICTIONARY
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.IndexedAspectType
 import com.inari.util.indexed.AbstractIndexed
 import kotlin.jvm.JvmField
 import com.inari.util.NO_NAME
 import com.inari.util.Named
+import com.inari.util.collection.EMPTY_DICTIONARY
 
 /** Defines the component based builder DSL marker */
 @DslMarker annotation class ComponentDSL
@@ -43,7 +44,7 @@ interface ComponentType<C : Component> : Aspect {
 
 sealed interface ComponentId {
     val type: ComponentType<*>
-    val instanceIndex: Int
+    val componentIndex: Int
 }
 
 class ComponentKey internal constructor (
@@ -51,21 +52,17 @@ class ComponentKey internal constructor (
     override val type: ComponentType<*>
 ) : ComponentId {
 
-    init {
-        // DEBUG  println("-> new ComponentKey: $name : ${type.typeName} : ${type.subTypeName}")
-    }
-
     internal constructor(index: Int, type: ComponentType<*>) : this(NO_NAME, type) {
-        instanceIndex = index
+        componentIndex = index
     }
 
     var name: String = name
         private set
-    override var instanceIndex: Int = -1
+    override var componentIndex = NULL_COMPONENT_INDEX
         internal set
 
     override fun toString(): String =
-        "CKey($name, ${type.aspectName}, $instanceIndex)"
+        "CKey($name, ${type.aspectName}, $componentIndex)"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -79,7 +76,7 @@ class ComponentKey internal constructor (
     internal fun clearKey() {
         // DEBUG  println("-> clear ComponentKey: $name $type")
         name = NO_NAME
-        instanceIndex = -1
+        componentIndex = NULL_COMPONENT_INDEX
     }
 
     override fun hashCode(): Int {
@@ -100,21 +97,23 @@ abstract class Component protected constructor(
     val componentType: ComponentType<out Component>
 ) : AbstractIndexed(componentType.typeName), Named {
 
+    val componentIndex: Int
+        get() = index
     @JvmField var autoLoad = false
     @JvmField var autoActivation = false
 
     var key = NO_COMPONENT_KEY
         internal set
-    internal fun earlyKeyAccess(): ComponentKey {
+    fun earlyKeyAccess(): ComponentKey {
         // DEBUG  println("--> earlyKeyAccess: $this")
         if (key != NO_COMPONENT_KEY) return key
         return if (name != NO_NAME) {
             key = ComponentSystem[componentType].getOrCreateKey(name)
-            key.instanceIndex = this.index
+            key.componentIndex = componentIndex
             key
         }
         else
-            ComponentKey(this.index, componentType)
+            ComponentKey(componentIndex, componentType)
     }
 
     override var name: String = NO_NAME
@@ -231,8 +230,8 @@ open class Composite protected constructor(
 
     private fun runTaskIfDefined(type: LifecycleTaskType) =
         tasks[type.ordinal]?.apply {
-            if (this.instanceIndex >= 0)
-                Task[this](this@Composite.key, attributes)
+            if (this.componentIndex > NULL_COMPONENT_INDEX)
+                Task[this](this@Composite.index, attributes)
         }
 
     companion object : ComponentSystem<Composite>("Composite") {

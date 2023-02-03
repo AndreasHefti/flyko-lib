@@ -112,7 +112,7 @@ class AssetTest {
     fun lifeCycleWithDependentAssets() {
         val testEvents = StringBuilder()
         val assetListener: ComponentEventListener =  { key, type ->
-            testEvents.append("|index=").append(key.instanceIndex).append(":").append(Asset[key.instanceIndex].name).append(":").append(type)
+            testEvents.append("|index=").append(key.componentIndex).append(":").append(Asset[key.componentIndex].name).append(":").append(type)
         }
         Asset.registerComponentListener(assetListener )
         assertEquals("", testEvents.toString())

@@ -7,6 +7,7 @@ import com.inari.firefly.core.api.InputDevice.Companion.ACTION_PRESS
 import com.inari.firefly.core.api.InputDevice.Companion.ACTION_TYPED
 import com.inari.firefly.core.api.InputDevice.Companion.VOID_INPUT_DEVICE
 import com.inari.util.NO_NAME
+import com.inari.util.VOID_CALL
 import com.inari.util.collection.DynIntArray
 
 import org.lwjgl.glfw.GLFW
@@ -84,7 +85,7 @@ actual object InputAPIImpl : InputAPI {
         GLFW.glfwSetMouseButtonCallback(w) { _, key, action, _ -> callback.invoke(key, action) }
     }
 
-    private var buttonCallbackUpdate: () -> Unit = {}
+    private var buttonCallbackUpdate: () -> Unit = VOID_CALL
     actual override fun setButtonCallback(deviceName: String, callback: ButtonCallback) {
         if (deviceName in devices) {
             val device = devices[deviceName]!!
@@ -106,7 +107,7 @@ actual object InputAPIImpl : InputAPI {
         GLFW.glfwSetKeyCallback(w, null)
         GLFW.glfwSetMouseButtonCallback(w, null)
         Engine.disposeListener(Engine.UPDATE_EVENT_TYPE, buttonCallbackUpdate)
-        buttonCallbackUpdate = {}
+        buttonCallbackUpdate = VOID_CALL
     }
 
     class GLFWDesktopKeyboardInput(override val window: Long) : KeyInput {

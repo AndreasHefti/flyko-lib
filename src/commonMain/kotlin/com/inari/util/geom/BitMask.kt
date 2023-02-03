@@ -1,6 +1,7 @@
 package com.inari.util.geom
 
 import com.inari.util.StringUtils
+import com.inari.util.VOID_CALL
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.GeomUtils.area
 import kotlin.jvm.JvmField
@@ -181,7 +182,7 @@ class BitMask constructor(
                     Direction.SOUTH_WEST -> if (y >= x) setBit(x, y)
                     Direction.SOUTH_EAST -> if (region.height - 1 - y <= x) setBit(x, y)
                     Direction.NORTH_WEST -> if (x < region.height - y) setBit(x, y)
-                    else -> {}
+                    else -> VOID_CALL
                 }
             }
         }
@@ -197,7 +198,7 @@ class BitMask constructor(
                     Direction.SOUTH_WEST -> if (y - region.height / 2 >= x / 2) setBit(x, y)
                     Direction.SOUTH_EAST -> if (x / 2 >= region.height-1-y) setBit(x, y)
                     Direction.NORTH_WEST -> if (region.width-1-x >= y * 2) setBit(x, y)
-                    else -> {}
+                    else -> VOID_CALL
                 }
             }
         }
@@ -213,7 +214,7 @@ class BitMask constructor(
                     Direction.SOUTH_WEST -> if (y - region.height >= (x - region.width / 2) * 2) setBit(x, y)
                     Direction.SOUTH_EAST -> if ((x - 1) * 2 >= region.height-y+region.height / 2) setBit(x, y)
                     Direction.NORTH_WEST -> if (region.width-1-x >= (y + region.height) / 2) setBit(x, y)
-                    else -> {}
+                    else -> VOID_CALL
                 }
             }
         }
@@ -229,7 +230,7 @@ class BitMask constructor(
                     Direction.SOUTH_WEST -> if (y + region.height >= x * 2) setBit(x, y)
                     Direction.SOUTH_EAST -> if (x * 2 >= region.height-1-y) setBit(x, y)
                     Direction.NORTH_WEST -> if (region.width-1-x >= y / 2) setBit(x, y)
-                    else -> {}
+                    else -> VOID_CALL
                 }
             }
         }
@@ -245,7 +246,7 @@ class BitMask constructor(
                     Direction.SOUTH_WEST -> if (y >= x / 2) setBit(x, y)
                     Direction.SOUTH_EAST -> if (x / 2 >= ((region.height-1) / 2) -y) setBit(x, y)
                     Direction.NORTH_WEST -> if (region.width-1-x >= (y - region.height / 2) * 2) setBit(x, y)
-                    else -> {}
+                    else -> VOID_CALL
                 }
             }
         }

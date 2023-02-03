@@ -1,48 +1,42 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.api.*
 import com.inari.util.*
+import com.inari.util.collection.Dictionary
+import com.inari.util.collection.EMPTY_DICTIONARY
 import kotlin.jvm.JvmField
 
 class Task private constructor(): Component(Task) {
 
     @JvmField var deleteAfterRun: Boolean = false
     @JvmField var noneBlocking: Boolean = false
-    @JvmField var operation: TaskOperation = SUCCESS_TASK_OPERATION
+    @JvmField var simpleTask: SimpleTask = VOID_CONSUMER_1
+    @JvmField var operation: TaskOperation = VOID_TASK_OPERATION
     @JvmField var callback: TaskCallback = VOID_TASK_CALLBACK
-
-    fun withSimpleOperation(op: (ComponentKey) -> Unit) {
-        operation = { i1, _ ->
-            op(i1)
-            OperationResult.SUCCESS
-        }
-    }
-    fun withVoidOperation(op: () -> Unit) {
-        operation = { _, _ ->
-            op()
-            OperationResult.SUCCESS
-        }
-    }
+    @JvmField var attributes: Dictionary = EMPTY_DICTIONARY
 
     operator fun invoke(
-        compKey: ComponentKey = NO_COMPONENT_KEY,
-        attributes: Dictionary = EMPTY_DICTIONARY): OperationResult {
+        compIndex: Int = NULL_COMPONENT_INDEX,
+        attributes: Dictionary = EMPTY_DICTIONARY) {
 
-        return if (noneBlocking) {
-            startParallelTask(
-                name,
-                { operation(compKey, attributes) },
-                { _, r ->
-                    if (r) callback(compKey, attributes, OperationResult.SUCCESS)
-                    else callback(compKey, attributes, OperationResult.FAILED)
-                }
-            )
-            if (deleteAfterRun) Task.delete(this)
-            OperationResult.RUNNING
-        } else {
-            val result = operation(compKey, attributes)
-            if (deleteAfterRun) Task.delete(this)
-            result
+        if (simpleTask != VOID_CONSUMER_1) {
+            simpleTask(compIndex)
         }
+
+        if (operation == VOID_TASK_OPERATION)
+            return
+
+        val dict = if (this.attributes != EMPTY_DICTIONARY)
+            this.attributes + attributes
+            else attributes
+
+
+        if (noneBlocking)
+            startParallelTask(name) { operation(compIndex, dict, callback) }
+        else
+            operation(compIndex, dict, callback)
+
+        if (deleteAfterRun) Task.delete(this)
     }
 
     companion object : ComponentSystem<Task>("Task") {

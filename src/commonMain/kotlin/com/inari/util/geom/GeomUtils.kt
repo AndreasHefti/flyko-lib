@@ -1,6 +1,8 @@
 package com.inari.util.geom
 
 
+import com.inari.util.DO_NOTHING
+import com.inari.util.VOID_CALL
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Direction.*
 import kotlin.jvm.JvmField
@@ -407,7 +409,7 @@ object GeomUtils {
             Orientation.SOUTH -> pos.y = if (originUpperCorner) pos.y + distance else pos.y - distance
             Orientation.WEST -> pos.x -= distance
             Orientation.EAST -> pos.x += distance
-            else -> {}
+            else -> DO_NOTHING
         }
 
     fun newVec4f(jsonString: String): Vector4f {

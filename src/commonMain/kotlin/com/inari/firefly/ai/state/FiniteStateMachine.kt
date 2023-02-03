@@ -111,12 +111,12 @@ class FiniteStateMachine : Control() {
             val stateChange = currentStateChanges[i++] ?: continue
             if (stateChange.condition()) {
                 if (stateChange.disposeStateTaskRef.exists)
-                    Task[stateChange.disposeStateTaskRef.targetKey](this.key)
+                    Task[stateChange.disposeStateTaskRef.targetKey](this.index)
 
                 currentState = stateChange.toState
 
                 if (stateChange.initStateTaskRef.exists)
-                    Task[stateChange.initStateTaskRef.targetKey](this.key)
+                    Task[stateChange.initStateTaskRef.targetKey](this.index)
 
                 if (stateChange.toState !== NO_STATE)
                     sendEvent(
