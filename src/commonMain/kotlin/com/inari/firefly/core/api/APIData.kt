@@ -113,14 +113,14 @@ interface TransformData {
     val scale: Vector2f
     val rotation: Float
     val hasRotation: Boolean get() = rotation != ZERO_FLOAT
-    val hasScale: Boolean get() = scale.v0 != ZERO_FLOAT || scale.v1 != ZERO_FLOAT
+    val hasScale: Boolean get() = scale.v0 != 1.0f || scale.v1 != 1.0f
 }
 
 class TransformDataImpl() : TransformData {
     override val position = Vector2f()
     override val pivot = Vector2f()
     override val scale = Vector2f()
-    override var rotation = ZERO_FLOAT
+    override var rotation = 1.0f
 }
 
 interface ShaderData {

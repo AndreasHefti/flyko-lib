@@ -43,7 +43,7 @@ interface ComponentType<C : Component> : Aspect {
 
 sealed interface ComponentId {
     val type: ComponentType<*>
-    val instanceIndex: Int
+    val componentIndex: Int
 }
 
 class ComponentKey internal constructor (
@@ -56,16 +56,16 @@ class ComponentKey internal constructor (
     }
 
     internal constructor(index: Int, type: ComponentType<*>) : this(NO_NAME, type) {
-        instanceIndex = index
+        componentIndex = index
     }
 
     var name: String = name
         private set
-    override var instanceIndex: Int = -1
+    override var componentIndex: Int = -1
         internal set
 
     override fun toString(): String =
-        "CKey($name, ${type.aspectName}, $instanceIndex)"
+        "CKey($name, ${type.aspectName}, $componentIndex)"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -79,7 +79,7 @@ class ComponentKey internal constructor (
     internal fun clearKey() {
         // DEBUG  println("-> clear ComponentKey: $name $type")
         name = NO_NAME
-        instanceIndex = -1
+        componentIndex = -1
     }
 
     override fun hashCode(): Int {
@@ -105,12 +105,12 @@ abstract class Component protected constructor(
 
     var key = NO_COMPONENT_KEY
         internal set
-    internal fun earlyKeyAccess(): ComponentKey {
+    fun earlyKeyAccess(): ComponentKey {
         // DEBUG  println("--> earlyKeyAccess: $this")
         if (key != NO_COMPONENT_KEY) return key
         return if (name != NO_NAME) {
             key = ComponentSystem[componentType].getOrCreateKey(name)
-            key.instanceIndex = this.index
+            key.componentIndex = this.index
             key
         }
         else
@@ -231,8 +231,8 @@ open class Composite protected constructor(
 
     private fun runTaskIfDefined(type: LifecycleTaskType) =
         tasks[type.ordinal]?.apply {
-            if (this.instanceIndex >= 0)
-                Task[this](this@Composite.key, attributes)
+            if (this.componentIndex >= 0)
+                Task[this](this@Composite.index, attributes)
         }
 
     companion object : ComponentSystem<Composite>("Composite") {
