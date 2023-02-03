@@ -5,6 +5,7 @@ import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.game.tile.TileMap
 import com.inari.firefly.graphics.view.ViewSystemRenderer
 import com.inari.util.*
+import com.inari.util.collection.Attributes
 import com.inari.util.geom.GeomUtils
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField

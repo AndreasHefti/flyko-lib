@@ -1,12 +1,12 @@
 package com.inari.firefly.core
 
-import com.inari.util.EMPTY_DICTIONARY
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.IndexedAspectType
 import com.inari.util.indexed.AbstractIndexed
 import kotlin.jvm.JvmField
 import com.inari.util.NO_NAME
 import com.inari.util.Named
+import com.inari.util.collection.EMPTY_DICTIONARY
 
 /** Defines the component based builder DSL marker */
 @DslMarker annotation class ComponentDSL

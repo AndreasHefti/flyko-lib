@@ -4,6 +4,8 @@ import com.inari.firefly.core.Component
 import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
 import com.inari.firefly.core.ComponentKey
 import com.inari.firefly.core.api.ButtonType
+import com.inari.util.collection.Dictionary
+import com.inari.util.collection.EMPTY_DICTIONARY
 import com.inari.util.geom.ImmutableVector2f
 import com.inari.util.geom.ImmutableVector2i
 import com.inari.util.geom.ImmutableVector4f
@@ -70,25 +72,6 @@ interface Disposable {
     fun dispose()
 }
 
-interface Loadable {
-    fun load(): Disposable
-}
-
-/** Use this for types that can be cleared or are used in an abstract service that used to
- * clear object(s) but do not have to know the exact subType of the object(s)
- */
-interface Clearable {
-    /** Clears the instance  */
-    fun clear()
-}
-
-interface Dictionary : Iterable<String> {
-    operator fun contains(name: String): Boolean
-    operator fun invoke(name: String): String?
-    fun names(): Iterator<String>
-    override fun iterator(): Iterator<String> = names()
-}
-
 interface IntIterator {
     operator fun hasNext(): Boolean
     operator fun next(): Int
@@ -131,11 +114,7 @@ typealias ConditionalOperation = (Int, Int, Int) -> Boolean
 typealias NormalOperation = (Int, Int, Int) -> Float
 /** { entityId, velocity, button -> } */
 typealias MoveCallback = (Int, Float, ButtonType) -> Unit
-val EMPTY_DICTIONARY: Dictionary = object : Dictionary {
-    override fun contains(name: String): Boolean = false
-    override fun invoke(name: String): String? = null
-    override fun names(): Iterator<String> = emptyList<String>().iterator()
-}
+
 val VOID_MOVE_CALLBACK: MoveCallback = { _, _, _ -> }
 val VOID_TASK_CALLBACK: TaskCallback = { _, _, _ -> }
 val RUNNING_OPERATION: Operation = { OperationResult.RUNNING }
@@ -157,9 +136,3 @@ operator fun TaskOperation.invoke(key: ComponentKey) = this(key, EMPTY_DICTIONAR
 operator fun NormalOperation.invoke() = this(-1, -1, -1)
 operator fun NormalOperation.invoke(entityId: Int) = this(entityId, -1, -1)
 operator fun NormalOperation.invoke(entityId1: Int, entityId2: Int) = this(entityId1, entityId2, -1)
-
-class Attributes(val map: Map<String, String>) : Dictionary {
-    override fun contains(name: String): Boolean = map.containsKey(name)
-    override fun invoke(name: String): String? = map[name]
-    override fun names(): Iterator<String> = map.keys.iterator()
-}

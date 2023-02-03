@@ -1,6 +1,8 @@
 package com.inari.firefly.core
 
 import com.inari.util.*
+import com.inari.util.collection.Dictionary
+import com.inari.util.collection.EMPTY_DICTIONARY
 import kotlin.jvm.JvmField
 
 class Task private constructor(): Component(Task) {
