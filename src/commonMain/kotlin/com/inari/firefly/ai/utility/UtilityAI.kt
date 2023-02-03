@@ -1,6 +1,8 @@
 package com.inari.firefly.ai.utility
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.*
+import com.inari.firefly.core.api.OperationResult.*
 import com.inari.util.*
 import com.inari.util.collection.BitSet
 import com.inari.util.collection.Dictionary
@@ -20,12 +22,12 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
 
         private val entityIds = BitSet()
         private val entityListener: ComponentEventListener = { key, type ->
-            val entity = Entity[key.instanceIndex]
+            val entity = Entity[key.componentIndex]
             if (EUtility in entity.aspects) {
                 when (type) {
-                    ComponentEventType.ACTIVATED -> entityIds[key.instanceIndex] = true
-                    ComponentEventType.DEACTIVATED -> entityIds[key.instanceIndex] = false
-                    else -> {}
+                    ComponentEventType.ACTIVATED -> entityIds[key.componentIndex] = true
+                    ComponentEventType.DEACTIVATED -> entityIds[key.componentIndex] = false
+                    else -> VOID_CALL
                 }
             }
         }
@@ -43,7 +45,7 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
                 if (utility.runningActionIndex >= 0) {
                     val action = this[utility.runningActionIndex] as UtilityAction
                     val result = action.callAction(entity.index)
-                    if (result != OperationResult.RUNNING)
+                    if (result != RUNNING)
                         utility.runningActionIndex = -1
                 }
 
@@ -94,7 +96,7 @@ class Consideration private constructor() : UtilityAI() {
     @JvmField var normalOperation: NormalOperation = ZERO_OP
 
     override fun getUtilityValue(entityId: Int, intentionId: Int): Float =
-        quantifier(normalOperation(entityId, intentionId)) * weighting
+        quantifier(normalOperation(entityId, intentionId, NULL_COMPONENT_INDEX)) * weighting
 
     companion object : ComponentSubTypeBuilder<UtilityAI, Consideration>(UtilityAI, "Consideration") {
         override fun create() = Consideration()
@@ -106,15 +108,15 @@ class Intention private constructor() : UtilityAI() {
     @JvmField val considerations = BitSet()
 
     fun withConsideration(key: ComponentKey) {
-        considerations[key.instanceIndex] = true
+        considerations[key.componentIndex] = true
     }
     fun withConsideration(configure: (Consideration.() -> Unit)): ComponentKey {
         val result = Consideration.build(configure)
-        considerations.set(result.instanceIndex)
+        considerations.set(result.componentIndex)
         return result
     }
     fun removeConsideration(key: ComponentKey) {
-        considerations[key.instanceIndex] = false
+        considerations[key.componentIndex] = false
     }
 
     override fun getUtilityValue(entityId: Int, intentionId: Int): Float {
@@ -134,22 +136,19 @@ class Intention private constructor() : UtilityAI() {
 
 class UtilityAction private constructor() : UtilityAI() {
 
-    @JvmField var actionOperation: TaskOperation = SUCCESS_TASK_OPERATION
-    @JvmField var operationArg2 = -1
-    @JvmField var operationArg3 = -1
-    @JvmField var attributes: Dictionary = EMPTY_DICTIONARY
+    @JvmField var actionOperation: Action = SUCCESS_ACTION
     @JvmField val considerations = BitSet()
 
     fun withConsideration(key: ComponentKey) {
-        considerations[key.instanceIndex] = true
+        considerations[key.componentIndex] = true
     }
     fun withConsideration(configure: (Consideration.() -> Unit)): ComponentKey {
         val result = Consideration.build(configure)
-        considerations.set(result.instanceIndex)
+        considerations.set(result.componentIndex)
         return result
     }
     fun removeConsideration(key: ComponentKey) {
-        considerations[key.instanceIndex] = false
+        considerations[key.componentIndex] = false
     }
 
     override fun getUtilityValue(entityId: Int, intentionId: Int): Float {
@@ -162,8 +161,7 @@ class UtilityAction private constructor() : UtilityAI() {
         return result
     }
 
-    fun callAction(entityId: Int): OperationResult =
-        actionOperation(Entity.getKey(entityId), attributes)
+    fun callAction(entityId: Int): OperationResult = actionOperation(entityId)
 
     companion object : ComponentSubTypeBuilder<UtilityAI, UtilityAction>(UtilityAI, "UtilityAction") {
         override fun create() = UtilityAction()

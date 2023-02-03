@@ -3,6 +3,7 @@ package com.inari.firefly.core
 import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.firefly.core.api.FFTimer
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
 
@@ -25,7 +26,7 @@ abstract class Control protected constructor() : Component(Control) {
         override fun create() = throw UnsupportedOperationException("Control is abstract use sub type builder instead")
 
         init {
-            Engine.registerListener(UPDATE_EVENT_TYPE, ::updateAllActiveControls)
+           Engine.registerListener(UPDATE_EVENT_TYPE, ::updateAllActiveControls)
         }
 
         private fun updateAllActiveControls() {
@@ -62,14 +63,14 @@ abstract class SingleComponentControl<C : Component> protected constructor(
     override fun register(key: ComponentKey) {
         if (key.type.aspectIndex != controlledType.aspectIndex)
             throw IllegalArgumentException("Type mismatch")
-        if (key.instanceIndex < 0)
+        if (key.componentIndex < 0)
             throw IllegalArgumentException("Invalid Key -1")
         controlledComponentKey = key
         init(controlledComponentKey)
     }
 
     override fun update() {
-        if (controlledComponentKey.instanceIndex < 0) return
+        if (controlledComponentKey.componentIndex < 0) return
         val c: C = ComponentSystem[controlledComponentKey]
         if (c.active)
             update(c)
@@ -96,15 +97,15 @@ abstract class ComponentsControl<C : Component> protected constructor(
     override fun register(key: ComponentKey) {
         if (key.type.aspectIndex != controlledType.aspectIndex)
             throw IllegalArgumentException("Type mismatch")
-        if (key.instanceIndex < 0)
+        if (key.componentIndex < 0)
             throw IllegalArgumentException("Invalid Key -1")
-        controlledComponents.set(key.instanceIndex)
+        controlledComponents.set(key.componentIndex)
     }
 
     override fun update() {
-        var componentIndex = controlledComponents.nextSetBit(0)
-        while (componentIndex >= 0) {
-            //val componentIndex = it.nextInt()
+        val it = controlledComponents.iterator()
+        while (it.hasNext()) {
+            val componentIndex = it.nextInt()
             if (!system.exists(componentIndex)) {
                 controlledComponents[componentIndex] = false
                 continue
@@ -113,7 +114,6 @@ abstract class ComponentsControl<C : Component> protected constructor(
             val c = system[componentIndex]
             if (c.active)
                 update(c)
-            componentIndex = controlledComponents.nextSetBit(componentIndex + 1)
         }
     }
 
@@ -126,12 +126,12 @@ abstract class EntityControl  protected constructor() : Control() {
     protected val entityIndexes = BitSet()
     private val componentListener: ComponentEventListener = { key, type ->
         if (type == ComponentEventType.ACTIVATED && matchForControl(Entity[key])) {
-            entityIndexes[key.instanceIndex] = true
+            entityIndexes[key.componentIndex] = true
             if (!this.active)
                 Control.activate(this)
         }
-        else if (type == ComponentEventType.DEACTIVATED && key.instanceIndex < entityIndexes.size)
-            entityIndexes[key.instanceIndex] = false
+        else if (type == ComponentEventType.DEACTIVATED && key.componentIndex < entityIndexes.size)
+            entityIndexes[key.componentIndex] = false
     }
 
     override fun load() {

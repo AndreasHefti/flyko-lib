@@ -16,9 +16,9 @@ object SpriteGroupRenderer : EntityRenderer("SpriteGroupRenderer") {
 
     override fun render(entities: DynArray<Entity>) {
         val graphics = Engine.graphics
-        var i = 0
-        while (i < entities.capacity) {
-            val entity = entities[i++] ?: continue
+        val iter = entities.iterator()
+        while (iter.hasNext()) {
+            val entity = iter.next()
 
             val sprite = entity[ESprite]
             val transform = entity[ETransform]

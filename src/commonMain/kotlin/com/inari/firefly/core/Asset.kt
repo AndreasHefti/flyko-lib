@@ -1,10 +1,12 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.api.NULL_BINDING_INDEX
+
 abstract class Asset protected constructor(assetType: ComponentType<out Asset>) : Composite(assetType) {
 
-    var assetIndex: Int = -1
+    var assetIndex: Int = NULL_BINDING_INDEX
         protected set
-    open fun assetIndex(at: Int) = assetIndex
+    open fun assetIndex(at: Int): Int = assetIndex
 
     companion object : ComponentSystem<Asset>("Asset") {
         override fun allocateArray(size: Int): Array<Asset?> = arrayOfNulls(size)
@@ -15,11 +17,13 @@ abstract class Asset protected constructor(assetType: ComponentType<out Asset>) 
                 throw IllegalArgumentException("Missing Asset reference: $key")
             if (key.type.aspectIndex != Asset.aspectIndex)
                 throw IllegalArgumentException("Type mismatch")
-            if (key.instanceIndex < 0)
+            if (key.componentIndex < 0)
                 throw IllegalArgumentException("No instance")
+
             val asset: Asset = ComponentSystem[key]
             if (!asset.loaded && preload)
                 ComponentSystem.load(key)
+
             return asset.assetIndex(setIndex)
         }
     }

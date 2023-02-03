@@ -36,6 +36,7 @@ class Player private constructor() : Composite(Player), Controlled {
     var playerMovement: EMovement? = null
         internal set
 
+    //override val controllerReferences = ControllerReferences(Player)
     internal val playerRoomTransitionObserver = RoomTransitionObserver(this)
 
     override fun initialize() {
@@ -109,7 +110,7 @@ class Player private constructor() : Composite(Player), Controlled {
         }
 
         fun findFirstActive(): Player {
-            val pIndex = Player.getNextActiveIndex(0)
+            val pIndex = Player.activeIndexIterator().next()
             if (pIndex < 0)
                 throw IllegalStateException("No Player found")
             return Player[pIndex]
@@ -177,7 +178,7 @@ class Player private constructor() : Composite(Player), Controlled {
 class DefaultSelectionBasedRoomSupplier: RoomSupplier {
 
     override fun getNextRoom(playerXPos: Int, playerYPos: Int, orientation: Orientation): PlayerOrientation {
-        if (Room.activeRoomKey.instanceIndex < 0) throw IllegalStateException()
+        if (Room.activeRoomKey.componentIndex < 0) throw IllegalStateException()
         val room = Room[Room.activeRoomKey]
         if (room.areaOrientationType != WorldOrientationType.SECTION)
             throw RuntimeException("Unsupported area orientation type: ${room.areaOrientationType}")

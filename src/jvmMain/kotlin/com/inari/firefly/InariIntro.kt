@@ -14,6 +14,7 @@ import com.inari.firefly.graphics.view.View
 import com.inari.firefly.physics.animation.DefaultFloatEasing
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.EasedFloatAnimation
+import com.inari.util.VOID_CALL
 import com.inari.util.geom.Easing
 import org.lwjgl.glfw.GLFW
 
@@ -22,7 +23,7 @@ object InariIntro {
     private var textureAssetName = "INARI_LOGO_TEX"
     private var spriteAssetName = "INARI_LOGO_SPRITE"
     private var entityId = NO_COMPONENT_KEY
-    private var callback: () -> Unit = {}
+    private var callback: () -> Unit = VOID_CALL
     private var disposing = false
 
     private const val pngWidth = 520
@@ -65,6 +66,8 @@ object InariIntro {
                 }
             }
         }
+
+
 
         Engine.input.setKeyCallback { _, _, _ -> dispose() }
         Engine.input.setMouseButtonCallback { _, _ -> dispose() }

@@ -21,7 +21,7 @@ class ViewLayerMapping {
 
     operator fun get(view: Int, layer: Int): BitSetRO = internalGet(view, layer)
     operator fun get(viewLayer: ViewLayerAware): BitSetRO = internalGet(viewLayer.viewIndex, viewLayer.layerIndex)
-    operator fun get(view: ComponentKey, layer: ComponentKey): BitSetRO = internalGet(view.instanceIndex, layer.instanceIndex)
+    operator fun get(view: ComponentKey, layer: ComponentKey): BitSetRO = internalGet(view.componentIndex, layer.componentIndex)
     operator fun get(view: View, layer: Layer): BitSetRO = internalGet(view.index, layer.index)
 
     fun add(viewLayer: ViewLayerAware, index: Int) =

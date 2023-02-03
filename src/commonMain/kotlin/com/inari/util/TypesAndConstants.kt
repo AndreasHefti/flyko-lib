@@ -1,15 +1,8 @@
 package com.inari.util
 
-import com.inari.firefly.core.Component
-import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
-import com.inari.firefly.core.ComponentKey
-import com.inari.firefly.core.api.ButtonType
-import com.inari.util.collection.Dictionary
-import com.inari.util.collection.EMPTY_DICTIONARY
 import com.inari.util.geom.ImmutableVector2f
 import com.inari.util.geom.ImmutableVector2i
 import com.inari.util.geom.ImmutableVector4f
-import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
 const val ZERO_INT = 0
@@ -44,19 +37,15 @@ const val NO_PROGRAM: String = "[[NO_PROGRAM]]"
 @JvmField val VEC_NI_WEST = ImmutableVector2i(-1, 0)
 @JvmField val VEC_NI_EAST = ImmutableVector2i(1, 0)
 
-@JvmField val VOID_INT_CONSUMER: (Int) -> Unit = { _ -> }
 @JvmField val INT_FUNCTION_IDENTITY: (Int) -> Int = { i -> i }
-@JvmField val INT_FUNCTION_NULL: (Int) -> Int = { _ -> 0 }
-@JvmField val NULL_INT_FUNCTION: (Int) -> Int = { _ -> throw IllegalStateException("NULL_INT_FUNCTION") }
-@JvmField val NULL_INT_CONSUMER: (Int) -> Unit = { _ -> throw IllegalStateException("NULL_INT_CONSUMER") }
-@JvmField val NULL_CONSUMER: (Any) -> Unit = { _ -> throw IllegalStateException("NULL_CONSUMER") }
-@JvmField val NULL_CALL: () -> Unit = { throw IllegalStateException("NULL_CALL called") }
+@JvmField val INT_FUNCTION_ZERO: (Int) -> Int = { _ -> 0 }
 @JvmField val DO_NOTHING = {}
 @JvmField val FALSE_SUPPLIER = { false }
 @JvmField val TRUE_SUPPLIER = { true }
 @JvmField val FALSE_PREDICATE: (Any) -> Boolean = { false }
 @JvmField val TRUE_PREDICATE: (Any) -> Boolean = { true }
 @JvmField val VOID_CONSUMER: (Any) -> Unit = { _ -> }
+@JvmField val VOID_INT_CONSUMER: (Int) -> Unit = VOID_CONSUMER
 @JvmField val VOID_CALL: () -> Unit = {}
 
 @JvmField val BLACK = ImmutableVector4f(0f, 0f, 0f, 1f)
@@ -64,12 +53,6 @@ const val NO_PROGRAM: String = "[[NO_PROGRAM]]"
 
 interface Named {
     val name: String
-}
-
-/** Use this on types that can be disposed  */
-interface Disposable {
-    /** Dispose the instance  */
-    fun dispose()
 }
 
 interface IntIterator {
@@ -99,40 +82,7 @@ val VOID_INT_PROPERTY_ACCESSOR = object : IntPropertyAccessor {
 val VOID_FLOAT_PROPERTY_ACCESSOR_PROVIDER: (Int) -> FloatPropertyAccessor = { _ -> VOID_FLOAT_PROPERTY_ACCESSOR }
 val VOID_INT_PROPERTY_ACCESSOR_PROVIDER: (Int) -> IntPropertyAccessor = { _ -> VOID_INT_PROPERTY_ACCESSOR }
 
-enum class OperationResult {
-    SUCCESS,
-    RUNNING,
-    FAILED
-}
-
-//typealias AttributeMap = (String) -> String?
-typealias Operation = () -> OperationResult
-typealias OperationCallback = (OperationResult) -> Unit
-typealias TaskOperation = (ComponentKey, Dictionary) -> OperationResult
-typealias TaskCallback = (ComponentKey, Dictionary, OperationResult) -> Unit
-typealias ConditionalOperation = (Int, Int, Int) -> Boolean
-typealias NormalOperation = (Int, Int, Int) -> Float
-/** { entityId, velocity, button -> } */
-typealias MoveCallback = (Int, Float, ButtonType) -> Unit
-
-val VOID_MOVE_CALLBACK: MoveCallback = { _, _, _ -> }
-val VOID_TASK_CALLBACK: TaskCallback = { _, _, _ -> }
-val RUNNING_OPERATION: Operation = { OperationResult.RUNNING }
-val SUCCESS_OPERATION: Operation = { OperationResult.SUCCESS }
-val FAILED_OPERATION: Operation = { OperationResult.FAILED }
-val RUNNING_TASK_OPERATION: TaskOperation = {  _, _ -> OperationResult.RUNNING }
-val SUCCESS_TASK_OPERATION: TaskOperation = {  _, _ -> OperationResult.SUCCESS }
-val FAILED_TASK_OPERATION: TaskOperation = {  _, _ -> OperationResult.FAILED }
-val TRUE_OPERATION: ConditionalOperation = { _, _, _ -> true }
-val FALSE_OPERATION: ConditionalOperation = { _, _, _ -> false }
-@JvmField val ZERO_OP: NormalOperation = { _, _, _ -> 0f }
-@JvmField val ONE_OP : NormalOperation = { _, _, _ -> 1f }
-
-operator fun ConditionalOperation.invoke() = this(-1, -1, -1)
-operator fun ConditionalOperation.invoke(entityId: Int) = this(entityId, -1, -1)
-operator fun ConditionalOperation.invoke(entityId1: Int, entityId2: Int) = this(entityId1, entityId2, -1)
-operator fun TaskOperation.invoke() = this(NO_COMPONENT_KEY, EMPTY_DICTIONARY)
-operator fun TaskOperation.invoke(key: ComponentKey) = this(key, EMPTY_DICTIONARY)
-operator fun NormalOperation.invoke() = this(-1, -1, -1)
-operator fun NormalOperation.invoke(entityId: Int) = this(entityId, -1, -1)
-operator fun NormalOperation.invoke(entityId1: Int, entityId2: Int) = this(entityId1, entityId2, -1)
+@JvmField val VOID_CONSUMER_0 = {}
+@JvmField val VOID_CONSUMER_1: (Any) -> Unit = { _ -> }
+@JvmField val VOID_CONSUMER_2: (Any, Any) -> Unit = { _, _ -> }
+@JvmField val VOID_CONSUMER_3: (Any, Any, Any) -> Unit = { _, _, _ -> }

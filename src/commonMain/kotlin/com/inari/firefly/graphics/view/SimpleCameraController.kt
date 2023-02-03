@@ -20,13 +20,13 @@ class SimpleCameraController private constructor() : SingleComponentControl<View
 
     override fun init(key: ComponentKey) {
         viewChangeEvent = View.createViewChangeEvent(
-            key.instanceIndex,
-            ViewChangeEvent.Type.ORIENTATION,
+            key.componentIndex,
+            View.ViewChangeEvent.Type.ORIENTATION,
             false)
     }
 
     fun adjust() {
-        if (controlledComponentKey.instanceIndex < 0) return
+        if (controlledComponentKey.componentIndex < 0) return
         val view: View = ComponentSystem[controlledComponentKey]
         if (getPos(view.zoom, view.bounds, view.worldPosition)) {
             view.worldPosition.x = floor(view.worldPosition.x + pos.x)

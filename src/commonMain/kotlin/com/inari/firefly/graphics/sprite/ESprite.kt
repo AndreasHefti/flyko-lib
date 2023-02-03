@@ -2,6 +2,7 @@ package com.inari.firefly.graphics.sprite
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
+import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.SpriteRenderable
 import com.inari.util.FloatPropertyAccessor
 import com.inari.util.IntPropertyAccessor
@@ -10,7 +11,7 @@ import kotlin.jvm.JvmField
 
 class ESprite private constructor() : EntityComponent(ESprite), SpriteRenderable {
 
-    override var spriteIndex = -1
+    override var spriteIndex = NULL_BINDING_INDEX
     override val tintColor = Vector4f(1f, 1f, 1f, 1f)
     override var blendMode = BlendMode.NONE
 
@@ -30,11 +31,11 @@ class ESprite private constructor() : EntityComponent(ESprite), SpriteRenderable
     }
 
     override fun deactivate() {
-        spriteIndex = -1
+        spriteIndex = NULL_BINDING_INDEX
     }
 
     override fun reset() {
-        spriteIndex = -1
+        spriteIndex = NULL_BINDING_INDEX
         spriteRef.reset()
         spriteSetRef.reset()
         tintColor(1f, 1f, 1f, 1f)

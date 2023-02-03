@@ -12,7 +12,7 @@ class ContactConstraint private constructor(): Component(ContactConstraint) {
 
     @JvmField var layerRef = CReference(Layer)
     val layerIndex: Int
-        get() = layerRef.targetKey.instanceIndex
+        get() = layerRef.targetKey.componentIndex
     @JvmField var fullScan = false
     @JvmField var isCircle = false
     @JvmField val bounds: Vector4i = Vector4i()

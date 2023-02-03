@@ -40,14 +40,14 @@ fun main() {
 
         Task {
             name = "beforeTileMapLoad"
-            withSimpleOperation {
+            simpleTask = {
                 println("Load Player")
             }
         }
 
         Task {
             name = "beforeTileMapActivation"
-            withSimpleOperation {
+            simpleTask = {
                 println("Tile Map on activation")
             }
         }

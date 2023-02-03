@@ -23,27 +23,27 @@ class EUtility  private constructor() : EntityComponent(EUtility) {
         set(value) { scheduler = Engine.timer.createUpdateScheduler(value) }
 
     fun withIntention(key: ComponentKey) {
-        intentions[key.instanceIndex] = true
+        intentions[key.componentIndex] = true
     }
     fun withIntention(configure: (Intention.() -> Unit)): ComponentKey {
         val result = Intention.build(configure)
-        intentions.set(result.instanceIndex)
+        intentions.set(result.componentIndex)
         return result
     }
     fun removeIntention(key: ComponentKey) {
-        intentions[key.instanceIndex] = false
+        intentions[key.componentIndex] = false
     }
 
     fun withAction(key: ComponentKey) {
-        actions[key.instanceIndex] = true
+        actions[key.componentIndex] = true
     }
     fun withAction(configure: (UtilityAction.() -> Unit)): ComponentKey {
         val result = UtilityAction.build(configure)
-        actions.set(result.instanceIndex)
+        actions.set(result.componentIndex)
         return result
     }
     fun removeAction(key: ComponentKey) {
-        actions[key.instanceIndex] = false
+        actions[key.componentIndex] = false
     }
 
     override fun reset() {

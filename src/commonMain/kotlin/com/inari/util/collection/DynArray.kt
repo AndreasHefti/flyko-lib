@@ -75,6 +75,10 @@ interface DynArrayRO<T> : Iterable<T> {
      */
     fun nextIndex(fromIndex: Int): Int
 
+    /** Use this to get an index iterator to iterate to all indexed of this DynArray that has a value
+     * @return IntIterator the index iterator
+     */
+    fun indexIterator(): IntIterator
 }
 
 /** An Array that dynamically grows if more space is needed.
@@ -220,9 +224,8 @@ class DynArray<T> constructor(
         if (fromIndex >= this.capacity)
             return -1
         var result = fromIndex
-        while (result < array.size && array[result] == null) {
+        while (result < array.size && array[result] == null)
             result++
-        }
         if (result >= array.size) return -1
         return result
     }
@@ -315,6 +318,17 @@ class DynArray<T> constructor(
     override fun iterator(): Iterator<T> =
         DynArrayIterator()
 
+    override fun indexIterator(): IntIterator {
+        return object : IntIterator() {
+            private var index = nextIndex(0)
+            override fun hasNext(): Boolean = index >= 0
+            override fun nextInt(): Int {
+                val ret = index
+                index = nextIndex(index + 1)
+                return ret
+            }
+        }
+    }
 
     fun trim() {
         if (size == capacity)
@@ -387,29 +401,12 @@ class DynArray<T> constructor(
     }
 
     private inner class DynArrayIterator : Iterator<T> {
-
-        private var index = 0
-
-        init {
-            findNext()
-        }
-
-        override fun hasNext(): Boolean {
-            if (index < array.size && array[index] == null)
-                findNext()
-            return index < array.size
-        }
-
+        private var index = nextIndex(0)
+        override fun hasNext(): Boolean = index >= 0
         override fun next(): T {
             val result = array[index]!!
-            index++
-            findNext()
+            index = nextIndex(index + 1)
             return result
-        }
-
-        private fun findNext() {
-            while (index < array.size && array[index] == null)
-                index++
         }
     }
 

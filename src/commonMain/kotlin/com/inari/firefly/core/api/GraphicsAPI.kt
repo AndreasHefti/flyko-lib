@@ -1,5 +1,6 @@
 package com.inari.firefly.core.api
 
+import com.inari.util.ZERO_FLOAT
 import com.inari.util.collection.DynArrayRO
 import com.inari.util.geom.Vector4f
 import com.inari.util.geom.Vector4i
@@ -122,7 +123,7 @@ interface GraphicsAPI {
         posY: Float,
         scaleX: Float = 1f,
         scaleY: Float = 1f,
-        rotation: Float = 0f,
+        rotation: Float = ZERO_FLOAT,
         flipX: Boolean = false,
         flipY: Boolean = false,
         tintColor: Vector4f = Vector4f(1f, 1f, 1f, 1f),
@@ -158,7 +159,7 @@ interface GraphicsAPI {
      * @param xOffset the x-axis offset, default is 0f
      * @param yOffset the y-axis offset, default is 0f
      */
-    fun renderShape(data: ShapeData, xOffset: Float = 0f, yOffset: Float = 0f)
+    fun renderShape(data: ShapeData, xOffset: Float = ZERO_FLOAT, yOffset: Float = ZERO_FLOAT)
 
     /** This is called form the firefly API to render a shape with given [TransformData].
      * See [ShapeData] for more information about the data structure of shapes.
@@ -240,11 +241,11 @@ expect object GraphicsAPIImpl {
     fun startViewportRendering(view: ViewData, clear: Boolean)
     fun applyViewportOffset(x: Float, y: Float)
     fun setActiveShader(shaderId: Int)
-    fun renderTexture(textureId: Int, posX: Float, posY: Float, scaleX: Float = 1f, scaleY: Float = 1f, rotation: Float = 0f, flipX: Boolean = false, flipY: Boolean = false, tintColor: Vector4f = Vector4f(1f, 1f, 1f, 1f), blendMode: BlendMode = BlendMode.NONE)
+    fun renderTexture(textureId: Int, posX: Float, posY: Float, scaleX: Float = 1f, scaleY: Float = 1f, rotation: Float = ZERO_FLOAT, flipX: Boolean = false, flipY: Boolean = false, tintColor: Vector4f = Vector4f(1f, 1f, 1f, 1f), blendMode: BlendMode = BlendMode.NONE)
     fun renderSprite(renderableSprite: SpriteRenderable, xOffset: Float, yOffset: Float)
     fun renderSprite(renderableSprite: SpriteRenderable, transform: TransformData)
     fun renderSprite(renderableSprite: SpriteRenderable, transform: TransformData, xOffset: Float, yOffset: Float)
-    fun renderShape(data: ShapeData, xOffset: Float = 0f, yOffset: Float = 0f)
+    fun renderShape(data: ShapeData, xOffset: Float = ZERO_FLOAT, yOffset: Float = ZERO_FLOAT)
     fun renderShape(data: ShapeData, transform: TransformData)
     fun renderShape(data: ShapeData, transform: TransformData, xOffset: Float, yOffset: Float)
     fun endViewportRendering(view: ViewData)

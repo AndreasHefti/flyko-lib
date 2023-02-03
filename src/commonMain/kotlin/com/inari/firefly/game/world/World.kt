@@ -1,9 +1,10 @@
 package com.inari.firefly.game.world
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.ActionCallback
+import com.inari.firefly.core.api.OperationResult.*
+import com.inari.firefly.core.api.invoke
 import com.inari.firefly.graphics.view.Scene
-import com.inari.util.OperationCallback
-import com.inari.util.OperationResult
 import com.inari.util.geom.*
 import kotlin.jvm.JvmField
 import kotlin.native.concurrent.ThreadLocal
@@ -91,7 +92,7 @@ class Room private constructor() : Composite(Room) {
 
         private fun activateRoom(roomIndex: Int) {
             // If this room is already active, ignore
-            if (activeRoomKey.instanceIndex == roomIndex) return
+            if (activeRoomKey.componentIndex == roomIndex) return
             // If there is another active room, deactivate it first
             deactivateRoom()
 
@@ -104,12 +105,12 @@ class Room private constructor() : Composite(Room) {
 
             val activeRoom = Room[activeRoomKey]
             if (activeRoom.pauseTask.exists)
-                Task[activeRoom.pauseTask](activeRoom.key)
+                Task[activeRoom.pauseTask](activeRoom.index)
             paused = true
         }
 
         fun startRoom(playerIndex: Int, px: Int, py: Int, roomIndex: Int) {
-            val startGameCall: OperationCallback = { resumeRoom() }
+            val startGameCall: ActionCallback = { _, _ -> resumeRoom() }
             // activate new room and player
             Room.activate(roomIndex)
             val activeRoom = Room[activeRoomKey]
@@ -121,9 +122,9 @@ class Room private constructor() : Composite(Room) {
 
             // run play init scene if defined or start game directly
             if (activeRoom.activationScene.defined)
-                Scene.runScene(activeRoom.activationScene.targetKey.instanceIndex, startGameCall)
+                Scene.runScene(activeRoom.activationScene.targetKey.componentIndex, startGameCall)
             else
-                startGameCall(OperationResult.SUCCESS)
+                startGameCall(SUCCESS)
         }
 
         fun resumeRoom() {
@@ -131,7 +132,7 @@ class Room private constructor() : Composite(Room) {
 
             val activeRoom = Room[activeRoomKey]
             if (activeRoom.resumeTask.exists)
-                Task[activeRoom.resumeTask](activeRoom.key)
+                Task[activeRoom.resumeTask](activeRoom.index)
             paused = false
         }
 
@@ -142,7 +143,7 @@ class Room private constructor() : Composite(Room) {
         }
 
         fun handleRoomChange(playerXPos: Int, playerYPos: Int, orientation: Orientation = Orientation.NONE) {
-            if (activeRoomKey.instanceIndex < 0)
+            if (activeRoomKey.componentIndex < 0)
                 throw IllegalStateException("No active Room")
 
             val activeRoom = Room[activeRoomKey]
@@ -150,25 +151,25 @@ class Room private constructor() : Composite(Room) {
         }
 
         private fun handleRoomChange(playerOrientation: PlayerOrientation) {
-             if (playerOrientation.roomKey.instanceIndex < 0)
+             if (playerOrientation.roomKey.componentIndex < 0)
                 throw IllegalStateException("No Room found")
-            if (activeRoomKey.instanceIndex < 0)
+            if (activeRoomKey.componentIndex < 0)
                 throw IllegalStateException("No active Room")
 
             val player = Player.findFirstActive()
             pauseRoom()
             val activeRoom = Room[activeRoomKey]
-            val startGameCallback: OperationCallback = {
+            val startGameCallback: ActionCallback = { _, _ ->
                 resumeRoom()
             }
-            val disposeGameCallback: OperationCallback = {
+            val disposeGameCallback: ActionCallback = { _, _ ->
 
                 // deactivate player and room, clear systems
                 Player.deactivate(player.index)
                 deactivateRoom()
 
                 // activate new room and player
-                Room.activate(playerOrientation.roomKey.instanceIndex)
+                Room.activate(playerOrientation.roomKey.componentIndex)
                 player.playerPosition(playerOrientation.playerPosition)
                 Player.activate(player.index)
                 pauseRoom()
@@ -177,13 +178,13 @@ class Room private constructor() : Composite(Room) {
                 if (activeRoom.activationScene.exists)
                     Scene.runScene(activeRoom.activationScene, startGameCallback)
                 else
-                    startGameCallback(OperationResult.SUCCESS)
+                    startGameCallback(SUCCESS)
             }
 
             if (activeRoom.deactivationScene.exists)
                 Scene.runScene(activeRoom.deactivationScene, disposeGameCallback)
             else
-                disposeGameCallback(OperationResult.SUCCESS)
+                disposeGameCallback(SUCCESS)
         }
     }
 }

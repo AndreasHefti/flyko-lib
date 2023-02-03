@@ -79,8 +79,6 @@ interface InputAPI {
 interface InputImpl {
     val type: DeviceType
     fun <T : InputDevice> create(window: Long = 0): T
-
-
 }
 
 interface InputDevice {

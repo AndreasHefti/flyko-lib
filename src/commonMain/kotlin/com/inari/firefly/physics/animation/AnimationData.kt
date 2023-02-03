@@ -117,14 +117,14 @@ class BezierCurveAnimation private constructor() : CurveAnimation() {
     @JvmField var curve = CubicBezierCurve()
     @JvmField var easing: EasingFunction = Easing.LINEAR
 
-    companion object : AnimatedDataBuilder<BezierCurveAnimation> {
-        override fun create() = BezierCurveAnimation()
-    }
-
     override fun reset() {
         accessorX(curve.p0.x)
         accessorY(curve.p0.y)
         accessorRot(ZERO_FLOAT)
+    }
+
+    companion object : AnimatedDataBuilder<BezierCurveAnimation> {
+        override fun create() = BezierCurveAnimation()
     }
 }
 

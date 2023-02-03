@@ -33,19 +33,19 @@ fun main() {
 
         Task {
             name = "afterLoadTileMap"
-            withSimpleOperation {
+            simpleTask = {
                 println("Tile Map after load")
             }
         }
         Task {
             name = "beforeActivateTileMap"
-            withSimpleOperation {
+            simpleTask = {
                 println("Tile Map on activation")
             }
         }
         Task {
             name = "afterActivateTileMap"
-            withSimpleOperation {
+            simpleTask = {
                 println("Tile Map after activation")
             }
         }

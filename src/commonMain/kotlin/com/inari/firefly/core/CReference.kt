@@ -16,9 +16,9 @@ class CReference internal constructor(
     val defined: Boolean
         get() { return targetKey != NO_COMPONENT_KEY }
     val exists: Boolean
-        get() { return targetKey.instanceIndex >= 0 }
+        get() { return targetKey.componentIndex >= 0 }
     val refIndex: Int
-        get() = if (exists) targetKey.instanceIndex else throw IllegalStateException("Reference does not exists yet")
+        get() = if (exists) targetKey.componentIndex else throw IllegalStateException("Reference does not exists yet")
 
     operator fun invoke(index: Int) {
         targetKey = ComponentSystem[targetType].getKey(index)

@@ -7,53 +7,61 @@ import com.inari.util.geom.CubicBezierCurve.Companion.bezierCurvePoint
 import com.inari.util.geom.GeomUtils
 
 abstract class Animation<D : AnimatedData>(
-    protected val animatedData: DynArray<D>
+    private val animatedData: DynArray<D>
 ) : Control() {
+
+    private val entityListener: (ComponentKey, ComponentEventType) -> Unit = { key, type ->
+        if (type == ComponentEventType.ACTIVATED) notifyActivation(Entity[key])
+        else if (type == ComponentEventType.DEACTIVATED) notifyDeactivation(Entity[key])
+    }
 
     override fun load() {
         super.load()
-        Entity.registerComponentListener(::entityListener)
+        Entity.registerComponentListener(entityListener)
     }
 
     override fun dispose() {
-        Entity.disposeComponentListener(::entityListener)
+        Entity.disposeComponentListener(entityListener)
         super.dispose()
     }
 
-    override fun update() = animatedData.forEach {
-        if (it.active)
-            update(it)
-        else if (it.condition(it))
-            it.active = true
+    override fun update() {
+        animatedData.forEach {
+            if (it.active)
+                update(it)
+            else if (it.condition(it))
+                it.active = true
+        }
     }
 
     protected abstract fun update(data: D)
     protected abstract fun accept(data: AnimatedData): D?
 
-    private fun entityListener(key: ComponentKey, type: ComponentEventType) {
-        if (type == ComponentEventType.ACTIVATED) notifyActivation(Entity[key])
-        else if (type == ComponentEventType.DEACTIVATED) notifyDeactivation(Entity[key])
-    }
-
     private fun notifyActivation(entity: Entity) {
         if (EAnimation !in entity.aspects) return
         val eAnimation = entity[EAnimation]
-        eAnimation.animations.forEach { iAccept(it)?.let {
-                data -> animatedData + data
-        } }
+        val iter = eAnimation.animations.iterator()
+        while (iter.hasNext()) {
+            val it = iter.next()
+            val data = iAccept(it)
+            if (data != null) animatedData.add(data)
+        }
     }
 
     private fun notifyDeactivation(entity: Entity) {
         if (EAnimation !in entity.aspects) return
         val eAnimation = entity[EAnimation]
-        eAnimation.animations.forEach { accept(it)?.let {
-                data -> animatedData - data
-        } }
+        val iter = eAnimation.animations.iterator()
+        while (iter.hasNext()) {
+            val it = iter.next()
+            val data = iAccept(it)
+            if (data != null) animatedData.remove(data)
+        }
     }
 
     private fun iAccept(data: AnimatedData): D? {
-        if ( data.animationController.targetKey.instanceIndex >= 0 &&
-            data.animationController.targetKey.instanceIndex != this.index)
+        if ( data.animationController.targetKey.componentIndex >= 0 &&
+            data.animationController.targetKey.componentIndex != this.index)
             return null
         return accept(data)
     }

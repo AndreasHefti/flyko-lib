@@ -14,7 +14,7 @@ class TestCameraController private constructor() : SingleComponentControl<View>(
 
     override fun init(key: ComponentKey) {
         viewChangeEvent = View.createViewChangeEvent(
-            key.instanceIndex,
+            key.componentIndex,
             View.ViewChangeEvent.Type.ORIENTATION,
             false)
     }

@@ -15,9 +15,9 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
     @JvmField internal val cellDim = Vector2i(-1, -1)
 
     override val viewIndex: Int
-        get() = viewRef.targetKey.instanceIndex
+        get() = viewRef.targetKey.componentIndex
     override val layerIndex: Int
-        get() = if(layerRef.targetKey.instanceIndex >= 0) layerRef.targetKey.instanceIndex else 0
+        get() = if(layerRef.targetKey.componentIndex >= 0) layerRef.targetKey.componentIndex else 0
     @JvmField val viewRef = CReference(View)
     @JvmField val layerRef = CReference(Layer)
     @JvmField var renderer: EntityRenderer = SimpleTileGridRenderer
@@ -149,8 +149,8 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
         private val VIEW_LAYER_MAPPING = ViewLayerMapping()
 
         private fun entityListener(key: ComponentKey, type: ComponentEventType) {
-            if (type == ComponentEventType.ACTIVATED) addEntity(key.instanceIndex)
-            else if (type == ComponentEventType.DEACTIVATED) removeEntity(key.instanceIndex)
+            if (type == ComponentEventType.ACTIVATED) addEntity(key.componentIndex)
+            else if (type == ComponentEventType.DEACTIVATED) removeEntity(key.componentIndex)
         }
 
         init { Entity.registerComponentListener(this::entityListener) }
@@ -168,7 +168,8 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
         }
 
         operator fun get(viewLayer: ViewLayerAware): BitSetRO = VIEW_LAYER_MAPPING[viewLayer]
-        operator fun get(viewIndex: Int, layerIndex: Int): BitSetRO = VIEW_LAYER_MAPPING[viewIndex, layerIndex]
+        operator fun get(viewIndex: Int, layerIndex: Int): BitSetRO =
+            VIEW_LAYER_MAPPING[viewIndex, layerIndex]
 
         internal fun getTileGridIterator(clip: Vector4i, tileGrid: TileGrid): TileGridIterator {
             val instance = instance
@@ -221,7 +222,7 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
                 return
             val tile = entity[ETile]
             val tileGrid = if (tile.tileGridRef.exists)
-                if (this.exists(tile.tileGridRef.targetKey.instanceIndex))
+                if (this.exists(tile.tileGridRef.targetKey.componentIndex))
                     this[tile.tileGridRef.targetKey]
                 else return
             else {

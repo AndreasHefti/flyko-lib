@@ -39,7 +39,7 @@ object SimpleTextRenderer : EntityRenderer("SimpleTextRenderer") {
             textRenderable.blendMode = text.blend
             transformCollector(transform)
             if (EChild in entity.aspects)
-                collectTransformData(entity[EChild].parent.targetKey.instanceIndex, transformCollector)
+                collectTransformData(entity[EChild].parent.targetKey.componentIndex, transformCollector)
 
             val horizontalStep = (font.charWidth + font.charSpace) * transform.scale.v0
             val verticalStep = (font.charHeight + font.lineSpace) * transform.scale.v1

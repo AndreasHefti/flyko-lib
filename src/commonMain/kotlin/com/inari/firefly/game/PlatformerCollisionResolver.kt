@@ -86,7 +86,7 @@ class PlatformerCollisionResolver : CollisionResolver() {
     override fun resolve(entity: Entity, contact: EContact, contactScan: ContactScans) {
 
         if (terrainContactConstraintRef.exists) {
-            val terrainContact = contactScan.getFullScan(terrainContactConstraintRef.targetKey.instanceIndex)!!
+            val terrainContact = contactScan.getFullScan(terrainContactConstraintRef.targetKey.componentIndex)!!
             if (terrainContact.hasAnyContact()) {
                 val movement = entity[EMovement]
                 val prefGround = movement.onGround
@@ -96,7 +96,7 @@ class PlatformerCollisionResolver : CollisionResolver() {
         }
 
         if (fullContactConstraintRef.exists) {
-            val fullContact = contactScan.getFullScan(fullContactConstraintRef.targetKey.instanceIndex)!!
+            val fullContact = contactScan.getFullScan(fullContactConstraintRef.targetKey.componentIndex)!!
 
             // process callbacks first if available
             // stop processing on first callback returns true
@@ -233,7 +233,7 @@ class PlatformerCollisionResolver : CollisionResolver() {
     }
 
     private fun initTerrainContact() {
-        val constraint = ContactConstraint[terrainContactConstraintRef.targetKey.instanceIndex]
+        val constraint = ContactConstraint[terrainContactConstraintRef.targetKey.componentIndex]
         x2 = constraint.bounds.width / 2
         x3 = constraint.bounds.width - 3
         y2 = (constraint.bounds.height - gapSouth) / 2

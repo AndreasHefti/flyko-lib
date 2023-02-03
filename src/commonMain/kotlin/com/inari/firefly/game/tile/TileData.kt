@@ -170,7 +170,7 @@ class TileMapLayerData {
 class TileSetMapping {
     var tileSetRef = CReference(TileSet)
     val tileSetIndex: Int
-        get() = tileSetRef.targetKey.instanceIndex
+        get() = tileSetRef.targetKey.componentIndex
 //        get() {
 //            val tileSet = TileSet[tileSetRef.targetKey]
 //            if (!tileSet.loaded)

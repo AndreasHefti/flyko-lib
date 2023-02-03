@@ -3,7 +3,7 @@ package com.inari.firefly.game.world
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.api.InputDevice
-import com.inari.util.VOID_MOVE_CALLBACK
+import com.inari.firefly.core.api.VOID_MOVE_CALLBACK
 import com.inari.util.ZERO_FLOAT
 import kotlin.jvm.JvmField
 import kotlin.math.max

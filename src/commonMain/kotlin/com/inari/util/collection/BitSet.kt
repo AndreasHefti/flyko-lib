@@ -289,6 +289,17 @@ class BitSet(nBits: Int = 64) : BitSetRO {
         return true
     }
 
+    fun iterator(): IntIterator {
+        return object : IntIterator() {
+            var index = nextSetBit(0)
+            override fun hasNext(): Boolean = index >= 0
+            override fun nextInt(): Int {
+                val r = index
+                index = nextSetBit(index + 1)
+                return r
+            }
+        }
+    }
 
     companion object {
         private const val LONG_MASK = 0x3f

@@ -22,9 +22,9 @@ object SimpleSpriteRenderer : EntityRenderer("SimpleSpriteRenderer") {
 
     override fun render(entities: DynArray<Entity>) {
         val graphics = Engine.graphics
-        var i = 0
-        while (i < entities.capacity) {
-            val entity = entities[i++] ?: continue
+        val iter = entities.iterator()
+        while (iter.hasNext()) {
+            val entity = iter.next()
             graphics.renderSprite(entity[ESprite], entity[ETransform])
         }
     }

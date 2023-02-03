@@ -1,6 +1,7 @@
 package com.inari.firefly.graphics.sprite
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.SpriteData
 import com.inari.firefly.physics.animation.IntFrameAnimation
 import com.inari.util.NO_NAME
@@ -12,19 +13,19 @@ import kotlin.jvm.JvmField
 
 class SpriteTemplate internal constructor(): SpriteData {
 
-    @JvmField var name: String = NO_NAME
-    override val textureBounds: Vector4i = Vector4i()
-    override var hFlip: Boolean = false
-    override var vFlip: Boolean = false
+    @JvmField var name = NO_NAME
+    override val textureBounds = Vector4i()
+    override var hFlip = false
+    override var vFlip = false
 
-    var spriteIndex: Int = -1
+    var spriteIndex = NULL_BINDING_INDEX
         internal set
-    override var textureIndex: Int = -1
+    override var textureIndex = NULL_BINDING_INDEX
         internal set
 
     fun reset() {
-        spriteIndex = -1
-        textureIndex = -1
+        spriteIndex = NULL_BINDING_INDEX
+        textureIndex = NULL_BINDING_INDEX
         textureBounds(ZERO_INT, ZERO_INT, ZERO_INT, ZERO_INT)
         hFlip = false
         vFlip = true
@@ -67,11 +68,11 @@ class SpriteSet private constructor(): Asset(SpriteSet) {
         get() = spriteData
 
     override fun assetIndex(at: Int) =
-        spriteData[at]?.spriteIndex ?: -1
+        spriteData[at]?.spriteIndex ?: NULL_BINDING_INDEX
 
     fun assetIndex(name: String): Int {
         if (name == NO_NAME)
-            return -1
+            return NULL_BINDING_INDEX
 
         return spriteData
             .first { name == it.name }.spriteIndex
@@ -98,7 +99,7 @@ class SpriteSet private constructor(): Asset(SpriteSet) {
         for (i in 0 until spriteData.capacity) {
             val sprite = spriteData[i] ?: continue
             Engine.graphics.disposeSprite(sprite.spriteIndex)
-            sprite.spriteIndex = -1
+            sprite.spriteIndex = NULL_BINDING_INDEX
         }
         super.dispose()
     }

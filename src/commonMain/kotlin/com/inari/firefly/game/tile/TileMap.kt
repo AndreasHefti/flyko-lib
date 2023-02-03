@@ -144,7 +144,7 @@ open class TileMap : Composite(TileMap) {
                     if (layerData.entityCodeMapping[codeIndex] >= 0)
                         throw IllegalStateException("Entity code mapping already exists, please check! code: $codeIndex")
 
-                    layerData.entityCodeMapping[codeIndex] = entityId.instanceIndex
+                    layerData.entityCodeMapping[codeIndex] = entityId.componentIndex
                     codeIndex++
                 }
             }
@@ -165,7 +165,7 @@ open class TileMap : Composite(TileMap) {
             cellHeight = gridData.tileHeight
             position(gridData.position)
             spherical = gridData.spherical
-        }.instanceIndex
+        }.componentIndex
     }
 
     private fun fillTileGrid(layerData: TileMapLayerData, gridData: TileMapGridData) {
@@ -220,7 +220,7 @@ open class TileMap : Composite(TileMap) {
         private val viewListener: ComponentEventListener = { key, type ->
             when(type) {
                 ComponentEventType.DELETED ->  TileMap.forEachDo { tileMap ->
-                    if (tileMap.viewRef.refIndex == key.instanceIndex)
+                    if (tileMap.viewRef.refIndex == key.componentIndex)
                         TileMap.delete(tileMap.index)
                 }
                 else -> DO_NOTHING
