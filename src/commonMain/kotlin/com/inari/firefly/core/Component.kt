@@ -105,7 +105,7 @@ abstract class Component protected constructor(
 
     var key = NO_COMPONENT_KEY
         internal set
-    internal fun earlyKeyAccess(): ComponentKey {
+    fun earlyKeyAccess(): ComponentKey {
         // DEBUG  println("--> earlyKeyAccess: $this")
         if (key != NO_COMPONENT_KEY) return key
         return if (name != NO_NAME) {

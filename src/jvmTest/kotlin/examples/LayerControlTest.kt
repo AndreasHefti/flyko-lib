@@ -63,30 +63,26 @@ fun main() {
     }
 }
 
-class LayerControl : SystemControl(Layer) {
+class LayerControl : SingleComponentControl<Layer>(Layer) {
 
-    private var layer: Layer? = null
     private val move = Vector2f(1f, 1f)
 
-    override fun update(index: Int) {
-        layer?.apply {
-            this.position + this@LayerControl.move
-            if (this.position.x >= 400- 32) this@LayerControl.move.x = -1f
-            if (this.position.x <= 0) this@LayerControl.move.x = 1f
-            if (this.position.y >= 300 - 32) this@LayerControl.move.y = -1f
-            if (this.position.y <= 0) this@LayerControl.move.y = 1f
-        }
+    override fun init(key: ComponentKey) {
+
     }
 
-    override fun matchForControl(key: ComponentKey): Boolean {
-        val comp = Layer[key]
-        if (this.index in comp.controllerReferences) {
-            this.layer = comp
-            return true
-        }
-        return false
+    override fun update(c: Layer) {
+        c.position + this.move
+        if (c.position.x >= 400- 32) this.move.x = -1f
+        if (c.position.x <= 0) this.move.x = 1f
+        if (c.position.y >= 300 - 32) this.move.y = -1f
+        if (c.position.y <= 0) this.move.y = 1f
     }
+
+
     companion object : ComponentSubTypeBuilder<Control, LayerControl>(Control, "LayerControl") {
         override fun create() = LayerControl()
     }
+
+
 }

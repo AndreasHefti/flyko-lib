@@ -36,7 +36,6 @@ class Player private constructor() : Composite(Player), Controlled {
     var playerMovement: EMovement? = null
         internal set
 
-    override val controllerReferences = ControllerReferences(Player)
     internal val playerRoomTransitionObserver = RoomTransitionObserver(this)
 
     override fun initialize() {

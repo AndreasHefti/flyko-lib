@@ -75,8 +75,6 @@ class View private constructor(): Composite(View), ViewData, Controlled {
         throw IllegalStateException("All three render targets are already set.")
     }
 
-    override val controllerReferences = ControllerReferences(View)
-
     override fun load() {
         if (shader.targetKey !== NO_COMPONENT_KEY)
             shaderIndex = Asset.resolveAssetIndex(shader.targetKey)

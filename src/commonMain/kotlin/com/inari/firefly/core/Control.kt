@@ -8,104 +8,167 @@ import kotlin.jvm.JvmField
 
 abstract class Control protected constructor() : Component(Control) {
 
+    init {
+        autoLoad = true
+        autoActivation = true
+    }
+
     @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
     var updateResolution: Float
         get() = scheduler.resolution
         set(value) { scheduler = Engine.timer.createUpdateScheduler(value) }
 
-    override fun activate() =
-        Engine.registerListener(UPDATE_EVENT_TYPE, ::internalUpdate)
-    override fun deactivate() =
-        Engine.disposeListener(UPDATE_EVENT_TYPE, ::internalUpdate)
-
-    private fun internalUpdate() {
-        if (scheduler.needsUpdate())
-            update()
-    }
-
-    abstract fun update()
+    protected abstract fun update()
 
     companion object : ComponentSystem<Control>("Control") {
         override fun allocateArray(size: Int): Array<Control?> = arrayOfNulls(size)
         override fun create() = throw UnsupportedOperationException("Control is abstract use sub type builder instead")
+
+        init {
+            Engine.registerListener(UPDATE_EVENT_TYPE, ::updateAllActiveControls)
+        }
+
+        private fun updateAllActiveControls() {
+            var i = Control.ACTIVE_COMPONENT_MAPPING.nextSetBit(0)
+            while (i >= 0) {
+                val c = Control[i]
+                if (c.scheduler.needsUpdate())
+                    c.update()
+                i = Control.ACTIVE_COMPONENT_MAPPING.nextSetBit(i + 1)
+            }
+//            val iter = Control.activeIterator()
+//            while (iter.hasNext()) {
+//                val it = iter.next()
+//                if (it.scheduler.needsUpdate())
+//                    it.update()
+//            }
+        }
     }
 }
 
-abstract class SystemControl protected constructor(
-    val controlledType: ComponentType<*>
-) : Control() {
+abstract class ComponentControl protected constructor() : Control() {
+    abstract val controlledType : ComponentType<*>
+    abstract fun register(key: ComponentKey)
+}
 
-    init {
-        autoLoad = true
+abstract class SingleComponentControl<C : Component> protected constructor(
+    final override val controlledType: ComponentType<*>
+) : ComponentControl() {
+
+    @JvmField val deleteOnControlledDelete = true
+
+    protected var controlledComponentKey = NO_COMPONENT_KEY
+
+    override fun register(key: ComponentKey) {
+        if (key.type.aspectIndex != controlledType.aspectIndex)
+            throw IllegalArgumentException("Type mismatch")
+        if (key.instanceIndex < 0)
+            throw IllegalArgumentException("Invalid Key -1")
+        controlledComponentKey = key
+        init(controlledComponentKey)
     }
 
-    protected val componentIndexes = BitSet()
+    override fun update() {
+        if (controlledComponentKey.instanceIndex < 0) return
+        val c: C = ComponentSystem[controlledComponentKey]
+        if (c.active)
+            update(c)
+        else if (c.index < 0)
+            if (deleteOnControlledDelete)
+                Control.delete(this)
+            else
+                controlledComponentKey = NO_COMPONENT_KEY
+    }
+
+    abstract fun init(key: ComponentKey)
+    abstract fun update(c: C)
+}
+
+
+abstract class ComponentsControl<C : Component> protected constructor(
+    final override val controlledType: ComponentType<*>
+) : ComponentControl() {
+
+    @Suppress("UNCHECKED_CAST")
+    protected val system: IComponentSystem<C> = ComponentSystem[controlledType] as IComponentSystem<C>
+    protected var controlledComponents = BitSet()
+
+    override fun register(key: ComponentKey) {
+        if (key.type.aspectIndex != controlledType.aspectIndex)
+            throw IllegalArgumentException("Type mismatch")
+        if (key.instanceIndex < 0)
+            throw IllegalArgumentException("Invalid Key -1")
+        controlledComponents.set(key.instanceIndex)
+    }
+
+    override fun update() {
+        var componentIndex = controlledComponents.nextSetBit(0)
+        while (componentIndex >= 0) {
+            //val componentIndex = it.nextInt()
+            if (!system.exists(componentIndex)) {
+                controlledComponents[componentIndex] = false
+                continue
+            }
+
+            val c = system[componentIndex]
+            if (c.active)
+                update(c)
+            componentIndex = controlledComponents.nextSetBit(componentIndex + 1)
+        }
+    }
+
+    abstract fun update(c: C)
+
+}
+
+abstract class EntityControl  protected constructor() : Control() {
+
+    protected val entityIndexes = BitSet()
     private val componentListener: ComponentEventListener = { key, type ->
-        if (type == ComponentEventType.ACTIVATED && matchForControl(key)) {
-            componentIndexes[key.instanceIndex] = true
+        if (type == ComponentEventType.ACTIVATED && matchForControl(Entity[key])) {
+            entityIndexes[key.instanceIndex] = true
             if (!this.active)
                 Control.activate(this)
         }
-        else if (type == ComponentEventType.DEACTIVATED && key.instanceIndex < componentIndexes.size)
-            componentIndexes[key.instanceIndex] = false
+        else if (type == ComponentEventType.DEACTIVATED && key.instanceIndex < entityIndexes.size)
+            entityIndexes[key.instanceIndex] = false
     }
 
     override fun load() {
         super.load()
-        ComponentSystem[controlledType].registerComponentListener(componentListener)
+        Entity.registerComponentListener(componentListener)
     }
 
     override fun dispose() {
         super.dispose()
-        ComponentSystem[controlledType].disposeComponentListener(componentListener)
+        Entity.disposeComponentListener(componentListener)
     }
 
     override fun update() {
-        var index = componentIndexes.nextSetBit(0)
+        var index = entityIndexes.nextSetBit(0)
         while (index >= 0) {
             update(index)
-            index = componentIndexes.nextSetBit(index + 1)
+            index = entityIndexes.nextSetBit(index + 1)
         }
+//        val it = entityIndexes.iterator()
+//        while (it.hasNext())
+//            update(it.nextInt())
     }
 
-    abstract fun matchForControl(key: ComponentKey): Boolean
-    abstract fun update(index: Int)
-
-}
-
-class ControllerReferences(val componentType: ComponentType<out Component>) {
-
-    private var indexes: BitSet? = null
-
-    fun clear() = indexes?.clear()
-    operator fun contains(index: Int) = indexes?.get(index) ?: false
-    internal fun register(key: ComponentKey) {
-        if (key === Component.NO_COMPONENT_KEY)
-            throw IllegalStateException("Illegal control key, NO_COMPONENT_KEY")
-        if (key.instanceIndex < 0)
-            throw IllegalStateException("Control key has no instance yet")
-
-        val control = Control[key] as SystemControl
-        if (componentType.aspectIndex != control.controlledType.aspectIndex)
-            throw IllegalStateException("Illegal control key, control type mismatch: ${control.controlledType.subTypeName} : ${componentType.typeName}")
-
-        if (indexes == null)
-            indexes = BitSet()
-        indexes?.set(key.instanceIndex, true)
-    }
-    internal fun dispose(index: Int) = indexes?.set(index, false)
+    abstract fun matchForControl(entity: Entity): Boolean
+    protected abstract fun update(entityId: Int)
 }
 
 interface Controlled {
 
-    val controllerReferences: ControllerReferences
+    fun earlyKeyAccess(): ComponentKey
 
-    fun withControl(name: String) = controllerReferences.register(Control[name].key)
-    fun withControl(key: ComponentKey) = controllerReferences.register(key)
-    fun <CTRL : SystemControl> withControl(builder: ComponentBuilder<CTRL>, configure: (CTRL.() -> Unit)) =
-        controllerReferences.register(builder.build(configure))
-
+    fun withControl(name: String) = (Control[name] as ComponentControl).register(earlyKeyAccess())
+    fun withControl(key: ComponentKey) = (Control[key] as ComponentControl).register(earlyKeyAccess())
+    fun <CTRL : ComponentControl> withControl(builder: ComponentBuilder<CTRL>, configure: (CTRL.() -> Unit)) {
+        val control = builder.buildAndGet(configure)
+        control.register(earlyKeyAccess())
+    }
 }
-
 
 

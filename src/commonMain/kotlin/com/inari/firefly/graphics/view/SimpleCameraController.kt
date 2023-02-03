@@ -1,7 +1,6 @@
 package com.inari.firefly.graphics.view
 
 import com.inari.firefly.core.*
-import com.inari.firefly.graphics.view.View.ViewChangeEvent.Type.*
 import com.inari.firefly.graphics.view.View.ViewChangeEvent
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4i
@@ -9,7 +8,7 @@ import kotlin.jvm.JvmField
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class SimpleCameraController private constructor() : SystemControl(View) {
+class SimpleCameraController private constructor() : SingleComponentControl<View>(View) {
 
     @JvmField var pixelPerfect = false
     @JvmField var pivot: Vector2f = Vector2f()
@@ -17,10 +16,18 @@ class SimpleCameraController private constructor() : SystemControl(View) {
     @JvmField var velocity: Float = 0.25f
 
     private val pos = Vector2f()
-    private lateinit var view: View
     private lateinit var viewChangeEvent: ViewChangeEvent
 
+    override fun init(key: ComponentKey) {
+        viewChangeEvent = View.createViewChangeEvent(
+            key.instanceIndex,
+            ViewChangeEvent.Type.ORIENTATION,
+            false)
+    }
+
     fun adjust() {
+        if (controlledComponentKey.instanceIndex < 0) return
+        val view: View = ComponentSystem[controlledComponentKey]
         if (getPos(view.zoom, view.bounds, view.worldPosition)) {
             view.worldPosition.x = floor(view.worldPosition.x + pos.x)
             view.worldPosition.y = floor(view.worldPosition.y + pos.y)
@@ -28,18 +35,7 @@ class SimpleCameraController private constructor() : SystemControl(View) {
         }
     }
 
-    override fun update(index: Int) {}
-    override fun matchForControl(key: ComponentKey): Boolean {
-        val comp = View[key]
-        if (this.index in comp.controllerReferences) {
-            this.view = View[key]
-            viewChangeEvent = View.createViewChangeEvent(view.index, ORIENTATION, pixelPerfect)
-            return true
-        }
-        return false
-    }
-
-    override fun update() {
+    override fun update(view: View) {
         if (getPos(view.zoom, view.bounds, view.worldPosition)) {
             view.worldPosition.x += pos.x * velocity
             view.worldPosition.y += pos.y * velocity
@@ -82,4 +78,6 @@ class SimpleCameraController private constructor() : SystemControl(View) {
     companion object : ComponentSubTypeBuilder<Control, SimpleCameraController>(Control, "SimpleCameraController") {
         override fun create() = SimpleCameraController()
     }
+
+
 }

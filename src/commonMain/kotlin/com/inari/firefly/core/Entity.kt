@@ -38,7 +38,6 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
     internal val components: AspectSet<EntityComponent> = AspectSet.of(ENTITY_COMPONENT_ASPECTS)
     /** The Aspects that reflects the EntityComponent types that are hold by this Entity */
     override val aspects: Aspects = components.aspects
-    override val controllerReferences = ControllerReferences(Entity)
 
     override fun activate() = components.forEach { components.get(it)?.iActivate() }
     override fun deactivate()  = components.forEach { components.get(it)?.iDeactivate() }

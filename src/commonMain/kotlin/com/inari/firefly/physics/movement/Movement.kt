@@ -14,7 +14,7 @@ import kotlin.math.min
 import kotlin.native.concurrent.ThreadLocal
 
 @ThreadLocal
-object Movement : SystemControl(Entity) {
+object Movement : EntityControl() {
 
     @JvmField val MOVEMENT_ASPECT_GROUP = IndexedAspectType("MOVEMENT_ASPECT_GROUP")
     @JvmField val UNDEFINED_MOVEMENT = MOVEMENT_ASPECT_GROUP.createAspect("UNDEFINED_MOVEMENT")
@@ -40,8 +40,8 @@ object Movement : SystemControl(Entity) {
         Control.activate(this.index)
     }
 
-    override fun matchForControl(key: ComponentKey) =
-        EMovement in Entity[key].aspects
+    override fun matchForControl(entity: Entity) =
+        EMovement in entity.aspects
 
 
     override fun update() {
