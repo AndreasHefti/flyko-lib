@@ -1,6 +1,8 @@
 package com.inari.firefly.graphics.sprite
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.BindingIndex
+import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.SpriteData
 import com.inari.firefly.physics.animation.IntFrameAnimation
@@ -70,7 +72,7 @@ class SpriteSet private constructor(): Asset(SpriteSet) {
     override fun assetIndex(at: Int) =
         spriteData[at]?.spriteIndex ?: NULL_BINDING_INDEX
 
-    fun assetIndex(name: String): Int {
+    fun assetIndex(name: String): BindingIndex {
         if (name == NO_NAME)
             return NULL_BINDING_INDEX
 

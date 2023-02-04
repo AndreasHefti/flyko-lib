@@ -1,8 +1,7 @@
 package com.inari.firefly.graphics.view
 
 import com.inari.firefly.core.*
-import com.inari.firefly.core.api.BlendMode
-import com.inari.firefly.core.api.ViewData
+import com.inari.firefly.core.api.*
 import com.inari.util.event.Event
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4f
@@ -25,15 +24,15 @@ class View private constructor(): Composite(View), ViewData, Controlled {
     override var zoom = 1.0f
     override var  fboScale = 1.0f
     @JvmField val shader = CReference(Shader)
-    override var shaderIndex = -1
+    override var shaderIndex = NULL_BINDING_INDEX
         internal set
 
     @JvmField var excludeFromEntityRendering = false
-    override var renderTargetOf1 = -1
+    override var renderTargetOf1 = NULL_BINDING_INDEX
         internal set
-    override var renderTargetOf2 = -1
+    override var renderTargetOf2 = NULL_BINDING_INDEX
         internal set
-    override var renderTargetOf3 = -1
+    override var renderTargetOf3 = NULL_BINDING_INDEX
         internal set
     override var renderToBase = true
         set(value) {
@@ -107,7 +106,7 @@ class View private constructor(): Composite(View), ViewData, Controlled {
                 Layer.dispose(it)
         }
 
-        shaderIndex = -1
+        shaderIndex = NULL_COMPONENT_INDEX
         Engine.graphics.disposeView(this.index)
         super.dispose()
     }
@@ -180,14 +179,14 @@ class View private constructor(): Composite(View), ViewData, Controlled {
             }
         }
 
-        fun notifyViewChangeEvent(viewIndex: Int, type: ViewChangeEvent.Type, pixelPerfect: Boolean) {
+        fun notifyViewChangeEvent(viewIndex: ComponentIndex, type: ViewChangeEvent.Type, pixelPerfect: Boolean) {
             viewChangeEvent.viewIndex = viewIndex
             viewChangeEvent.type = type
             viewChangeEvent.pixelPerfect = pixelPerfect
             Engine.notify(viewChangeEvent)
         }
 
-        fun createViewChangeEvent(viewIndex: Int, type: ViewChangeEvent.Type, pixelPerfect: Boolean): ViewChangeEvent {
+        fun createViewChangeEvent(viewIndex: ComponentIndex, type: ViewChangeEvent.Type, pixelPerfect: Boolean): ViewChangeEvent {
             val viewChangeEvent = ViewChangeEvent(VIEW_CHANGE_EVENT_TYPE)
             viewChangeEvent.viewIndex = viewIndex
             viewChangeEvent.type = type
@@ -200,7 +199,7 @@ class View private constructor(): Composite(View), ViewData, Controlled {
 
         enum class Type { POSITION, ORIENTATION, SIZE }
 
-        var viewIndex: Int = -1
+        var viewIndex: ComponentIndex = NULL_COMPONENT_INDEX
             internal set
         var type: Type = Type.POSITION
             internal set

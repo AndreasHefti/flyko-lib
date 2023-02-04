@@ -1,6 +1,9 @@
 package com.inari.firefly.physics.contact
 
 import com.inari.firefly.core.ComponentKey
+import com.inari.firefly.core.api.ComponentIndex
+import com.inari.firefly.core.api.EntityIndex
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.physics.contact.EContact.Companion.CONTACT_TYPE_ASPECT_GROUP
 import com.inari.firefly.physics.contact.EContact.Companion.MATERIAL_ASPECT_GROUP
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_CONTACT_TYPE
@@ -23,7 +26,7 @@ abstract class ContactScan {
         originWorldContact: SystemContactBounds,
         otherWorldContact: SystemContactBounds,
         otherContactDef: EContact,
-        otherEntityId: Int)
+        otherEntityId: EntityIndex)
 
     abstract fun clear()
 }
@@ -46,7 +49,7 @@ class ContactScans internal constructor() {
         scans[simpleScan.constraint.index] = simpleScan
     }
 
-    fun removeScan(index: Int) {
+    fun removeScan(index: ComponentIndex) {
         if (scans == DynArray.NULL_ARRAY)
             return;
         scans.remove(index)
@@ -54,7 +57,7 @@ class ContactScans internal constructor() {
             scans = DynArray.nullArray()
     }
 
-    fun hasAnyContactForConstraint(constraintId: Int): Boolean {
+    fun hasAnyContactForConstraint(constraintId: ComponentIndex): Boolean {
         return scans[constraintId]?.hasAnyContact() ?: false
     }
 
@@ -80,10 +83,10 @@ class ContactScans internal constructor() {
 
     fun getSimpleScan(constraint: ContactConstraint): SimpleContactScan? = getSimpleScan(constraint.index)
     fun getSimpleScan(constraint: ComponentKey): SimpleContactScan? = getSimpleScan(constraint.componentIndex)
-    fun getSimpleScan(constraintRef: Int): SimpleContactScan? = scans[constraintRef] as SimpleContactScan
+    fun getSimpleScan(constraintRef: ComponentIndex): SimpleContactScan? = scans[constraintRef] as SimpleContactScan
     fun getFullScan(constraint: ContactConstraint): FullContactScan? = getFullScan(constraint.index)
     fun getFullScan(constraint: ComponentKey): FullContactScan? = getFullScan(constraint.componentIndex)
-    fun getFullScan(constraintRef: Int): FullContactScan? = scans[constraintRef] as FullContactScan
+    fun getFullScan(constraintRef: ComponentIndex): FullContactScan? = scans[constraintRef] as FullContactScan
 
     fun clearContacts() {
         var i = 0
@@ -98,12 +101,12 @@ class ContactScans internal constructor() {
 }
 
 class SimpleContactScan  internal constructor(
-    @JvmField internal var constraintRef: Int
+    @JvmField internal var constraintRef: ComponentIndex
 ) : ContactScan() {
 
     override val constraint = ContactConstraint[constraintRef]
     @JvmField internal val normalizedContactBounds = Vector4i()
-    @JvmField internal val entities = DynIntArray(1, -1, 1)
+    @JvmField internal val entities = DynIntArray(1, NULL_COMPONENT_INDEX, 1)
 
     override fun hasAnyContact() = !entities.isEmpty
 
@@ -116,7 +119,7 @@ class SimpleContactScan  internal constructor(
         originWorldContact: SystemContactBounds,
         otherWorldContact: SystemContactBounds,
         otherContactDef: EContact,
-        otherEntityId: Int
+        otherEntityId: EntityIndex
     ) {
         if (!constraint.match(otherContactDef))
             return
@@ -147,7 +150,7 @@ class SimpleContactScan  internal constructor(
 }
 
 class FullContactScan internal constructor(
-    @JvmField internal var constraintRef: Int
+    @JvmField internal var constraintRef: ComponentIndex
 ) : ContactScan() {
 
     override val constraint = ContactConstraint[constraintRef]

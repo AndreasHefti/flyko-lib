@@ -2,6 +2,7 @@ package com.inari.firefly.graphics.sprite
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
+import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.SpriteRenderable
 import com.inari.util.FloatPropertyAccessor
@@ -43,18 +44,18 @@ class ESprite private constructor() : EntityComponent(ESprite), SpriteRenderable
     }
 
     object PropertyAccessor {
-        fun getInstance(index: Int) = ComponentSystem[Entity, index][ESprite]
-        fun getTintColor(index: Int) = getInstance(index).tintColor
-        fun getTintColorRed(index: Int) = getTintColor(index).getV0PropertyAccessor()
-        fun getTintColorGreen(index: Int) = getTintColor(index).getV1PropertyAccessor()
-        fun getTintColorBlue(index: Int) = getTintColor(index).getV2PropertyAccessor()
-        fun getTintColorAlpha(index: Int) = getTintColor(index).getV3PropertyAccessor()
-        fun getSpriteIndex(index: Int) = getInstance(index).getSpriteIndexPropertyAccessor()
+        fun getInstance(index: ComponentIndex) = ComponentSystem[Entity, index][ESprite]
+        fun getTintColor(index: ComponentIndex) = getInstance(index).tintColor
+        fun getTintColorRed(index: ComponentIndex) = getTintColor(index).getV0PropertyAccessor()
+        fun getTintColorGreen(index: ComponentIndex) = getTintColor(index).getV1PropertyAccessor()
+        fun getTintColorBlue(index: ComponentIndex) = getTintColor(index).getV2PropertyAccessor()
+        fun getTintColorAlpha(index: ComponentIndex) = getTintColor(index).getV3PropertyAccessor()
+        fun getSpriteIndex(index: ComponentIndex) = getInstance(index).getSpriteIndexPropertyAccessor()
         @JvmField val SPRITE_INDEX = this::getSpriteIndex
-        @JvmField val TINT_COLOR_RED: (Int) -> FloatPropertyAccessor = this::getTintColorRed
-        @JvmField val TINT_COLOR_GREEN: (Int) -> FloatPropertyAccessor = this::getTintColorGreen
-        @JvmField val TINT_COLOR_BLUE: (Int) -> FloatPropertyAccessor = this::getTintColorBlue
-        @JvmField val TINT_COLOR_ALPHA: (Int) -> FloatPropertyAccessor = this::getTintColorAlpha
+        @JvmField val TINT_COLOR_RED: (ComponentIndex) -> FloatPropertyAccessor = this::getTintColorRed
+        @JvmField val TINT_COLOR_GREEN: (ComponentIndex) -> FloatPropertyAccessor = this::getTintColorGreen
+        @JvmField val TINT_COLOR_BLUE: (ComponentIndex) -> FloatPropertyAccessor = this::getTintColorBlue
+        @JvmField val TINT_COLOR_ALPHA: (ComponentIndex) -> FloatPropertyAccessor = this::getTintColorAlpha
     }
 
     override val componentType = Companion

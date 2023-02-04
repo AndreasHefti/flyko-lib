@@ -3,6 +3,7 @@ package com.inari.firefly.game
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.EntityComponent
 import com.inari.firefly.core.EntityComponentBuilder
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.physics.contact.ContactConstraint
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.IndexedAspectType
@@ -10,8 +11,8 @@ import kotlin.jvm.JvmField
 
 class EActor private constructor() : EntityComponent(EActor) {
 
-    @JvmField internal var encounterContactConstraintRef = -1
-    @JvmField internal var hitContactConstraintRef = -1
+    @JvmField internal var encounterContactConstraintRef = NULL_COMPONENT_INDEX
+    @JvmField internal var hitContactConstraintRef = NULL_COMPONENT_INDEX
 
     var category: Aspect = UNDEFINED_ACTOR_CATEGORY
         set(value) { if (ACTOR_CATEGORY_ASPECT_GROUP.typeCheck(value)) field = value else throw IllegalArgumentException() }
@@ -32,8 +33,8 @@ class EActor private constructor() : EntityComponent(EActor) {
         type = UNDEFINED_ACTOR_TYPE
         maxHealth = -1
         health = -1
-        encounterContactConstraintRef = -1
-        hitContactConstraintRef = -1
+        encounterContactConstraintRef = NULL_COMPONENT_INDEX
+        hitContactConstraintRef = NULL_COMPONENT_INDEX
     }
 
     override val componentType = Companion

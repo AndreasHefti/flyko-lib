@@ -16,7 +16,7 @@ class Task private constructor(): Component(Task) {
     @JvmField var attributes: Dictionary = EMPTY_DICTIONARY
 
     operator fun invoke(
-        compIndex: Int = NULL_COMPONENT_INDEX,
+        compIndex: ComponentIndex = NULL_COMPONENT_INDEX,
         attributes: Dictionary = EMPTY_DICTIONARY) {
 
         if (simpleTask != VOID_CONSUMER_1) {

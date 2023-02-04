@@ -1,6 +1,7 @@
 package com.inari.firefly.game.tile
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
@@ -52,11 +53,11 @@ open class TileSet: Composite(TileSet) {
         for (i in 0 until tileTemplates.capacity) {
             val tileTemplate = tileTemplates[i] ?: continue
             Engine.graphics.disposeSprite(tileTemplate.spriteTemplate.spriteIndex)
-            tileTemplate.spriteTemplate.spriteIndex = -1
+            tileTemplate.spriteTemplate.spriteIndex = NULL_COMPONENT_INDEX
             if (tileTemplate.animationData != null) {
                 tileTemplate.animationData!!.sprites.values.forEach { aSpriteTemplate ->
                     Engine.graphics.disposeSprite(aSpriteTemplate.spriteIndex)
-                    aSpriteTemplate.spriteIndex = -1
+                    aSpriteTemplate.spriteIndex = NULL_COMPONENT_INDEX
                 }
             }
         }

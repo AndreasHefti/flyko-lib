@@ -3,6 +3,8 @@ package com.inari.firefly.physics.animation
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.Control
+import com.inari.firefly.core.api.EntityIndex
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.*
 import com.inari.util.geom.*
 import kotlin.jvm.JvmField
@@ -13,7 +15,7 @@ interface AnimatedDataBuilder<D : AnimatedData> {
 
 abstract class AnimatedData {
 
-    var entityIndex = -1
+    var entityIndex: EntityIndex = NULL_COMPONENT_INDEX
         internal set
     var active = false
         internal set

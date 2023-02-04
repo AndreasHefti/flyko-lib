@@ -1,5 +1,7 @@
 package com.inari.firefly.physics.contact
 
+import com.inari.firefly.core.api.EntityIndex
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_MATERIAL
 import com.inari.util.geom.BitMask
@@ -10,7 +12,7 @@ import kotlin.jvm.JvmField
 
 class Contact internal constructor() {
 
-    var entityId = -1
+    var entityId: EntityIndex = NULL_COMPONENT_INDEX
         internal set
     @JvmField var isCircle = false
     @JvmField val worldCircle = Vector3i()
@@ -118,7 +120,7 @@ internal object ContactsPool {
     private val CONTACTS_POOL = ArrayDeque<Contact>()
 
     internal fun disposeContact(contact: Contact) {
-        contact.entityId = -1
+        contact.entityId = NULL_COMPONENT_INDEX
         contact.intersectionMask.clearMask()
         contact.worldBounds(0, 0, 0, 0)
         contact.contactType = UNDEFINED_CONTACT_TYPE

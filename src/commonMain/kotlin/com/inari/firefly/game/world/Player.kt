@@ -1,6 +1,7 @@
 package com.inari.firefly.game.world
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.game.world.Player.PlayerEventType.*
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.movement.EMovement
@@ -119,10 +120,10 @@ class Player private constructor() : Composite(Player), Controlled {
 
     internal class RoomTransitionObserver(private val player: Player) {
 
-        @JvmField internal var roomX1 = -1
-        @JvmField internal var roomX2 = -1
-        @JvmField internal var roomY1 = -1
-        @JvmField internal var roomY2 = -1
+        @JvmField internal var roomX1 = NULL_COMPONENT_INDEX
+        @JvmField internal var roomX2 = NULL_COMPONENT_INDEX
+        @JvmField internal var roomY1 = NULL_COMPONENT_INDEX
+        @JvmField internal var roomY2 = NULL_COMPONENT_INDEX
 
         internal fun activate() {
             // set room coordinates relative to the origin of player position
@@ -143,10 +144,10 @@ class Player private constructor() : Composite(Player), Controlled {
 
         internal fun deactivate() {
             Engine.disposeListener(Engine.UPDATE_EVENT_TYPE, ::updateListener)
-            roomX1 = -1
-            roomX2 = -1
-            roomY1 = -1
-            roomY2 = -1
+            roomX1 = NULL_COMPONENT_INDEX
+            roomX2 = -NULL_COMPONENT_INDEX
+            roomY1 = NULL_COMPONENT_INDEX
+            roomY2 = NULL_COMPONENT_INDEX
         }
 
         private fun updateListener() {

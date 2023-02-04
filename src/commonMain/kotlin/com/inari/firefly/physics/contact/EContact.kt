@@ -1,6 +1,7 @@
 package com.inari.firefly.physics.contact
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.ComponentIndex
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.IndexedAspectType
 import kotlin.jvm.JvmField
@@ -40,7 +41,7 @@ class EContact private constructor() : EntityComponent(EContact) {
 
     fun removeConstraint(constraint: ContactConstraint) = removeConstraint(constraint.index)
     fun removeConstraint(name: String) = removeConstraint(ContactConstraint.getKey(name))
-    fun removeConstraint(index: Int) = removeConstraint(ContactConstraint.getKey(index))
+    fun removeConstraint(index: ComponentIndex) = removeConstraint(ContactConstraint.getKey(index))
     fun removeConstraint(key: ComponentKey) {
         if (key.type != ContactConstraint)
             throw IllegalArgumentException("Type mismatch: $key.type")

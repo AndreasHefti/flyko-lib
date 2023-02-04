@@ -1,6 +1,7 @@
 package com.inari.firefly.physics.sound
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.util.NO_NAME
 import com.inari.util.ZERO_FLOAT
 import kotlin.jvm.JvmField
@@ -32,7 +33,7 @@ abstract class Play protected constructor(subType: ComponentType<out Play>) : As
     override fun dispose() {
         if (assetIndex < 0) return
         Engine.audio.disposeSound(assetIndex, streaming)
-        assetIndex = -1
+        assetIndex = NULL_BINDING_INDEX
     }
 
     abstract fun play()

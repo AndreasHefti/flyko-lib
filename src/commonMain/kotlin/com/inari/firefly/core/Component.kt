@@ -1,5 +1,7 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.api.ComponentIndex
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.IndexedAspectType
 import com.inari.util.indexed.AbstractIndexed
@@ -43,7 +45,7 @@ interface ComponentType<C : Component> : Aspect {
 
 sealed interface ComponentId {
     val type: ComponentType<*>
-    val componentIndex: Int
+    val componentIndex: ComponentIndex
 }
 
 class ComponentKey internal constructor (
@@ -55,13 +57,13 @@ class ComponentKey internal constructor (
         // DEBUG  println("-> new ComponentKey: $name : ${type.typeName} : ${type.subTypeName}")
     }
 
-    internal constructor(index: Int, type: ComponentType<*>) : this(NO_NAME, type) {
+    internal constructor(index: ComponentIndex, type: ComponentType<*>) : this(NO_NAME, type) {
         componentIndex = index
     }
 
     var name: String = name
         private set
-    override var componentIndex: Int = -1
+    override var componentIndex: ComponentIndex = NULL_COMPONENT_INDEX
         internal set
 
     override fun toString(): String =
@@ -79,7 +81,7 @@ class ComponentKey internal constructor (
     internal fun clearKey() {
         // DEBUG  println("-> clear ComponentKey: $name $type")
         name = NO_NAME
-        componentIndex = -1
+        componentIndex = NULL_COMPONENT_INDEX
     }
 
     override fun hashCode(): Int {
@@ -241,7 +243,3 @@ open class Composite protected constructor(
             throw UnsupportedOperationException("Composite is abstract use a concrete implementation instead")
     }
 }
-
-
-
-

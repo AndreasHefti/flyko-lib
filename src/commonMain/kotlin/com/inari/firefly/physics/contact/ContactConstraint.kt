@@ -3,6 +3,7 @@ package com.inari.firefly.physics.contact
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.Component
 import com.inari.firefly.core.ComponentSystem
+import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.graphics.view.Layer
 import com.inari.util.aspect.Aspects
 import com.inari.util.geom.Vector4i
@@ -11,7 +12,7 @@ import kotlin.jvm.JvmField
 class ContactConstraint private constructor(): Component(ContactConstraint) {
 
     @JvmField var layerRef = CReference(Layer)
-    val layerIndex: Int
+    val layerIndex: ComponentIndex
         get() = layerRef.targetKey.componentIndex
     @JvmField var fullScan = false
     @JvmField var isCircle = false

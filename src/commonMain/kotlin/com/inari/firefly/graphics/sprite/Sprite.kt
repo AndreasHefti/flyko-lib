@@ -1,6 +1,7 @@
 package com.inari.firefly.graphics.sprite
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.core.api.SpriteData
 import com.inari.util.ZERO_INT
@@ -20,7 +21,7 @@ class Sprite private constructor(): Asset(Sprite), SpriteData {
 
     override fun load() {
         super.load()
-        if (assetIndex >= 0) return
+        if (assetIndex > NULL_BINDING_INDEX) return
         // ensure texture is defined
         if (!textureRef.exists)
             throw IllegalStateException("No texture defined. Define texture for sprite first")
@@ -35,7 +36,7 @@ class Sprite private constructor(): Asset(Sprite), SpriteData {
     override fun dispose() {
         if (assetIndex < 0) return
         Engine.graphics.disposeSprite(assetIndex)
-        assetIndex = -1
+        assetIndex = NULL_BINDING_INDEX
         super.dispose()
     }
 

@@ -1,6 +1,9 @@
 package com.inari.firefly.physics.contact
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.ComponentIndex
+import com.inari.firefly.core.api.EntityIndex
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.view.*
 import com.inari.firefly.physics.movement.Movement
@@ -12,9 +15,9 @@ import kotlin.jvm.JvmField
 
 abstract class ContactMap protected constructor() : Composite(ContactMap), ViewLayerAware  {
 
-    override val viewIndex: Int
+    override val viewIndex: ComponentIndex
         get() = viewRef.targetKey.componentIndex
-    override val layerIndex: Int
+    override val layerIndex: ComponentIndex
         get() = layerRef.targetKey.componentIndex
     @JvmField val viewRef = CReference(View)
     @JvmField val layerRef = CReference(Layer)
@@ -29,7 +32,7 @@ abstract class ContactMap protected constructor() : Composite(ContactMap), ViewL
         entities[entity.index] = true
     }
 
-    internal fun notifyEntityDeactivation(index: Int) {
+    internal fun notifyEntityDeactivation(index: EntityIndex) {
         entities[index] = false
     }
 
@@ -52,7 +55,7 @@ abstract class ContactMap protected constructor() : Composite(ContactMap), ViewL
      *
      * @param index the index of an entity that has just moved and changed its position in the world
      */
-    open fun update(index: Int) {
+    open fun update(index: EntityIndex) {
         if (entities[index]) {
             val entity = Entity[index]
             update(entity.index, entity[ETransform], entity[EContact])
@@ -64,7 +67,7 @@ abstract class ContactMap protected constructor() : Composite(ContactMap), ViewL
      *
      * @param entityIndex the index of an entity that has just moved and changed its position in the world
      */
-    abstract fun update(entityIndex: Int, transform: ETransform, collision: EContact)
+    abstract fun update(entityIndex: EntityIndex, transform: ETransform, collision: EContact)
 
     /** Use this to get an IntIterator of all entity id's that most possibly has a collision within the given region.
      * The efficiency of this depends on an specified implementation and can be different for different needs.
@@ -85,7 +88,7 @@ abstract class ContactMap protected constructor() : Composite(ContactMap), ViewL
             return key
         }
 
-        override fun unregisterComponent(index: Int) {
+        override fun unregisterComponent(index: ComponentIndex) {
             val c = this[index]
             VIEW_LAYER_MAPPING.delete(c, c.index)
             super.unregisterComponent(index)
@@ -151,7 +154,7 @@ abstract class ContactMap protected constructor() : Composite(ContactMap), ViewL
 
 class SimpleContactMap private constructor(): ContactMap() {
 
-    override fun update(entityIndex: Int, transform: ETransform, collision: EContact) {
+    override fun update(entityIndex: EntityIndex, transform: ETransform, collision: EContact) {
         // not needed here since this is just an ordinary list
     }
 
@@ -171,8 +174,8 @@ class SimpleContactMap private constructor(): ContactMap() {
 
     private inner class EntityIdIterator : IntIterator() {
 
-        private var index: Int = -1
-        private var exclude: Int = -1
+        private var index: EntityIndex = NULL_COMPONENT_INDEX
+        private var exclude: EntityIndex = NULL_COMPONENT_INDEX
 
         override fun hasNext(): Boolean =
             index >= 0
@@ -192,8 +195,8 @@ class SimpleContactMap private constructor(): ContactMap() {
                 ITERATOR_POOL.add(this)
         }
 
-        fun reset(exclude: Int) {
-            index = -1
+        fun reset(exclude: EntityIndex) {
+            index = NULL_COMPONENT_INDEX
             this.exclude = exclude
             findNext()
         }

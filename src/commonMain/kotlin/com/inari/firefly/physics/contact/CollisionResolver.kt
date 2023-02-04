@@ -2,6 +2,9 @@ package com.inari.firefly.physics.contact
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
+import com.inari.firefly.core.api.ComponentIndex
+import com.inari.firefly.core.api.EntityIndex
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGrid
 import com.inari.firefly.graphics.view.ETransform
@@ -35,7 +38,7 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                 entitiesWithScan[key.componentIndex] = false
         }
 
-        private fun entityMatch(index: Int) : Boolean {
+        private fun entityMatch(index: EntityIndex) : Boolean {
             val entity = Entity[index]
             return (EContact in entity.aspects &&
                 ETransform in entity.aspects &&
@@ -81,7 +84,7 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
             }
         }
 
-        fun updateContacts(entityIndex: Int) = updateContacts(Entity[entityIndex])
+        fun updateContacts(entityIndex: EntityIndex) = updateContacts(Entity[entityIndex])
         fun updateContacts(entity: Entity) {
             val contacts = entity[EContact]
             if (!contacts.contactScans.hasAnyScan)
@@ -125,7 +128,12 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
         }
 
         private val tempPos = Vector2f()
-        private fun scanTileContacts(entity: Entity, viewRef: Int, layerRef: Int, contactScan: ContactScan) {
+        private fun scanTileContacts(
+            entity: Entity,
+            viewRef: ComponentIndex,
+            layerRef: ComponentIndex,
+            contactScan: ContactScan) {
+
             val tileGrids = TileGrid[viewRef, layerRef]
             var gridIndex = tileGrids.nextSetBit(0)
             while (gridIndex >= 0) {
@@ -156,7 +164,12 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
             }
         }
 
-        private fun scanSpriteContacts(entity: Entity, viewRef: Int, layerRef: Int, contactScan: ContactScan) {
+        private fun scanSpriteContacts(
+            entity: Entity,
+            viewRef: ComponentIndex,
+            layerRef: ComponentIndex,
+            contactScan: ContactScan) {
+
             val contactMaps = ContactMap.VIEW_LAYER_MAPPING[viewRef, layerRef]
             var mapIndex = contactMaps.nextSetBit(0)
             while (mapIndex >= 0) {
@@ -220,7 +233,7 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                 transform.position
         }
 
-        private fun addTransformPos(parent: Int) {
+        private fun addTransformPos(parent: EntityIndex) {
             val parentEntity = Entity[parent]
             tempPos + parentEntity[ETransform].position
             if (EChild in parentEntity.aspects)
@@ -232,7 +245,7 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
     }
 
     class ContactEvent(override val eventType: EventType) : Event<(Int) -> Unit>() {
-        var entityId: Int = -1
+        var entityId: EntityIndex = NULL_COMPONENT_INDEX
             internal set
         override fun notify(listener: (Int) -> Unit) { listener(entityId) }
     }

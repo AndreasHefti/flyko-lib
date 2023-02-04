@@ -1,6 +1,7 @@
 package com.inari.firefly.graphics.view
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.ShaderData
 import com.inari.firefly.core.api.ShaderUpdate
 import com.inari.util.NO_NAME
@@ -38,7 +39,7 @@ class Shader private constructor(): Asset(Shader), ShaderData {
     override fun dispose() {
         if (assetIndex < 0) return
         Engine.graphics.disposeShader(assetIndex)
-        assetIndex = -1
+        assetIndex = NULL_BINDING_INDEX
     }
 
     private fun loadShaderProgram(resource: String): String {

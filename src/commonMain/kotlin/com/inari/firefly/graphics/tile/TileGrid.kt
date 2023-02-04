@@ -1,6 +1,9 @@
 package com.inari.firefly.graphics.tile
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.ComponentIndex
+import com.inari.firefly.core.api.EntityIndex
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.graphics.view.*
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.collection.*
@@ -14,9 +17,9 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
     @JvmField internal val gridDim = Vector2i(-1, -1)
     @JvmField internal val cellDim = Vector2i(-1, -1)
 
-    override val viewIndex: Int
+    override val viewIndex: ComponentIndex
         get() = viewRef.targetKey.componentIndex
-    override val layerIndex: Int
+    override val layerIndex: ComponentIndex
         get() = if(layerRef.targetKey.componentIndex >= 0) layerRef.targetKey.componentIndex else 0
     @JvmField val viewRef = CReference(View)
     @JvmField val layerRef = CReference(Layer)
@@ -42,13 +45,13 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
     @JvmField internal val normalisedWorldBounds = Vector4i(0, 0, 0, 0)
 
     override fun initialize() {
-        grid = Array(gridHeight) { IntArray(gridWidth) { -1 } }
+        grid = Array(gridHeight) { IntArray(gridWidth) { NULL_COMPONENT_INDEX } }
         normalisedWorldBounds.width = gridWidth
         normalisedWorldBounds.height = gridHeight
         super.initialize()
     }
 
-    operator fun get(pos: Vector2i): Int =
+    operator fun get(pos: Vector2i): EntityIndex =
         if (spherical) {
             val y = pos.y % gridDim.v1
             val x = pos.x % gridDim.v0
@@ -56,7 +59,7 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
         } else
             checkAndGet(pos.x, pos.y)
 
-    operator fun get(xpos: Int, ypos: Int): Int =
+    operator fun get(xpos: Int, ypos: Int): EntityIndex =
         if (spherical) {
             val y = ypos % gridDim.v1
             val x = xpos % gridDim.v0
@@ -64,25 +67,25 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
         } else
             checkAndGet(xpos, ypos)
 
-    private fun checkAndGet(xpos: Int, ypos: Int): Int =
+    private fun checkAndGet(xpos: Int, ypos: Int): EntityIndex =
         if (xpos >= 0 && xpos < gridDim.v0 && ypos >= 0 && ypos < gridDim.v1)
             grid[ypos][xpos]
-        else -1
+        else NULL_COMPONENT_INDEX
 
-    fun getTileAt(worldPos: Vector2i): Int =
+    fun getTileAt(worldPos: Vector2i): EntityIndex =
         get(
             floor((worldPos.x.toDouble() - position.x) / cellWidth).toInt(),
             floor((worldPos.y.toDouble() - position.y) / cellHeight).toInt())
 
-    fun getTileAt(xpos: Float, ypos: Float): Int =
+    fun getTileAt(xpos: Float, ypos: Float): EntityIndex =
         get(
             floor((xpos.toDouble() - position.x) / cellWidth).toInt(),
             floor((ypos.toDouble() - position.y) / cellHeight).toInt())
 
-    operator fun set(position: Vector2i, entityId: Int) =
+    operator fun set(position: Vector2i, entityId: EntityIndex) =
         set(position.x, position.y, entityId)
 
-    operator fun set(xpos: Int, ypos: Int, entityId: Int) =
+    operator fun set(xpos: Int, ypos: Int, entityId: EntityIndex) =
         if (spherical) {
             val y = ypos % gridDim.v1
             val x = xpos % gridDim.v0
@@ -90,24 +93,24 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
         } else
             grid[ypos][xpos] = entityId
 
-    fun reset(xpos: Int, ypos: Int): Int {
+    fun reset(xpos: Int, ypos: Int): EntityIndex {
         return if (spherical) {
             val y = if (ypos % gridDim.v1 < 0) gridDim.v1 + (ypos % gridDim.v1) else ypos % gridDim.v1
             val x = if (xpos % gridDim.v0 < 0) gridDim.v0 + (xpos % gridDim.v0) else xpos % gridDim.v0
             val old = grid[y][x]
-            grid[y][x] = -1
+            grid[y][x] = NULL_COMPONENT_INDEX
             old
         } else {
             val old = grid[ypos][xpos]
-            grid[ypos][xpos] = -1
+            grid[ypos][xpos] = NULL_COMPONENT_INDEX
             old
         }
     }
 
-    fun resetIfMatch(entityId: Int, position: Vector2i) =
+    fun resetIfMatch(entityId: EntityIndex, position: Vector2i) =
         resetIfMatch(entityId, position.x, position.y)
 
-    fun resetIfMatch(entityId: Int, xpos: Int, ypos: Int) {
+    fun resetIfMatch(entityId: EntityIndex, xpos: Int, ypos: Int) {
         var ixpos = xpos
         var iypos = ypos
         if (spherical) {
@@ -115,7 +118,7 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
             iypos = if (ypos % gridDim.v1 < 0) gridDim.v1 + (ypos % gridDim.v1) else ypos % gridDim.v1
         }
         if (grid[iypos][ixpos] == entityId) {
-            grid[iypos][ixpos] = -1
+            grid[iypos][ixpos] = NULL_COMPONENT_INDEX
         }
     }
 
@@ -161,7 +164,7 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
             return key
         }
 
-        override fun unregisterComponent(index: Int) {
+        override fun unregisterComponent(index: ComponentIndex) {
             val c = this[index]
             VIEW_LAYER_MAPPING.delete(c, index)
             super.unregisterComponent(index)
@@ -193,7 +196,7 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
                     ITERATOR_POOL.removeLastOrNull()!!
             }
 
-        private fun addEntity(index: Int) {
+        private fun addEntity(index: EntityIndex) {
             val entity = Entity[index]
             if (ETile !in entity.aspects)
                 return
@@ -216,7 +219,7 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
             }
         }
 
-        private fun removeEntity(index: Int) {
+        private fun removeEntity(index: EntityIndex) {
             val entity = Entity[index]
             if (ETile !in entity.aspects)
                 return
@@ -307,7 +310,7 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
         private fun findNext() {
             while (clip.y < ysize) {
                 while (clip.x < xsize) {
-                    if (tileGrid[clip] != -1) {
+                    if (tileGrid[clip] != NULL_COMPONENT_INDEX) {
                         hasNext = true
                         return
                     }

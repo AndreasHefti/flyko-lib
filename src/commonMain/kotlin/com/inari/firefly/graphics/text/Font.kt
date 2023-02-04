@@ -1,6 +1,8 @@
 package com.inari.firefly.graphics.text
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.NULL_BINDING_INDEX
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.core.api.SpriteData
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.util.collection.DynIntArray
@@ -11,7 +13,7 @@ class Font private constructor(): Asset(Font) {
 
     @JvmField val textureRef = CReference(Texture)
     @JvmField internal var dChar = -1
-    @JvmField internal val charSpriteMap = DynIntArray(256, -1)
+    @JvmField internal val charSpriteMap = DynIntArray(256, NULL_COMPONENT_INDEX)
     @JvmField var charMap: Array<CharArray> = emptyArray()
     @JvmField var charWidth = 0
     @JvmField var charHeight = 0
@@ -24,7 +26,7 @@ class Font private constructor(): Asset(Font) {
         set(value) { dChar = value.code }
 
     private val tmpSpriteData = object : SpriteData {
-        override var textureIndex = -1
+        override var textureIndex = NULL_BINDING_INDEX
         override val textureBounds = Vector4i()
         override val hFlip = false
         override val vFlip = false
@@ -60,7 +62,7 @@ class Font private constructor(): Asset(Font) {
 
         charSpriteMap.clear()
         Engine.graphics.disposeTexture(tmpSpriteData.textureIndex)
-        tmpSpriteData.textureIndex = -1
+        tmpSpriteData.textureIndex = NULL_BINDING_INDEX
     }
 
     companion object : ComponentSubTypeBuilder<Asset, Font>(Asset,"Font") {

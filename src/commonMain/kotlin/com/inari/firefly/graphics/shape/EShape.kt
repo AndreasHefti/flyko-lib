@@ -5,6 +5,7 @@ import com.inari.firefly.core.Entity
 import com.inari.firefly.core.EntityComponent
 import com.inari.firefly.core.EntityComponentBuilder
 import com.inari.firefly.core.api.BlendMode
+import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.core.api.ShapeData
 import com.inari.firefly.core.api.ShapeType
 import com.inari.util.FloatPropertyAccessor
@@ -38,16 +39,16 @@ class EShape private constructor() : EntityComponent(EShape), ShapeData {
     }
 
     object PropertyAccessor {
-        fun getInstance(index: Int) = ComponentSystem[Entity, index][EShape]
-        fun getColor(index: Int) = getInstance(index).color1
-        fun getColorRed(index: Int) = getColor(index).getV0PropertyAccessor()
-        fun getColorGreen(index: Int) = getColor(index).getV1PropertyAccessor()
-        fun getColorBlue(index: Int) = getColor(index).getV2PropertyAccessor()
-        fun getColorAlpha(index: Int) = getColor(index).getV3PropertyAccessor()
-        @JvmField val COLOR_RED: (Int) -> FloatPropertyAccessor = this::getColorRed
-        @JvmField val COLOR_GREEN: (Int) -> FloatPropertyAccessor = this::getColorGreen
-        @JvmField val COLOR_BLUE: (Int) -> FloatPropertyAccessor = this::getColorBlue
-        @JvmField val COLOR_ALPHA: (Int) -> FloatPropertyAccessor = this::getColorAlpha
+        fun getInstance(index: EntityIndex) = ComponentSystem[Entity, index][EShape]
+        fun getColor(index: EntityIndex) = getInstance(index).color1
+        fun getColorRed(index: EntityIndex) = getColor(index).getV0PropertyAccessor()
+        fun getColorGreen(index: EntityIndex) = getColor(index).getV1PropertyAccessor()
+        fun getColorBlue(index: EntityIndex) = getColor(index).getV2PropertyAccessor()
+        fun getColorAlpha(index: EntityIndex) = getColor(index).getV3PropertyAccessor()
+        @JvmField val COLOR_RED: (EntityIndex) -> FloatPropertyAccessor = this::getColorRed
+        @JvmField val COLOR_GREEN: (EntityIndex) -> FloatPropertyAccessor = this::getColorGreen
+        @JvmField val COLOR_BLUE: (EntityIndex) -> FloatPropertyAccessor = this::getColorBlue
+        @JvmField val COLOR_ALPHA: (EntityIndex) -> FloatPropertyAccessor = this::getColorAlpha
     }
 
     override val componentType = Companion

@@ -3,7 +3,6 @@ package com.inari.firefly.core
 import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.firefly.core.api.FFTimer
-import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
 
@@ -30,19 +29,12 @@ abstract class Control protected constructor() : Component(Control) {
         }
 
         private fun updateAllActiveControls() {
-            var i = Control.ACTIVE_COMPONENT_MAPPING.nextSetBit(0)
-            while (i >= 0) {
-                val c = Control[i]
-                if (c.scheduler.needsUpdate())
-                    c.update()
-                i = Control.ACTIVE_COMPONENT_MAPPING.nextSetBit(i + 1)
+            val iter = Control.activeIterator()
+            while (iter.hasNext()) {
+                val it = iter.next()
+                if (it.scheduler.needsUpdate())
+                    it.update()
             }
-//            val iter = Control.activeIterator()
-//            while (iter.hasNext()) {
-//                val it = iter.next()
-//                if (it.scheduler.needsUpdate())
-//                    it.update()
-//            }
         }
     }
 }
@@ -145,14 +137,9 @@ abstract class EntityControl  protected constructor() : Control() {
     }
 
     override fun update() {
-        var index = entityIndexes.nextSetBit(0)
-        while (index >= 0) {
-            update(index)
-            index = entityIndexes.nextSetBit(index + 1)
-        }
-//        val it = entityIndexes.iterator()
-//        while (it.hasNext())
-//            update(it.nextInt())
+        val it = entityIndexes.iterator()
+        while (it.hasNext())
+            update(it.nextInt())
     }
 
     abstract fun matchForControl(entity: Entity): Boolean

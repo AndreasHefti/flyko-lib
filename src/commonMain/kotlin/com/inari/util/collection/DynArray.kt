@@ -404,7 +404,8 @@ class DynArray<T> constructor(
         private var index = nextIndex(0)
         override fun hasNext(): Boolean = index >= 0
         override fun next(): T {
-            val result = array[index]!!
+            val result = array[index] ?:
+                throw ConcurrentModificationException("Concurrent modification detected. Next item is not existing anymore")
             index = nextIndex(index + 1)
             return result
         }

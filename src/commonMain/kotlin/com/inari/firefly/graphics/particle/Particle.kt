@@ -4,6 +4,7 @@ import com.inari.firefly.core.Asset
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.api.BlendMode
+import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.SpriteRenderable
 import com.inari.firefly.core.api.TransformDataImpl
 import com.inari.firefly.graphics.sprite.Sprite
@@ -39,7 +40,7 @@ abstract class Particle protected constructor() {
 class SpriteParticle(): Particle(), SpriteRenderable {
 
     val spriteRef = CReference(Sprite)
-    override val spriteIndex: Int
+    override val spriteIndex: ComponentIndex
         get() = Asset.resolveAssetIndex(spriteRef.targetKey)
     override val tintColor = Vector4f()
     override val blendMode = BlendMode.NORMAL_ALPHA

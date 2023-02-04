@@ -23,15 +23,10 @@ abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
         private val entityListener: ComponentEventListener = { key, type ->
             val entity = Entity[key.componentIndex]
             if (EBehavior in entity.aspects) {
-                when (type) {
-                    ComponentEventType.ACTIVATED -> entityIds[key.componentIndex] = true
-                    ComponentEventType.DEACTIVATED -> entityIds[key.componentIndex] = false
-                    else -> {}
-                }
-//                if (type == ComponentEventType.ACTIVATED)
-//                    entityIds[key.componentIndex] = true
-//                else if (type == ComponentEventType.DEACTIVATED)
-//                    entityIds[key.componentIndex] = false
+                if (type == ComponentEventType.ACTIVATED)
+                    entityIds[key.componentIndex] = true
+                else if (type == ComponentEventType.DEACTIVATED)
+                    entityIds[key.componentIndex] = false
             }
         }
 
@@ -92,26 +87,14 @@ class ParallelNode private constructor() : BranchNode() {
         var failuresCount = 0
         var i = childrenNodes.nextSetBit(0)
         loop@ while (i >= 0) {
-            when(BehaviorNode[i].tick(entityId)) {
-                RUNNING -> DO_NOTHING
-                SUCCESS -> successCount++
-                FAILED -> failuresCount++
-            }
-//            val result = BehaviorNode[i].tick(entityId)
-//            if (result == SUCCESS) successCount++
-//            else if (result == FAILED) failuresCount++
+            val result = BehaviorNode[i].tick(entityId)
+            if (result == SUCCESS) successCount++
+            else if (result == FAILED) failuresCount++
             i = childrenNodes.nextSetBit(i + 1)
         }
-
-        return when {
-            successCount >= threshold -> SUCCESS
-            failuresCount > 0 -> FAILED
-            else -> RUNNING
-        }
-
-//        return if (successCount >= threshold) SUCCESS
-//        else if (failuresCount > 0 ) FAILED
-//        else RUNNING
+        return if (successCount >= threshold) SUCCESS
+        else if (failuresCount > 0 ) FAILED
+        else RUNNING
     }
 
     companion object : ComponentSubTypeBuilder<BehaviorNode, ParallelNode>(BehaviorNode, "ParallelNode") {
@@ -124,14 +107,9 @@ class SelectionNode private constructor() : BranchNode() {
     override fun tick(entityId: Int): OperationResult {
         var i = childrenNodes.nextSetBit(0)
         loop@ while (i >= 0) {
-            when(BehaviorNode[i].tick(entityId)) {
-                RUNNING -> return RUNNING
-                SUCCESS -> return SUCCESS
-                FAILED -> DO_NOTHING
-            }
-//            val result = BehaviorNode[i].tick(entityId)
-//            if (result != FAILED)
-//                return result
+            val result = BehaviorNode[i].tick(entityId)
+            if (result != FAILED)
+                return result
             i = childrenNodes.nextSetBit(i + 1)
         }
         return FAILED
@@ -147,14 +125,9 @@ class SequenceNode private constructor() : BranchNode() {
     override fun tick(entityId: Int): OperationResult {
         var i = childrenNodes.nextSetBit(0)
         loop@ while (i >= 0) {
-            when(BehaviorNode[i].tick(entityId)) {
-                RUNNING -> return RUNNING
-                FAILED -> return FAILED
-                SUCCESS -> DO_NOTHING
-            }
-//            val result = BehaviorNode[i].tick(entityId)
-//            if (result != SUCCESS)
-//                return result
+            val result = BehaviorNode[i].tick(entityId)
+            if (result != SUCCESS)
+                return result
             i = childrenNodes.nextSetBit(i + 1)
         }
         return SUCCESS

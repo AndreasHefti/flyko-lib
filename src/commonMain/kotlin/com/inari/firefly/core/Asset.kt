@@ -1,10 +1,11 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.api.BindingIndex
 import com.inari.firefly.core.api.NULL_BINDING_INDEX
 
 abstract class Asset protected constructor(assetType: ComponentType<out Asset>) : Composite(assetType) {
 
-    var assetIndex: Int = NULL_BINDING_INDEX
+    var assetIndex: BindingIndex = NULL_BINDING_INDEX
         protected set
     open fun assetIndex(at: Int): Int = assetIndex
 

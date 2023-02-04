@@ -46,16 +46,16 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
                     val action = this[utility.runningActionIndex] as UtilityAction
                     val result = action.callAction(entity.index)
                     if (result != RUNNING)
-                        utility.runningActionIndex = -1
+                        utility.runningActionIndex = NULL_COMPONENT_INDEX
                 }
 
                 if (utility.runningActionIndex < 0) {
                     // find next action by intention
                     var maxUtilityValue = 0f
-                    var id = -1
+                    var id = NULL_COMPONENT_INDEX
                     var intIndex = utility.intentions.nextSetBit(0)
                     while (intIndex >= 0) {
-                        val uv = this[intIndex].getUtilityValue(entity.index, -1)
+                        val uv = this[intIndex].getUtilityValue(entity.index, NULL_COMPONENT_INDEX)
                         if (uv > maxUtilityValue) {
                             maxUtilityValue = uv
                             id = intIndex
@@ -65,7 +65,7 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
                     if (intIndex >= 0 && maxUtilityValue >= utility.intentionThreshold) {
                         // get best fitting action for the previous found intention
                         val intention = this[id]
-                        id = -1
+                        id = NULL_COMPONENT_INDEX
                         maxUtilityValue = 0f
                         intIndex = utility.actions.nextSetBit(0)
                         while (intIndex >= 0) {

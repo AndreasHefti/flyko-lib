@@ -1,6 +1,7 @@
 package com.inari.firefly.game.tile
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGrid
 import com.inari.firefly.graphics.view.ETransform
@@ -75,7 +76,7 @@ open class TileMap : Composite(TileMap) {
     fun getTileEntityIndex(layerName: String, code: Int): Int =
         getTileEntityIndex(Layer[layerName].index, code)
     fun getTileEntityIndex(layerId: Int, code: Int): Int =
-        tileMapLayerData[layerId]?.entityCodeMapping?.get(code) ?: -1
+        tileMapLayerData[layerId]?.entityCodeMapping?.get(code) ?: NULL_COMPONENT_INDEX
 
     private fun activateTileSetForLayer(layerData: TileMapLayerData) {
 

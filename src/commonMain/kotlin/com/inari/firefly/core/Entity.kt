@@ -1,9 +1,11 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.aspect.*
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynFloatArray
+import com.inari.util.collection.EMPTY_DICTIONARY
 import com.inari.util.indexed.AbstractIndexed
 import kotlin.jvm.JvmField
 
@@ -22,7 +24,7 @@ abstract class EntityComponent protected constructor(
     entityComponentType: EntityComponentType<*>
 ) : AbstractIndexed(entityComponentType.typeName) {
 
-    var entityIndex: Int = NULL_COMPONENT_INDEX
+    var entityIndex: EntityIndex = NULL_COMPONENT_INDEX
         internal set
 
     internal fun iActivate() = activate()
@@ -170,14 +172,10 @@ class EMultiplier private constructor() : EntityComponent(EMultiplier) {
 
 class EAttribute private constructor() : EntityComponent(EAttribute) {
 
-    @JvmField internal val attributes = mutableMapOf<String, String>()
-
-    fun setAttribute(name: String, value: String) { attributes[name] = value }
-    fun getAttribute(name: String): String? = attributes[name]
-    fun getAttributeFloat(name: String): Float? = attributes[name]?.toFloat()
+    @JvmField internal var attributes = EMPTY_DICTIONARY
 
     override fun reset() {
-        attributes.clear()
+            attributes = EMPTY_DICTIONARY
     }
 
     override val componentType = Companion

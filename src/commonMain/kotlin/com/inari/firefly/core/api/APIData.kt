@@ -9,17 +9,17 @@ import kotlin.jvm.JvmField
 const val NULL_COMPONENT_INDEX = -1
 const val NULL_BINDING_INDEX = -1
 
-//typealias ComponentIndex = Int
-//typealias EntityIndex = Int
-//typealias BindingIndex = Int
+typealias ComponentIndex = Int
+typealias EntityIndex = Int
+typealias BindingIndex = Int
 
 enum class OperationResult {
     SUCCESS,
     RUNNING,
     FAILED
 }
-typealias Action = (Int) -> OperationResult
-typealias ActionCallback = (Int, OperationResult) -> Unit
+typealias Action = (ComponentIndex) -> OperationResult
+typealias ActionCallback = (ComponentIndex, OperationResult) -> Unit
 operator fun ActionCallback.invoke() = this(NULL_COMPONENT_INDEX, OperationResult.SUCCESS)
 operator fun ActionCallback.invoke(result: OperationResult) = this(NULL_COMPONENT_INDEX, result)
 @JvmField val SUCCESS_ACTION: Action = { _ -> OperationResult.SUCCESS }
@@ -28,17 +28,17 @@ operator fun ActionCallback.invoke(result: OperationResult) = this(NULL_COMPONEN
 @JvmField val NO_ACTION: Action = FAILED_ACTION
 
 
-typealias NormalOperation = (Int, Int, Int) -> Float
+typealias NormalOperation = (ComponentIndex, ComponentIndex, ComponentIndex) -> Float
 @JvmField val ZERO_OP: NormalOperation = { _, _, _ -> 0f }
 @JvmField val ONE_OP : NormalOperation = { _, _, _ -> 1f }
 
-typealias SimpleTask = (Int) -> Unit
-typealias TaskOperation = (Int, Dictionary, TaskCallback) -> Unit
-typealias TaskCallback = (Int, Dictionary, OperationResult) -> Unit
+typealias SimpleTask = (ComponentIndex) -> Unit
+typealias TaskOperation = (ComponentIndex, Dictionary, TaskCallback) -> Unit
+typealias TaskCallback = (ComponentIndex, Dictionary, OperationResult) -> Unit
 @JvmField val VOID_TASK_OPERATION: TaskOperation = VOID_CONSUMER_3
 @JvmField val VOID_TASK_CALLBACK: TaskCallback = VOID_CONSUMER_3
 
-typealias MoveCallback = (Int, Float, ButtonType) -> Unit
+typealias MoveCallback = (ComponentIndex, Float, ButtonType) -> Unit
 @JvmField val VOID_MOVE_CALLBACK: MoveCallback = VOID_CONSUMER_3
 
 enum class BlendMode constructor(val source: Int, val dest: Int) {
@@ -94,13 +94,13 @@ interface ViewData {
     val clearBeforeStartRendering: Boolean
     val tintColor: Vector4f
     val blendMode: BlendMode
-    val shaderIndex: Int
+    val shaderIndex: BindingIndex
     val zoom: Float
     val fboScale: Float
-    val index: Int
-    val renderTargetOf1: Int
-    val renderTargetOf2: Int
-    val renderTargetOf3: Int
+    val index: BindingIndex
+    val renderTargetOf1: BindingIndex
+    val renderTargetOf2: BindingIndex
+    val renderTargetOf3: BindingIndex
     val isRenderTarget: Boolean
         get() = renderTargetOf1 >= 0 || renderTargetOf2 >= 0 || renderTargetOf3 >= 0
     val renderToBase: Boolean
@@ -151,20 +151,20 @@ interface TextureData {
 }
 
 interface SpriteData {
-    val textureIndex: Int
+    val textureIndex: BindingIndex
     val textureBounds: Vector4i
     val hFlip: Boolean
     val vFlip: Boolean
 }
 
 interface SpriteRenderable {
-    val spriteIndex: Int
+    val spriteIndex: BindingIndex
     val tintColor: Vector4f
     val blendMode: BlendMode
 }
 
 class SpriteRenderableImpl : SpriteRenderable {
-    override var spriteIndex: Int = NULL_BINDING_INDEX
+    override var spriteIndex: BindingIndex = NULL_BINDING_INDEX
     override val tintColor = Vector4f(1f, 1f, 1f, 1f)
     override var blendMode = BlendMode.NORMAL_ALPHA
 }
@@ -198,7 +198,7 @@ interface FrameBufferData {
     val clearColor: Vector4f
     val tintColor: Vector4f
     val blendMode: BlendMode
-    val shaderRef: Int
+    val shaderRef: BindingIndex
     val zoom: Float
     val fboScale: Float
 }

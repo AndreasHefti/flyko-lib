@@ -3,6 +3,7 @@ package com.inari.firefly.ai.utility
 import com.inari.firefly.core.*
 import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.api.FFTimer
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
 
@@ -12,7 +13,7 @@ class EUtility  private constructor() : EntityComponent(EUtility) {
     @JvmField internal var intentions = BitSet()
     @JvmField internal val actions = BitSet()
 
-    @JvmField internal var runningActionIndex = -1
+    @JvmField internal var runningActionIndex = NULL_COMPONENT_INDEX
 
     @JvmField var intentionThreshold = .5f
     @JvmField var actionThreshold = .5f
@@ -47,7 +48,7 @@ class EUtility  private constructor() : EntityComponent(EUtility) {
     }
 
     override fun reset() {
-        runningActionIndex = -1
+        runningActionIndex = NULL_COMPONENT_INDEX
         intentions.clear()
         actions.clear()
     }

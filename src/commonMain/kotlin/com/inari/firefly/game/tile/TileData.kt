@@ -3,6 +3,7 @@ package com.inari.firefly.game.tile
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.api.BlendMode
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.game.tile.TileUtils.TILE_ASPECT_GROUP
 import com.inari.firefly.graphics.sprite.SpriteFrame
 import com.inari.firefly.graphics.sprite.SpriteTemplate
@@ -97,7 +98,7 @@ class TileMapGridData {
 
     @JvmField internal val tileSetMapping = DynArray.of<TileSetMapping>(2, 5)
 
-    @JvmField internal var tileGridIndex = -1
+    @JvmField internal var tileGridIndex = NULL_COMPONENT_INDEX
     @JvmField var renderer: EntityRenderer? = null
     @JvmField var mapWidth = 0
     @JvmField var mapHeight = 0
@@ -121,7 +122,7 @@ class TileMapGridData {
 class TileMapLayerData {
 
     @JvmField internal val tileGridData = DynArray.of<TileMapGridData>(2, 5)
-    @JvmField internal val entityCodeMapping = DynIntArray(50, -1, 100)
+    @JvmField internal val entityCodeMapping = DynIntArray(50, NULL_COMPONENT_INDEX, 100)
 
     @JvmField var parallaxFactorX = ZERO_FLOAT
     @JvmField var parallaxFactorY = ZERO_FLOAT

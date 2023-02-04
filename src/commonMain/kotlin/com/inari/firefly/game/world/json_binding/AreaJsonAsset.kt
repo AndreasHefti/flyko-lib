@@ -1,6 +1,8 @@
 package com.inari.firefly.game.world.json_binding
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.NULL_BINDING_INDEX
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.game.world.Area
 import com.inari.firefly.game.world.Room
 import com.inari.util.NO_NAME
@@ -110,7 +112,7 @@ class AreaJsonAsset private constructor() : Asset(AreaJsonAsset) {
         areaData = null
     }
 
-    override fun assetIndex(at: Int) = -1
+    override fun assetIndex(at: Int) = NULL_BINDING_INDEX
 
     companion object : ComponentSubTypeBuilder<Asset, AreaJsonAsset>(Asset,"AreaJsonAsset") {
         override fun create() = AreaJsonAsset()
