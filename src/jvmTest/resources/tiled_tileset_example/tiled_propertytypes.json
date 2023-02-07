@@ -60,7 +60,7 @@
             },
             {
                 "name": "tint_color",
-                "type": "color",
+                "type": "string",
                 "value": ""
             }
         ],
@@ -266,17 +266,30 @@
         ]
     },
     {
-        "id": 17,
-        "name": "tile_aspect",
-        "storageType": "string",
-        "type": "enum",
-        "values": [
-            "tile_aspect_1",
-            "tile_aspect_2",
-            "tile_aspect_3",
-            "..."
+        "color": "#ffa0a0a4",
+        "id": 25,
+        "members": [
+            {
+                "name": "area",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "room",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "world",
+                "type": "string",
+                "value": ""
+            }
         ],
-        "valuesAsFlags": true
+        "name": "roomKey",
+        "type": "class",
+        "useAs": [
+            "property"
+        ]
     },
     {
         "color": "#ffa0a0a4",
@@ -329,11 +342,64 @@
             "property",
             "map",
             "layer",
-            "object",
-            "tile",
-            "tileset",
-            "wangcolor",
-            "wangset"
+            "object"
         ]
+    },
+    {
+        "id": 17,
+        "name": "tile_aspect",
+        "storageType": "string",
+        "type": "enum",
+        "values": [
+            "tile_aspect_1",
+            "tile_aspect_2",
+            "tile_aspect_3",
+            "..."
+        ],
+        "valuesAsFlags": true
+    },
+    {
+        "color": "#ffa0a0a4",
+        "id": 23,
+        "members": [
+            {
+                "name": "applyTask",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "to",
+                "propertyType": "roomKey",
+                "type": "class",
+                "value": {
+                    "area": "this",
+                    "world": "this"
+                }
+            },
+            {
+                "name": "triggerOn",
+                "propertyType": "triggerOn",
+                "type": "string",
+                "value": "CONTACT"
+            }
+        ],
+        "name": "transition",
+        "type": "class",
+        "useAs": [
+            "property",
+            "object"
+        ]
+    },
+    {
+        "id": 24,
+        "name": "triggerOn",
+        "storageType": "string",
+        "type": "enum",
+        "values": [
+            "CONTACT",
+            "ACTION",
+            "CONDITION"
+        ],
+        "valuesAsFlags": true
     }
 ]

@@ -77,6 +77,7 @@ class DesktopApp(
             initializer(this)
 
             if (debug) {
+                ComponentSystem.dumpInfo()
                 val runtime = Runtime.getRuntime()
                 val usedMemInMB = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L
                 val maxHeapSizeInMB = runtime.maxMemory() / 1048576L
@@ -86,7 +87,6 @@ class DesktopApp(
                 println("maxHeapSizeInMB: : $maxHeapSizeInMB")
                 println("availHeapSizeInMB: : $availHeapSizeInMB")
                 println("*************************************************************************")
-                ComponentSystem.dumpInfo()
             }
         }
     }

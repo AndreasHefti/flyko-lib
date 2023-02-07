@@ -13,7 +13,7 @@ import com.inari.util.collection.BitSet
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
-abstract class ContactMap protected constructor() : Composite(ContactMap), ViewLayerAware  {
+abstract class ContactMap protected constructor() : Component(ContactMap), ViewLayerAware  {
 
     override val viewIndex: ComponentIndex
         get() = viewRef.targetKey.componentIndex

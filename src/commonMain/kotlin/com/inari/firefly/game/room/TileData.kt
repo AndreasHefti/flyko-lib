@@ -1,10 +1,10 @@
-package com.inari.firefly.game.tile
+package com.inari.firefly.game.room
 
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
-import com.inari.firefly.game.tile.TileUtils.TILE_ASPECT_GROUP
+import com.inari.firefly.game.room.TileUtils.TILE_ASPECT_GROUP
 import com.inari.firefly.graphics.sprite.SpriteFrame
 import com.inari.firefly.graphics.sprite.SpriteTemplate
 import com.inari.firefly.graphics.view.EntityRenderer

@@ -3,7 +3,7 @@ package com.inari.firefly.core
 import com.inari.firefly.core.api.BindingIndex
 import com.inari.firefly.core.api.NULL_BINDING_INDEX
 
-abstract class Asset protected constructor(assetType: ComponentType<out Asset>) : Composite(assetType) {
+abstract class Asset protected constructor(assetType: ComponentType<out Asset>) : Component(assetType) {
 
     var assetIndex: BindingIndex = NULL_BINDING_INDEX
         protected set
@@ -11,7 +11,7 @@ abstract class Asset protected constructor(assetType: ComponentType<out Asset>) 
 
     companion object : ComponentSystem<Asset>("Asset") {
         override fun allocateArray(size: Int): Array<Asset?> = arrayOfNulls(size)
-        override fun create() = throw UnsupportedOperationException("Trigger is abstract use sub type builder instead")
+        override fun create() = throw UnsupportedOperationException("Asset is abstract use sub type builder instead")
 
         fun resolveAssetIndex(key: ComponentKey, preload: Boolean = true, setIndex: Int = 0): Int {
             if (key == NO_COMPONENT_KEY)

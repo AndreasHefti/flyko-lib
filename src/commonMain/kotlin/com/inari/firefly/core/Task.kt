@@ -6,7 +6,7 @@ import com.inari.util.collection.Dictionary
 import com.inari.util.collection.EMPTY_DICTIONARY
 import kotlin.jvm.JvmField
 
-class Task private constructor(): Component(Task) {
+open class Task protected constructor(): Component(Task) {
 
     @JvmField var deleteAfterRun: Boolean = false
     @JvmField var noneBlocking: Boolean = false

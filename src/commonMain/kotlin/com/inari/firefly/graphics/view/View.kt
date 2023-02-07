@@ -9,7 +9,7 @@ import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 import kotlin.math.roundToInt
 
-class View private constructor(): Composite(View), ViewData, Controlled {
+class View private constructor(): Component(View), ViewData, Controlled {
 
     override var isBase = false
         internal set
@@ -73,8 +73,6 @@ class View private constructor(): Composite(View), ViewData, Controlled {
         View.delete(c)
         throw IllegalStateException("All three render targets are already set.")
     }
-
-    //override val controllerReferences = ControllerReferences(View)
 
     override fun load() {
         if (shader.targetKey !== NO_COMPONENT_KEY)
@@ -208,5 +206,4 @@ class View private constructor(): Composite(View), ViewData, Controlled {
 
         override fun notify(listener: (ViewChangeEvent) -> Unit) = listener(this)
     }
-
 }

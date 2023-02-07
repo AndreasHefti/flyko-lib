@@ -1,6 +1,7 @@
 package com.inari.firefly.core
 
 import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
+import com.inari.firefly.core.ComponentGroups.Companion.COMPONENT_GROUP_ASPECT
 import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.NO_NAME
@@ -50,26 +51,36 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
     fun load(name: String) = load(getKey(name).componentIndex)
     fun load(key: ComponentKey) = load(key.componentIndex)
     fun load(index: ComponentIndex)
+    fun loadGroup(group: String) = loadGroup(COMPONENT_GROUP_ASPECT[group]!!)
+    fun loadGroup(group: Aspect)
 
     fun activate(c: C) = activate(c.index)
     fun activate(name: String) = activate(getKey(name).componentIndex)
     fun activate(key: ComponentKey) = activate(key.componentIndex)
     fun activate(index: ComponentIndex)
+    fun activateGroup(group: String) = activateGroup(COMPONENT_GROUP_ASPECT[group]!!)
+    fun activateGroup(group: Aspect)
 
     fun deactivate(c: C) = deactivate(c.index)
     fun deactivate(name: String) = deactivate(getKey(name).componentIndex)
     fun deactivate(key: ComponentKey) = deactivate(key.componentIndex)
     fun deactivate(index: ComponentIndex)
+    fun deactivateGroup(group: String) = deactivateGroup(COMPONENT_GROUP_ASPECT[group]!!)
+    fun deactivateGroup(group: Aspect)
 
     fun dispose(c: C) = dispose(c.index)
     fun dispose(name: String) = dispose(getKey(name).componentIndex)
     fun dispose(key: ComponentKey) = dispose(key.componentIndex)
     fun dispose(index: Int)
+    fun disposeGroup(group: String) = disposeGroup(COMPONENT_GROUP_ASPECT[group]!!)
+    fun disposeGroup(group: Aspect)
 
     fun delete(c: C) = delete(c.index)
     fun delete(name: String) = delete(getKey(name).componentIndex)
     fun delete(key: ComponentKey) = delete(checkKey(key).componentIndex)
     fun delete(index: ComponentIndex)
+    fun deleteGroup(group: String) = deleteGroup(COMPONENT_GROUP_ASPECT[group]!!)
+    fun deleteGroup(group: Aspect)
 
     val componentEventType: Event.EventType
     fun registerComponentListener(listener: ComponentEventListener) =
@@ -251,13 +262,11 @@ abstract class ComponentSystem<C : Component>(
 
     fun registerAsSingleton(component: C, static: Boolean = false) {
         val namePrefix = component::class.simpleName!! + SINGLETON_MARKER
-        COMPONENT_MAPPING.forEach {
-            if (it.name != NO_NAME && it.name.startsWith(namePrefix))
-                throw IllegalStateException("$namePrefix is singleton and already exists")
-        }
+        val name = namePrefix + if (static) STATIC_COMPONENT_MARKER else ""
+        if (COMPONENT_KEY_MAPPING.containsKey(name))
+            throw IllegalStateException("$namePrefix is singleton and already exists")
 
         component.onStateChange = true
-        val name = namePrefix + if (static) STATIC_COMPONENT_MARKER else ""
         component.name = name
         registerComponent(component)
         component.iInitialize()
@@ -305,7 +314,15 @@ abstract class ComponentSystem<C : Component>(
         send(comp.key, ComponentEventType.LOADED)
 
         // DEBUG  println("<-- load: ${aspectName}:${index}")
+    }
 
+    override fun loadGroup(group: Aspect) {
+        val iter = COMPONENT_MAPPING.iterator()
+        while (iter.hasNext()) {
+            val c = iter.next()
+            if (group in c.groups)
+                load(c)
+        }
     }
 
     override fun activate(index: ComponentIndex) {
@@ -330,6 +347,15 @@ abstract class ComponentSystem<C : Component>(
         // DEBUG  println("<-- activate: ${aspectName}:${index}")
     }
 
+    override fun activateGroup(group: Aspect) {
+        val iter = COMPONENT_MAPPING.iterator()
+        while (iter.hasNext()) {
+            val c = iter.next()
+            if (group in c.groups)
+                activate(c)
+        }
+    }
+
     override fun deactivate(index: ComponentIndex) {
 
         // DEBUG  println("--> deactivate: ${aspectName}:${index}")
@@ -347,6 +373,15 @@ abstract class ComponentSystem<C : Component>(
         send(comp.key, ComponentEventType.DEACTIVATED)
 
         // DEBUG  println("<-- deactivate: ${aspectName}:${index}")
+    }
+
+    override fun deactivateGroup(group: Aspect) {
+        val iter = COMPONENT_MAPPING.iterator()
+        while (iter.hasNext()) {
+            val c = iter.next()
+            if (group in c.groups)
+                deactivate(c)
+        }
     }
 
     override fun dispose(index: ComponentIndex) {
@@ -370,6 +405,15 @@ abstract class ComponentSystem<C : Component>(
         // DEBUG  println("<-- dispose: ${aspectName}:${index}")
     }
 
+    override fun disposeGroup(group: Aspect) {
+        val iter = COMPONENT_MAPPING.iterator()
+        while (iter.hasNext()) {
+            val c = iter.next()
+            if (group in c.groups)
+                dispose(c)
+        }
+    }
+
     override fun delete(index: ComponentIndex) {
 
         // DEBUG  println("--> delete: ${aspectName}:${index}")
@@ -390,6 +434,15 @@ abstract class ComponentSystem<C : Component>(
         comp.iDisposeIndex()
 
         // DEBUG  println("<-- delete: ${aspectName}:${index}")
+    }
+
+    override fun deleteGroup(group: Aspect) {
+        val index = COMPONENT_MAPPING.nextIndex(0)
+        while (index > NULL_COMPONENT_INDEX) {
+            val c = COMPONENT_MAPPING[index]!!
+            if (group in c.groups)
+                dispose(c)
+        }
     }
 
     fun checkIndex(index: ComponentIndex): Boolean  {
@@ -475,6 +528,41 @@ abstract class ComponentSystem<C : Component>(
         fun deactivate(key: ComponentKey) = this[key.type].deactivate(key)
         fun dispose(key: ComponentKey) = this[key.type].dispose(key)
         fun delete(key: ComponentKey) = this[key.type].delete(key)
+
+        fun loadAllOfGroup(group: String) = loadAllOfGroup(COMPONENT_GROUP_ASPECT[group]!!)
+        fun loadAllOfGroup(group: Aspect) {
+            val iter = COMPONENT_SYSTEM_MAPPING.values.iterator()
+            while (iter.hasNext())
+                iter.next().loadGroup(group)
+        }
+
+        fun activateAllOfGroup(group: String) = activateAllOfGroup(COMPONENT_GROUP_ASPECT[group]!!)
+        fun activateAllOfGroup(group: Aspect) {
+            val iter = COMPONENT_SYSTEM_MAPPING.values.iterator()
+            while (iter.hasNext())
+                iter.next().activateGroup(group)
+        }
+
+        fun deactivateAllOfGroup(group: String) = deactivateAllOfGroup(COMPONENT_GROUP_ASPECT[group]!!)
+        fun deactivateAllOfGroup(group: Aspect) {
+            val iter = COMPONENT_SYSTEM_MAPPING.values.iterator()
+            while (iter.hasNext())
+                iter.next().deactivateGroup(group)
+        }
+
+        fun disposeAllOfGroup(group: String) = disposeAllOfGroup(COMPONENT_GROUP_ASPECT[group]!!)
+        fun disposeAllOfGroup(group: Aspect) {
+            val iter = COMPONENT_SYSTEM_MAPPING.values.iterator()
+            while (iter.hasNext())
+                iter.next().disposeGroup(group)
+        }
+
+        fun deleteAllOfGroup(group: String) = deleteAllOfGroup(COMPONENT_GROUP_ASPECT[group]!!)
+        fun deleteAllOfGroup(group: Aspect) {
+            val iter = COMPONENT_SYSTEM_MAPPING.values.iterator()
+            while (iter.hasNext())
+                iter.next().deleteGroup(group)
+        }
 
         fun clearSystems() {
             val iter = HashMap(COMPONENT_SYSTEM_MAPPING).values.iterator()
@@ -562,10 +650,15 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
     override fun get(index: ComponentIndex): CC = system[index] as CC
     override fun exists(index: ComponentIndex) = system.exists(index)
     override fun load(index: ComponentIndex) = system.load(index)
+    override fun loadGroup(group: Aspect) = system.loadGroup(group)
     override fun activate(index: ComponentIndex) = system.activate(index)
+    override fun activateGroup(group: Aspect) = system.activateGroup(group)
     override fun deactivate(index: ComponentIndex) = system.deactivate(index)
+    override fun deactivateGroup(group: Aspect) = system.deactivateGroup(group)
     override fun dispose(index: ComponentIndex) = system.dispose(index)
+    override fun disposeGroup(group: Aspect) = system.disposeGroup(group)
     override fun delete(index: ComponentIndex) = system.delete(index)
+    override fun deleteGroup(group: Aspect) = system.deleteGroup(group)
     override fun build(configure: CC.() -> Unit): ComponentKey {
         val comp: CC = create()
         comp.also(configure)

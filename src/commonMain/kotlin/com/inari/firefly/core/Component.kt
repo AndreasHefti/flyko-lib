@@ -1,6 +1,7 @@
 package com.inari.firefly.core
 
 import com.inari.firefly.core.api.ComponentIndex
+import com.inari.firefly.core.ComponentEventType.*
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.IndexedAspectType
@@ -8,6 +9,8 @@ import com.inari.util.indexed.AbstractIndexed
 import kotlin.jvm.JvmField
 import com.inari.util.NO_NAME
 import com.inari.util.Named
+import com.inari.util.aspect.Aspects
+import com.inari.util.collection.DynIntArray
 import com.inari.util.collection.EMPTY_DICTIONARY
 
 /** Defines the component based builder DSL marker */
@@ -35,7 +38,9 @@ enum class LifecycleTaskType {
     BEFORE_DISPOSE,
     AFTER_DISPOSE,
     BEFORE_DELETE,
-    AFTER_DELETE
+    AFTER_DELETE,
+    PAUSE,
+    RESUME
 }
 
 interface ComponentType<C : Component> : Aspect {
@@ -97,6 +102,34 @@ sealed interface ComponentBuilder<C : Component> {
     fun buildAndGet(configure: C.() -> Unit): C
 }
 
+class ComponentGroups {
+
+    private var groups: Aspects? = null
+    operator fun plus(name: String) {
+        if (groups == null) groups = COMPONENT_GROUP_ASPECT.createAspects()
+        groups!! + COMPONENT_GROUP_ASPECT.createAspect(name)
+    }
+    operator fun minus(name: String) =
+        groups?.minus(COMPONENT_GROUP_ASPECT[name])
+
+    operator fun contains(name: String): Boolean =
+        groups?.contains(COMPONENT_GROUP_ASPECT[name]) ?: false
+
+    operator fun plus(aspect: Aspect) {
+        if (groups == null) groups = COMPONENT_GROUP_ASPECT.createAspects()
+        groups!! + aspect
+    }
+    operator fun minus(aspect: Aspect) =
+        groups?.minus(aspect)
+
+    operator fun contains(aspect: Aspect): Boolean =
+        groups?.contains(aspect) ?: false
+
+    companion object {
+        @JvmField val COMPONENT_GROUP_ASPECT = IndexedAspectType("COMPONENT_GROUP_ASPECT")
+    }
+}
+
 @ComponentDSL
 abstract class Component protected constructor(
     val componentType: ComponentType<out Component>
@@ -128,6 +161,7 @@ abstract class Component protected constructor(
             field = value
         }
 
+    @JvmField val groups = ComponentGroups()
     @JvmField internal var onStateChange = false
     var initialized: Boolean = false
         internal set
@@ -181,19 +215,19 @@ open class Composite protected constructor(
     subType: ComponentType<out Composite>
 ) : Component(subType) {
 
-    private val tasks: Array<ComponentKey?> = arrayOfNulls(LifecycleTaskType.values().size)
+    private val taskRefs: Array<DynIntArray?> = arrayOfNulls(LifecycleTaskType.values().size)
 
     @JvmField var attributes = EMPTY_DICTIONARY
 
     fun withTask(apply: LifecycleTaskType, taskKey: ComponentKey) {
         if (taskKey.type != Task) throw IllegalArgumentException("Key mismatch taskKey is not of expected type Task")
-        tasks[apply.ordinal] = taskKey
+        getTaskRefs(apply) + taskKey.componentIndex
     }
-    fun withTask(apply: LifecycleTaskType, name: String) {
-        tasks[apply.ordinal] = Task.getOrCreateKey(name)
-    }
+    fun withTask(apply: LifecycleTaskType, name: String) =
+        getTaskRefs(apply) + Task.getKey(name).componentIndex
+
     fun withTask(apply: LifecycleTaskType, configure: (Task.() -> Unit)) {
-        tasks[apply.ordinal] = Task(configure)
+        getTaskRefs(apply) + Task(configure).componentIndex
     }
 
     override fun iInitialize() {
@@ -231,15 +265,35 @@ open class Composite protected constructor(
         runTaskIfDefined(LifecycleTaskType.AFTER_DELETE)
     }
 
+    private fun removeTaskRef(index: ComponentIndex) {
+        taskRefs.forEach {
+            if (it != null && index in it)
+                it.remove(index)
+        }
+    }
+
+    private fun getTaskRefs(apply: LifecycleTaskType): DynIntArray {
+        if (taskRefs[apply.ordinal] == null)
+            taskRefs[apply.ordinal] = DynIntArray(1, NULL_COMPONENT_INDEX, 2)
+        return taskRefs[apply.ordinal]!!
+    }
+
     private fun runTaskIfDefined(type: LifecycleTaskType) =
-        tasks[type.ordinal]?.apply {
-            if (this.componentIndex >= 0)
-                Task[this](this@Composite.index, attributes)
+        taskRefs[type.ordinal]?.iterator()?.apply {
+            while (this.hasNext())
+                Task[this.next()](this@Composite.index, attributes)
         }
 
     companion object : ComponentSystem<Composite>("Composite") {
         override fun allocateArray(size: Int): Array<Composite?> = arrayOfNulls(size)
         override fun create(): Composite =
             throw UnsupportedOperationException("Composite is abstract use a concrete implementation instead")
+
+        init {
+            Task.registerComponentListener { key, type ->
+                if (type == DISPOSED || type == DELETED)
+                    Composite.COMPONENT_MAPPING.forEach { it.removeTaskRef(key.componentIndex) }
+            }
+        }
     }
 }

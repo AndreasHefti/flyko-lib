@@ -11,7 +11,7 @@ import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.View
 
 fun main() {
-    DesktopApp("TileGridTest", 800, 600) {
+    DesktopApp("TileGridTest", 800, 600, debug = true) {
         Texture.build {
             name = "logoTexture"
             resourceName = "firefly/logo.png"

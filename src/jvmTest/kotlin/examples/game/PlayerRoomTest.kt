@@ -2,7 +2,6 @@ package examples.game
 
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.core.Task
-import com.inari.firefly.game.tile.tiled_binding.TiledTileMap
 import com.inari.firefly.graphics.FFInfoSystem
 import com.inari.firefly.graphics.FrameRateInfo
 import com.inari.firefly.graphics.view.View
@@ -31,12 +30,7 @@ fun main() {
             withControl(TestCameraController) {}
         }
 
-        TiledTileMap {
-            name = "testmap1"
-            viewRef("testView")
-            tilesetAssetDirectory = "tiled_tileset_example/"
-            resourceName = "tiled_map_example/example_map1.json"
-        }
+
 
         Task {
             name = "beforeTileMapLoad"
@@ -52,6 +46,5 @@ fun main() {
             }
         }
 
-        TiledTileMap.activate("testmap1")
     }
 }

@@ -2,7 +2,7 @@ package examples.game
 
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.core.api.DesktopAppAdapter
-import com.inari.firefly.game.tile.TileUtils
+import com.inari.firefly.game.room.TileUtils
 import com.inari.firefly.graphics.sprite.AccessibleTexture
 import com.inari.util.geom.Vector4i
 import kotlin.test.assertEquals

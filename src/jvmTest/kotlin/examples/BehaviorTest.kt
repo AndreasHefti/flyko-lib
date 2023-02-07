@@ -18,7 +18,7 @@ import com.inari.firefly.physics.movement.EMovement
 import kotlin.random.Random
 
 fun main(args: Array<String>) {
-    DesktopApp( "CoverCodeTest", 800, 600) {
+    DesktopApp( "CoverCodeTest", 800, 600, debug = true) {
 
         FFInfoSystem
             .addInfo(FrameRateInfo)
@@ -121,7 +121,5 @@ fun main(args: Array<String>) {
                 }
             }
         }
-
-        ComponentSystem.dumpInfo()
     }
 }

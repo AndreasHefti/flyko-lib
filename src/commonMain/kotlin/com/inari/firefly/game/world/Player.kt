@@ -16,6 +16,11 @@ import com.inari.util.geom.Vector2i
 import kotlin.jvm.JvmField
 import kotlin.math.floor
 
+data class PlayerOrientation(
+    @JvmField val roomKey: ComponentKey = Component.NO_COMPONENT_KEY,
+    @JvmField val playerPosition: Vector2f = Vector2f()
+)
+
 class Player private constructor() : Composite(Player), Controlled {
 
     enum class PlayerEventType {
@@ -37,8 +42,7 @@ class Player private constructor() : Composite(Player), Controlled {
     var playerMovement: EMovement? = null
         internal set
 
-    //override val controllerReferences = ControllerReferences(Player)
-    internal val playerRoomTransitionObserver = RoomTransitionObserver(this)
+    //internal val playerRoomTransitionObserver = RoomTransitionObserver(this)
 
     override fun initialize() {
         super.initialize()
@@ -62,14 +66,14 @@ class Player private constructor() : Composite(Player), Controlled {
     override fun activate() {
         super.activate()
         Entity.activate(playerEntityKey)
-        playerRoomTransitionObserver.activate()
+        //playerRoomTransitionObserver.activate()
         send(index, PLAYER_ACTIVATED)
     }
 
     override fun deactivate() {
         super.deactivate()
         Entity.deactivate(playerEntityKey)
-        playerRoomTransitionObserver.deactivate()
+       // playerRoomTransitionObserver.deactivate()
         send(index, PLAYER_DEACTIVATED)
     }
 
@@ -118,147 +122,147 @@ class Player private constructor() : Composite(Player), Controlled {
         }
     }
 
-    internal class RoomTransitionObserver(private val player: Player) {
-
-        @JvmField internal var roomX1 = NULL_COMPONENT_INDEX
-        @JvmField internal var roomX2 = NULL_COMPONENT_INDEX
-        @JvmField internal var roomY1 = NULL_COMPONENT_INDEX
-        @JvmField internal var roomY2 = NULL_COMPONENT_INDEX
-
-        internal fun activate() {
-            // set room coordinates relative to the origin of player position
-            val room = Room[Room.activeRoomKey]
-            roomX1 = room.roomOrientation.x
-            roomX2 = room.roomOrientation.x + room.roomOrientation.width
-            roomY1 = room.roomOrientation.y
-            roomY2 = room.roomOrientation.y + room.roomOrientation.height
-            if (room.roomOrientationType == WorldOrientationType.TILES) {
-                roomX1 *= room.tileDimension.v0
-                roomX2 *= room.tileDimension.v0
-                roomY1 *= room.tileDimension.v1
-                roomY2 *= room.tileDimension.v1
-            }
-
-            Engine.registerListener(Engine.UPDATE_EVENT_TYPE, ::updateListener)
-        }
-
-        internal fun deactivate() {
-            Engine.disposeListener(Engine.UPDATE_EVENT_TYPE, ::updateListener)
-            roomX1 = NULL_COMPONENT_INDEX
-            roomX2 = -NULL_COMPONENT_INDEX
-            roomY1 = NULL_COMPONENT_INDEX
-            roomY2 = NULL_COMPONENT_INDEX
-        }
-
-        private fun updateListener() {
-            if (Room.paused)
-                return
-
-            val px = floor(player.playerPosition.x).toInt()
-            val py = floor(player.playerPosition.y).toInt()
-            val ppx = px + player.playerPivot.x
-            val ppy = py + player.playerPivot.y
-
-            var orientation = Orientation.NONE
-            if (ppx < roomX1) {
-                orientation = Orientation.WEST
-            } else if (ppx > roomX2) {
-                orientation = Orientation.EAST
-            } else if (ppy < roomY1) {
-                orientation = Orientation.NORTH
-            } else if (ppy > roomY2) {
-                orientation = Orientation.SOUTH
-            }
-
-            if (orientation != Orientation.NONE)
-                Room.handleRoomChange(ppx, ppy, orientation)
-        }
-    }
+//    internal class RoomTransitionObserver(private val player: Player) {
+//
+//        @JvmField internal var roomX1 = NULL_COMPONENT_INDEX
+//        @JvmField internal var roomX2 = NULL_COMPONENT_INDEX
+//        @JvmField internal var roomY1 = NULL_COMPONENT_INDEX
+//        @JvmField internal var roomY2 = NULL_COMPONENT_INDEX
+//
+//        internal fun activate() {
+//            // set room coordinates relative to the origin of player position
+//            val room = Room[Room.activeRoomKey]
+//            roomX1 = room.roomOrientation.x
+//            roomX2 = room.roomOrientation.x + room.roomOrientation.width
+//            roomY1 = room.roomOrientation.y
+//            roomY2 = room.roomOrientation.y + room.roomOrientation.height
+//            if (room.roomOrientationType == WorldOrientationType.TILES) {
+//                roomX1 *= room.tileDimension.v0
+//                roomX2 *= room.tileDimension.v0
+//                roomY1 *= room.tileDimension.v1
+//                roomY2 *= room.tileDimension.v1
+//            }
+//
+//            Engine.registerListener(Engine.UPDATE_EVENT_TYPE, ::updateListener)
+//        }
+//
+//        internal fun deactivate() {
+//            Engine.disposeListener(Engine.UPDATE_EVENT_TYPE, ::updateListener)
+//            roomX1 = NULL_COMPONENT_INDEX
+//            roomX2 = -NULL_COMPONENT_INDEX
+//            roomY1 = NULL_COMPONENT_INDEX
+//            roomY2 = NULL_COMPONENT_INDEX
+//        }
+//
+//        private fun updateListener() {
+//            if (Room.paused)
+//                return
+//
+//            val px = floor(player.playerPosition.x).toInt()
+//            val py = floor(player.playerPosition.y).toInt()
+//            val ppx = px + player.playerPivot.x
+//            val ppy = py + player.playerPivot.y
+//
+//            var orientation = Orientation.NONE
+//            if (ppx < roomX1) {
+//                orientation = Orientation.WEST
+//            } else if (ppx > roomX2) {
+//                orientation = Orientation.EAST
+//            } else if (ppy < roomY1) {
+//                orientation = Orientation.NORTH
+//            } else if (ppy > roomY2) {
+//                orientation = Orientation.SOUTH
+//            }
+//
+//            if (orientation != Orientation.NONE)
+//                Room.handleRoomChange(ppx, ppy, orientation)
+//        }
+//    }
 }
 
-class DefaultSelectionBasedRoomSupplier: RoomSupplier {
-
-    override fun getNextRoom(playerXPos: Int, playerYPos: Int, orientation: Orientation): PlayerOrientation {
-        if (Room.activeRoomKey.componentIndex < 0) throw IllegalStateException()
-        val room = Room[Room.activeRoomKey]
-        if (room.areaOrientationType != WorldOrientationType.SECTION)
-            throw RuntimeException("Unsupported area orientation type: ${room.areaOrientationType}")
-
-        val player = Player.findFirstActive()
-        // calc section dimension
-        val sWidth = room.roomOrientation.width / room.areaOrientation.width
-        val sHeight = room.roomOrientation.height / room.areaOrientation.height
-
-        // find section of player relative to room coordinates
-        var sx = GeomUtils.intoBoundary(playerXPos / sWidth, 0, room.areaOrientation.width - 1)
-        var sy = GeomUtils.intoBoundary(playerYPos / sHeight, 0, room.areaOrientation.height - 1)
-        val sOffsetX = playerXPos % sWidth
-        val sOffsetY = playerYPos % sHeight
-        // set section position relative to area coordinates
-        sx += room.areaOrientation.x
-        sy += room.areaOrientation.y
-        when (orientation) {
-            // exit old room north way, enter new room on south
-            Orientation.NORTH -> {
-                sy--
-                val newRoom = Room.findFirst { r ->
-                    GeomUtils.contains(r.areaOrientation, sx, sy)
-                } ?: return PlayerOrientation()
-                val normalizedSx = sx - newRoom.areaOrientation.x
-                return PlayerOrientation(
-                    newRoom.key,
-                    Vector2f(
-                        normalizedSx * sWidth + sOffsetX - player.playerPivot.v0,
-                        newRoom.areaOrientation.height * sHeight - player.playerPivot.v1
-                    )
-                )
-            }
-            // exit old room east way, enter new room on west
-            Orientation.EAST -> {
-                sx++
-                val newRoom = Room.findFirst { r ->
-                    GeomUtils.contains(r.areaOrientation, sx, sy)
-                } ?: return PlayerOrientation()
-                val normalizedSy = sy - newRoom.areaOrientation.y
-                return PlayerOrientation(
-                    newRoom.key,
-                    Vector2f(
-                        -player.playerPivot.v0,
-                        normalizedSy * sHeight + sOffsetY - player.playerPivot.v1
-                    )
-                )
-            }
-            // exit old room south way, enter new room on north
-            Orientation.SOUTH -> {
-                sy++
-                val newRoom = Room.findFirst { r ->
-                    GeomUtils.contains(r.areaOrientation, sx, sy)
-                } ?: return PlayerOrientation()
-                val normalizedSx = sx - newRoom.areaOrientation.x
-                return PlayerOrientation(
-                    newRoom.key,
-                    Vector2f(
-                        normalizedSx * sWidth + sOffsetX - player.playerPivot.v0,
-                        -player.playerPivot.v1
-                    )
-                )
-            }
-            // exit old room west way, enter new room on east
-            Orientation.WEST -> {
-                sx--
-                val newRoom = Room.findFirst { r ->
-                    GeomUtils.contains(r.areaOrientation, sx, sy)
-                } ?: return PlayerOrientation()
-                val normalizedSy = sy - newRoom.areaOrientation.y
-                return PlayerOrientation(
-                    newRoom.key,
-                    Vector2f(
-                        newRoom.areaOrientation.width * sWidth - player.playerPivot.v0,
-                        normalizedSy * sHeight + sOffsetY - player.playerPivot.v1
-                    )
-                )
-            }
-            else -> throw RuntimeException("No Room Found")
-        }
-    }
-}
+//class DefaultSelectionBasedRoomSupplier: RoomSupplier {
+//
+//    override fun getNextRoom(playerXPos: Int, playerYPos: Int, orientation: Orientation): PlayerOrientation {
+//        if (Room.activeRoomKey.componentIndex < 0) throw IllegalStateException()
+//        val room = Room[Room.activeRoomKey]
+//        if (room.areaOrientationType != WorldOrientationType.SECTION)
+//            throw RuntimeException("Unsupported area orientation type: ${room.areaOrientationType}")
+//
+//        val player = Player.findFirstActive()
+//        // calc section dimension
+//        val sWidth = room.roomOrientation.width / room.areaOrientation.width
+//        val sHeight = room.roomOrientation.height / room.areaOrientation.height
+//
+//        // find section of player relative to room coordinates
+//        var sx = GeomUtils.intoBoundary(playerXPos / sWidth, 0, room.areaOrientation.width - 1)
+//        var sy = GeomUtils.intoBoundary(playerYPos / sHeight, 0, room.areaOrientation.height - 1)
+//        val sOffsetX = playerXPos % sWidth
+//        val sOffsetY = playerYPos % sHeight
+//        // set section position relative to area coordinates
+//        sx += room.areaOrientation.x
+//        sy += room.areaOrientation.y
+//        when (orientation) {
+//            // exit old room north way, enter new room on south
+//            Orientation.NORTH -> {
+//                sy--
+//                val newRoom = Room.findFirst { r ->
+//                    GeomUtils.contains(r.areaOrientation, sx, sy)
+//                } ?: return PlayerOrientation()
+//                val normalizedSx = sx - newRoom.areaOrientation.x
+//                return PlayerOrientation(
+//                    newRoom.key,
+//                    Vector2f(
+//                        normalizedSx * sWidth + sOffsetX - player.playerPivot.v0,
+//                        newRoom.areaOrientation.height * sHeight - player.playerPivot.v1
+//                    )
+//                )
+//            }
+//            // exit old room east way, enter new room on west
+//            Orientation.EAST -> {
+//                sx++
+//                val newRoom = Room.findFirst { r ->
+//                    GeomUtils.contains(r.areaOrientation, sx, sy)
+//                } ?: return PlayerOrientation()
+//                val normalizedSy = sy - newRoom.areaOrientation.y
+//                return PlayerOrientation(
+//                    newRoom.key,
+//                    Vector2f(
+//                        -player.playerPivot.v0,
+//                        normalizedSy * sHeight + sOffsetY - player.playerPivot.v1
+//                    )
+//                )
+//            }
+//            // exit old room south way, enter new room on north
+//            Orientation.SOUTH -> {
+//                sy++
+//                val newRoom = Room.findFirst { r ->
+//                    GeomUtils.contains(r.areaOrientation, sx, sy)
+//                } ?: return PlayerOrientation()
+//                val normalizedSx = sx - newRoom.areaOrientation.x
+//                return PlayerOrientation(
+//                    newRoom.key,
+//                    Vector2f(
+//                        normalizedSx * sWidth + sOffsetX - player.playerPivot.v0,
+//                        -player.playerPivot.v1
+//                    )
+//                )
+//            }
+//            // exit old room west way, enter new room on east
+//            Orientation.WEST -> {
+//                sx--
+//                val newRoom = Room.findFirst { r ->
+//                    GeomUtils.contains(r.areaOrientation, sx, sy)
+//                } ?: return PlayerOrientation()
+//                val normalizedSy = sy - newRoom.areaOrientation.y
+//                return PlayerOrientation(
+//                    newRoom.key,
+//                    Vector2f(
+//                        newRoom.areaOrientation.width * sWidth - player.playerPivot.v0,
+//                        normalizedSy * sHeight + sOffsetY - player.playerPivot.v1
+//                    )
+//                )
+//            }
+//            else -> throw RuntimeException("No Room Found")
+//        }
+//    }
+//}

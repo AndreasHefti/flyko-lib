@@ -5,7 +5,8 @@ import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Entity
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.ShapeType
-import com.inari.firefly.game.tile.tiled_binding.TiledTileSet
+import com.inari.firefly.game.room.TileSet
+import com.inari.firefly.game.room.tiled_binding.TiledTileSetLoadTask
 import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.text.EText
@@ -15,14 +16,21 @@ import com.inari.firefly.graphics.view.View
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.IntFrameAnimation
 import com.inari.firefly.physics.animation.IntFrameAnimationControl
+import com.inari.util.collection.Attributes
 
 fun main() {
     DesktopApp("TiledTileSetTest", 800, 600, debug = true) {
-        val tiledTileSetAsset = TiledTileSet {
-            name = "TiledTileSetTestAsset"
-            resourceName = "tiled_tileset_example/tiled_tileset.json"
-        }
 
+        // Load TileSet from Tiled JSON file with TiledTileSetLoadTask
+        val tileSetName = "TiledTileSetTest"
+        val tiledTileSetAttrs = Attributes() +
+            ( TiledTileSetLoadTask.ATTR_NAME to tileSetName ) +
+            ( TiledTileSetLoadTask.ATTR_RESOURCE to "tiled_tileset_example/tiled_tileset.json")
+
+        TiledTileSetLoadTask(attributes = tiledTileSetAttrs)
+        TileSet.activate(tileSetName)
+
+        // Create View and draw each Tile with its collision mask to screen
         View {
             autoActivation = true
             name = "testView"
@@ -30,12 +38,10 @@ fun main() {
             zoom = 1f
         }
 
-        TiledTileSet.load(tiledTileSetAsset)
-        TiledTileSet.activate(tiledTileSetAsset)
         val offset = 50
         var x = 0
         var y = 0
-        TiledTileSet[tiledTileSetAsset].tiles.forEach {
+        TileSet[tileSetName].tiles.forEach {
             Entity {
                 autoActivation = true
                 withComponent(ETransform) {

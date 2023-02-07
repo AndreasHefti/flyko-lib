@@ -37,7 +37,7 @@
                 }, 
                 {
                  "name":"tint_color",
-                 "type":"color",
+                 "type":"string",
                  "value":""
                 }],
          "type":"tilelayer",
@@ -73,9 +73,31 @@
          "width":20,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":4,
+         "name":"objects",
+         "objects":[
+                {
+                 "height":20,
+                 "id":1,
+                 "name":"",
+                 "rotation":0,
+                 "type":"transition",
+                 "visible":true,
+                 "width":10,
+                 "x":315,
+                 "y":14
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":4,
- "nextobjectid":1,
+ "nextlayerid":5,
+ "nextobjectid":2,
  "orientation":"orthogonal",
  "properties":[
         {

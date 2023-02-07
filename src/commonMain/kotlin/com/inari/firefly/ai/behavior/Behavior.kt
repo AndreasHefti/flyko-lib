@@ -21,7 +21,7 @@ abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
 
         private val entityIds = BitSet()
         private val entityListener: ComponentEventListener = { key, type ->
-            val entity = Entity[key.componentIndex]
+            val entity = Entity[key]
             if (EBehavior in entity.aspects) {
                 if (type == ComponentEventType.ACTIVATED)
                     entityIds[key.componentIndex] = true

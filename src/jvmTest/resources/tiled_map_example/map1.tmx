@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.9.2" class="firefly_tilemap" orientation="orthogonal" renderorder="right-down" width="20" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="1">
+<map version="1.8" tiledversion="1.9.2" class="firefly_tilemap" orientation="orthogonal" renderorder="right-down" width="20" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="2">
  <editorsettings>
   <export target="example_map1.json" format="json"/>
  </editorsettings>
@@ -19,7 +19,7 @@
   <properties>
    <property name="blend_mode" propertytype="blend" value="NORMAL_ALPHA"/>
    <property name="layer_tilesets" value="blueGrid1616"/>
-   <property name="tint_color" type="color" value=""/>
+   <property name="tint_color" value=""/>
   </properties>
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,2,32,22,12,0,0,0,0,0,0,0,
@@ -51,4 +51,7 @@
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 </data>
  </layer>
+ <objectgroup id="4" name="objects">
+  <object id="1" type="transition" x="315" y="14" width="10" height="20"/>
+ </objectgroup>
 </map>

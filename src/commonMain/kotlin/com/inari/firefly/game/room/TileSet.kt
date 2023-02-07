@@ -1,4 +1,4 @@
-package com.inari.firefly.game.tile
+package com.inari.firefly.game.room
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
@@ -7,8 +7,9 @@ import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynArrayRO
 import kotlin.jvm.JvmField
 
-open class TileSet: Composite(TileSet) {
+open class TileSet: Component(TileSet) {
 
+    @JvmField var mappingStartTileId: Int = -1
     @JvmField val textureRef = CReference(Texture)
     val textureIndex: Int
         get() = textureRef.targetKey.componentIndex

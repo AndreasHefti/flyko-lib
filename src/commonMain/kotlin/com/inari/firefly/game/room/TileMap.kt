@@ -1,4 +1,4 @@
-package com.inari.firefly.game.tile
+package com.inari.firefly.game.room
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
@@ -17,11 +17,10 @@ import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 import kotlin.math.floor
 
-open class TileMap : Composite(TileMap) {
+open class TileMap : Component(TileMap) {
 
     @JvmField var viewRef = CReference(View)
     @JvmField var autoCreateLayer = true
-    @JvmField var autoActivateLayer =  true
 
     private val tileMapLayerData = DynArray.of<TileMapLayerData>(5, 5)
     private var parallax = false
@@ -32,23 +31,37 @@ open class TileMap : Composite(TileMap) {
     val withTileLayer: (TileMapLayerData.() -> Unit) -> Unit = { configure ->
         val instance = TileMapLayerData()
         instance.also(configure)
+        tileMapLayerData + instance
+    }
 
-        if (autoCreateLayer && !instance.layerRef.exists) {
-            Layer {
-                name = instance.layerRef.targetKey.name
-                this@Layer.viewRef(this@TileMap.viewRef.targetKey)
-                position(instance.position)
-            }
+    override fun load() {
+        super.load()
+
+        // check view reference is set and valid
+        if (!viewRef.exists)
+            throw IllegalStateException("No View reference exists")
+
+        // check or create needed layer for view
+        val iter = tileMapLayerData.iterator()
+        while (iter.hasNext()) {
+            val lData = iter.next()
+            if (autoCreateLayer && !lData.layerRef.exists) {
+                Layer {
+                    name = lData.layerRef.targetKey.name
+                    this.viewRef(this@TileMap.viewRef)
+                    position(lData.position)
+                }
+            } else if (!lData.layerRef.exists)
+                throw IllegalStateException("No Layer with name ${lData.layerRef.targetKey.name} exists")
         }
-        if (autoActivateLayer)
-            Layer.activate(instance.layerRef.refIndex)
-
-        tileMapLayerData[instance.layerRef.refIndex] = instance
     }
 
     override fun activate() {
         super.activate()
         tileMapLayerData.forEach { layerData ->
+            // activate layer first
+            Layer.activate(layerData.layerRef.refIndex)
+
             layerData.tileGridData.forEach { buildTileGrid(layerData, it) }
             activateTileSetForLayer(layerData)
             layerData.tileGridData.forEach { fillTileGrid(layerData, it) }

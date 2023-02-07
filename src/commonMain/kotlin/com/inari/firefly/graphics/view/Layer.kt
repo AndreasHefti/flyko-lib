@@ -6,9 +6,7 @@ import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 
-class Layer private constructor(): Composite(Layer), Controlled {
-
-    //override val controllerReferences = ControllerReferences(Layer)
+class Layer private constructor(): Component(Layer), Controlled {
 
     @JvmField val viewRef = CReference(View)
     @JvmField var zPosition = 0

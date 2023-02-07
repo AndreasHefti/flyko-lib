@@ -1,4 +1,4 @@
-package com.inari.firefly.game.tile.tiled_binding
+package com.inari.firefly.game.room.tiled_binding
 
 import com.inari.util.EMPTY_STRING
 import com.inari.util.NO_NAME
@@ -38,6 +38,7 @@ const val FLAG_NAME_VERTICAL = "v"
 const val PROP_VALUE_TYPE_LAYER = "tilelayer"
 const val PROP_VALUE_TYPE_OBJECT = "objectgroup"
 const val PROP_LAYER_TILE_SETS = "layer_tilesets"
+const val PROP_TILE_SET_REFS = "tileset_refs"
 
 @Suppress("UNCHECKED_CAST")
 class TiledPropertyJson(
@@ -122,7 +123,7 @@ class TiledTileSetRefJson(
     @JvmField val source: String
 )
 
-class TiledTileMapJson(
+class TiledMapJson(
     @JvmField val width: Int,
     @JvmField val height: Int,
     @JvmField val tilewidth: Int,
