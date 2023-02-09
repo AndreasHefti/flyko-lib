@@ -38,9 +38,7 @@ enum class LifecycleTaskType {
     BEFORE_DISPOSE,
     AFTER_DISPOSE,
     BEFORE_DELETE,
-    AFTER_DELETE,
-    PAUSE,
-    RESUME
+    AFTER_DELETE
 }
 
 interface ComponentType<C : Component> : Aspect {
@@ -104,26 +102,27 @@ sealed interface ComponentBuilder<C : Component> {
 
 class ComponentGroups {
 
-    private var groups: Aspects? = null
+    var aspects: Aspects? = null
+        private set
     operator fun plus(name: String) {
-        if (groups == null) groups = COMPONENT_GROUP_ASPECT.createAspects()
-        groups!! + COMPONENT_GROUP_ASPECT.createAspect(name)
+        if (aspects == null) aspects = COMPONENT_GROUP_ASPECT.createAspects()
+        aspects!! + COMPONENT_GROUP_ASPECT.createAspect(name)
     }
     operator fun minus(name: String) =
-        groups?.minus(COMPONENT_GROUP_ASPECT[name])
+        aspects?.minus(COMPONENT_GROUP_ASPECT[name])
 
     operator fun contains(name: String): Boolean =
-        groups?.contains(COMPONENT_GROUP_ASPECT[name]) ?: false
+        aspects?.contains(COMPONENT_GROUP_ASPECT[name]) ?: false
 
     operator fun plus(aspect: Aspect) {
-        if (groups == null) groups = COMPONENT_GROUP_ASPECT.createAspects()
-        groups!! + aspect
+        if (aspects == null) aspects = COMPONENT_GROUP_ASPECT.createAspects()
+        aspects!! + aspect
     }
     operator fun minus(aspect: Aspect) =
-        groups?.minus(aspect)
+        aspects?.minus(aspect)
 
     operator fun contains(aspect: Aspect): Boolean =
-        groups?.contains(aspect) ?: false
+        aspects?.contains(aspect) ?: false
 
     companion object {
         @JvmField val COMPONENT_GROUP_ASPECT = IndexedAspectType("COMPONENT_GROUP_ASPECT")
@@ -211,13 +210,24 @@ abstract class Component protected constructor(
     }
 }
 
-open class Composite protected constructor(
+open class AttributedComponent protected constructor(
     subType: ComponentType<out Composite>
 ) : Component(subType) {
 
-    private val taskRefs: Array<DynIntArray?> = arrayOfNulls(LifecycleTaskType.values().size)
-
     @JvmField var attributes = EMPTY_DICTIONARY
+
+    companion object : ComponentSystem<Composite>("AttributedComponent") {
+        override fun allocateArray(size: Int): Array<Composite?> = arrayOfNulls(size)
+        override fun create(): Composite =
+            throw UnsupportedOperationException("AttributedComponent is abstract use a concrete implementation instead")
+    }
+}
+
+open class Composite protected constructor(
+    subType: ComponentType<out Composite>
+) : AttributedComponent(subType) {
+
+    private val taskRefs: Array<DynIntArray?> = arrayOfNulls(LifecycleTaskType.values().size)
 
     fun withTask(apply: LifecycleTaskType, taskKey: ComponentKey) {
         if (taskKey.type != Task) throw IllegalArgumentException("Key mismatch taskKey is not of expected type Task")

@@ -9,8 +9,6 @@ import kotlin.test.fail
 
 class IndexerTest {
 
-
-
     @Test
     fun testSimpleIndexedObject() {
         assertEquals(

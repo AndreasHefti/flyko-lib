@@ -3,14 +3,73 @@ package com.inari.firefly.core
 import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.firefly.core.api.FFTimer
+import com.inari.firefly.core.api.SimpleTask
+import com.inari.firefly.game.world.PlatformerHMoveController
+import com.inari.util.VOID_CONSUMER_1
+import com.inari.util.aspect.Aspect
+import com.inari.util.aspect.Aspects
 import com.inari.util.collection.BitSet
+import com.inari.util.event.Event
 import kotlin.jvm.JvmField
+
+enum class PauseEventType {
+    PAUSE,
+    RESUME
+}
+
+typealias PauseEventListener = (PauseEventType, Aspects?) -> Unit
+val PAUSE_EVENT_TYPE = Event.EventType("PauseEvent")
+class PauseEvent internal constructor(override val eventType: EventType): Event<PauseEventListener>() {
+    internal var type: PauseEventType = PauseEventType.PAUSE
+    internal var groups: Aspects? = null
+    override fun notify(listener: PauseEventListener) = listener(type,  groups)
+
+    companion object {
+        private val event = PauseEvent(PAUSE_EVENT_TYPE)
+        fun notifyPause(groups: Aspects?) {
+            event.type = PauseEventType.PAUSE
+            event.groups = groups
+            Engine.notify(event)
+        }
+        fun notifyResume() {
+            event.type = PauseEventType.RESUME
+            event.groups = null
+            Engine.notify(event)
+        }
+    }
+}
 
 abstract class Control protected constructor() : Component(Control) {
 
     init {
         autoLoad = true
         autoActivation = true
+    }
+
+    var paused = false
+        private set
+    private var pausedGroups: Aspects? = null
+    private val pauseEventListener: PauseEventListener = { type, groups ->
+        if (type == PauseEventType.PAUSE) {
+            paused = true
+            pausedGroups = if (groups != null && !groups.isEmpty) groups else null
+        } else {
+            paused = false
+            pausedGroups = null
+        }
+    }
+    fun isPaused(group: Aspect): Boolean = paused && (pausedGroups == null || group in pausedGroups!!)
+    fun isPaused(groups: Aspects?): Boolean = paused && (pausedGroups == null ||
+            (groups != null && pausedGroups!!.intersects(groups)))
+
+    override fun activate() {
+        super.activate()
+        Engine.registerListener(PAUSE_EVENT_TYPE, pauseEventListener)
+    }
+
+    override fun deactivate() {
+        Engine.disposeListener(PAUSE_EVENT_TYPE, pauseEventListener)
+        super.deactivate()
     }
 
     @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
@@ -32,10 +91,21 @@ abstract class Control protected constructor() : Component(Control) {
             val iter = Control.activeIterator()
             while (iter.hasNext()) {
                 val it = iter.next()
-                if (it.scheduler.needsUpdate())
+                if (!it.isPaused(it.groups.aspects) && it.scheduler.needsUpdate())
                     it.update()
             }
         }
+    }
+}
+
+class UpdateControl private constructor() : Control() {
+
+    @JvmField var updateOp: SimpleTask = VOID_CONSUMER_1
+
+    override fun update() = updateOp(this.index)
+
+    companion object : ComponentSubTypeBuilder<Control, UpdateControl>(Control, "UpdateControl") {
+        override fun create() = UpdateControl()
     }
 }
 

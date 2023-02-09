@@ -6,7 +6,7 @@ import kotlin.reflect.cast
 
 class AspectSet<T : Any> constructor(
     val aspectType: AspectType,
-    val dynArrayFunction: (Int, Int) -> DynArray<T>
+    dynArrayFunction: (Int, Int) -> DynArray<T>
 ) : AspectAware, Iterable<Aspect> {
 
     private val values: DynArray<T> = dynArrayFunction(0, 5)
@@ -44,7 +44,7 @@ class AspectSet<T : Any> constructor(
 
     operator fun plus(other: AspectSet<T>) {
         if (other.aspectType == this.aspectType) {
-            for (aspect in other.aspects)
+            for (aspect in other.aspects.iterator())
                 this.set(aspect, other.values[aspect.aspectIndex]!!)
         }
     }
@@ -58,7 +58,7 @@ class AspectSet<T : Any> constructor(
     }
 
     override fun iterator(): Iterator<Aspect> = aspects.iterator()
-    fun getIterable(): Iterable<Aspect> = aspects
+    //fun getIterable(): Iterable<Aspect> = aspects.iterator()
 
     companion object {
         inline fun <reified T : Any> of(aspectType: AspectType): AspectSet<T> {

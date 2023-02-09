@@ -6,7 +6,7 @@ import com.inari.util.indexed.Indexed
 
 class Aspects internal constructor(
     val type: AspectType
-) : Iterable<Aspect> {
+) {
 
     internal val bitSet: BitSet = BitSet()
     private val tempBitSet: BitSet = BitSet()
@@ -57,7 +57,8 @@ class Aspects internal constructor(
         return this
     }
 
-    operator fun minus(aspect: Aspect): Aspects {
+    operator fun minus(aspect: Aspect?): Aspects {
+        if (aspect == null) return this
         checkType(aspect)
         bitSet[aspect.aspectIndex] = false
         return this
@@ -100,14 +101,14 @@ class Aspects internal constructor(
         return !exclude(aspects)
     }
 
-    operator fun contains(aspect: Aspect): Boolean {
+    operator fun contains(aspect: Aspect?): Boolean {
+        if (aspect == null) return false
         checkType(aspect)
         return bitSet[aspect.aspectIndex]
     }
 
-    override fun iterator(): Iterator<Aspect> =
+    fun iterator(): Iterator<Aspect> =
         AspectIterator()
-
 
     fun clear() {
         bitSet.clear()
