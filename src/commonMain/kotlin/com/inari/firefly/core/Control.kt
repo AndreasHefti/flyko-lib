@@ -4,11 +4,11 @@ import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.firefly.core.api.FFTimer
 import com.inari.firefly.core.api.SimpleTask
-import com.inari.firefly.game.world.PlatformerHMoveController
 import com.inari.util.VOID_CONSUMER_1
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.Aspects
 import com.inari.util.collection.BitSet
+import com.inari.util.collection.IndexIterator
 import com.inari.util.event.Event
 import kotlin.jvm.JvmField
 
@@ -88,11 +88,12 @@ abstract class Control protected constructor() : Component(Control) {
         }
 
         private fun updateAllActiveControls() {
-            val iter = Control.activeIterator()
+            val iter = Control.activeIndexIterator()
             while (iter.hasNext()) {
-                val it = iter.next()
-                if (!it.isPaused(it.groups.aspects) && it.scheduler.needsUpdate())
-                    it.update()
+                val c = Control[iter.next()]
+                if (!c.active) continue
+                if (!c.isPaused(c.groups.aspects) && c.scheduler.needsUpdate())
+                    c.update()
             }
         }
     }
@@ -165,7 +166,7 @@ abstract class ComponentsControl<C : Component> protected constructor(
     }
 
     override fun update() {
-        val it = controlledComponents.iterator()
+        val it = IndexIterator(controlledComponents)
         while (it.hasNext()) {
             val componentIndex = it.nextInt()
             if (!system.exists(componentIndex)) {
@@ -207,7 +208,7 @@ abstract class EntityControl  protected constructor() : Control() {
     }
 
     override fun update() {
-        val it = entityIndexes.iterator()
+        val it = IndexIterator(entityIndexes)
         while (it.hasNext())
             update(it.nextInt())
     }

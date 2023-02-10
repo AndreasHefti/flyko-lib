@@ -1,6 +1,9 @@
 package com.inari.firefly.game.room
 
-import com.inari.firefly.core.*
+import com.inari.firefly.core.CReference
+import com.inari.firefly.core.Component
+import com.inari.firefly.core.ComponentSystem
+import com.inari.firefly.core.Engine
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.util.collection.DynArray

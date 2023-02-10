@@ -8,6 +8,7 @@ import com.inari.util.geom.Vector4f
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 import kotlin.math.roundToInt
+import kotlin.native.concurrent.ThreadLocal
 
 class View private constructor(): Component(View), ViewData, Controlled {
 
@@ -118,6 +119,7 @@ class View private constructor(): Component(View), ViewData, Controlled {
         super.delete()
     }
 
+    @ThreadLocal
     companion object : ComponentSystem<View>("View") {
         override fun allocateArray(size: Int): Array<View?> = arrayOfNulls(size)
         override fun create() = View()

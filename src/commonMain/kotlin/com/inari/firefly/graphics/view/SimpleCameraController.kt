@@ -35,13 +35,13 @@ class SimpleCameraController private constructor() : SingleComponentControl<View
         }
     }
 
-    override fun update(view: View) {
-        if (getPos(view.zoom, view.bounds, view.worldPosition)) {
-            view.worldPosition.x += pos.x * velocity
-            view.worldPosition.y += pos.y * velocity
+    override fun update(c: View) {
+        if (getPos(c.zoom, c.bounds, c.worldPosition)) {
+            c.worldPosition.x += pos.x * velocity
+            c.worldPosition.y += pos.y * velocity
             if (pixelPerfect) {
-                view.worldPosition.x = floor(view.worldPosition.x)
-                view.worldPosition.y = floor(view.worldPosition.y)
+                c.worldPosition.x = floor(c.worldPosition.x)
+                c.worldPosition.y = floor(c.worldPosition.y)
             }
             Engine.notify(viewChangeEvent)
         }

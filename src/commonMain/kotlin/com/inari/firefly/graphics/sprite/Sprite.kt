@@ -1,6 +1,9 @@
 package com.inari.firefly.graphics.sprite
 
-import com.inari.firefly.core.*
+import com.inari.firefly.core.Asset
+import com.inari.firefly.core.CReference
+import com.inari.firefly.core.ComponentSubTypeBuilder
+import com.inari.firefly.core.Engine
 import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.core.api.SpriteData

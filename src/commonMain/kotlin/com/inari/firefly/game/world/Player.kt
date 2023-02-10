@@ -1,7 +1,6 @@
 package com.inari.firefly.game.world
 
 import com.inari.firefly.core.*
-import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.game.world.Player.PlayerEventType.*
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.movement.EMovement
@@ -9,12 +8,9 @@ import com.inari.util.NO_NAME
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.IndexedAspectType
 import com.inari.util.event.Event
-import com.inari.util.geom.GeomUtils
-import com.inari.util.geom.Orientation
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector2i
 import kotlin.jvm.JvmField
-import kotlin.math.floor
 
 data class PlayerOrientation(
     @JvmField val roomKey: ComponentKey = Component.NO_COMPONENT_KEY,

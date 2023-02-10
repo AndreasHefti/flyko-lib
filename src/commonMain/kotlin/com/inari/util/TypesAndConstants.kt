@@ -25,7 +25,7 @@ const val NO_NAME = "[[NO_NAME]]"
 const val NO_STATE: String = "[[NO_STATE]]"
 const val NO_PROGRAM: String = "[[NO_PROGRAM]]"
 
-// normalized vecrtors
+const val LONG_MASK = 0x3f
 
 @JvmField val VEC_NF_NORTH = ImmutableVector2f(0f, 1f)
 @JvmField val VEC_NF_SOUTH = ImmutableVector2f(0f, -1f)
@@ -53,11 +53,6 @@ const val NO_PROGRAM: String = "[[NO_PROGRAM]]"
 
 interface Named {
     val name: String
-}
-
-interface IntIterator {
-    operator fun hasNext(): Boolean
-    operator fun next(): Int
 }
 
 interface FloatPropertyAccessor {

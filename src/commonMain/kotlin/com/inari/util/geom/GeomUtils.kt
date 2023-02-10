@@ -403,7 +403,12 @@ object GeomUtils {
     fun getFlatArrayIndex(x: Int, y: Int, width: Int): Int =
         y * width + x
 
-    fun movePosition(pos: Vector2i, orientation: Orientation, distance: Int = 1, originUpperCorner: Boolean = true) =
+    fun movePosition(
+        pos: Vector2i,
+        orientation: Orientation,
+        distance: Int = 1,
+        originUpperCorner: Boolean = true) {
+
         when (orientation) {
             Orientation.NORTH -> pos.y = if (originUpperCorner) pos.y - distance else pos.y + distance
             Orientation.SOUTH -> pos.y = if (originUpperCorner) pos.y + distance else pos.y - distance
@@ -411,6 +416,7 @@ object GeomUtils {
             Orientation.EAST -> pos.x += distance
             else -> DO_NOTHING
         }
+    }
 
     fun newVec4f(jsonString: String): Vector4f {
         val result = Vector4f()

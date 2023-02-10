@@ -1,8 +1,9 @@
 package com.inari.util.collection
 
+import com.inari.util.LONG_MASK
 import kotlin.math.min
 
-interface BitSetRO {
+interface BitSetRO : IndexIterable {
     val cardinality: Int
     val isEmpty: Boolean
     fun length(): Int
@@ -20,7 +21,7 @@ class BitSet(nBits: Int = 64) : BitSetRO {
     private var bits: LongArray
 
     init {
-        var length:Int = nBits ushr 6
+        var length: Int = nBits ushr 6
         if ((nBits and LONG_MASK) != 0)
             ++length
         bits = LongArray(length)
@@ -217,6 +218,7 @@ class BitSet(nBits: Int = 64) : BitSetRO {
         return _from
     }
 
+    override fun nextIndex(from: Int): Int = nextSetBit(from)
     override fun nextSetBit(from: Int): Int {
         var _from = from
         var offset = _from shr 6
@@ -289,19 +291,4 @@ class BitSet(nBits: Int = 64) : BitSetRO {
         return true
     }
 
-    fun iterator(): IntIterator {
-        return object : IntIterator() {
-            var index = nextSetBit(0)
-            override fun hasNext(): Boolean = index >= 0
-            override fun nextInt(): Int {
-                val r = index
-                index = nextSetBit(index + 1)
-                return r
-            }
-        }
-    }
-
-    companion object {
-        private const val LONG_MASK = 0x3f
-    }
 }

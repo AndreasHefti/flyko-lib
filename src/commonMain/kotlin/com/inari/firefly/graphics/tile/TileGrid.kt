@@ -210,8 +210,8 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
                 val multiplier = entity[EMultiplier]
                 val pi = multiplier.positions.iterator()
                 while (pi.hasNext()) {
-                    val x: Int = pi.nextFloat().toInt()
-                    val y: Int = pi.nextFloat().toInt()
+                    val x: Int = pi.next().toInt()
+                    val y: Int = pi.next().toInt()
                     tileGrid[x, y] = entity.index
                 }
             } else {
@@ -239,8 +239,8 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
                 val multiplier = entity[EMultiplier]
                 val pi = multiplier.positions.iterator()
                 while (pi.hasNext()) {
-                    val x: Int = pi.nextFloat().toInt()
-                    val y: Int = pi.nextFloat().toInt()
+                    val x: Int = pi.next().toInt()
+                    val y: Int = pi.next().toInt()
                     tileGrid.resetIfMatch(entity.index, x, y)
                 }
             } else {

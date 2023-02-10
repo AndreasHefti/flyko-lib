@@ -8,7 +8,6 @@ import com.inari.firefly.physics.contact.EContact.Companion.CONTACT_TYPE_ASPECT_
 import com.inari.firefly.physics.contact.EContact.Companion.MATERIAL_ASPECT_GROUP
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_MATERIAL
-import com.inari.util.IntIterator
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.Aspects
 import com.inari.util.collection.DynArray

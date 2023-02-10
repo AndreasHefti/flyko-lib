@@ -12,8 +12,11 @@ import com.inari.firefly.physics.animation.IntFrameAnimation
 import com.inari.firefly.physics.animation.IntFrameAnimationControl
 import com.inari.firefly.physics.contact.EContact
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_CONTACT_TYPE
-import com.inari.util.*
+import com.inari.util.DO_NOTHING
+import com.inari.util.NO_NAME
+import com.inari.util.ZERO_FLOAT
 import com.inari.util.collection.DynArray
+import com.inari.util.collection.IndexIterator
 import kotlin.jvm.JvmField
 import kotlin.math.floor
 
@@ -199,7 +202,7 @@ open class TileMap : Component(TileMap) {
 
     private fun deactivateTileSets() {
         tileMapLayerData.forEach { mapLayer ->
-            val iterator = mapLayer.entityCodeMapping.iterator()
+            val iterator = IndexIterator(mapLayer.entityCodeMapping)
             while (iterator.hasNext())
                 Entity.delete(iterator.nextInt())
 

@@ -29,8 +29,8 @@ object MultiPositionSpriteRenderer : EntityRenderer("MultiPositionSpriteRenderer
 
             val pi = multiplier.positions.iterator()
             while (pi.hasNext()) {
-                val x = pi.nextFloat()
-                val y = pi.nextFloat()
+                val x = pi.next()
+                val y = pi.next()
                 transformCollector.move(x, y)
                 graphics.renderSprite(sprite, transformCollector.data)
                 transformCollector.move(-x, -y)

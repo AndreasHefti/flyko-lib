@@ -2,7 +2,6 @@ package com.inari.firefly.graphics.sprite
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BindingIndex
-import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.SpriteData
 import com.inari.firefly.physics.animation.IntFrameAnimation

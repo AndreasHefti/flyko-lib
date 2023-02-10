@@ -3,7 +3,6 @@ package com.inari.firefly.core
 import com.inari.firefly.core.Engine.Companion.RENDER_EVENT_TYPE
 import com.inari.firefly.core.api.TransformData
 import com.inari.util.ZERO_FLOAT
-import com.inari.util.event.Event
 import com.inari.util.geom.Vector2f
 import kotlin.math.floor
 

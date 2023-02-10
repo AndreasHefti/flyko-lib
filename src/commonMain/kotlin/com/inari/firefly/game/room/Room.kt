@@ -1,7 +1,9 @@
 package com.inari.firefly.game.room
 
-import com.inari.firefly.core.*
-import com.inari.util.collection.BitSet
+import com.inari.firefly.core.CReference
+import com.inari.firefly.core.ComponentKey
+import com.inari.firefly.core.ComponentSubTypeBuilder
+import com.inari.firefly.core.Composite
 import kotlin.jvm.JvmField
 
 class Room private constructor() : Composite(Room) {

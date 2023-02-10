@@ -1,7 +1,10 @@
 package com.inari.firefly.graphics.tile
 
 import com.inari.firefly.core.*
-import com.inari.firefly.core.api.*
+import com.inari.firefly.core.api.BlendMode
+import com.inari.firefly.core.api.EntityIndex
+import com.inari.firefly.core.api.NULL_BINDING_INDEX
+import com.inari.firefly.core.api.SpriteRenderable
 import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.SpriteSet
 import com.inari.util.FloatPropertyAccessor

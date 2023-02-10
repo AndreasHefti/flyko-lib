@@ -1,12 +1,13 @@
 package com.inari.firefly.graphics.view
 
-import com.inari.firefly.core.*
+import com.inari.firefly.core.Asset
+import com.inari.firefly.core.ComponentSubTypeBuilder
+import com.inari.firefly.core.Engine
 import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.ShaderData
 import com.inari.firefly.core.api.ShaderUpdate
 import com.inari.util.NO_NAME
 import com.inari.util.NO_PROGRAM
-import com.inari.util.VOID_CALL
 import com.inari.util.VOID_CONSUMER
 
 class Shader private constructor(): Asset(Shader), ShaderData {

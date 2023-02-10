@@ -1,17 +1,19 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.ComponentEventType.DELETED
+import com.inari.firefly.core.ComponentEventType.DISPOSED
 import com.inari.firefly.core.api.ComponentIndex
-import com.inari.firefly.core.ComponentEventType.*
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
-import com.inari.util.aspect.Aspect
-import com.inari.util.aspect.IndexedAspectType
-import com.inari.util.indexed.AbstractIndexed
-import kotlin.jvm.JvmField
 import com.inari.util.NO_NAME
 import com.inari.util.Named
+import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.Aspects
+import com.inari.util.aspect.IndexedAspectType
 import com.inari.util.collection.DynIntArray
 import com.inari.util.collection.EMPTY_DICTIONARY
+import com.inari.util.collection.IndexIterator
+import com.inari.util.indexed.AbstractIndexed
+import kotlin.jvm.JvmField
 
 /** Defines the component based builder DSL marker */
 @DslMarker annotation class ComponentDSL
@@ -56,9 +58,9 @@ class ComponentKey internal constructor (
     override val type: ComponentType<*>
 ) : ComponentId {
 
-    init {
-        // DEBUG  println("-> new ComponentKey: $name : ${type.typeName} : ${type.subTypeName}")
-    }
+    // DEBUG  init {
+    // DEBUG        println("-> new ComponentKey: $name : ${type.typeName} : ${type.subTypeName}")
+    // DEBUG   }
 
     internal constructor(index: ComponentIndex, type: ComponentType<*>) : this(NO_NAME, type) {
         componentIndex = index
@@ -288,11 +290,14 @@ open class Composite protected constructor(
         return taskRefs[apply.ordinal]!!
     }
 
-    private fun runTaskIfDefined(type: LifecycleTaskType) =
-        taskRefs[type.ordinal]?.iterator()?.apply {
-            while (this.hasNext())
-                Task[this.next()](this@Composite.index, attributes)
+    private fun runTaskIfDefined(type: LifecycleTaskType) {
+        val taskRefs = taskRefs[type.ordinal]
+        if (taskRefs != null) {
+            val iter = IndexIterator(taskRefs)
+            while (iter.hasNext())
+                Task[iter.next()](this@Composite.index, attributes)
         }
+    }
 
     companion object : ComponentSystem<Composite>("Composite") {
         override fun allocateArray(size: Int): Array<Composite?> = arrayOfNulls(size)
@@ -302,7 +307,7 @@ open class Composite protected constructor(
         init {
             Task.registerComponentListener { key, type ->
                 if (type == DISPOSED || type == DELETED)
-                    Composite.COMPONENT_MAPPING.forEach { it.removeTaskRef(key.componentIndex) }
+                    Composite.componentMapping.forEach { it.removeTaskRef(key.componentIndex) }
             }
         }
     }

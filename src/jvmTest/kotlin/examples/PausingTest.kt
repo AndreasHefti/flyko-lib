@@ -1,4 +1,4 @@
-package examples.game
+package examples
 
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.ai.behavior.ActionNode

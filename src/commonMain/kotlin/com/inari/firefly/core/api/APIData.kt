@@ -3,7 +3,10 @@ package com.inari.firefly.core.api
 import com.inari.util.VOID_CONSUMER_3
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.collection.Dictionary
-import com.inari.util.geom.*
+import com.inari.util.geom.Vector2f
+import com.inari.util.geom.Vector3f
+import com.inari.util.geom.Vector4f
+import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
 const val NULL_COMPONENT_INDEX = -1

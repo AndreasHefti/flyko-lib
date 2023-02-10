@@ -1,7 +1,5 @@
 package com.inari.firefly.core
 
-
-
 import com.inari.firefly.core.api.*
 import com.inari.util.event.*
 import kotlin.jvm.JvmField

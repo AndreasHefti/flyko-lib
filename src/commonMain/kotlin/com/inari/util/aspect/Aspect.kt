@@ -41,9 +41,13 @@ class IndexedAspectType(
     }
 
     override operator fun get(name: String): Aspect? {
-        for (aspect in aspects)
-            if (name == aspect.aspectName)
-                return aspect
+        var i = aspects.nextIndex(0)
+        while (i >= 0) {
+            val aspect = aspects[i]
+            if (name == aspect?.aspectName)
+                return aspect // TODO iterator pool
+            i = aspects.nextIndex(i + 1)
+        }
         return null
     }
 

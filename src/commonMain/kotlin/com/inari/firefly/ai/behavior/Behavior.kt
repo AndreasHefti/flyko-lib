@@ -6,7 +6,6 @@ import com.inari.firefly.core.api.Action
 import com.inari.firefly.core.api.OperationResult
 import com.inari.firefly.core.api.OperationResult.*
 import com.inari.firefly.core.api.SUCCESS_ACTION
-import com.inari.util.DO_NOTHING
 import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
 

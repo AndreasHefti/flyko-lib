@@ -7,8 +7,6 @@ import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.view.*
 import com.inari.firefly.physics.movement.Movement
-import com.inari.util.DO_NOTHING
-import com.inari.util.VOID_CALL
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
@@ -97,35 +95,31 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
         private val entityListener: ComponentEventListener = { key, type ->
             val entity =  Entity[key.componentIndex]
             if (EContact in entity.aspects && ETile !in entity.aspects) {
-                when (type) {
-                    ComponentEventType.ACTIVATED -> COMPONENT_MAPPING.forEach {
-                        it.notifyEntityActivation(entity)
-                    }
-                    ComponentEventType.DEACTIVATED -> COMPONENT_MAPPING.forEach {
-                        it.notifyEntityDeactivation(key.componentIndex)
-                    }
-                    else -> VOID_CALL
+               val iter = iterator()
+                if (type == ComponentEventType.ACTIVATED) {
+                    while (iter.hasNext())
+                        iter.next().notifyEntityActivation(entity)
+                } else if (type == ComponentEventType.DEACTIVATED) {
+                    while (iter.hasNext())
+                        iter.next().notifyEntityDeactivation(key.componentIndex)
                 }
             }
         }
 
         private val viewListener: ComponentEventListener = { key, type ->
-            when(type) {
-                ComponentEventType.DELETED -> {
-                    COMPONENT_MAPPING.forEach {
-                        if (it.viewIndex == key.componentIndex)
-                            delete(key.componentIndex)
-                    }
-                }
-                else -> DO_NOTHING
+            if (type == ComponentEventType.DELETED) {
+                val iter = iterator()
+                while (iter.hasNext())
+                    if (iter.next().viewIndex == key.componentIndex)
+                        delete(key.componentIndex)
             }
         }
 
         private val moveListener: (Movement.MoveEvent) -> Unit = {
-            var index = ACTIVE_COMPONENT_MAPPING.nextSetBit(0)
+            var index =  activeComponentSet.nextIndex(0)
             while (index >= 0) {
                 ContactMap[index].updateAll(it.entities)
-                index = ACTIVE_COMPONENT_MAPPING.nextSetBit(index + 1)
+                index = activeComponentSet.nextIndex(index + 1)
             }
         }
 

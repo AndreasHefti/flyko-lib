@@ -5,7 +5,6 @@ import com.inari.util.FALSE_SUPPLIER
 import com.inari.util.TRUE_SUPPLIER
 import kotlin.jvm.JvmField
 
-
 abstract class Trigger protected constructor(componentType: ComponentType<out Trigger>): Component(componentType) {
 
     @JvmField var condition: () -> Boolean = FALSE_SUPPLIER

@@ -1,11 +1,14 @@
 package com.inari.firefly.graphics.view
 
-import com.inari.firefly.core.*
+import com.inari.firefly.core.CReference
+import com.inari.firefly.core.ComponentKey
+import com.inari.firefly.core.ComponentSubTypeBuilder
+import com.inari.firefly.core.Control
 import com.inari.firefly.core.api.Action
 import com.inari.firefly.core.api.ActionCallback
-import com.inari.firefly.core.api.OperationResult.*
+import com.inari.firefly.core.api.OperationResult.RUNNING
 import com.inari.firefly.core.api.RUNNING_ACTION
-import com.inari.util.*
+import com.inari.util.VOID_CONSUMER_2
 import kotlin.jvm.JvmField
 
 class Scene private constructor(): Control() {

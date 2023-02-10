@@ -1,7 +1,7 @@
 package com.inari.firefly.util.collection
 
 import com.inari.util.collection.BitSet
-import com.inari.util.collection.BitSetIterator
+import com.inari.util.collection.IndexIterator
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -25,7 +25,7 @@ class BitSetTest {
         bitset[4] = true
         bitset[5] = true
 
-        val iterator = BitSetIterator(bitset)
+        val iterator = IndexIterator(bitset)
         val buffer = StringBuffer()
         while (iterator.hasNext())
             buffer.append("${iterator.next()},")

@@ -2,11 +2,9 @@ package com.inari.firefly.ai.utility
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.*
-import com.inari.firefly.core.api.OperationResult.*
-import com.inari.util.*
+import com.inari.firefly.core.api.OperationResult.RUNNING
+import com.inari.util.VOID_CALL
 import com.inari.util.collection.BitSet
-import com.inari.util.collection.Dictionary
-import com.inari.util.collection.EMPTY_DICTIONARY
 import com.inari.util.geom.Easing
 import com.inari.util.geom.EasingFunction
 import kotlin.jvm.JvmField

@@ -1,7 +1,10 @@
 package com.inari.firefly.ai.utility
 
-import com.inari.firefly.core.*
+import com.inari.firefly.core.ComponentKey
+import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
+import com.inari.firefly.core.EntityComponent
+import com.inari.firefly.core.EntityComponentBuilder
 import com.inari.firefly.core.api.FFTimer
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.collection.BitSet

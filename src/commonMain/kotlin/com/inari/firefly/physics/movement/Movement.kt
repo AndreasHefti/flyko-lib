@@ -1,9 +1,11 @@
 package com.inari.firefly.physics.movement
 
-import com.inari.firefly.core.*
+import com.inari.firefly.core.Control
+import com.inari.firefly.core.Engine
+import com.inari.firefly.core.Entity
+import com.inari.firefly.core.EntityControl
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.util.ZERO_FLOAT
-
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.AspectType
 import com.inari.util.aspect.IndexedAspectType
@@ -54,8 +56,8 @@ object Movement : EntityControl() {
             Engine.notify(moveEvent)
     }
 
-    override fun update(index: Int) {
-        val entity = Entity[index]
+    override fun update(entityId: Int) {
+        val entity = Entity[entityId]
         if (this.isPaused(entity.groups.aspects))
             return
 

@@ -20,7 +20,7 @@ import kotlin.Comparator
 import kotlin.jvm.JvmField
 
 
-interface DynArrayRO<T> : Iterable<T> {
+interface DynArrayRO<T> : IndexIterable, IndexedTypeIterable<T>, Iterable<T> {
 
     /** Indicates the grow number that defines the number of additional capacity that is added when a object is set with an
      * index higher then the actual capacity.
@@ -52,7 +52,7 @@ interface DynArrayRO<T> : Iterable<T> {
      * @param index the index
      * @throws IndexOutOfBoundsException if index is out of bounds ( 0 - capacity )
      */
-    operator fun get(index: Int): T?
+    override operator fun get(index: Int): T?
 
     /** Indicates if there is an object referenced by the specified id. If there is no object referenced
      * by the index, false is returned also in the case, the index is out of bounds.
@@ -70,15 +70,11 @@ interface DynArrayRO<T> : Iterable<T> {
     fun indexOf(value: T): Int
 
     /** Use this to get the next none empty index of the array from given index
-     * @param fromIndex the start index where to get the next none empty index of the array
+     * @param from the start index where to get the next none empty index of the array
      * @return the next none empty index in the array or -1 if there is no such index
      */
-    fun nextIndex(fromIndex: Int): Int
+    override fun nextIndex(from: Int): Int
 
-    /** Use this to get an index iterator to iterate to all indexed of this DynArray that has a value
-     * @return IntIterator the index iterator
-     */
-    fun indexIterator(): IntIterator
 }
 
 /** An Array that dynamically grows if more space is needed.
@@ -170,8 +166,11 @@ class DynArray<T> constructor(
      */
     fun addAll(values: DynArrayRO<T>) {
         ensureCapacity(this.size + values.size)
-        for (value in values)
-            add(value)
+        var i = values.nextIndex(0)
+        while (i >= 0) {
+            add(values[i]!!)
+            i = values.nextIndex(i + 1)
+        }
     }
 
     /** Get the object at specified index or null if there is no object referenced by specified index.
@@ -217,13 +216,13 @@ class DynArray<T> constructor(
     }
 
     /** Use this to get the next none empty index of the array from given index
-     * @param fromIndex the start index where to get the next none empty index of the array
+     * @param from the start index where to get the next none empty index of the array
      * @return the next none empty index in the array or -1 if there is no such index
      */
-    override fun nextIndex(fromIndex: Int): Int {
-        if (fromIndex >= this.capacity)
+    override fun nextIndex(from: Int): Int {
+        if (from >= this.capacity)
             return -1
-        var result = fromIndex
+        var result = from
         while (result < array.size && array[result] == null)
             result++
         if (result >= array.size) return -1
@@ -315,20 +314,7 @@ class DynArray<T> constructor(
      *
      * @return an Iterator of specified type to iterate over all objects in the DynArray by skipping the empty/null values
      */
-    override fun iterator(): Iterator<T> =
-        DynArrayIterator()
-
-    override fun indexIterator(): IntIterator {
-        return object : IntIterator() {
-            private var index = nextIndex(0)
-            override fun hasNext(): Boolean = index >= 0
-            override fun nextInt(): Int {
-                val ret = index
-                index = nextIndex(index + 1)
-                return ret
-            }
-        }
-    }
+    override fun iterator(): Iterator<T> = IndexedTypeIterator(this)
 
     fun trim() {
         if (size == capacity)
@@ -398,17 +384,6 @@ class DynArray<T> constructor(
             arrayAllocation(initialCapacity)
         else
             arrayAllocation(0)
-    }
-
-    private inner class DynArrayIterator : Iterator<T> {
-        private var index = nextIndex(0)
-        override fun hasNext(): Boolean = index >= 0
-        override fun next(): T {
-            val result = array[index] ?:
-                throw ConcurrentModificationException("Concurrent modification detected. Next item is not existing anymore")
-            index = nextIndex(index + 1)
-            return result
-        }
     }
 
     companion object {

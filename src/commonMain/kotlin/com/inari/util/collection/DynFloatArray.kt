@@ -2,7 +2,7 @@ package com.inari.util.collection
 
 import com.inari.util.arraycopy
 
-interface DynFloatArrayRO {
+interface DynFloatArrayRO : IndexedTypeIterable<Float> {
     val nullValue: Float
     val expand: Int
     val isEmpty: Boolean
@@ -10,9 +10,9 @@ interface DynFloatArrayRO {
     val length: Int
     fun isEmpty(index: Int): Boolean
     operator fun contains(value: Float): Boolean
-    operator fun get(index: Int): Float
+    override operator fun get(index: Int): Float
     fun indexOf(value: Float): Int
-    operator fun iterator(): FloatIterator
+    operator fun iterator(): IndexedTypeIterator<Float>
 }
 
 class DynFloatArray(
@@ -123,8 +123,18 @@ class DynFloatArray(
     override fun get(index: Int): Float =
         array[index]
 
-    override fun iterator(): FloatIterator =
-        DynFloatArrayIterator()
+    override fun nextIndex(from: Int): Int {
+        if (from >= this.size)
+            return -1
+        var result = from
+        while (result < array.size && array[result] == nullValue)
+            result++
+        if (result >= array.size) return -1
+        return result
+    }
+
+    override operator fun iterator(): IndexedTypeIterator<Float> =
+        IndexedTypeIterator(this)
 
     private fun firstEmptyIndex(): Int =
         indexOf(nullValue)
@@ -190,27 +200,5 @@ class DynFloatArray(
         val temp = array
         initArray(temp.size + expandSize + expand)
         arraycopy(temp, 0, array, 0, temp.size)
-    }
-
-    private inner class DynFloatArrayIterator internal constructor() : FloatIterator() {
-
-        private var currentIndex = 0
-
-        init { findNext() }
-
-        override fun hasNext(): Boolean =
-            currentIndex < array.size
-
-        override fun nextFloat(): Float {
-            val result = array[currentIndex]
-            currentIndex++
-            findNext()
-            return result
-        }
-
-        fun findNext() {
-            while (currentIndex < array.size && array[currentIndex] == nullValue)
-                currentIndex++
-        }
     }
 }

@@ -4,7 +4,8 @@ import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.movement.Movement.MovementAspect.*
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
-import kotlin.math.*
+import kotlin.math.max
+import kotlin.math.min
 
 interface IntegratorBuilder<I : Integrator> {
     fun create(): I
