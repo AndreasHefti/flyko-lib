@@ -21,10 +21,8 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
 
     abstract fun resolve(entity: Entity, contact: EContact, contactScan: ContactScans)
 
-    companion object : ComponentSystem<CollisionResolver>("ContactResolver") {
+    companion object : AbstractComponentSystem<CollisionResolver>("ContactResolver") {
         override fun allocateArray(size: Int): Array<CollisionResolver?> = arrayOfNulls(size)
-        override fun create(): CollisionResolver =
-            throw UnsupportedOperationException("ContactResolver is abstract use a concrete implementation instead")
 
         // Contains all entity ids that has contact scans defined and are active
         // They are all processed during one contact scan cycle. A contact scan is triggered by a move event

@@ -1,8 +1,11 @@
 package com.inari.firefly.game.room.tiled_binding
 
+import com.inari.firefly.game.room.Room
 import com.inari.util.EMPTY_STRING
 import com.inari.util.NO_NAME
 import com.inari.util.ZERO_FLOAT
+import com.inari.util.collection.Attributes
+import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
 const val TILED_PROP_STRING_TYPE = "string"
@@ -72,29 +75,32 @@ abstract class WithMappedProperties(
     fun getSubPropAsInt(name: String, subName: String): Int? =
         mappedProperties[name]?.classValue?.get(subName)?.toString()?.toFloat()?.toInt()
 
-    fun getPropertyStringMap(): MutableMap<String, String> {
-        val result = mutableMapOf<String, String>()
-        mappedProperties.forEach {
+    fun putProperties(attributes: Attributes): Attributes {
+        val iter = mappedProperties.entries.iterator()
+        while (iter.hasNext()) {
+            val it = iter.next()
             if (it.value.type == TILED_PROP_STRING_TYPE)
-                result[it.value.name] = it.value.stringValue
+                attributes[it.value.name] = it.value.stringValue
             else {
                 try {
-                    fillProps(it.value.classValue, result)
+                    fillProps(it.value.classValue, attributes)
                 } catch (e: Exception) {
                     println("Failed to parse tiled property: $it")
                 }
             }
         }
-        return result
+        return attributes
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun fillProps(props: Map<String, Any>, result: MutableMap<String, String>) {
-        props.forEach {
+    private fun fillProps(props: Map<String, Any>, attributes: Attributes) {
+        val iter = props.entries.iterator()
+        while (iter.hasNext()) {
+            val it = iter.next()
             if (it.value is String || it.value is Number)
-                result[it.key] = it.value.toString()
+                attributes[it.key] = it.value.toString()
             else try {
-                fillProps(it.value as Map<String, Any>, result)
+                fillProps(it.value as Map<String, Any>, attributes)
             } catch (e: Exception) {
                 println("Failed to parse tiled property: $it")
             }
@@ -164,7 +170,19 @@ class TiledObject(
     @JvmField val height: Float = ZERO_FLOAT,
     @JvmField val rotation: Float = ZERO_FLOAT,
     @JvmField val visible: Boolean = false,
-    @JvmField val gid: Int = -1,
-    @JvmField val point: Boolean = false,
     @JvmField val properties: Array<TiledPropertyJson> = emptyArray()
-) : WithMappedProperties(properties)
+) : WithMappedProperties(properties) {
+
+    fun toAttributes(): Attributes {
+        val attributes: Attributes = Attributes() +
+                ( Room.ATTR_OBJECT_ID to id.toString() ) +
+                ( Room.ATTR_OBJECT_TYPE to type ) +
+                ( Room.ATTR_OBJECT_NAME to name ) +
+                ( Room.ATTR_OBJECT_BOUNDS to Vector4f(x, y, width, height).toJsonString() ) +
+                ( Room.ATTR_OBJECT_ROTATION to rotation.toString() ) +
+                ( Room.ATTR_OBJECT_VISIBLE to visible.toString() )
+
+        putProperties(attributes)
+        return attributes
+    }
+}

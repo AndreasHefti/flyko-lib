@@ -83,8 +83,39 @@
                  "height":20,
                  "id":1,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"groups",
+                         "type":"string",
+                         "value":"transition"
+                        }, 
+                        {
+                         "name":"target",
+                         "type":"string",
+                         "value":"TestRoom2"
+                        }, 
+                        {
+                         "name":"tasks",
+                         "propertytype":"tasks",
+                         "type":"class",
+                         "value":
+                            {
+                             "ON_LOAD":"RoomTransitionBuildTask"
+                            }
+                        }, 
+                        {
+                         "name":"triggerOn",
+                         "propertytype":"triggerOn",
+                         "type":"string",
+                         "value":"CONTACT"
+                        }, 
+                        {
+                         "name":"triggerTask",
+                         "type":"string",
+                         "value":"RoomTransition"
+                        }],
                  "rotation":0,
-                 "type":"transition",
+                 "type":"room_transition",
                  "visible":true,
                  "width":10,
                  "x":315,
@@ -101,6 +132,11 @@
  "orientation":"orthogonal",
  "properties":[
         {
+         "name":"groups",
+         "type":"string",
+         "value":""
+        }, 
+        {
          "name":"name",
          "type":"string",
          "value":"map1"
@@ -111,9 +147,9 @@
          "type":"class",
          "value":
             {
-             "AFTER_ACTIVATION":"afterActivateTileMap",
-             "AFTER_LOAD":"afterLoadTileMap",
-             "BEFORE_ACTIVATION":"beforeActivateTileMap"
+             "ON_ACTIVATION":"onActivationRoom",
+             "ON_DEACTIVATION":"onDeactivateRoom",
+             "ON_LOAD":"onLoadRoom"
             }
         }, 
         {

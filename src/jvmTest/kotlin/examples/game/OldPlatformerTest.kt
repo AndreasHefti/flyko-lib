@@ -6,7 +6,7 @@ package examples.game
 //import com.inari.firefly.core.api.ButtonType
 //import com.inari.firefly.core.api.InputAPIImpl
 //import com.inari.firefly.core.api.OperationResult
-//import com.inari.firefly.game.PlatformerCollisionResolver
+//import com.inari.firefly.game.player.PlatformerCollisionResolver
 //import com.inari.firefly.game.world.json_binding.AreaJsonAsset
 //import com.inari.firefly.game.room.TileMaterialType
 //

@@ -4,6 +4,10 @@ import com.inari.firefly.DesktopApp
 import com.inari.firefly.core.Task
 import com.inari.firefly.game.room.Room
 import com.inari.firefly.game.room.tiled_binding.TiledRoomLoadTask
+import com.inari.firefly.game.room.tiled_binding.TiledRoomLoadTask.ATTR_TILE_SET_DIR_PATH
+import com.inari.firefly.game.room.tiled_binding.TiledRoomLoadTask.ATTR_VIEW_NAME
+import com.inari.firefly.game.room.tiled_binding.TiledRoomLoadTask.ATTR_NAME
+import com.inari.firefly.game.room.tiled_binding.TiledRoomLoadTask.ATTR_RESOURCE
 import com.inari.firefly.graphics.FFInfoSystem
 import com.inari.firefly.graphics.FrameRateInfo
 import com.inari.firefly.graphics.view.View
@@ -34,30 +38,37 @@ fun main() {
         }
 
         Task {
-            name = "afterLoadTileMap"
+            name = "onLoadRoom"
             simpleTask = {
                 println("After Room loaded")
             }
         }
         Task {
-            name = "beforeActivateTileMap"
+            name = "onActivationRoom"
             simpleTask = {
-                println("Before Room activation")
+                println("After Room activation")
             }
         }
         Task {
-            name = "afterActivateTileMap"
+            name = "onDeactivateRoom"
             simpleTask = {
-                println("After Room activation")
+                println("Before Room Deactivated")
+            }
+        }
+        Task{
+            name = "RoomTransitionBuildTask"
+            operation = { roomIndex, attributes, callback ->
+                println("RoomTransitionBuildTask on Room ${Room[roomIndex]}")
+                println(attributes.toString())
             }
         }
 
         val tileSetName = "TiledMapTest"
         val tiledMapAttrs = Attributes() +
-                ( TiledRoomLoadTask.ATTR_NAME to tileSetName ) +
-                ( TiledRoomLoadTask.ATTR_VIEW_NAME to "testView" ) +
-                ( TiledRoomLoadTask.ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
-                ( TiledRoomLoadTask.ATTR_RESOURCE to "tiled_map_example/example_map1.json")
+                ( ATTR_NAME to tileSetName ) +
+                ( ATTR_VIEW_NAME to "testView" ) +
+                ( ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
+                ( ATTR_RESOURCE to "tiled_map_example/example_map1.json")
 
         TiledRoomLoadTask(attributes = tiledMapAttrs)
         Room.activate(tileSetName)

@@ -1,4 +1,4 @@
-package com.inari.firefly.game.world
+package com.inari.firefly.game.player
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.ButtonType

@@ -9,9 +9,8 @@ abstract class Asset protected constructor(assetType: ComponentType<out Asset>) 
         protected set
     open fun assetIndex(at: Int): Int = assetIndex
 
-    companion object : ComponentSystem<Asset>("Asset") {
+    companion object : AbstractComponentSystem<Asset>("Asset") {
         override fun allocateArray(size: Int): Array<Asset?> = arrayOfNulls(size)
-        override fun create() = throw UnsupportedOperationException("Asset is abstract use sub type builder instead")
 
         fun resolveAssetIndex(key: ComponentKey, preload: Boolean = true, setIndex: Int = 0): Int {
             if (key == NO_COMPONENT_KEY)

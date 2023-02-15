@@ -1,11 +1,9 @@
 package com.inari.firefly.game.room.tiled_binding
 
 import com.inari.firefly.core.Engine
+import com.inari.firefly.core.StaticTask
 import com.inari.firefly.core.Task
-import com.inari.firefly.core.api.BlendMode
-import com.inari.firefly.core.api.ComponentIndex
-import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
-import com.inari.firefly.core.api.TaskCallback
+import com.inari.firefly.core.api.*
 import com.inari.firefly.game.room.TileMaterialType
 import com.inari.firefly.game.room.TileSet
 import com.inari.firefly.game.room.TileUtils
@@ -17,23 +15,14 @@ import com.inari.util.collection.Dictionary
 import com.inari.util.collection.EMPTY_DICTIONARY
 import com.inari.util.geom.Vector4i
 
-object  TiledTileSetLoadTask : Task() {
-
-    init {
-        super.operation = ::apply
-        Task.registerAsSingleton(this, true)
-        Task.activate(this.name)
-    }
+object  TiledTileSetLoadTask : StaticTask() {
 
     const val ATTR_NAME = "tileSetName"
     const val ATTR_RESOURCE = "tiledJsonResource"
     const val ATTR_ENCRYPTION = "encryptionKey"
     const val ATTR_MAPPING_START_TILE_ID = "mappingStartTileId"
 
-    private fun apply(
-        compIndex: ComponentIndex = NULL_COMPONENT_INDEX,
-        attributes: Dictionary = EMPTY_DICTIONARY,
-        callback: TaskCallback) {
+    override fun apply(attributes: Dictionary, callback: TaskCallback) {
 
         // get all needed attributes and check
         val name = attributes[ATTR_NAME] ?: throw IllegalArgumentException("Missing name")
@@ -154,5 +143,7 @@ object  TiledTileSetLoadTask : Task() {
                 }
             }
         }
+
+        callback(-1, attributes, OperationResult.SUCCESS)
     }
 }

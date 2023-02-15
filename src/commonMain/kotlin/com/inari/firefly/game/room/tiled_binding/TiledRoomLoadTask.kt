@@ -2,11 +2,8 @@ package com.inari.firefly.game.room.tiled_binding
 
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.LifecycleTaskType
-import com.inari.firefly.core.Task
-import com.inari.firefly.core.api.BlendMode
-import com.inari.firefly.core.api.ComponentIndex
-import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
-import com.inari.firefly.core.api.TaskCallback
+import com.inari.firefly.core.StaticTask
+import com.inari.firefly.core.api.*
 import com.inari.firefly.game.room.Room
 import com.inari.firefly.game.room.TileMap
 import com.inari.firefly.game.room.TileSet
@@ -16,17 +13,10 @@ import com.inari.util.EMPTY_STRING
 import com.inari.util.LIST_VALUE_SEPARATOR
 import com.inari.util.collection.Attributes
 import com.inari.util.collection.Dictionary
-import com.inari.util.collection.EMPTY_DICTIONARY
 import com.inari.util.geom.GeomUtils
 import com.inari.util.geom.Vector4f
 
-object TiledRoomLoadTask : Task() {
-
-    init {
-        super.operation = TiledRoomLoadTask::apply
-        Task.registerAsSingleton(this, true)
-        Task.activate(this.name)
-    }
+object TiledRoomLoadTask : StaticTask() {
 
     const val ATTR_NAME = "tileMapName"
     const val ATTR_RESOURCE = "tiledJsonResource"
@@ -38,10 +28,7 @@ object TiledRoomLoadTask : Task() {
     const val ATTR_DEFAULT_BLEND = "defaultBlend"
     const val ATTR_DEFAULT_TINT = "defaultTint"
 
-    private fun apply(
-        compIndex: ComponentIndex = NULL_COMPONENT_INDEX,
-        attributes: Dictionary = EMPTY_DICTIONARY,
-        callback: TaskCallback) {
+    override fun apply(attributes: Dictionary, callback: TaskCallback) {
 
         // get all needed attributes and check
         val name = attributes[ATTR_NAME] ?: throw IllegalArgumentException("Missing name")
@@ -50,34 +37,37 @@ object TiledRoomLoadTask : Task() {
         val enc = attributes[ATTR_ENCRYPTION]
         val tileSetDirPath = attributes[ATTR_TILE_SET_DIR_PATH] ?: EMPTY_STRING
 
-        val createLayer = attributes[ATTR_CREATE_LAYER]?.toBoolean() ?: true
-        val defaultBlend = BlendMode.valueOf(attributes[ATTR_DEFAULT_BLEND] ?: "NONE")
-        val defaultTint = Vector4f()(attributes[ATTR_DEFAULT_TINT] ?: "1,1,1,1")
+        println(">LoadTask In")
 
         // load tiled JSON resource
         val tileMapJson = Engine.resourceService.loadJSONResource(res, TiledMapJson::class, enc)
+        val createLayer = TiledRoomLoadTask.attributes[ATTR_CREATE_LAYER]?.toBoolean() ?: true
+
+        println(">LoadTask > JSON")
 
         // now create Room, TileMap and Objects from TiledMap input
-        //val tileSetOffsetMapping = mutableMapOf<String, Int>()
         val roomKey = Room {
             this.name = name
             // set attributes and tasks
-            this.attributes = Attributes(tileMapJson.getPropertyStringMap())
+            this.attributes = tileMapJson.putProperties(Attributes())
             tileMapJson.mappedProperties["tasks"]?.apply {
+                val initTask = withLifecycleTask {}
                 LifecycleTaskType.values().forEach {
                     this.classValue[it.name]?.apply {
-                        this@Room.withTask(it, this as String)
+                        initTask.withTask(it, this as String)
                     }
                 }
             }
-            // create TileMap
-            withTileMap {
-                this.name = name
-                viewRef(viewName)
-            }
         }
 
-        val tileMap = TileMap[name]
+        val tileMapKey = TileMap {
+            this.name = name
+            viewRef(viewName)
+            autoCreateLayer = createLayer
+        }
+        val tileMap = TileMap[tileMapKey]
+        val room = Room[roomKey]
+        room.withLifecycleComponent(tileMapKey)
 
         // load mapped tileset json files and create TiledTileSet components for it
         val tileSetReferences = tileMapJson.mappedProperties[PROP_TILE_SET_REFS]?.stringValue
@@ -90,7 +80,7 @@ object TiledRoomLoadTask : Task() {
             val resPath = tileSetDirPath + tileSetRefJson.source.substringAfterLast('/')
             val tiledTileSetAttrs = Attributes() +
                     ( TiledTileSetLoadTask.ATTR_NAME to tileSetRefName ) +
-                    (  TiledTileSetLoadTask.ATTR_RESOURCE to resPath)
+                    ( TiledTileSetLoadTask.ATTR_RESOURCE to resPath)
 
             TiledTileSetLoadTask(attributes = tiledTileSetAttrs)
 
@@ -103,14 +93,20 @@ object TiledRoomLoadTask : Task() {
             if (layerJson.type == PROP_VALUE_TYPE_LAYER)
                loadTileLayer(tileMap, tileMapJson, layerJson)
             else if (layerJson.type == PROP_VALUE_TYPE_OBJECT)
-                loadObjectLayer(tileMap, tileMapJson, layerJson)
+                loadObjectLayer(room, tileMapJson, layerJson)
         }
+
+        callback(-1, attributes, OperationResult.SUCCESS)
     }
 
     private fun loadTileLayer(
         tileMap: TileMap,
         tileMapJson: TiledMapJson,
         layerJson: TiledLayer) {
+
+
+        val defaultBlend = BlendMode.valueOf(attributes[ATTR_DEFAULT_BLEND] ?: "NONE")
+        val defaultTint = Vector4f()(attributes[ATTR_DEFAULT_TINT] ?: "1,1,1,1")
 
         // check tile-sets for layer are defined
         val layerTileSets = layerJson.mappedProperties[PROP_LAYER_TILE_SETS]?.stringValue
@@ -122,13 +118,12 @@ object TiledRoomLoadTask : Task() {
             parallaxFactorY = layerJson.parallaxy - 1
             layerRef(layerJson.name)
             if (layerJson.tintcolor.isNotEmpty())
-                tint = GeomUtils.colorOf(layerJson.tintcolor)
+                tint(GeomUtils.colorOf(layerJson.tintcolor))
+            else
+                tint(defaultTint)
             if (layerJson.opacity < 1.0f)
                 tint.a = layerJson.opacity
-            if (BLEND_PROP in layerJson.mappedProperties)
-                blend = BlendMode.valueOf(layerJson.mappedProperties[BLEND_PROP]?.stringValue!!)
-
-
+            blend = BlendMode.valueOf(layerJson.mappedProperties[BLEND_PROP]?.stringValue ?: defaultBlend.name)
             withTileGridData {
                 tileWidth = tileMapJson.tilewidth
                 tileHeight = tileMapJson.tileheight
@@ -150,8 +145,21 @@ object TiledRoomLoadTask : Task() {
         }
     }
 
-    private fun loadObjectLayer(tileMap: TileMap, tileMapJson: TiledMapJson, layerJson: TiledLayer) {
-        // TODO
-    }
+    private fun loadObjectLayer(room: Room, json: TiledMapJson, layerJson: TiledLayer) {
+        val iter = layerJson.objects?.iterator() ?: return
+        while (iter.hasNext()) {
+            val tiledObj = iter.next()
+            val attributes = tiledObj.toAttributes()
+            val taskProps = tiledObj.mappedProperties["tasks"]
 
+            room.withLifecycleTask {
+                this.order = 10
+                this.attributes = attributes
+
+                taskProps!!.classValue.entries.forEach {
+                    withTask(LifecycleTaskType.valueOf(it.key), it.value.toString())
+                }
+            }
+        }
+    }
 }

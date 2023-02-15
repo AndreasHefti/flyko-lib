@@ -132,6 +132,11 @@
         "id": 19,
         "members": [
             {
+                "name": "groups",
+                "type": "string",
+                "value": ""
+            },
+            {
                 "name": "name",
                 "type": "string",
                 "value": ""
@@ -267,6 +272,46 @@
     },
     {
         "color": "#ffa0a0a4",
+        "id": 23,
+        "members": [
+            {
+                "name": "groups",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "target",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "tasks",
+                "propertyType": "tasks",
+                "type": "class",
+                "value": {
+                }
+            },
+            {
+                "name": "triggerOn",
+                "propertyType": "triggerOn",
+                "type": "string",
+                "value": "CONTACT"
+            },
+            {
+                "name": "triggerTask",
+                "type": "string",
+                "value": ""
+            }
+        ],
+        "name": "room_transition",
+        "type": "class",
+        "useAs": [
+            "property",
+            "object"
+        ]
+    },
+    {
+        "color": "#ffa0a0a4",
         "id": 25,
         "members": [
             {
@@ -296,42 +341,27 @@
         "id": 22,
         "members": [
             {
-                "name": "AFTER_ACTIVATION",
+                "name": "ON_ACTIVATION",
                 "type": "string",
                 "value": ""
             },
             {
-                "name": "AFTER_DEACTIVATION",
+                "name": "ON_DEACTIVATION",
                 "type": "string",
                 "value": ""
             },
             {
-                "name": "AFTER_DISPOSE",
+                "name": "ON_DELETE",
                 "type": "string",
                 "value": ""
             },
             {
-                "name": "AFTER_LOAD",
+                "name": "ON_DISPOSE",
                 "type": "string",
                 "value": ""
             },
             {
-                "name": "BEFORE_ACTIVATION",
-                "type": "string",
-                "value": ""
-            },
-            {
-                "name": "BEFORE_DEACTIVATION",
-                "type": "string",
-                "value": ""
-            },
-            {
-                "name": "BEFORE_DELETE",
-                "type": "string",
-                "value": ""
-            },
-            {
-                "name": "BEFORE_DISPOSE",
+                "name": "ON_LOAD",
                 "type": "string",
                 "value": ""
             }
@@ -357,38 +387,6 @@
             "..."
         ],
         "valuesAsFlags": true
-    },
-    {
-        "color": "#ffa0a0a4",
-        "id": 23,
-        "members": [
-            {
-                "name": "applyTask",
-                "type": "string",
-                "value": ""
-            },
-            {
-                "name": "to",
-                "propertyType": "roomKey",
-                "type": "class",
-                "value": {
-                    "area": "this",
-                    "world": "this"
-                }
-            },
-            {
-                "name": "triggerOn",
-                "propertyType": "triggerOn",
-                "type": "string",
-                "value": "CONTACT"
-            }
-        ],
-        "name": "transition",
-        "type": "class",
-        "useAs": [
-            "property",
-            "object"
-        ]
     },
     {
         "id": 24,

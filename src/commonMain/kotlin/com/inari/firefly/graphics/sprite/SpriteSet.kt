@@ -51,13 +51,13 @@ class SpriteFrame : IntFrameAnimation.IntFrame {
     override val value: Int
         get() = sprite.spriteIndex
 
-    companion object {
-        val of: (SpriteFrame.() -> Unit) -> SpriteFrame = { configure ->
-            val instance = SpriteFrame()
-            instance.also(configure)
-            instance
-        }
-    }
+//    companion object {
+//        val of: (SpriteFrame.() -> Unit) -> SpriteFrame = { configure ->
+//            val instance = SpriteFrame()
+//            instance.also(configure)
+//            instance
+//        }
+//    }
 }
 
 class SpriteSet private constructor(): Asset(SpriteSet) {

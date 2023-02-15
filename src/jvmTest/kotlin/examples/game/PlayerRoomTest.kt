@@ -2,9 +2,12 @@ package examples.game
 
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.core.Task
+import com.inari.firefly.game.room.Room
+import com.inari.firefly.game.room.tiled_binding.TiledRoomLoadTask
 import com.inari.firefly.graphics.FFInfoSystem
 import com.inari.firefly.graphics.FrameRateInfo
 import com.inari.firefly.graphics.view.View
+import com.inari.util.collection.Attributes
 import examples.TestCameraController
 
 fun main() {
@@ -30,21 +33,23 @@ fun main() {
             withControl(TestCameraController) {}
         }
 
-
-
-        Task {
-            name = "beforeTileMapLoad"
-            simpleTask = {
-                println("Load Player")
+        Task{
+            name = "RoomTransitionBuildTask"
+            operation = { roomIndex, attributes, callback ->
+                println("RoomTransitionBuildTask on Room ${Room[roomIndex]}")
+                println(attributes.toString())
             }
         }
 
-        Task {
-            name = "beforeTileMapActivation"
-            simpleTask = {
-                println("Tile Map on activation")
-            }
-        }
+        val tileSetName = "TiledMapTest"
+        val tiledMapAttrs = Attributes() +
+                ( TiledRoomLoadTask.ATTR_NAME to tileSetName ) +
+                ( TiledRoomLoadTask.ATTR_VIEW_NAME to "testView" ) +
+                ( TiledRoomLoadTask.ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
+                ( TiledRoomLoadTask.ATTR_RESOURCE to "tiled_map_example/example_map1.json")
+
+        TiledRoomLoadTask(attributes = tiledMapAttrs)
+        Room.activate(tileSetName)
 
     }
 }

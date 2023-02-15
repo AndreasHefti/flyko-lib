@@ -79,9 +79,8 @@ abstract class Control protected constructor() : Component(Control) {
 
     protected abstract fun update()
 
-    companion object : ComponentSystem<Control>("Control") {
+    companion object : AbstractComponentSystem<Control>("Control") {
         override fun allocateArray(size: Int): Array<Control?> = arrayOfNulls(size)
-        override fun create() = throw UnsupportedOperationException("Control is abstract use sub type builder instead")
 
         init {
            Engine.registerListener(UPDATE_EVENT_TYPE, ::updateAllActiveControls)

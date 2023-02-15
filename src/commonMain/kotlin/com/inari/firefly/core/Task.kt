@@ -1,6 +1,7 @@
 package com.inari.firefly.core
 
 import com.inari.firefly.core.api.*
+import com.inari.firefly.game.room.tiled_binding.TiledTileSetLoadTask
 import com.inari.util.VOID_CONSUMER_1
 import com.inari.util.collection.Dictionary
 import com.inari.util.collection.EMPTY_DICTIONARY
@@ -44,4 +45,17 @@ open class Task protected constructor(): Component(Task) {
         override fun allocateArray(size: Int): Array<Task?> = arrayOfNulls(size)
         override fun create() = Task()
     }
+}
+
+abstract class StaticTask protected constructor() : Task() {
+
+    init {
+        super.operation = {  _, attributes, callback ->  this.apply(attributes, callback) }
+        Task.registerAsSingleton(this, true)
+        Task.activate(this.index)
+    }
+
+    protected abstract fun apply(
+        attributes: Dictionary = EMPTY_DICTIONARY,
+        callback: TaskCallback)
 }

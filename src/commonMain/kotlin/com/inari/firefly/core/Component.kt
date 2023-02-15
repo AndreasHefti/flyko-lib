@@ -1,7 +1,5 @@
 package com.inari.firefly.core
 
-import com.inari.firefly.core.ComponentEventType.DELETED
-import com.inari.firefly.core.ComponentEventType.DISPOSED
 import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.NO_NAME
@@ -9,9 +7,8 @@ import com.inari.util.Named
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.Aspects
 import com.inari.util.aspect.IndexedAspectType
-import com.inari.util.collection.DynIntArray
+import com.inari.util.collection.DynArray
 import com.inari.util.collection.EMPTY_DICTIONARY
-import com.inari.util.collection.IndexIterator
 import com.inari.util.indexed.AbstractIndexed
 import kotlin.jvm.JvmField
 
@@ -30,17 +27,11 @@ enum class ComponentEventType {
 }
 
 enum class LifecycleTaskType {
-    AFTER_INIT,
-    BEFORE_LOAD,
-    AFTER_LOAD,
-    BEFORE_ACTIVATION,
-    AFTER_ACTIVATION,
-    BEFORE_DEACTIVATION,
-    AFTER_DEACTIVATION,
-    BEFORE_DISPOSE,
-    AFTER_DISPOSE,
-    BEFORE_DELETE,
-    AFTER_DELETE
+    ON_LOAD,
+    ON_ACTIVATION,
+    ON_DEACTIVATION,
+    ON_DISPOSE,
+    ON_DELETE
 }
 
 interface ComponentType<C : Component> : Aspect {
@@ -225,77 +216,96 @@ open class AttributedComponent protected constructor(
     }
 }
 
+@ComponentDSL
+class LifecycleTask {
+
+    @JvmField var order = 1
+    @JvmField var attributes = EMPTY_DICTIONARY
+    @JvmField val tasks: Array<String?> = arrayOfNulls(LifecycleTaskType.values().size)
+
+    fun withTask(type: LifecycleTaskType, name: String) {
+        tasks[type.ordinal] = name
+    }
+}
+
 open class Composite protected constructor(
     subType: ComponentType<out Composite>
 ) : AttributedComponent(subType) {
 
-    private val taskRefs: Array<DynIntArray?> = arrayOfNulls(LifecycleTaskType.values().size)
+    private val tasks = DynArray.of<LifecycleTask>(2, 5)
+    private val lifecycleComponents = DynArray.of<ComponentKey>(2, 5)
 
-    fun withTask(apply: LifecycleTaskType, taskKey: ComponentKey) {
-        if (taskKey.type != Task) throw IllegalArgumentException("Key mismatch taskKey is not of expected type Task")
-        getTaskRefs(apply) + taskKey.componentIndex
-    }
-    fun withTask(apply: LifecycleTaskType, name: String) =
-        getTaskRefs(apply) + Task.getKey(name).componentIndex
+    fun withLifecycleComponent(key: ComponentKey) =
+        lifecycleComponents + key
 
-    fun withTask(apply: LifecycleTaskType, configure: (Task.() -> Unit)) {
-        getTaskRefs(apply) + Task(configure).componentIndex
+    fun withLifecycleTask(lifecycleTask: LifecycleTask) {
+        tasks + lifecycleTask
+        sortTasks()
     }
 
-    override fun iInitialize() {
-        super.iInitialize()
-        runTaskIfDefined(LifecycleTaskType.AFTER_INIT)
+    fun withLifecycleTask(configure: (LifecycleTask.() -> Unit)): LifecycleTask {
+        val lifecycleTask = LifecycleTask()
+        lifecycleTask.also(configure)
+        tasks + lifecycleTask
+        sortTasks()
+        return lifecycleTask
     }
 
-    override fun iLoad() {
-        runTaskIfDefined(LifecycleTaskType.BEFORE_LOAD)
-        super.iLoad()
-        runTaskIfDefined(LifecycleTaskType.AFTER_LOAD)
+    override fun load() {
+        super.load()
+        runTaskIfDefined(LifecycleTaskType.ON_LOAD)
+        val iter = lifecycleComponents.iterator()
+        while (iter.hasNext())
+            ComponentSystem.load(iter.next())
     }
 
-    override fun iActivate() {
-        runTaskIfDefined(LifecycleTaskType.BEFORE_ACTIVATION)
-        super.iActivate()
-        runTaskIfDefined(LifecycleTaskType.AFTER_ACTIVATION)
+    override fun activate() {
+        super.activate()
+        runTaskIfDefined(LifecycleTaskType.ON_ACTIVATION)
+        val iter = lifecycleComponents.iterator()
+        while (iter.hasNext())
+            ComponentSystem.activate(iter.next())
     }
 
-    override fun iDeactivate() {
-        runTaskIfDefined(LifecycleTaskType.BEFORE_DEACTIVATION)
-        super.iDeactivate()
-        runTaskIfDefined(LifecycleTaskType.AFTER_DEACTIVATION)
+    override fun deactivate() {
+        val iter = lifecycleComponents.iterator()
+        while (iter.hasNext())
+            ComponentSystem.deactivate(iter.next())
+        runTaskIfDefined(LifecycleTaskType.ON_DEACTIVATION)
+        super.deactivate()
     }
 
-    override fun iDispose() {
-        runTaskIfDefined(LifecycleTaskType.BEFORE_DISPOSE)
-        super.iDispose()
-        runTaskIfDefined(LifecycleTaskType.AFTER_DISPOSE)
+    override fun dispose() {
+        val iter = lifecycleComponents.iterator()
+        while (iter.hasNext())
+            ComponentSystem.dispose(iter.next())
+        runTaskIfDefined(LifecycleTaskType.ON_DISPOSE)
+        super.dispose()
     }
 
-    override fun iDelete() {
-        runTaskIfDefined(LifecycleTaskType.BEFORE_DELETE)
-        super.iDelete()
-        runTaskIfDefined(LifecycleTaskType.AFTER_DELETE)
-    }
-
-    private fun removeTaskRef(index: ComponentIndex) {
-        taskRefs.forEach {
-            if (it != null && index in it)
-                it.remove(index)
-        }
-    }
-
-    private fun getTaskRefs(apply: LifecycleTaskType): DynIntArray {
-        if (taskRefs[apply.ordinal] == null)
-            taskRefs[apply.ordinal] = DynIntArray(1, NULL_COMPONENT_INDEX, 2)
-        return taskRefs[apply.ordinal]!!
+    override fun delete() {
+        val iter = lifecycleComponents.iterator()
+        while (iter.hasNext())
+            ComponentSystem.delete(iter.next())
+        runTaskIfDefined(LifecycleTaskType.ON_DELETE)
+        super.delete()
     }
 
     private fun runTaskIfDefined(type: LifecycleTaskType) {
-        val taskRefs = taskRefs[type.ordinal]
-        if (taskRefs != null) {
-            val iter = IndexIterator(taskRefs)
-            while (iter.hasNext())
-                Task[iter.next()](this@Composite.index, attributes)
+        val coIter = tasks.iterator()
+        while (coIter.hasNext()) {
+            val co = coIter.next()
+            if (co.tasks[type.ordinal] != null)
+                if (!Task.exists(co.tasks[type.ordinal]!!))
+                    println("**** WARN: Task ${co.tasks[type.ordinal]} does not exist")
+                else
+                    Task[co.tasks[type.ordinal]!!](this@Composite.index, co.attributes)
+        }
+    }
+
+    private fun sortTasks() {
+        tasks.sort { lt1, lt2 ->
+            lt1?.order?.compareTo(lt2?.order ?: 0)  ?: -1
         }
     }
 
@@ -303,12 +313,5 @@ open class Composite protected constructor(
         override fun allocateArray(size: Int): Array<Composite?> = arrayOfNulls(size)
         override fun create(): Composite =
             throw UnsupportedOperationException("Composite is abstract use a concrete implementation instead")
-
-        init {
-            Task.registerComponentListener { key, type ->
-                if (type == DISPOSED || type == DELETED)
-                    Composite.componentMapping.forEach { it.removeTaskRef(key.componentIndex) }
-            }
-        }
     }
 }

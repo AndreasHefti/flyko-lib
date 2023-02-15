@@ -1,4 +1,4 @@
-package com.inari.firefly.game
+package com.inari.firefly.game.player
 
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentKey

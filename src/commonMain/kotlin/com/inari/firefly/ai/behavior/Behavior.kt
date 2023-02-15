@@ -9,14 +9,12 @@ import com.inari.firefly.core.api.SUCCESS_ACTION
 import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
 
-abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
+abstract class BehaviorNode protected constructor(nodeType: ComponentType<out BehaviorNode>) : Component(nodeType) {
 
     abstract fun tick(entityId: Int): OperationResult
 
-    companion object : ComponentSystem<BehaviorNode>("BehaviorNode") {
+    companion object : AbstractComponentSystem<BehaviorNode>("BehaviorNode") {
         override fun allocateArray(size: Int): Array<BehaviorNode?> = arrayOfNulls(size)
-        override fun create() =
-            throw UnsupportedOperationException("BehaviorNode is abstract use a concrete implementation instead")
 
         private val entityIds = BitSet()
         private val entityListener: ComponentEventListener = { key, type ->
@@ -61,7 +59,7 @@ abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
     }
 }
 
-abstract class BranchNode internal constructor() : BehaviorNode() {
+abstract class BranchNode internal constructor(nodeType: ComponentType<out BranchNode>) : BehaviorNode(nodeType) {
 
     @JvmField internal val childrenNodes = BitSet()
 
@@ -72,7 +70,7 @@ abstract class BranchNode internal constructor() : BehaviorNode() {
     }
 }
 
-class ParallelNode private constructor() : BranchNode() {
+class ParallelNode private constructor() : BranchNode(ParallelNode) {
 
     @JvmField var successThreshold: Int = 0
 
@@ -101,7 +99,7 @@ class ParallelNode private constructor() : BranchNode() {
     }
 }
 
-class SelectionNode private constructor() : BranchNode() {
+class SelectionNode private constructor() : BranchNode(SelectionNode) {
 
     override fun tick(entityId: Int): OperationResult {
         var i = childrenNodes.nextSetBit(0)
@@ -119,7 +117,7 @@ class SelectionNode private constructor() : BranchNode() {
     }
 }
 
-class SequenceNode private constructor() : BranchNode() {
+class SequenceNode private constructor() : BranchNode(SequenceNode) {
 
     override fun tick(entityId: Int): OperationResult {
         var i = childrenNodes.nextSetBit(0)
@@ -148,7 +146,7 @@ class SequenceNode private constructor() : BranchNode() {
 //    }
 //}
 
-class ActionNode private constructor() : BehaviorNode() {
+class ActionNode private constructor() : BehaviorNode(ActionNode) {
 
     @JvmField var actionOperation: Action = SUCCESS_ACTION
 

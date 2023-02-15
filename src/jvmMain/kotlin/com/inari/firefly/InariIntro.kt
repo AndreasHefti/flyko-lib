@@ -82,11 +82,10 @@ object InariIntro {
     }
 
     private fun dispose() {
-
         if (!disposing) {
             disposing = true
             Entity.delete(entityId)
-            Asset.delete(textureAssetName)
+            Texture.delete(textureAssetName)
             entityId = NO_COMPONENT_KEY
             Engine.graphics.clearView(View[View.BASE_VIEW_KEY])
             Engine.input.resetInputCallbacks()

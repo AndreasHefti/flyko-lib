@@ -217,7 +217,7 @@ abstract class ComponentSystem<C : Component>(
         while (index > NULL_COMPONENT_INDEX) {
             val c = _componentMapping[index]!!
             if (!c.name.contains(STATIC_COMPONENT_MARKER))
-                this.delete(index)
+                this.internalDelete(index)
             index = _componentMapping.nextIndex(index + 1)
         }
 
@@ -410,7 +410,8 @@ abstract class ComponentSystem<C : Component>(
         }
     }
 
-    override fun delete(index: ComponentIndex) {
+    override fun delete(index: ComponentIndex) = internalDelete(index)
+    internal fun internalDelete(index: ComponentIndex) {
 
         // DEBUG  println("--> delete: ${aspectName}:${index}")
 
@@ -580,12 +581,18 @@ class ComponentEvent internal constructor(override val eventType: EventType): Ev
     override fun notify(listener: ComponentEventListener) = listener(key, componentEventType)
 }
 
+abstract class AbstractComponentSystem<C : Component>(systemName: String) : ComponentSystem<C>(systemName) {
+    override fun create() = throw UnsupportedOperationException("Asset is abstract use sub type builder instead")
+    override fun delete(index: ComponentIndex) = throw UnsupportedOperationException("Asset is abstract concrete use sub type")
+}
+
 abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
      val system: ComponentSystem<C>,
      final override val subTypeName: String
  ) : ComponentBuilder<CC>, IComponentSystem<CC> {
 
-    private val subTypeFilter: (C) -> Boolean = { it.componentType.subTypeName == subTypeName }
+    private val subComponentRefs = BitSet()
+    private val activeSubComponentRefs = BitSet()
 
     final override val systemName: String = subTypeName
     final override val typeName: String = system.typeName
@@ -600,41 +607,22 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
 
     override val componentEventType: Event.EventType = system.componentEventType
     override val hasComponents: Boolean
-        get() = !system.componentMapping.isEmpty
+        get() = !subComponentRefs.isEmpty
     override val hasActiveComponents: Boolean
-        get() = system.activeComponentSet.nextIndex(0) >= 0
+        get() = activeSubComponentRefs.nextIndex(0) >= 0
 
-    override fun indexIterator(): IntIterator = system.indexIterator()
-    override fun activeIndexIterator(): IntIterator = system.activeIndexIterator()
-    override fun iterator(): Iterator<CC> = SubTypeIterator(indexIterator())
-    //override fun activeIterator(): Iterator<CC> = SubTypeIterator(activeIndexIterator())
-    inner class SubTypeIterator<CC : Component>(private val iter: IntIterator): Iterator<CC> {
-        private var next = findNext()
-        override fun hasNext(): Boolean = next >= 0
-        override fun next(): CC {
-            @Suppress("UNCHECKED_CAST")
-            val ret = system[next] as CC
-            next = findNext()
-            return ret
-        }
-        private fun findNext(): Int {
-            var n = iter.next()
-            while(n >= 0) {
-                if (subTypeFilter(system[n]))
-                    return n
-                n = iter.next()
-            }
-            return n
-        }
+    override fun indexIterator(): IntIterator = IndexIterator.getIndexIterator(subComponentRefs)
+    override fun activeIndexIterator(): IntIterator = IndexIterator.getIndexIterator(activeSubComponentRefs)
+    override fun iterator(): Iterator<CC> = IndexedTypeIterator.getIndexIterator(iterableTypeAdapter)
+    private val iterableTypeAdapter: IndexedTypeIterable<CC> = object : IndexedTypeIterable<CC> {
+        override fun get(index: Int): CC? = if (subComponentRefs[index]) this@ComponentSubTypeBuilder[index] else null
+        override fun nextIndex(from: Int): Int = subComponentRefs.nextIndex(from)
     }
 
     override fun clearSystem() {
-        val iter = system.iterator()
-        while (iter.hasNext()) {
-            val c = iter.next()
-            if (subTypeFilter.invoke(c))
-                system.delete(c)
-        }
+        val iter = IndexIterator.getIndexIterator(subComponentRefs)
+        while (iter.hasNext())
+            delete(iter.next())
     }
 
     override fun createKey(name: String) = system.createKey(name)
@@ -647,25 +635,39 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
     override fun exists(index: ComponentIndex) = system.exists(index)
     override fun load(index: ComponentIndex) = system.load(index)
     override fun loadGroup(group: Aspect) = system.loadGroup(group)
-    override fun activate(index: ComponentIndex) = system.activate(index)
+    override fun activate(index: ComponentIndex) {
+        system.activate(index)
+        activeSubComponentRefs[index] = true
+    }
     override fun activateGroup(group: Aspect) = system.activateGroup(group)
-    override fun deactivate(index: ComponentIndex) = system.deactivate(index)
+    override fun deactivate(index: ComponentIndex) {
+        system.deactivate(index)
+        activeSubComponentRefs[index] = false
+    }
     override fun deactivateGroup(group: Aspect) = system.deactivateGroup(group)
     override fun dispose(index: ComponentIndex) = system.dispose(index)
     override fun disposeGroup(group: Aspect) = system.disposeGroup(group)
-    override fun delete(index: ComponentIndex) = system.delete(index)
+    override fun delete(index: ComponentIndex)  {
+        if (system.exists(index))
+            system.internalDelete(index)
+        else
+            println("**** WARING: Component $aspectName $subTypeName $index has already been deleted")
+        subComponentRefs[index] = false
+    }
     override fun deleteGroup(group: Aspect) = system.deleteGroup(group)
     override fun build(configure: CC.() -> Unit): ComponentKey {
         val comp: CC = create()
         comp.also(configure)
         val key = system.registerComponent(comp)
         system.initComponent(comp)
+        subComponentRefs.set(key.componentIndex)
         return key
     }
     override fun buildAndGet(configure: CC.() -> Unit): CC {
         val comp: CC = create()
         comp.also(configure)
         system.registerComponent(comp)
+        subComponentRefs.set(comp.index)
         system.initComponent(comp)
         return comp
     }

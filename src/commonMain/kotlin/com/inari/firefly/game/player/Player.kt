@@ -1,7 +1,7 @@
-package com.inari.firefly.game.world
+package com.inari.firefly.game.player
 
 import com.inari.firefly.core.*
-import com.inari.firefly.game.world.Player.PlayerEventType.*
+import com.inari.firefly.game.player.Player.PlayerEventType.*
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.util.NO_NAME

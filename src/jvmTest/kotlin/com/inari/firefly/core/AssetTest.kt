@@ -86,22 +86,22 @@ class AssetTest {
             testEvents.toString()
         )
 
-        Asset.activate(assetId)
+        TestAsset.activate(assetId)
         assertEquals(
             "|INITIALIZED|LOADED|ACTIVATED",
             testEvents.toString()
         )
-        Asset.deactivate(assetId)
+        TestAsset.deactivate(assetId)
         assertEquals(
             "|INITIALIZED|LOADED|ACTIVATED|DEACTIVATED",
             testEvents.toString()
         )
-        Asset.activate(assetId)
+        TestAsset.activate(assetId)
         assertEquals(
             "|INITIALIZED|LOADED|ACTIVATED|DEACTIVATED|ACTIVATED",
             testEvents.toString()
         )
-        Asset.delete(assetId)
+        TestAsset.delete(assetId)
         assertEquals(
             "|INITIALIZED|LOADED|ACTIVATED|DEACTIVATED|ACTIVATED|DEACTIVATED|DISPOSED|DELETED",
             testEvents.toString()
@@ -138,7 +138,7 @@ class AssetTest {
             Asset["childAsset"].toString()
         )
 
-        Asset.activate("childAsset")
+        TestAsset.activate("childAsset")
         assertEquals(
 
             "|index=1:childAsset:INITIALIZED" +
@@ -150,7 +150,7 @@ class AssetTest {
             testEvents.toString()
         )
 
-        Asset.dispose(asset1)
+        TestAsset.dispose(asset1)
         assertEquals(
             "|index=1:childAsset:INITIALIZED" +
                     "|index=0:parentAsset:INITIALIZED" +
@@ -255,15 +255,6 @@ class TestAsset private constructor(
 
         assetIndex = -1
         super.dispose()
-    }
-
-    override fun delete() {
-        TestAsset.forEachDo {
-            if (it.parent.exists && it.parent.targetKey == this.key)
-                TestAsset.delete(it)
-        }
-
-        super.delete()
     }
 
     override fun toString(): String {
