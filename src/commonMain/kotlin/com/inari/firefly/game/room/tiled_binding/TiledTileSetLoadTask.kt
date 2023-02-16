@@ -61,7 +61,9 @@ object  TiledTileSetLoadTask : StaticTask() {
             textureRef(atlasPath)
             mappingStartTileId = startId
             // create tiles
-            tileSetJson.tiles.forEach { tileJson ->
+            val iter = tileSetJson.tiles.iterator()
+            while (iter.hasNext()) {
+                val tileJson = iter.next()
                 val tileName = tileJson.mappedProperties[NAME_PROP]?.stringValue
                     ?: NO_NAME
                 val blend = tileJson.mappedProperties[BLEND_PROP]
@@ -102,9 +104,9 @@ object  TiledTileSetLoadTask : StaticTask() {
                     this.contactType = contactType
                     this.contactMask = contactBitMask
 
-                    tileAspectsString?.split(COMMA)?.forEach {
-                        this.aspects + it
-                    }
+                    val iter = tileAspectsString?.split(COMMA)?.iterator()
+                    while (iter?.hasNext() == true)
+                        this.aspects + iter.next()
 
                     this.withSprite {
                         this.textureBounds(

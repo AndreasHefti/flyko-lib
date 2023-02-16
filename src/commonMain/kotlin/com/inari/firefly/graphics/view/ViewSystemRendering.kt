@@ -146,7 +146,9 @@ object ViewSystemRenderer : Renderer() {
     private fun updateReferences() {
         SORTED_RENDER_TO_BASE.clear()
         FOR_ENTITY_RENDERING.clear()
-        VIEW_LAYER_MAPPING.forEach {
+        val iter = VIEW_LAYER_MAPPING.iterator()
+        while (iter.hasNext()) {
+            val it = iter.next()
             it.second.sort(LAYER_COMPARATOR)
             if (it.first.renderToBase)
                 SORTED_RENDER_TO_BASE.add(it.first)
@@ -183,7 +185,9 @@ object ViewSystemRenderer : Renderer() {
             renderViewport(View[View.BASE_VIEW_KEY])
             Engine.graphics.flush(NO_VIRTUAL_VIEW_PORTS)
         } else {
-            FOR_ENTITY_RENDERING.forEach { renderViewport(it) }
+            val iter = FOR_ENTITY_RENDERING.iterator()
+            while (iter.hasNext())
+                renderViewport(iter.next())
             Engine.graphics.flush(SORTED_RENDER_TO_BASE)
         }
     }
@@ -228,7 +232,9 @@ object ViewSystemRenderer : Renderer() {
         Engine.graphics.endViewportRendering(data)
     }
 
-    private fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i) =
-        RENDERING_CHAIN.forEach { it.render(viewIndex, layerIndex, clip) }
-
+    private fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i) {
+        val iter = RENDERING_CHAIN.iterator()
+        while (iter.hasNext())
+            iter.next().render(viewIndex, layerIndex, clip)
+    }
 }

@@ -61,13 +61,21 @@ open class TileMap : Component(TileMap) {
 
     override fun activate() {
         super.activate()
-        tileMapLayerData.forEach { layerData ->
+        val iter = tileMapLayerData.iterator()
+        while (iter.hasNext()) {
+            val layerData = iter.next()
             // activate layer first
             Layer.activate(layerData.layerRef.refIndex)
 
-            layerData.tileGridData.forEach { buildTileGrid(layerData, it) }
+            var iter = layerData.tileGridData.iterator()
+            while (iter.hasNext())
+                buildTileGrid(layerData, iter.next())
+
             activateTileSetForLayer(layerData)
-            layerData.tileGridData.forEach { fillTileGrid(layerData, it) }
+
+            iter = layerData.tileGridData.iterator()
+            while (iter.hasNext())
+                fillTileGrid(layerData, iter.next())
 
             if (layerData.parallaxFactorX >= 0f || layerData.parallaxFactorY >= 0f)
                 parallax = true
@@ -82,8 +90,12 @@ open class TileMap : Component(TileMap) {
             Engine.disposeListener(View.VIEW_CHANGE_EVENT_TYPE, parallaxListener)
         parallax = false
 
-        tileMapLayerData.forEach { data ->
-            data.tileGridData.forEach { deleteTileGrid(it) }
+        val iter = tileMapLayerData.iterator()
+        while (iter.hasNext()) {
+            val data = iter.next()
+            val iter2 = data.tileGridData.iterator()
+            while (iter2.hasNext())
+                deleteTileGrid(iter2.next())
             deactivateTileSets()
         }
         super.deactivate()
@@ -96,8 +108,12 @@ open class TileMap : Component(TileMap) {
 
     private fun activateTileSetForLayer(layerData: TileMapLayerData) {
 
-        layerData.tileGridData.forEach { tileGridData ->
-            tileGridData.tileSetMapping.forEach { mapping ->
+        val iter = layerData.tileGridData.iterator()
+        while (iter.hasNext()) {
+            val tileGridData = iter.next()
+            val iter2 = tileGridData.tileSetMapping.iterator()
+            while (iter2.hasNext()) {
+                val mapping = iter2.next()
                 var codeIndex = mapping.codeOffset
                 val tileSet = TileSet[mapping.tileSetIndex]
                 if (!tileSet.active)
@@ -201,7 +217,9 @@ open class TileMap : Component(TileMap) {
     }
 
     private fun deactivateTileSets() {
-        tileMapLayerData.forEach { mapLayer ->
+        val iter = tileMapLayerData.iterator()
+        while (iter.hasNext()) {
+            val mapLayer = iter.next()
             val iterator = IndexIterator(mapLayer.entityCodeMapping)
             while (iterator.hasNext())
                 Entity.delete(iterator.nextInt())
@@ -221,7 +239,9 @@ open class TileMap : Component(TileMap) {
     private fun updateParallaxLayer(pixelPerfect: Boolean) {
         val viewPos = View[viewRef].worldPosition
 
-        tileMapLayerData.forEach { mapLayer ->
+        val iter = tileMapLayerData.iterator()
+        while (iter.hasNext()) {
+            val mapLayer = iter.next()
             if (mapLayer.parallaxFactorX != ZERO_FLOAT || mapLayer.parallaxFactorY != ZERO_FLOAT) {
                 Layer[mapLayer.layerRef].position(
                     if (pixelPerfect) floor(-viewPos.x * mapLayer.parallaxFactorX) else -viewPos.x * mapLayer.parallaxFactorX,

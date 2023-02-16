@@ -1,9 +1,6 @@
 package com.inari.firefly.game.player
 
-import com.inari.firefly.core.CReference
-import com.inari.firefly.core.ComponentKey
-import com.inari.firefly.core.ComponentSubTypeBuilder
-import com.inari.firefly.core.Entity
+import com.inari.firefly.core.*
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.contact.*
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_CONTACT_TYPE
@@ -100,13 +97,15 @@ class PlatformerCollisionResolver : CollisionResolver() {
 
             // process callbacks first if available
             // stop processing on first callback returns true
-            if (!fullContactCallbacks.isEmpty)
-                fullContactCallbacks.forEach {
-                    if (fullContact.hasMaterialContact(it.material) && it.callback(fullContact))
-                        return
-                    if (fullContact.hasContactOfType(it.contact) && it.callback(fullContact))
-                        return
-                }
+            var i = fullContactCallbacks.nextIndex(0)
+            while (i >= 0) {
+                val it = fullContactCallbacks[i]!!
+                if (fullContact.hasMaterialContact(it.material) && it.callback(fullContact))
+                    return
+                if (fullContact.hasContactOfType(it.contact) && it.callback(fullContact))
+                    return
+                i = fullContactCallbacks.nextIndex(i + 1)
+            }
         }
     }
 

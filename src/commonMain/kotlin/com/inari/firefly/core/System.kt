@@ -222,10 +222,10 @@ abstract class ComponentSystem<C : Component>(
         }
 
         try {
-            val keys = _componentKeyMapping
+            _componentKeyMapping
                 .filter { it.value.componentIndex <= NULL_COMPONENT_INDEX }
                 .map { it.key }
-            keys.forEach { _componentKeyMapping.remove(it) }
+                .forEach { _componentKeyMapping.remove(it) }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -569,7 +569,9 @@ abstract class ComponentSystem<C : Component>(
 
         fun dumpInfo() {
             println("---- System Info ---------------------------------------------------------------------------------")
-            COMPONENT_SYSTEM_MAPPING.values.forEach { println(it) }
+            val iter = COMPONENT_SYSTEM_MAPPING.values.iterator()
+            while (iter.hasNext())
+                println(iter.next())
             println("--------------------------------------------------------------------------------------------------")
         }
     }

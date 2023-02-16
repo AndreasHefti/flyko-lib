@@ -42,8 +42,16 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
     /** The Aspects that reflects the EntityComponent types that are hold by this Entity */
     override val aspects: Aspects = components.aspects
 
-    override fun activate() = components.forEach { components.get(it)?.iActivate() }
-    override fun deactivate()  = components.forEach { components.get(it)?.iDeactivate() }
+    override fun activate() {
+        val iter = components.iterator()
+        while (iter.hasNext())
+            components.get(iter.next())?.iActivate()
+    }
+    override fun deactivate() {
+        val iter = components.iterator()
+        while (iter.hasNext())
+            components.get(iter.next())?.iDeactivate()
+    }
 
     fun has(cType: EntityComponentType<*>): Boolean = aspects.contains(cType.typeAspect)
     @Suppress("UNCHECKED_CAST")
@@ -96,7 +104,10 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
         }
 
         private fun disposeEntity(entity: Entity) {
-            entity.components.forEach { dispose(entity.components.get(it)!!) }
+            val iter = entity.components.iterator()
+            while (iter.hasNext())
+                dispose(entity.components.get(iter.next())!!)
+
             entity.components.clear()
             entity.disposeIndex()
             disposedEntities.add(entity)

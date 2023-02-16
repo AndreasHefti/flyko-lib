@@ -40,15 +40,19 @@ open class TileSet: Component(TileSet) {
 
         // load all sprites on low level
         val textureIndex = texture.assetIndex
-        tileTemplates.forEach { tileTemplate ->
+        val iter = tileTemplates.iterator()
+        while (iter.hasNext()) {
+            val tileTemplate = iter.next()
             val spriteTemplate = tileTemplate.spriteTemplate
             spriteTemplate.textureIndex = textureIndex
             spriteTemplate.spriteIndex = Engine.graphics.createSprite(spriteTemplate)
             if (tileTemplate.animationData != null) {
-                    tileTemplate.animationData!!.sprites.values.forEach { aSpriteTemplate ->
-                        aSpriteTemplate.textureIndex = textureIndex
-                        aSpriteTemplate.spriteIndex = Engine.graphics.createSprite(aSpriteTemplate)
-                    }
+                val iter = tileTemplate.animationData!!.sprites.values.iterator()
+                while (iter.hasNext()) {
+                    val aSpriteTemplate = iter.next()
+                    aSpriteTemplate.textureIndex = textureIndex
+                    aSpriteTemplate.spriteIndex = Engine.graphics.createSprite(aSpriteTemplate)
+                }
             }
         }
     }
@@ -59,7 +63,9 @@ open class TileSet: Component(TileSet) {
             Engine.graphics.disposeSprite(tileTemplate.spriteTemplate.spriteIndex)
             tileTemplate.spriteTemplate.spriteIndex = NULL_COMPONENT_INDEX
             if (tileTemplate.animationData != null) {
-                tileTemplate.animationData!!.sprites.values.forEach { aSpriteTemplate ->
+                val iter = tileTemplate.animationData!!.sprites.values.iterator()
+                while (iter.hasNext()) {
+                    val aSpriteTemplate = iter.next()
                     Engine.graphics.disposeSprite(aSpriteTemplate.spriteIndex)
                     aSpriteTemplate.spriteIndex = NULL_COMPONENT_INDEX
                 }

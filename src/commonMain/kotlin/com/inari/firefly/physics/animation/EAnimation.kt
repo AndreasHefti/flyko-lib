@@ -17,7 +17,9 @@ class EAnimation private constructor() : EntityComponent(EAnimation) {
 
     override fun activate() {
         super.activate()
-        animations.forEach {
+        val iter = animations.iterator()
+        while (iter.hasNext()) {
+            val it = iter.next()
             it.init(entityIndex)
             if (it.condition(it))
                 it.active = true
@@ -25,7 +27,9 @@ class EAnimation private constructor() : EntityComponent(EAnimation) {
     }
 
     override fun deactivate() {
-        animations.forEach { it.active = false }
+        val iter = animations.iterator()
+        while (iter.hasNext())
+            iter.next().active = false
         super.deactivate()
     }
 

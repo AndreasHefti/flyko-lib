@@ -26,7 +26,9 @@ abstract class Animation<D : AnimatedData>(
     }
 
     override fun update() {
-        animatedData.forEach {
+        val iter = animatedData.iterator()
+        while (iter.hasNext()) {
+            val it = iter.next()
             if (it.active)
                 update(it)
             else if (it.condition(it))

@@ -52,7 +52,9 @@ object TiledRoomLoadTask : StaticTask() {
             this.attributes = tileMapJson.putProperties(Attributes())
             tileMapJson.mappedProperties["tasks"]?.apply {
                 val initTask = withLifecycleTask {}
-                LifecycleTaskType.values().forEach {
+                val iter = LifecycleTaskType.values().iterator()
+                while (iter.hasNext()) {
+                    val it = iter.next()
                     this.classValue[it.name]?.apply {
                         initTask.withTask(it, this as String)
                     }
@@ -74,8 +76,9 @@ object TiledRoomLoadTask : StaticTask() {
             ?.split(LIST_VALUE_SEPARATOR)?.iterator()
             ?: throw IllegalArgumentException("Missing tileset_refs from TiledMap JSON file")
 
-        tileMapJson.tilesets.forEach { tileSetRefJson ->
-
+        val iter = tileMapJson.tilesets.iterator()
+        while (iter.hasNext()) {
+            val tileSetRefJson = iter.next()
             val tileSetRefName = tileSetReferences.next()
             val resPath = tileSetDirPath + tileSetRefJson.source.substringAfterLast('/')
             val tiledTileSetAttrs = Attributes() +
@@ -89,7 +92,9 @@ object TiledRoomLoadTask : StaticTask() {
         }
 
         // load layers
-        tileMapJson.layers.forEach { layerJson ->
+        val iter2 = tileMapJson.layers.iterator()
+        while (iter2.hasNext()) {
+            val layerJson = iter2.next()
             if (layerJson.type == PROP_VALUE_TYPE_LAYER)
                loadTileLayer(tileMap, tileMapJson, layerJson)
             else if (layerJson.type == PROP_VALUE_TYPE_OBJECT)
@@ -135,7 +140,9 @@ object TiledRoomLoadTask : StaticTask() {
                     renderer = ViewSystemRenderer.byName(layerJson.mappedProperties[RENDERER_PROP]?.stringValue!!)
 
                 // define tile sets for this map
-                layerTileSets.split(COMMA).forEach { tileSetName ->
+                val iter =  layerTileSets.split(COMMA).iterator()
+               while (iter.hasNext()) {
+                   val tileSetName = iter.next()
                     withTileSetMapping {
                         tileSetRef(tileSetName)
                         codeOffset = TileSet[tileSetName].mappingStartTileId
@@ -156,7 +163,9 @@ object TiledRoomLoadTask : StaticTask() {
                 this.order = 10
                 this.attributes = attributes
 
-                taskProps!!.classValue.entries.forEach {
+                val iter = taskProps!!.classValue.entries.iterator()
+                while (iter.hasNext()) {
+                    val it = iter.next()
                     withTask(LifecycleTaskType.valueOf(it.key), it.value.toString())
                 }
             }

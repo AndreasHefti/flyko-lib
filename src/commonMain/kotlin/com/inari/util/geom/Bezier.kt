@@ -71,7 +71,9 @@ class BezierSpline {
 
     private fun calcRanges() {
         var lastToNormalized = 0f
-        curves.forEach {
+        val iter = curves.iterator()
+        while (iter.hasNext()) {
+            val it = iter.next()
             val from = lastToNormalized
             lastToNormalized += 1f * it.duration /splineDuration
             it.segmentTimeRange = NormalizedTimeRange(from, lastToNormalized)

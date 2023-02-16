@@ -55,15 +55,19 @@ class FiniteStateMachine : Control() {
         internal set(value) {
             field = value
             stateStateChanges.clear()
-            stateChanges.forEach { st ->
+            val iter = stateChanges.iterator()
+            while (iter.hasNext()) {
+                val st = iter.next()
                 if (st.fromState == currentState)
                     stateStateChanges.add(st)
             }
         }
 
     fun withState(state: String) = states + state
-    fun withStates(vararg states: String) = states.forEach {
-        this.states + it
+    fun withStates(vararg states: String)  {
+        val iter = states.iterator()
+        while (iter.hasNext())
+            this.states + iter.next()
     }
 
     fun withStateChange(configure: (StateChange.() -> Unit)) {
