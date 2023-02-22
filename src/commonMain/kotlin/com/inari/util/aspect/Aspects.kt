@@ -70,6 +70,11 @@ class Aspects internal constructor(
         return this
     }
 
+    operator fun set(aspect: Aspect, value: Boolean) {
+        checkType(aspect)
+        bitSet[aspect.aspectIndex] = value
+    }
+
     fun include(aspects: Aspects): Boolean {
         checkType(aspects)
         if (bitSet.isEmpty || aspects.bitSet.isEmpty)

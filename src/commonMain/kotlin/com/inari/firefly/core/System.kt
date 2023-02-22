@@ -41,9 +41,13 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
     operator fun get(key: ComponentKey): C  = get(checkKey(key).componentIndex)
     operator fun get(index: ComponentIndex): C
 
-    fun exists(name: String): Boolean = getKey(name).componentIndex >= 0
+    fun exists(name: String): Boolean = getKey(name).componentIndex > NULL_COMPONENT_INDEX
     fun exists(key: ComponentKey): Boolean = exists(checkKey(key).componentIndex)
     fun exists(index: ComponentIndex): Boolean
+
+    fun isActive(name: String): Boolean = isActive(getKey(name))
+    fun isActive(key: ComponentKey): Boolean = key.componentIndex > NULL_COMPONENT_INDEX && isActive(key.componentIndex)
+    fun isActive(index: ComponentIndex): Boolean
 
     fun load(c: C) = load(c.index)
     fun load(name: String) = load(getKey(name).componentIndex)
@@ -294,6 +298,7 @@ abstract class ComponentSystem<C : Component>(
         ?: throw IllegalArgumentException("No component for index: $index on system: $typeName")
 
     override fun exists(index: ComponentIndex): Boolean = _componentMapping.contains(index)
+    override fun isActive(index: ComponentIndex): Boolean = _activeComponentSet[index]
     override fun load(index: ComponentIndex) {
 
         // DEBUG  println("--> load: ${aspectName}:${index}")
@@ -635,6 +640,7 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
     @Suppress("UNCHECKED_CAST")
     override fun get(index: ComponentIndex): CC = system[index] as CC
     override fun exists(index: ComponentIndex) = system.exists(index)
+    override fun isActive(index: ComponentIndex): Boolean = activeSubComponentRefs[index]
     override fun load(index: ComponentIndex) = system.load(index)
     override fun loadGroup(group: Aspect) = system.loadGroup(group)
     override fun activate(index: ComponentIndex) {

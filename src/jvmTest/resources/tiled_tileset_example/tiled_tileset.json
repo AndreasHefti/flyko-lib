@@ -1,13 +1,5 @@
 { "class":"firefly_tileset",
  "columns":10,
- "editorsettings":
-    {
-     "export":
-        {
-         "format":"json",
-         "target":"tiled_tileset.json"
-        }
-    },
  "image":"tileset1616.png",
  "imageheight":64,
  "imagewidth":160,
@@ -159,7 +151,8 @@
                  "value":
                     {
                      "contact_mask_x":2,
-                     "contact_mask_y":0
+                     "contact_mask_y":0,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -201,7 +194,8 @@
                  "value":
                     {
                      "contact_mask_x":3,
-                     "contact_mask_y":0
+                     "contact_mask_y":0,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -243,7 +237,8 @@
                  "value":
                     {
                      "contact_mask_x":4,
-                     "contact_mask_y":0
+                     "contact_mask_y":0,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -285,7 +280,8 @@
                  "value":
                     {
                      "contact_mask_x":5,
-                     "contact_mask_y":0
+                     "contact_mask_y":0,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -327,7 +323,8 @@
                  "value":
                     {
                      "contact_mask_x":6,
-                     "contact_mask_y":0
+                     "contact_mask_y":0,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -369,7 +366,8 @@
                  "value":
                     {
                      "contact_mask_x":7,
-                     "contact_mask_y":0
+                     "contact_mask_y":0,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -411,7 +409,8 @@
                  "value":
                     {
                      "contact_mask_x":8,
-                     "contact_mask_y":0
+                     "contact_mask_y":0,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -453,7 +452,8 @@
                  "value":
                     {
                      "contact_mask_x":9,
-                     "contact_mask_y":0
+                     "contact_mask_y":0,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -495,7 +495,8 @@
                  "value":
                     {
                      "contact_mask_x":0,
-                     "contact_mask_y":1
+                     "contact_mask_y":1,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -537,7 +538,8 @@
                  "value":
                     {
                      "contact_mask_x":1,
-                     "contact_mask_y":1
+                     "contact_mask_y":1,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -579,7 +581,8 @@
                  "value":
                     {
                      "contact_mask_x":2,
-                     "contact_mask_y":1
+                     "contact_mask_y":1,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -621,7 +624,8 @@
                  "value":
                     {
                      "contact_mask_x":3,
-                     "contact_mask_y":1
+                     "contact_mask_y":1,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -663,7 +667,8 @@
                  "value":
                     {
                      "contact_mask_x":4,
-                     "contact_mask_y":1
+                     "contact_mask_y":1,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -705,7 +710,8 @@
                  "value":
                     {
                      "contact_mask_x":5,
-                     "contact_mask_y":1
+                     "contact_mask_y":1,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -747,7 +753,8 @@
                  "value":
                     {
                      "contact_mask_x":6,
-                     "contact_mask_y":1
+                     "contact_mask_y":1,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -789,7 +796,8 @@
                  "value":
                     {
                      "contact_mask_x":7,
-                     "contact_mask_y":1
+                     "contact_mask_y":1,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -831,7 +839,8 @@
                  "value":
                     {
                      "contact_mask_x":8,
-                     "contact_mask_y":1
+                     "contact_mask_y":1,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -873,7 +882,8 @@
                  "value":
                     {
                      "contact_mask_x":9,
-                     "contact_mask_y":1
+                     "contact_mask_y":1,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -915,7 +925,8 @@
                  "value":
                     {
                      "contact_mask_x":0,
-                     "contact_mask_y":2
+                     "contact_mask_y":2,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -957,7 +968,8 @@
                  "value":
                     {
                      "contact_mask_x":1,
-                     "contact_mask_y":2
+                     "contact_mask_y":2,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -999,7 +1011,8 @@
                  "value":
                     {
                      "contact_mask_x":2,
-                     "contact_mask_y":2
+                     "contact_mask_y":2,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1041,7 +1054,8 @@
                  "value":
                     {
                      "contact_mask_x":3,
-                     "contact_mask_y":2
+                     "contact_mask_y":2,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1083,7 +1097,8 @@
                  "value":
                     {
                      "contact_mask_x":4,
-                     "contact_mask_y":2
+                     "contact_mask_y":2,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1125,7 +1140,8 @@
                  "value":
                     {
                      "contact_mask_x":5,
-                     "contact_mask_y":2
+                     "contact_mask_y":2,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1167,7 +1183,8 @@
                  "value":
                     {
                      "contact_mask_x":6,
-                     "contact_mask_y":2
+                     "contact_mask_y":2,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1209,7 +1226,8 @@
                  "value":
                     {
                      "contact_mask_x":7,
-                     "contact_mask_y":2
+                     "contact_mask_y":2,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1251,7 +1269,8 @@
                  "value":
                     {
                      "contact_mask_x":8,
-                     "contact_mask_y":2
+                     "contact_mask_y":2,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1293,7 +1312,8 @@
                  "value":
                     {
                      "contact_mask_x":9,
-                     "contact_mask_y":2
+                     "contact_mask_y":2,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1340,7 +1360,8 @@
                  "value":
                     {
                      "contact_mask_x":0,
-                     "contact_mask_y":3
+                     "contact_mask_y":3,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1382,7 +1403,8 @@
                  "value":
                     {
                      "contact_mask_x":1,
-                     "contact_mask_y":3
+                     "contact_mask_y":3,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1424,7 +1446,8 @@
                  "value":
                     {
                      "contact_mask_x":2,
-                     "contact_mask_y":3
+                     "contact_mask_y":3,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1466,7 +1489,8 @@
                  "value":
                     {
                      "contact_mask_x":3,
-                     "contact_mask_y":3
+                     "contact_mask_y":3,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1508,7 +1532,8 @@
                  "value":
                     {
                      "contact_mask_x":4,
-                     "contact_mask_y":3
+                     "contact_mask_y":3,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1550,7 +1575,8 @@
                  "value":
                     {
                      "contact_mask_x":5,
-                     "contact_mask_y":3
+                     "contact_mask_y":3,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1592,7 +1618,8 @@
                  "value":
                     {
                      "contact_mask_x":6,
-                     "contact_mask_y":3
+                     "contact_mask_y":3,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1634,7 +1661,8 @@
                  "value":
                     {
                      "contact_mask_x":7,
-                     "contact_mask_y":3
+                     "contact_mask_y":3,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1676,7 +1704,8 @@
                  "value":
                     {
                      "contact_mask_x":8,
-                     "contact_mask_y":3
+                     "contact_mask_y":3,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {
@@ -1718,7 +1747,8 @@
                  "value":
                     {
                      "contact_mask_x":9,
-                     "contact_mask_y":3
+                     "contact_mask_y":3,
+                     "material_type":"TERRAIN"
                     }
                 }, 
                 {

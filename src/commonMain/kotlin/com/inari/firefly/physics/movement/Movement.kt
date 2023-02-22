@@ -21,8 +21,17 @@ object Movement : EntityControl() {
     @JvmField val MOVEMENT_ASPECT_GROUP = IndexedAspectType("MOVEMENT_ASPECT_GROUP")
     @JvmField val UNDEFINED_MOVEMENT = MOVEMENT_ASPECT_GROUP.createAspect("UNDEFINED_MOVEMENT")
 
-    enum class MovementAspect(private val aspect: Aspect) : Aspect {
-        ON_GROUND(MOVEMENT_ASPECT_GROUP.createAspect("ON_GROUND")),
+    enum class BasicMovementAspect(private val aspect: Aspect) : Aspect {
+        ON_SLOPE_UP(MOVEMENT_ASPECT_GROUP.createAspect("ON_SLOPE_UP")),
+        ON_SLOPE_DOWN(MOVEMENT_ASPECT_GROUP.createAspect("ON_SLOPE_DOWN")),
+        GROUND_TOUCHED(MOVEMENT_ASPECT_GROUP.createAspect("GROUND_TOUCHED")),
+        GROUND_LOOSE (MOVEMENT_ASPECT_GROUP.createAspect("GROUND_LOOSE")),
+        SLIP_RIGHT (MOVEMENT_ASPECT_GROUP.createAspect("SLIP_RIGHT")),
+        SLIP_LEFT (MOVEMENT_ASPECT_GROUP.createAspect("SLIP_RIGHT")),
+        JUMP(MOVEMENT_ASPECT_GROUP.createAspect("JUMP")),
+        DOUBLE_JUMP(MOVEMENT_ASPECT_GROUP.createAspect("DOUBLE_JUMP")),
+        CLIMB_UP(MOVEMENT_ASPECT_GROUP.createAspect("CLIMB_UP")),
+        CLIMB_DOWN(MOVEMENT_ASPECT_GROUP.createAspect("CLIMB_DOWN")),
         BLOCK_WEST(MOVEMENT_ASPECT_GROUP.createAspect("BLOCK_WEST")),
         BLOCK_EAST(MOVEMENT_ASPECT_GROUP.createAspect("BLOCK_EAST")),
         BLOCK_NORTH(MOVEMENT_ASPECT_GROUP.createAspect("BLOCK_NORTH")),
@@ -47,6 +56,7 @@ object Movement : EntityControl() {
 
 
     override fun update() {
+
         moveEvent.entities.clear()
         deltaTimeInSeconds = min(Engine.timer.timeElapsed / 1000f, .5f)
 

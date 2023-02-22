@@ -1,9 +1,10 @@
-package com.inari.firefly.game.player
+package com.inari.firefly.game.actor.player
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.api.InputDevice
 import com.inari.firefly.core.api.VOID_MOVE_CALLBACK
+import com.inari.firefly.physics.movement.Movement.BasicMovementAspect.*
 import com.inari.util.ZERO_FLOAT
 import kotlin.jvm.JvmField
 import kotlin.math.max
@@ -21,14 +22,12 @@ class PlatformerHMoveController private constructor() : SingleComponentControl<P
 
     @JvmField var directionChangeCallback = VOID_MOVE_CALLBACK
 
-    override fun init(key: ComponentKey) {}
-
-    override fun update(c: Player) {
-        val mov = c.playerMovement ?: return
+    override fun update(component: Player) {
+        val mov = component.playerMovement ?: return
         if (!moveOnAir && !mov.onGround)
             return
 
-        val cIndex = c.index
+        val cIndex = component.index
         if (inputDevice.buttonPressed(buttonLeft)) {
             val outRef = this@PlatformerHMoveController
             if (mov.velocity.v0 <= -mov.maxVelocityWest)
@@ -75,20 +74,27 @@ class PlatformerJumpController private constructor(): SingleComponentControl<Pla
     private var jumpAction = 0
     private var doubleJumpOn = true
 
-    override fun init(key: ComponentKey) {}
+    override fun update(component: Player) {
+        val mov = component.playerMovement ?: return
 
-    override fun update(c: Player) {
-        val mov = c.playerMovement ?: return
+        if (mov.onGround) {
+            mov.aspects[JUMP] = false
+            mov.aspects[DOUBLE_JUMP] = false
+        }
+
         if (inputDevice.buttonTyped(jumpButton)) {
             if (mov.onGround) {
                 mov.onGround = false
                 mov.velocity.v1 = -jumpImpulse
                 doubleJumpOn = false
                 jumpAction = 0
+                mov.aspects[JUMP] = true
             } else if (doubleJump && !doubleJumpOn) {
                 mov.velocity.v1 = -jumpImpulse
                 doubleJumpOn = true
                 jumpAction = 0
+                mov.aspects[JUMP] = false
+                mov.aspects[DOUBLE_JUMP] = true
             } else
                 jumpAction = 1
 

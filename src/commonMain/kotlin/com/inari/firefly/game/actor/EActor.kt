@@ -1,8 +1,9 @@
-package com.inari.firefly.game
+package com.inari.firefly.game.actor
 
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.EntityComponent
 import com.inari.firefly.core.EntityComponentBuilder
+import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.physics.contact.ContactConstraint
 import com.inari.util.aspect.Aspect

@@ -72,10 +72,10 @@ object  TiledTileSetLoadTask : StaticTask() {
                 val tint = tileJson.mappedProperties[TINT_PROP]
                     ?.let { TileUtils.getColorFromString(it.stringValue) }
                 val materialType = tileJson.getSubPropAsString(MATERIAL_PROP, MATERIAL_TYPE_PROP)
-                    ?.let { EContact.MATERIAL_ASPECT_GROUP[it] ?: TileMaterialType.NONE }
+                    ?.let { EContact.MATERIAL_ASPECT_GROUP[it] ?: EContact.MATERIAL_ASPECT_GROUP.createAspect(it) }
                     ?: TileMaterialType.NONE
                 val contactType = tileJson.getSubPropAsString(MATERIAL_PROP, CONTACT_TYPE_PROP)
-                    ?.let { EContact.CONTACT_TYPE_ASPECT_GROUP[it] ?: EContact.UNDEFINED_CONTACT_TYPE }
+                    ?.let { EContact.CONTACT_TYPE_ASPECT_GROUP[it] ?: EContact.CONTACT_TYPE_ASPECT_GROUP.createAspect(it) }
                     ?: EContact.UNDEFINED_CONTACT_TYPE
                 val atlasX = tileJson.getSubPropAsInt(ATLAS_POS_PROP, ATLAS_X_PROP)
                     ?: -1

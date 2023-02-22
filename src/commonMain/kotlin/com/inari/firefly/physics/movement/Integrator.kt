@@ -1,7 +1,7 @@
 package com.inari.firefly.physics.movement
 
 import com.inari.firefly.graphics.view.ETransform
-import com.inari.firefly.physics.movement.Movement.MovementAspect.*
+import com.inari.firefly.physics.movement.Movement.BasicMovementAspect.*
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 import kotlin.math.max
@@ -99,10 +99,12 @@ class VelocityVerletIntegrator private constructor() : Integrator() {
         adjustVelocity(movement)
     }
 
-    override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) =
+    override fun step(movement: EMovement, transform: ETransform, deltaTimeInSeconds: Float) {
         transform.move(
             deltaTimeInSeconds * (movement.velocity.v0 + deltaTimeInSeconds * movement.acceleration.v0 / 2),
-            deltaTimeInSeconds * (movement.velocity.v1 + deltaTimeInSeconds * movement.acceleration.v1 / 2))
+            deltaTimeInSeconds * (movement.velocity.v1 + deltaTimeInSeconds * movement.acceleration.v1 / 2)
+        )
+    }
 
     companion object : IntegratorBuilder<VelocityVerletIntegrator> {
         override fun create() = VelocityVerletIntegrator()

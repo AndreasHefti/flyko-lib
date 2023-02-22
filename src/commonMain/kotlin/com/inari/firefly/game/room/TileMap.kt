@@ -11,7 +11,6 @@ import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.IntFrameAnimation
 import com.inari.firefly.physics.animation.IntFrameAnimationControl
 import com.inari.firefly.physics.contact.EContact
-import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_CONTACT_TYPE
 import com.inari.util.DO_NOTHING
 import com.inari.util.NO_NAME
 import com.inari.util.ZERO_FLOAT
@@ -81,8 +80,10 @@ open class TileMap : Component(TileMap) {
                 parallax = true
         }
 
-        if (parallax)
+        if (parallax) {
             Engine.registerListener(View.VIEW_CHANGE_EVENT_TYPE, parallaxListener)
+            updateParallaxLayer(true)
+        }
     }
 
     override fun deactivate() {
@@ -148,17 +149,14 @@ open class TileMap : Component(TileMap) {
 
                         if (tile.hasContactComp) {
                             withComponent(EContact) {
-                                if (tile.contactType !== UNDEFINED_CONTACT_TYPE) {
-                                    contactBounds(
-                                        0, 0,
-                                        tile.spriteTemplate.textureBounds.width,
-                                        tile.spriteTemplate.textureBounds.height
-                                    )
-                                    contactType = tile.contactType
-                                    material = tile.material
-                                    contactBounds(tile.contactMask)
-                                }
+                                contactBounds(
+                                    0, 0,
+                                    tile.spriteTemplate.textureBounds.width,
+                                    tile.spriteTemplate.textureBounds.height
+                                )
+                                contactType = tile.contactType
                                 material = tile.material
+                                contactBounds(tile.contactMask)
                             }
                         }
 
@@ -187,7 +185,6 @@ open class TileMap : Component(TileMap) {
     private fun buildTileGrid(layerData: TileMapLayerData, gridData: TileMapGridData) {
         gridData.tileGridIndex = TileGrid {
             autoActivation = true
-            //name = "tilegrid_${this@TileMap.name}_${layerData.layerIndex}"
             viewRef(this@TileMap.viewRef)
             layerRef(layerData.layerRef)
             if (gridData.renderer != null)
@@ -238,7 +235,6 @@ open class TileMap : Component(TileMap) {
 
     private fun updateParallaxLayer(pixelPerfect: Boolean) {
         val viewPos = View[viewRef].worldPosition
-
         val iter = tileMapLayerData.iterator()
         while (iter.hasNext()) {
             val mapLayer = iter.next()

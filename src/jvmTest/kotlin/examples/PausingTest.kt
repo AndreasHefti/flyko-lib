@@ -129,7 +129,7 @@ fun main(args: Array<String>) {
             updateResolution = 10f
             var timer = 0
             var even = true
-            updateOp =  {
+            updateOp = {
                 timer++
                 if (timer > 100) {
                     timer = 0

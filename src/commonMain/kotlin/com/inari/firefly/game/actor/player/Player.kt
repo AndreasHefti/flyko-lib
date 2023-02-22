@@ -1,7 +1,7 @@
-package com.inari.firefly.game.player
+package com.inari.firefly.game.actor.player
 
 import com.inari.firefly.core.*
-import com.inari.firefly.game.player.Player.PlayerEventType.*
+import com.inari.firefly.game.actor.player.Player.PlayerEventType.*
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.util.NO_NAME
@@ -38,7 +38,10 @@ class Player private constructor() : Composite(Player), Controlled {
     var playerMovement: EMovement? = null
         internal set
 
-    //internal val playerRoomTransitionObserver = RoomTransitionObserver(this)
+    fun withPlayerEntity(config: (Entity.() -> Unit)): ComponentKey {
+        playerEntityKey = Entity.build(config)
+        return playerEntityKey
+    }
 
     override fun initialize() {
         super.initialize()
@@ -111,7 +114,7 @@ class Player private constructor() : Composite(Player), Controlled {
         }
 
         fun findFirstActive(): Player {
-            val pIndex = Player.activeIndexIterator().next()
+            val pIndex = activeComponentSet.nextIndex(0)
             if (pIndex < 0)
                 throw IllegalStateException("No Player found")
             return Player[pIndex]

@@ -50,7 +50,7 @@ class Contact internal constructor() {
 class ContactBounds {
 
     @JvmField val bounds: Vector4i = Vector4i()
-    @JvmField  var bitmask: BitMask? = null
+    @JvmField var bitmask: BitMask? = null
 
     val isEmpty: Boolean get() = bounds.x == 0 && bounds.y == 0 && bounds.width == 0 && bounds.height == 0 && bitmask == null
     val isCircle: Boolean get() = bounds.height == 0

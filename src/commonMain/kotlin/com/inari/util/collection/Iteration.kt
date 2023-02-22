@@ -77,5 +77,4 @@ class IndexedTypeIterator<T> (private var ref: IndexedTypeIterable<T>) : Iterato
             return r
         }
     }
-
 }

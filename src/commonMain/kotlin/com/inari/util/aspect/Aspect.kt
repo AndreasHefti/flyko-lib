@@ -45,7 +45,7 @@ class IndexedAspectType(
         while (i >= 0) {
             val aspect = aspects[i]
             if (name == aspect?.aspectName)
-                return aspect // TODO iterator pool
+                return aspect
             i = aspects.nextIndex(i + 1)
         }
         return null

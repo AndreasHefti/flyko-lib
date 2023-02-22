@@ -3,7 +3,7 @@ package com.inari.firefly.game.world
 import com.inari.firefly.TestApp
 import com.inari.firefly.core.ComponentSystem
 import com.inari.firefly.core.Entity
-import com.inari.firefly.game.player.Player
+import com.inari.firefly.game.actor.player.Player
 import kotlin.test.*
 
 

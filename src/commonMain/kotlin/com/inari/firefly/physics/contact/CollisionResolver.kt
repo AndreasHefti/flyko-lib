@@ -148,7 +148,6 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
 
                     val otherTransform = otherEntity[ETransform]
                     val otherContact = otherEntity[EContact]
-
                     //apply bounds of the other contact shape within world coordinate system
                     tempPos(
                         iterator.worldPosition.x + otherTransform.position.x,

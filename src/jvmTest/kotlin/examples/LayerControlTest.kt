@@ -67,10 +67,6 @@ class LayerControl : SingleComponentControl<Layer>(Layer) {
 
     private val move = Vector2f(1f, 1f)
 
-    override fun init(key: ComponentKey) {
-
-    }
-
     override fun update(c: Layer) {
         c.position + this.move
         if (c.position.x >= 400- 32) this.move.x = -1f

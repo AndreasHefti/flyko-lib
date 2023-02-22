@@ -1,4 +1,4 @@
-package com.inari.firefly.game
+package com.inari.firefly.game.actor
 
 import com.inari.firefly.core.EntityComponent
 import com.inari.firefly.core.EntityComponentBuilder
@@ -19,7 +19,7 @@ class EProjectile private constructor() : EntityComponent(EProjectile) {
         hitPower = 0
     }
 
-    override val componentType = EActor
+    override val componentType = EProjectile
     companion object : EntityComponentBuilder<EProjectile>("EProjectile") {
         override fun create() = EProjectile()
 

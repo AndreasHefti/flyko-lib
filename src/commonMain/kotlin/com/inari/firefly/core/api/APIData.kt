@@ -35,7 +35,7 @@ typealias NormalOperation = (ComponentIndex, ComponentIndex, ComponentIndex) -> 
 @JvmField val ZERO_OP: NormalOperation = { _, _, _ -> 0f }
 @JvmField val ONE_OP : NormalOperation = { _, _, _ -> 1f }
 
-typealias SimpleTask = (ComponentIndex) -> Unit
+typealias SimpleTask = () -> Unit
 typealias TaskOperation = (ComponentIndex, Dictionary, TaskCallback) -> Unit
 typealias TaskCallback = (ComponentIndex, Dictionary, OperationResult) -> Unit
 @JvmField val VOID_TASK_OPERATION: TaskOperation = VOID_CONSUMER_3

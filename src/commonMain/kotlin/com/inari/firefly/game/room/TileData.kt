@@ -32,7 +32,7 @@ enum class TileDimType {
 
 enum class TileMaterialType(private val aspect: Aspect) : Aspect {
     NONE(MATERIAL_ASPECT_GROUP.createAspect("NONE")),
-    TERRAIN(MATERIAL_ASPECT_GROUP.createAspect("TERRAIN_SOLID")),
+    TERRAIN(MATERIAL_ASPECT_GROUP.createAspect("TERRAIN")),
     PROJECTILE(MATERIAL_ASPECT_GROUP.createAspect("PROJECTILE")),
     WATER(MATERIAL_ASPECT_GROUP.createAspect("WATER")),
     LADDER(MATERIAL_ASPECT_GROUP.createAspect("LADDER")),

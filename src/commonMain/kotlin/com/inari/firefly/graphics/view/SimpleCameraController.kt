@@ -18,7 +18,8 @@ class SimpleCameraController private constructor() : SingleComponentControl<View
     private val pos = Vector2f()
     private lateinit var viewChangeEvent: ViewChangeEvent
 
-    override fun init(key: ComponentKey) {
+    override fun register(key: ComponentKey) {
+        super.register(key)
         viewChangeEvent = View.createViewChangeEvent(
             key.componentIndex,
             View.ViewChangeEvent.Type.ORIENTATION,
@@ -35,13 +36,13 @@ class SimpleCameraController private constructor() : SingleComponentControl<View
         }
     }
 
-    override fun update(c: View) {
-        if (getPos(c.zoom, c.bounds, c.worldPosition)) {
-            c.worldPosition.x += pos.x * velocity
-            c.worldPosition.y += pos.y * velocity
+    override fun update(component: View) {
+        if (getPos(component.zoom, component.bounds, component.worldPosition)) {
+            component.worldPosition.x += pos.x * velocity
+            component.worldPosition.y += pos.y * velocity
             if (pixelPerfect) {
-                c.worldPosition.x = floor(c.worldPosition.x)
-                c.worldPosition.y = floor(c.worldPosition.y)
+                component.worldPosition.x = floor(component.worldPosition.x)
+                component.worldPosition.y = floor(component.worldPosition.y)
             }
             Engine.notify(viewChangeEvent)
         }

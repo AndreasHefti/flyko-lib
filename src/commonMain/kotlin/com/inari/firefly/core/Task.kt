@@ -1,7 +1,7 @@
 package com.inari.firefly.core
 
 import com.inari.firefly.core.api.*
-import com.inari.firefly.game.room.tiled_binding.TiledTileSetLoadTask
+import com.inari.util.VOID_CALL
 import com.inari.util.VOID_CONSUMER_1
 import com.inari.util.collection.Dictionary
 import com.inari.util.collection.EMPTY_DICTIONARY
@@ -12,7 +12,7 @@ open class Task protected constructor(): Component(Task) {
 
     @JvmField var deleteAfterRun: Boolean = false
     @JvmField var noneBlocking: Boolean = false
-    @JvmField var simpleTask: SimpleTask = VOID_CONSUMER_1
+    @JvmField var simpleTask: SimpleTask = VOID_CALL
     @JvmField var operation: TaskOperation = VOID_TASK_OPERATION
     @JvmField var callback: TaskCallback = VOID_TASK_CALLBACK
     @JvmField var attributes: Dictionary = EMPTY_DICTIONARY
@@ -21,9 +21,8 @@ open class Task protected constructor(): Component(Task) {
         compIndex: ComponentIndex = NULL_COMPONENT_INDEX,
         attributes: Dictionary = EMPTY_DICTIONARY) {
 
-        if (simpleTask != VOID_CONSUMER_1) {
-            simpleTask(compIndex)
-        }
+        if (simpleTask != VOID_CALL)
+            simpleTask()
 
         if (operation == VOID_TASK_OPERATION)
             return

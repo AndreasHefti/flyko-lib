@@ -1,12 +1,13 @@
-package com.inari.firefly.game.player
+package com.inari.firefly.game.actor.player
 
 import com.inari.firefly.core.*
+
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.contact.*
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_CONTACT_TYPE
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_MATERIAL
 import com.inari.firefly.physics.movement.EMovement
-import com.inari.util.VOID_INT_CONSUMER
+import com.inari.firefly.physics.movement.Movement.BasicMovementAspect.*
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.aspect.Aspect
 import com.inari.util.collection.DynArray
@@ -54,9 +55,6 @@ class PlatformerCollisionResolver : CollisionResolver() {
     private val fullContactCallbacks = DynArray.of<CollisionCallback>()
 
     @JvmField var groundContactOffset = 2
-    @JvmField var touchGroundCallback: (Int) -> Unit = VOID_INT_CONSUMER
-    @JvmField var looseGroundContactCallback: (Int) -> Unit = VOID_INT_CONSUMER
-    @JvmField var onSlopeCallback: (Int, Int, FullContactScan) -> Unit = VOID_ON_SLOPE_CALLBACK
     @JvmField val fullContactConstraintRef = CReference(ContactConstraint)
     @JvmField val terrainContactConstraintRef = CReference(ContactConstraint) { initTerrainContact() }
 
@@ -81,7 +79,6 @@ class PlatformerCollisionResolver : CollisionResolver() {
     }
 
     override fun resolve(entity: Entity, contact: EContact, contactScan: ContactScans) {
-
         if (terrainContactConstraintRef.exists) {
             val terrainContact = contactScan.getFullScan(terrainContactConstraintRef.targetKey.componentIndex)!!
             if (terrainContact.hasAnyContact()) {
@@ -110,21 +107,23 @@ class PlatformerCollisionResolver : CollisionResolver() {
     }
 
     private fun resolveTerrainContact(contacts: FullContactScan, entity: Entity, movement: EMovement, prefGround: Boolean) {
-
         val transform = entity[ETransform]
         takeFullLedgeScans(contacts)
         resolveVertically(contacts, entity, transform, movement)
         resolveHorizontally(contacts, entity, transform, movement)
 
-        if (!prefGround && movement.onGround)
-            touchGroundCallback(entity.index)
-        if (prefGround && !movement.onGround)
-            looseGroundContactCallback(entity.index)
+        movement.aspects[GROUND_TOUCHED] = (!prefGround && movement.onGround)
+        movement.aspects[GROUND_LOOSE] = (prefGround && !movement.onGround)
     }
 
     private fun resolveVertically(contacts: FullContactScan, entity: Entity, transform: ETransform, movement: EMovement) {
+
         var refresh = false
         var setOnGround = false
+        movement.aspects[ON_SLOPE_DOWN] = false
+        movement.aspects[ON_SLOPE_UP] = false
+        movement.aspects[BLOCK_NORTH] = false
+
         val onSlope = contactSensorB1.cardinality != 0 &&
                 contactSensorB3.cardinality != 0 &&
                 contactSensorB1.cardinality != contactSensorB3.cardinality &&
@@ -133,23 +132,32 @@ class PlatformerCollisionResolver : CollisionResolver() {
         //println("onSlope $onSlope")
 
         if (onSlope && movement.velocity.v1 >= ZERO_FLOAT) {
-            //println("adjust slope ${contactSensorB2.cardinality}")
+            //println("adjust slope")
             if (contactSensorB1.cardinality > contactSensorB3.cardinality) {
-                //println("slope south-east")
-                transform.move(dy = -(contactSensorB1.cardinality - gapSouth))
-                transform.position.y = ceil(transform.position.y)
-                movement.velocity.v1 = ZERO_FLOAT
-                refresh = true
-                setOnGround = true
-                onSlopeCallback(entity.index, contactSensorB1.cardinality - contactSensorB3.cardinality, contacts)
+                val gap = contactSensorB1.cardinality - gapSouth
+                if (gap >= -1) {
+                    transform.move(dy = -gap)
+                    transform.position.y = ceil(transform.position.y)
+                    movement.velocity.v1 = ZERO_FLOAT
+                    refresh = true
+                    setOnGround = true
+                    val slopeO = (contactSensorB1.cardinality - contactSensorB3.cardinality > 0)
+                    movement.aspects[ON_SLOPE_DOWN] = slopeO
+                    movement.aspects[ON_SLOPE_UP] = !slopeO
+                }
             } else {
                 //println("slope south-west")
-                transform.move(dy = -(contactSensorB3.cardinality - gapSouth))
-                transform.position.y = ceil(transform.position.y)
-                movement.velocity.v1 = ZERO_FLOAT
-                refresh = true
-                setOnGround = true
-                onSlopeCallback(entity.index, contactSensorB1.cardinality - contactSensorB3.cardinality, contacts)
+                val gap = contactSensorB3.cardinality - gapSouth
+                if (gap >= -1) {
+                    transform.move(dy = -gap)
+                    transform.position.y = ceil(transform.position.y)
+                    movement.velocity.v1 = ZERO_FLOAT
+                    refresh = true
+                    setOnGround = true
+                    val slopeO = (contactSensorB1.cardinality - contactSensorB3.cardinality > 0)
+                    movement.aspects[ON_SLOPE_DOWN] = slopeO
+                    movement.aspects[ON_SLOPE_UP] = !slopeO
+                }
             }
         } else if (bmax > gapSouth && movement.velocity.v1 >= ZERO_FLOAT) {
             //println("adjust ground: ${bmax - gapSouth} : ${movement.velocity.v1 }")
@@ -167,6 +175,7 @@ class PlatformerCollisionResolver : CollisionResolver() {
             if (movement.velocity.v1 < ZERO_FLOAT)
                 movement.velocity.v1 = ZERO_FLOAT
             refresh = true
+            movement.aspects[BLOCK_NORTH] = true
         }
 
         if (refresh) {
@@ -175,9 +184,8 @@ class PlatformerCollisionResolver : CollisionResolver() {
         }
 
         //println("contactSensorGround.cardinality ${contactSensorGround.cardinality}")
-
         movement.onGround =
-            setOnGround || contactSensorGround.cardinality > 0
+            setOnGround || (movement.velocity.y >= 0f && contactSensorGround.cardinality > 0)
         if (movement.onGround)
             transform.position.y = ceil(transform.position.y)
 
@@ -187,18 +195,28 @@ class PlatformerCollisionResolver : CollisionResolver() {
     private fun resolveHorizontally(contacts: FullContactScan, entity: Entity, transform: ETransform, movement: EMovement) {
         var refresh = false
 
+        movement.aspects[SLIP_LEFT] = false
+        movement.aspects[SLIP_RIGHT] = false
+        movement.aspects[BLOCK_EAST] = false
+        movement.aspects[BLOCK_WEST] = false
+
         if (lmax > 0) {
-            //println("adjust left: $lmax")
+            println("adjust left: $lmax ${movement.velocity.v0 }")
             transform.move(dx = lmax)
             transform.position.x = floor(transform.position.x)
+            movement.aspects[SLIP_RIGHT] = movement.velocity.v0 > -1f
+            movement.aspects[BLOCK_WEST] = movement.velocity.v0 <= 0f
             movement.velocity.v0 = ZERO_FLOAT
             refresh = true
+
         }
 
         if (rmax > 0) {
-            //println("adjust right: $rmax")
+            //println("adjust right: $rmax ${movement.velocity.v0 }")
             transform.move(dx = -rmax)
             transform.position.x = ceil(transform.position.x)
+            movement.aspects[SLIP_LEFT] = movement.velocity.v0 < 1f
+            movement.aspects[BLOCK_EAST] = movement.velocity.v0 >= 0f
             movement.velocity.v0 = ZERO_FLOAT
             refresh = true
         }

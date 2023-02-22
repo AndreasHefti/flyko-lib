@@ -148,7 +148,7 @@ class DynIntArray(
         while (currentIndex < array.size && array[currentIndex] == nullValue)
             currentIndex++
         if (currentIndex < array.size)
-            return array[currentIndex]
+            return currentIndex
         return -1
     }
 

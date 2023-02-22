@@ -156,6 +156,7 @@ class FullContactScan internal constructor(
     @JvmField internal val contactTypes = CONTACT_TYPE_ASPECT_GROUP.createAspects()
     @JvmField internal val materialTypes = MATERIAL_ASPECT_GROUP.createAspects()
     @JvmField internal val intersectionMask = BitMask(width = constraint.bounds.width, height = constraint.bounds.height)
+
     private val contacts: DynArray<Contact> = DynArray.of(1, 1)
 
     init {
@@ -337,7 +338,7 @@ class FullContactScan internal constructor(
             return
         }
 
-        // scan with with bitmask
+        // scan with bitmask
         if (!scanBitmask(contact, otherWorldContact.bitmask!!, originWorldContact.bounds))
             ContactsPool.disposeContact(contact)
 

@@ -15,7 +15,7 @@ import com.inari.util.collection.Attributes
 import examples.TestCameraController
 
 fun main() {
-    DesktopApp("TiledTileMapTest", 800, 600) {
+    DesktopApp("TiledTileMapTest", 800, 600, debug = true) {
 
         FFInfoSystem
             .addInfo(FrameRateInfo)

@@ -8,6 +8,7 @@ import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.view.*
 import com.inari.firefly.physics.movement.Movement
 import com.inari.util.collection.BitSet
+import com.inari.util.collection.IndexIterator
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
@@ -72,9 +73,9 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
      *
      * @param region The contact or collision region to check collision entity collisions against.
      * @param entity Entity to exclude from the search
-     * @return IntIterator of all entity id's that most possibly has a collision within the given region
+     * @return IndexIterator of all entity id's that most possibly has a collision within the given region
      */
-    abstract operator fun get(region: Vector4i, entity: Entity): IntIterator
+    abstract operator fun get(region: Vector4i, entity: Entity): IndexIterator
 
     companion object : ComponentSystem<ContactMap>("ContactMap") {
 
@@ -95,7 +96,7 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
         private val entityListener: ComponentEventListener = { key, type ->
             val entity =  Entity[key.componentIndex]
             if (EContact in entity.aspects && ETile !in entity.aspects) {
-               val iter = iterator()
+                val iter = iterator()
                 if (type == ComponentEventType.ACTIVATED) {
                     while (iter.hasNext())
                         iter.next().notifyEntityActivation(entity)
@@ -152,48 +153,15 @@ class SimpleContactMap private constructor(): ContactMap() {
         // not needed here since this is just an ordinary list
     }
 
-    override fun get(region: Vector4i, entity: Entity): IntIterator {
-        if (ITERATOR_POOL.isEmpty())
-            ITERATOR_POOL.add(EntityIdIterator())
-
-        val iterator = ITERATOR_POOL.removeFirst()
-        iterator.reset(entity.index)
-        return iterator
+    private val selfExcluded = BitSet()
+    override fun get(region: Vector4i, entity: Entity): IndexIterator {
+        selfExcluded.clear()
+        selfExcluded.or(entities)
+        selfExcluded[entity.index] = false
+        return IndexIterator.getIndexIterator(selfExcluded)
     }
 
     companion object : ComponentSubTypeBuilder<ContactMap, SimpleContactMap>(ContactMap, "SimpleContactMap") {
         override fun create() = SimpleContactMap()
-        private val ITERATOR_POOL = ArrayDeque<EntityIdIterator>()
     }
-
-    private inner class EntityIdIterator : IntIterator() {
-
-        private var index: EntityIndex = NULL_COMPONENT_INDEX
-        private var exclude: EntityIndex = NULL_COMPONENT_INDEX
-
-        override fun hasNext(): Boolean =
-            index >= 0
-
-        override fun nextInt(): Int {
-            val result = index
-            findNext()
-            return result
-        }
-
-        private fun findNext() {
-            index = entities.nextSetBit(index + 1)
-            if (index == exclude)
-                index = entities.nextSetBit(index + 1)
-
-            if (index < 0)
-                ITERATOR_POOL.add(this)
-        }
-
-        fun reset(exclude: EntityIndex) {
-            index = NULL_COMPONENT_INDEX
-            this.exclude = exclude
-            findNext()
-        }
-    }
-
 }
