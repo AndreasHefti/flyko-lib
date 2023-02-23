@@ -83,6 +83,7 @@ class DesktopApp(
                 val maxHeapSizeInMB = runtime.maxMemory() / 1048576L
                 val availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB
                 println("*************************************************************************")
+                println("Java Version: : ${java.lang.System.getProperty("java.version")}")
                 println("usedMemInMB: : $usedMemInMB")
                 println("maxHeapSizeInMB: : $maxHeapSizeInMB")
                 println("availHeapSizeInMB: : $availHeapSizeInMB")

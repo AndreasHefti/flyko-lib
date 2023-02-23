@@ -21,28 +21,39 @@ enum class OperationResult {
     RUNNING,
     FAILED
 }
-typealias Action = (ComponentIndex) -> OperationResult
+interface Action {
+    operator fun invoke(index: ComponentIndex): OperationResult
+}
 typealias ActionCallback = (ComponentIndex, OperationResult) -> Unit
 operator fun ActionCallback.invoke() = this(NULL_COMPONENT_INDEX, OperationResult.SUCCESS)
 operator fun ActionCallback.invoke(result: OperationResult) = this(NULL_COMPONENT_INDEX, result)
-@JvmField val SUCCESS_ACTION: Action = { _ -> OperationResult.SUCCESS }
-@JvmField val FAILED_ACTION: Action = { _ -> OperationResult.FAILED }
-@JvmField val RUNNING_ACTION: Action = { _ -> OperationResult.RUNNING }
+@JvmField val SUCCESS_ACTION: Action = object : Action {
+    override fun invoke(index: Int): OperationResult = OperationResult.SUCCESS
+}
+@JvmField val FAILED_ACTION: Action = object : Action {
+    override fun invoke(index: Int): OperationResult = OperationResult.FAILED
+}
+@JvmField val RUNNING_ACTION: Action = object : Action {
+    override fun invoke(index: Int): OperationResult = OperationResult.RUNNING
+}
 @JvmField val NO_ACTION: Action = FAILED_ACTION
 
 
-typealias NormalOperation = (ComponentIndex, ComponentIndex, ComponentIndex) -> Float
-@JvmField val ZERO_OP: NormalOperation = { _, _, _ -> 0f }
-@JvmField val ONE_OP : NormalOperation = { _, _, _ -> 1f }
+interface NormalOperation {
+    operator fun invoke(ci1: ComponentIndex, ci2: ComponentIndex, ci3: ComponentIndex): Float
+}
+@JvmField val ZERO_OP = object : NormalOperation {
+    override fun invoke(ci1: ComponentIndex, ci2: ComponentIndex, ci3: ComponentIndex) = ZERO_FLOAT
+}
+@JvmField val ONE_OP = object : NormalOperation {
+    override fun invoke(ci1: ComponentIndex, ci2: ComponentIndex, ci3: ComponentIndex) = 1f
+}
 
 typealias SimpleTask = () -> Unit
 typealias TaskOperation = (ComponentIndex, Dictionary, TaskCallback) -> Unit
 typealias TaskCallback = (ComponentIndex, Dictionary, OperationResult) -> Unit
 @JvmField val VOID_TASK_OPERATION: TaskOperation = VOID_CONSUMER_3
 @JvmField val VOID_TASK_CALLBACK: TaskCallback = VOID_CONSUMER_3
-
-typealias MoveCallback = (ComponentIndex, Float, ButtonType) -> Unit
-@JvmField val VOID_MOVE_CALLBACK: MoveCallback = VOID_CONSUMER_3
 
 enum class BlendMode constructor(val source: Int, val dest: Int) {
     /** No blending. Disables blending  */

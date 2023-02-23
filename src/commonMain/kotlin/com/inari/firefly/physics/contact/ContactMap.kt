@@ -158,7 +158,7 @@ class SimpleContactMap private constructor(): ContactMap() {
         selfExcluded.clear()
         selfExcluded.or(entities)
         selfExcluded[entity.index] = false
-        return IndexIterator.getIndexIterator(selfExcluded)
+        return IndexIterator(selfExcluded)
     }
 
     companion object : ComponentSubTypeBuilder<ContactMap, SimpleContactMap>(ContactMap, "SimpleContactMap") {

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.EllipseShapeBuilder
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
@@ -242,12 +243,12 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         }
         if (shaderId != activeShapeShaderId)
             if (shaderId < 0)
-                shapeRenderer = ShapeRenderer()
+                (shapeRenderer.renderer as ImmediateModeRenderer20).shader = null
             else {
                 val shader = shaders[shaderId]
                 if (shader != null) {
                     shader.activate()
-                    shapeRenderer = ShapeRenderer(1000, shader.program)
+                    (shapeRenderer.renderer as ImmediateModeRenderer20).shader = shader.program
                 }
             }
         activeShapeShaderId = shaderId
@@ -409,10 +410,10 @@ actual object GraphicsAPIImpl : GraphicsAPI {
 
     private fun doRenderWithShapeRenderer(data: ShapeData): Boolean =
             data.type === LINE ||
-                    data.type === POINT ||
-                    data.type === POLY_LINE ||
-                    data.type === ARC ||
-                    data.type === CURVE || !data.fill
+            data.type === POINT ||
+            data.type === POLY_LINE ||
+            data.type === ARC ||
+            data.type === CURVE || !data.fill
 
 
     private fun renderWithShapeRenderer(data: ShapeData, xOffset: Float, yOffset: Float) {

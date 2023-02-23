@@ -182,7 +182,7 @@ fun createPlayer() {
     UpdateControl {
         name = "MoveAspectTracker"
         updateOp = {
-            println(Player["player1"].playerMovement!!.aspects)
+            //println(Player["player1"].playerMovement!!.aspects)
         }
     }
 }

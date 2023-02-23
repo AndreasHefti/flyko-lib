@@ -290,9 +290,9 @@ abstract class ComponentSystem<C : Component>(
             _componentKeyMapping.remove(removed.name)?.clearKey()
     }
 
-    override fun indexIterator(): IntIterator = IndexIterator.getIndexIterator(_componentMapping)
-    override fun activeIndexIterator(): IntIterator = IndexIterator.getIndexIterator(_activeComponentSet)
-    override fun iterator(): Iterator<C> = IndexedTypeIterator.getIndexIterator(_componentMapping)
+    override fun indexIterator(): IntIterator = IndexIterator(_componentMapping)
+    override fun activeIndexIterator(): IntIterator = IndexIterator(_activeComponentSet)
+    override fun iterator(): Iterator<C> = IndexedTypeIterator(_componentMapping)
 
     override operator fun get(index: ComponentIndex): C = _componentMapping[index]
         ?: throw IllegalArgumentException("No component for index: $index on system: $typeName")
@@ -618,16 +618,16 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
     override val hasActiveComponents: Boolean
         get() = activeSubComponentRefs.nextIndex(0) >= 0
 
-    override fun indexIterator(): IntIterator = IndexIterator.getIndexIterator(subComponentRefs)
-    override fun activeIndexIterator(): IntIterator = IndexIterator.getIndexIterator(activeSubComponentRefs)
-    override fun iterator(): Iterator<CC> = IndexedTypeIterator.getIndexIterator(iterableTypeAdapter)
+    override fun indexIterator(): IntIterator = IndexIterator(subComponentRefs)
+    override fun activeIndexIterator(): IntIterator = IndexIterator(activeSubComponentRefs)
+    override fun iterator(): Iterator<CC> = IndexedTypeIterator(iterableTypeAdapter)
     private val iterableTypeAdapter: IndexedTypeIterable<CC> = object : IndexedTypeIterable<CC> {
         override fun get(index: Int): CC? = if (subComponentRefs[index]) this@ComponentSubTypeBuilder[index] else null
         override fun nextIndex(from: Int): Int = subComponentRefs.nextIndex(from)
     }
 
     override fun clearSystem() {
-        val iter = IndexIterator.getIndexIterator(subComponentRefs)
+        val iter = IndexIterator(subComponentRefs)
         while (iter.hasNext())
             delete(iter.next())
     }

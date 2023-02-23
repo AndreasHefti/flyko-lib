@@ -78,7 +78,7 @@ object DefaultFloatEasing : Animation<EasedFloatAnimation>(DynArray.of(5, 10)) {
     }
 
     override fun update(data: EasedFloatAnimation) {
-        val timeStep = Engine.timer.timeElapsed.toFloat() / data.duration
+        val timeStep: Float = 1f * Engine.timer.timeElapsed / data.duration
         if (data.applyTimeStep(timeStep))
             // calc and apply eased value
             if (data.inversed)

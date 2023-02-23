@@ -8,7 +8,7 @@ interface IndexedTypeIterable<T> :IndexIterable  {
     operator fun get(index: Int): T?
 }
 
-class IndexIterator(private var ref: IndexIterable) : IntIterator() {
+class IndexIterator private constructor(private var ref: IndexIterable) : IntIterator() {
 
     var nextIndex = ref.nextIndex(0)
     override fun hasNext(): Boolean = nextIndex >= 0
@@ -24,8 +24,7 @@ class IndexIterator(private var ref: IndexIterable) : IntIterator() {
 
     companion object {
         private val iteratorPool = DynArray.of<IndexIterator>(2, 2)
-        operator fun invoke(ref: IndexIterable) = getIndexIterator(ref)
-        fun getIndexIterator(ref: IndexIterable): IndexIterator {
+        operator fun invoke(ref: IndexIterable): IndexIterator {
             var i = iteratorPool.nextIndex(0)
             while (i >= 0) {
                 val n = iteratorPool[i]!!
@@ -44,7 +43,12 @@ class IndexIterator(private var ref: IndexIterable) : IntIterator() {
     }
 }
 
-class IndexedTypeIterator<T> (private var ref: IndexedTypeIterable<T>) : Iterator<T> {
+class IndexedTypeIterator<T> private constructor(private var ref: IndexedTypeIterable<T>) : Iterator<T> {
+
+    init {
+        println("IndexedTypeIterator")
+    }
+
     var nextIndex = ref.nextIndex(0)
     override fun hasNext(): Boolean = nextIndex >= 0
     override fun next(): T {
@@ -60,7 +64,7 @@ class IndexedTypeIterator<T> (private var ref: IndexedTypeIterable<T>) : Iterato
     companion object {
         private val iteratorPool = DynArray.of<IndexedTypeIterator<*>>(2, 2)
         @Suppress("UNCHECKED_CAST")
-        fun <T> getIndexIterator(ref: IndexedTypeIterable<T>): IndexedTypeIterator<T> {
+        operator fun <T> invoke(ref: IndexedTypeIterable<T>): IndexedTypeIterator<T> {
             var i = iteratorPool.nextIndex(0)
             while (i >= 0) {
                 val n: IndexedTypeIterator<T> = iteratorPool[i]!! as IndexedTypeIterator<T>

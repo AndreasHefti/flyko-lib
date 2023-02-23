@@ -201,7 +201,7 @@ class PlatformerCollisionResolver : CollisionResolver() {
         movement.aspects[BLOCK_WEST] = false
 
         if (lmax > 0) {
-            println("adjust left: $lmax ${movement.velocity.v0 }")
+            //println("adjust left: $lmax ${movement.velocity.v0 }")
             transform.move(dx = lmax)
             transform.position.x = floor(transform.position.x)
             movement.aspects[SLIP_RIGHT] = movement.velocity.v0 > -1f

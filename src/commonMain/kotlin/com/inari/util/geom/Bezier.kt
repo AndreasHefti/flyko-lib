@@ -1,5 +1,6 @@
 package com.inari.util.geom
 
+import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 import kotlin.math.pow
 
@@ -61,7 +62,7 @@ class BezierSpline {
 
     var splineDuration: Long = 0
         private set
-    private val curves = mutableListOf<BezierSplineSegment>()
+    private val curves = DynArray.of<BezierSplineSegment>(5)
 
     fun add(segment: BezierSplineSegment) {
         curves.add(segment)
