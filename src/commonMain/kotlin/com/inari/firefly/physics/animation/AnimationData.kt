@@ -1,8 +1,6 @@
 package com.inari.firefly.physics.animation
 
-import com.inari.firefly.core.CReference
-import com.inari.firefly.core.ComponentDSL
-import com.inari.firefly.core.Control
+import com.inari.firefly.core.*
 import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.*
@@ -17,6 +15,8 @@ abstract class AnimatedData {
 
     var entityIndex: EntityIndex = NULL_COMPONENT_INDEX
         internal set
+    val paused: Boolean
+        get() = entityIndex != NULL_COMPONENT_INDEX && active && Pausing.isPaused(Entity[entityIndex].groups)
     var active = false
         internal set
     var finished = false
@@ -74,7 +74,7 @@ abstract class AnimatedData {
 }
 
 @ComponentDSL
-class EasedFloatAnimation private constructor() : AnimatedData() {
+class EasedFloatData private constructor() : AnimatedData() {
 
     @JvmField var startValue = 0f
     @JvmField var endValue = 0f
@@ -83,8 +83,8 @@ class EasedFloatAnimation private constructor() : AnimatedData() {
 
     internal lateinit var accessor: FloatPropertyAccessor
 
-    companion object : AnimatedDataBuilder<EasedFloatAnimation> {
-        override fun create() = EasedFloatAnimation()
+    companion object : AnimatedDataBuilder<EasedFloatData> {
+        override fun create() = EasedFloatData()
     }
 
     override fun initialize() {
@@ -95,7 +95,7 @@ class EasedFloatAnimation private constructor() : AnimatedData() {
 
 }
 
-abstract class CurveAnimation protected constructor() : AnimatedData() {
+abstract class CurveData protected constructor() : AnimatedData() {
 
     @JvmField var animatedXProperty: (Int) -> FloatPropertyAccessor = VOID_FLOAT_PROPERTY_ACCESSOR_PROVIDER
     @JvmField var animatedYProperty: (Int) -> FloatPropertyAccessor = VOID_FLOAT_PROPERTY_ACCESSOR_PROVIDER
@@ -114,7 +114,7 @@ abstract class CurveAnimation protected constructor() : AnimatedData() {
 }
 
 @ComponentDSL
-class BezierCurveAnimation private constructor() : CurveAnimation() {
+class BezierCurveData private constructor() : CurveData() {
 
     @JvmField var curve = CubicBezierCurve()
     @JvmField var easing: EasingFunction = Easing.LINEAR
@@ -125,13 +125,13 @@ class BezierCurveAnimation private constructor() : CurveAnimation() {
         accessorRot(ZERO_FLOAT)
     }
 
-    companion object : AnimatedDataBuilder<BezierCurveAnimation> {
-        override fun create() = BezierCurveAnimation()
+    companion object : AnimatedDataBuilder<BezierCurveData> {
+        override fun create() = BezierCurveData()
     }
 }
 
 @ComponentDSL
-class BezierSplineAnimation private constructor() : CurveAnimation() {
+class BezierSplineData private constructor() : CurveData() {
 
     var spline = BezierSpline()
         set(value) {
@@ -139,8 +139,8 @@ class BezierSplineAnimation private constructor() : CurveAnimation() {
             duration = value.splineDuration
         }
 
-    companion object : AnimatedDataBuilder<BezierSplineAnimation> {
-        override fun create() = BezierSplineAnimation()
+    companion object : AnimatedDataBuilder<BezierSplineData> {
+        override fun create() = BezierSplineData()
     }
 
     override fun reset() {
@@ -153,7 +153,7 @@ class BezierSplineAnimation private constructor() : CurveAnimation() {
 }
 
 @ComponentDSL
-class IntFrameAnimation private constructor() : AnimatedData() {
+class IntFrameData private constructor() : AnimatedData() {
 
     var timeline: Array<out IntFrame> = emptyArray()
         set(value) {
@@ -171,8 +171,8 @@ class IntFrameAnimation private constructor() : AnimatedData() {
 
     override fun reset() = accessor(timeline[0].value)
 
-    companion object : AnimatedDataBuilder<IntFrameAnimation> {
-        override fun create() = IntFrameAnimation()
+    companion object : AnimatedDataBuilder<IntFrameData> {
+        override fun create() = IntFrameData()
     }
 
     interface IntFrame {

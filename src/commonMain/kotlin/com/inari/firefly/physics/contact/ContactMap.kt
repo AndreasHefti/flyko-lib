@@ -3,7 +3,6 @@ package com.inari.firefly.physics.contact
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.EntityIndex
-import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.view.*
 import com.inari.firefly.physics.movement.Movement
@@ -96,11 +95,12 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
         private val entityListener: ComponentEventListener = { key, type ->
             val entity =  Entity[key.componentIndex]
             if (EContact in entity.aspects && ETile !in entity.aspects) {
-                val iter = iterator()
                 if (type == ComponentEventType.ACTIVATED) {
+                    val iter = iterator()
                     while (iter.hasNext())
                         iter.next().notifyEntityActivation(entity)
                 } else if (type == ComponentEventType.DEACTIVATED) {
+                    val iter = iterator()
                     while (iter.hasNext())
                         iter.next().notifyEntityDeactivation(key.componentIndex)
                 }

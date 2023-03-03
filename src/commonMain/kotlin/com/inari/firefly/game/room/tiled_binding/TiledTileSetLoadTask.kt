@@ -2,7 +2,6 @@ package com.inari.firefly.game.room.tiled_binding
 
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.StaticTask
-import com.inari.firefly.core.Task
 import com.inari.firefly.core.api.*
 import com.inari.firefly.game.room.TileMaterialType
 import com.inari.firefly.game.room.TileSet
@@ -12,7 +11,6 @@ import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.physics.contact.EContact
 import com.inari.util.*
 import com.inari.util.collection.Dictionary
-import com.inari.util.collection.EMPTY_DICTIONARY
 import com.inari.util.geom.Vector4i
 
 object  TiledTileSetLoadTask : StaticTask() {
@@ -21,6 +19,8 @@ object  TiledTileSetLoadTask : StaticTask() {
     const val ATTR_RESOURCE = "tiledJsonResource"
     const val ATTR_ENCRYPTION = "encryptionKey"
     const val ATTR_MAPPING_START_TILE_ID = "mappingStartTileId"
+    const val ATTR_APPLY_TILE_SET_GROUPS = "applyTileSetGroups"
+    const val ATTR_APPLY_ANIMATION_GROUPS = "applyAnimationGroups"
 
     override fun apply(attributes: Dictionary, callback: TaskCallback) {
 
@@ -55,9 +55,13 @@ object  TiledTileSetLoadTask : StaticTask() {
             collisionTexRef = AccessibleTexture.getKey(collisionMapPath)
         }
 
+        val tileSetGroups = attributes[ATTR_APPLY_TILE_SET_GROUPS]?.split(LIST_VALUE_SEPARATOR)
+        val animationGroups = attributes[ATTR_APPLY_ANIMATION_GROUPS] ?: NO_NAME
+
         // create TileSet
         TileSet {
             this.name = name
+            tileSetGroups?.forEach { groups + it }
             textureRef(atlasPath)
             mappingStartTileId = startId
             // create tiles
@@ -120,6 +124,7 @@ object  TiledTileSetLoadTask : StaticTask() {
                     }
 
                     if (tileJson.mappedProperties.contains(ANIMATION_PROP)) {
+                        this.groups = animationGroups
                         val frames = tileJson.mappedProperties[ANIMATION_PROP]!!.stringValue.split(COMMA)
                         withAnimation {
                             frames.forEachIndexed { index, fString ->
@@ -146,6 +151,6 @@ object  TiledTileSetLoadTask : StaticTask() {
             }
         }
 
-        callback(-1, attributes, OperationResult.SUCCESS)
+        callback(NO_COMPONENT_KEY, attributes, OperationResult.SUCCESS)
     }
 }

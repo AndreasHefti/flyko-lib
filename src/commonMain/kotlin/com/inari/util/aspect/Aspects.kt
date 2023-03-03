@@ -8,8 +8,8 @@ class Aspects internal constructor(
     val type: AspectType
 ) {
 
-    internal val bitSet: BitSet = BitSet()
-    private val tempBitSet: BitSet = BitSet()
+    internal val bitSet: BitSet = BitSet(0)
+    private val tempBitSet: BitSet = BitSet(0)
 
     private constructor(source: Aspects) : this(source.type) {
         bitSet.or(source.bitSet)
@@ -53,7 +53,7 @@ class Aspects internal constructor(
     }
 
     operator fun plus(aspectName: String): Aspects {
-        type.createAspect(aspectName)
+        bitSet.set(type.createAspect(aspectName).aspectIndex)
         return this
     }
 

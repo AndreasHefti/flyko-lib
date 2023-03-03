@@ -109,9 +109,9 @@ class SimpleContactScan  internal constructor(
 
     override fun hasAnyContact() = !entities.isEmpty
 
-    override fun hasContactOfType(type: Aspect): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun hasContactOfType(type: Aspect): Boolean =
+        type in constraint.typeFilter && hasAnyContact()
+
     fun getContactEntityIterator(): IntIterator = null!!
 
     override fun scanFullContact(

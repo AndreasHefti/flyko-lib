@@ -58,14 +58,14 @@ fun main() {
                     Vector2f(300f, 300f),
                     Vector2f(300f, 200f)))
 
-                withAnimation(BezierSplineAnimation) {
+                withAnimation(BezierSplineData) {
                     looping = true
                     inverseOnLoop = true
                     spline = bezierSpline
                     animatedXProperty = ETransform.PropertyAccessor.POSITION_X
                     animatedYProperty = ETransform.PropertyAccessor.POSITION_Y
                     animatedRotationProperty = ETransform.PropertyAccessor.ROTATION
-                    animationController(BezierSplineAnimationControl)
+                    animationController(BezierSplineAnimation)
                 }
             }
         }

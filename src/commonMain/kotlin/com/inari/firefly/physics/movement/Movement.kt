@@ -66,11 +66,7 @@ object Movement : EntityControl() {
             Engine.notify(moveEvent)
     }
 
-    override fun update(entityId: Int) {
-        val entity = Entity[entityId]
-        if (this.isPaused(entity.groups.aspects))
-            return
-
+    override fun update(entity: Entity) {
         val movement = entity[EMovement]
         if (!movement.active || !movement.scheduler.needsUpdate())
             return

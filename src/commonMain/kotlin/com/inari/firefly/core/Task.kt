@@ -2,7 +2,6 @@ package com.inari.firefly.core
 
 import com.inari.firefly.core.api.*
 import com.inari.util.VOID_CALL
-import com.inari.util.VOID_CONSUMER_1
 import com.inari.util.collection.Dictionary
 import com.inari.util.collection.EMPTY_DICTIONARY
 import com.inari.util.startParallelTask
@@ -18,7 +17,7 @@ open class Task protected constructor(): Component(Task) {
     @JvmField var attributes: Dictionary = EMPTY_DICTIONARY
 
     operator fun invoke(
-        compIndex: ComponentIndex = NULL_COMPONENT_INDEX,
+        componentKey: ComponentKey = NO_COMPONENT_KEY,
         attributes: Dictionary = EMPTY_DICTIONARY) {
 
         if (simpleTask != VOID_CALL)
@@ -33,9 +32,12 @@ open class Task protected constructor(): Component(Task) {
 
 
         if (noneBlocking)
-            startParallelTask(name) { operation(compIndex, dict, callback) }
+            startParallelTask(name, { operation(componentKey, dict, callback) }) {
+                if (it != null)
+                    callback(componentKey, dict, OperationResult.FAILED)
+            }
         else
-            operation(compIndex, dict, callback)
+            operation(componentKey, dict, callback)
 
         if (deleteAfterRun) Task.delete(this)
     }

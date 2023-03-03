@@ -6,9 +6,9 @@ import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.View
-import com.inari.firefly.physics.animation.DefaultFloatEasing
 import com.inari.firefly.physics.animation.EAnimation
-import com.inari.firefly.physics.animation.EasedFloatAnimation
+import com.inari.firefly.physics.animation.EasedFloatData
+import com.inari.firefly.physics.animation.FloatEasingAnimation
 import com.inari.util.geom.Easing
 
 fun main() {
@@ -45,7 +45,7 @@ fun main() {
             }
             withComponent(EAnimation) {
                 // with an active easing animation on the sprite alpha blending value...
-                withAnimation(EasedFloatAnimation) {
+                withAnimation(EasedFloatData) {
                     looping = true
                     inverseOnLoop = true
                     easing = Easing.LINEAR
@@ -55,7 +55,7 @@ fun main() {
                     animatedProperty = ESprite.PropertyAccessor.TINT_COLOR_ALPHA
                 }
                 // and with an active easing animation on the sprites position on the x axis...
-                withAnimation(EasedFloatAnimation) {
+                withAnimation(EasedFloatData) {
                     looping = true
                     inverseOnLoop = true
                     easing = Easing.BACK_OUT
@@ -63,7 +63,7 @@ fun main() {
                     endValue = 400f
                     duration = 1000
                     animatedProperty = ETransform.PropertyAccessor.POSITION_X
-                    animationController(DefaultFloatEasing)
+                    animationController(FloatEasingAnimation)
                 }
             }
         }

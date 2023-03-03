@@ -14,6 +14,12 @@ class BitSetTest {
 
         bitset = BitSet(10000)
         assertEquals(157, bitset.size / 64)
+
+        bitset = BitSet(0)
+        assertEquals(0, bitset.size )
+
+        bitset.set(3)
+        assertEquals(1, bitset.size / 64)
     }
 
     @Test

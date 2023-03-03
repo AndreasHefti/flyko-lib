@@ -50,9 +50,9 @@
          "class":"firefly_maplayer",
          "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1,
+            1, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1,
-            1, 0, 0, 0, 13, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
+            1, 0, 0, 0, 13, 0, 0, 0, 40, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1,
             1, 5, 0, 0, 1, 14, 13, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
             1, 6, 0, 0, 1, 1, 1, 0, 22, 1, 1, 21, 21, 11, 11, 0, 2, 1, 1, 1,
             1, 1, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 33, 1, 1,
@@ -96,11 +96,12 @@
                         }, 
                         {
                          "name":"tasks",
-                         "propertytype":"tasks",
+                         "propertytype":"object_tasks",
                          "type":"class",
                          "value":
                             {
-                             "ON_LOAD":"RoomTransitionBuildTask"
+                             "activation_task":"RoomTransitionTask",
+                             "build_task":"RoomTransitionBuildTask"
                             }
                         }, 
                         {
@@ -108,17 +109,12 @@
                          "propertytype":"triggerOn",
                          "type":"string",
                          "value":"CONTACT"
-                        }, 
-                        {
-                         "name":"triggerTask",
-                         "type":"string",
-                         "value":"RoomTransition"
                         }],
                  "rotation":0,
                  "type":"room_transition",
                  "visible":true,
-                 "width":10,
-                 "x":315,
+                 "width":4,
+                 "x":318,
                  "y":14
                 }],
          "opacity":1,

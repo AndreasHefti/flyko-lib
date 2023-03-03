@@ -6,6 +6,7 @@ import com.inari.firefly.ai.behavior.EBehavior
 import com.inari.firefly.ai.behavior.ParallelNode
 import com.inari.firefly.ai.behavior.SequenceNode
 import com.inari.firefly.core.*
+import com.inari.firefly.core.Component.Companion.COMPONENT_GROUP_ASPECT
 import com.inari.firefly.core.api.*
 import com.inari.firefly.core.api.OperationResult.*
 import com.inari.firefly.graphics.FFInfoSystem
@@ -32,34 +33,30 @@ fun main(args: Array<String>) {
                     name = "X"
                     node(ActionNode) {
                         name="GoRight"
-                        actionOperation = object : Action {
-                            override fun invoke(index: ComponentIndex): OperationResult {
-                                val entity = Entity[index]
-                                val mov = entity[EMovement]
-                                return if (mov.velocity.x < 0)
-                                    SUCCESS
-                                else if (entity[ETransform].position.x > 800f || mov.velocity.x == 0.0f) {
-                                    mov.velocity.x = Random.nextInt(-150, -50).toFloat()
-                                    SUCCESS
-                                } else
-                                    RUNNING
-                            }
+                        actionOperation = {
+                            val entity = Entity[it]
+                            val mov = entity[EMovement]
+                            if (mov.velocity.x < 0)
+                                SUCCESS
+                            else if (entity[ETransform].position.x > 800f || mov.velocity.x == 0.0f) {
+                                mov.velocity.x = Random.nextInt(-150, -50).toFloat()
+                                SUCCESS
+                            } else
+                                RUNNING
                         }
                     }
                     node(ActionNode) {
                         name="GoLeft"
-                        actionOperation = object : Action {
-                            override fun invoke(index: ComponentIndex): OperationResult {
-                                val entity = Entity[index]
-                                val mov = entity[EMovement]
-                                return if (mov.velocity.x > 0)
-                                    SUCCESS
-                                else if (entity[ETransform].position.x < 10f) {
-                                    mov.velocity.x = Random.nextInt(50, 150).toFloat()
-                                    SUCCESS
-                                } else
-                                    RUNNING
-                            }
+                        actionOperation = {
+                            val entity = Entity[it]
+                            val mov = entity[EMovement]
+                            if (mov.velocity.x > 0)
+                                SUCCESS
+                            else if (entity[ETransform].position.x < 10f) {
+                                mov.velocity.x = Random.nextInt(50, 150).toFloat()
+                                SUCCESS
+                            } else
+                                RUNNING
                         }
                     }
                 }
@@ -67,34 +64,30 @@ fun main(args: Array<String>) {
                     name = "Y"
                     node(ActionNode) {
                         name="GoDown"
-                        actionOperation =  object : Action {
-                            override fun invoke(index: ComponentIndex): OperationResult {
-                                val entity = Entity[index]
-                                val mov = entity[EMovement]
-                                return if (mov.velocity.y < 0)
-                                    SUCCESS
-                                else if (entity[ETransform].position.y > 600f || mov.velocity.y == 0.0f) {
-                                    mov.velocity.y = Random.nextInt(-150, -50).toFloat()
-                                    SUCCESS
-                                } else
-                                    RUNNING
-                            }
+                        actionOperation =  {
+                            val entity = Entity[it]
+                            val mov = entity[EMovement]
+                            if (mov.velocity.y < 0)
+                                SUCCESS
+                            else if (entity[ETransform].position.y > 600f || mov.velocity.y == 0.0f) {
+                                mov.velocity.y = Random.nextInt(-150, -50).toFloat()
+                                SUCCESS
+                            } else
+                                RUNNING
                         }
                     }
                     node(ActionNode) {
                         name="GoUp"
-                        actionOperation =  object : Action {
-                            override fun invoke(index: ComponentIndex): OperationResult {
-                                val entity = Entity[index]
-                                val mov = entity[EMovement]
-                                return if (mov.velocity.y > 0)
-                                    SUCCESS
-                                else if (entity[ETransform].position.y < 10f) {
-                                    mov.velocity.y = Random.nextInt(50, 150).toFloat()
-                                    SUCCESS
-                                } else
-                                    RUNNING
-                            }
+                        actionOperation =  {
+                            val entity = Entity[it]
+                            val mov = entity[EMovement]
+                            if (mov.velocity.y > 0)
+                                SUCCESS
+                            else if (entity[ETransform].position.y < 10f) {
+                                mov.velocity.y = Random.nextInt(50, 150).toFloat()
+                                SUCCESS
+                            } else
+                                RUNNING
                         }
                     }
                 }
@@ -143,12 +136,12 @@ fun main(args: Array<String>) {
                     even = !even
                     println("*** send Pause event")
                     val aspect: Aspect =
-                        if (even) ComponentGroups.COMPONENT_GROUP_ASPECT["even"]!!
-                        else ComponentGroups.COMPONENT_GROUP_ASPECT["odd"]!!
+                        if (even) COMPONENT_GROUP_ASPECT["even"]!!
+                        else COMPONENT_GROUP_ASPECT["odd"]!!
 
-                    val groupsToPause = ComponentGroups.COMPONENT_GROUP_ASPECT.createAspects()
+                    val groupsToPause = COMPONENT_GROUP_ASPECT.createAspects()
                     groupsToPause + aspect
-                    PauseEvent.notifyPause(groupsToPause)
+                    Pausing.pauseAllExclusive(groupsToPause)
                 }
             }
         }

@@ -9,9 +9,10 @@ import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.physics.animation.EAnimation
 import com.inari.firefly.physics.animation.IntFrameAnimation
-import com.inari.firefly.physics.animation.IntFrameAnimationControl
+import com.inari.firefly.physics.animation.IntFrameData
 import com.inari.firefly.physics.contact.EContact
 import com.inari.util.DO_NOTHING
+import com.inari.util.LIST_VALUE_SEPARATOR
 import com.inari.util.NO_NAME
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.collection.DynArray
@@ -130,8 +131,14 @@ open class TileMap : Component(TileMap) {
 
                     val entityId = Entity {
                         autoActivation = true
+
                         if (tile.name != NO_NAME)
                             name = "${tile.name}_view:${this@TileMap.viewRef.refIndex}_layer:${layerData.layerRef.refIndex}"
+
+                        if (tile.groups != NO_NAME)
+                            tile.groups.split(LIST_VALUE_SEPARATOR).forEach {
+                                groups + it
+                            }
 
                         withComponent(ETransform) {
                             viewRef(this@TileMap.viewRef)
@@ -162,11 +169,11 @@ open class TileMap : Component(TileMap) {
 
                         if (tile.animationData != null) {
                             withComponent(EAnimation) {
-                                withAnimation(IntFrameAnimation) {
+                                withAnimation(IntFrameData) {
                                     animatedProperty = ETile.PropertyAccessor.SPRITE
                                     looping = true
                                     timeline = tile.animationData!!.frames.toArray()
-                                    animationController(IntFrameAnimationControl)
+                                    animationController(IntFrameAnimation)
                                 }
                             }
                         }

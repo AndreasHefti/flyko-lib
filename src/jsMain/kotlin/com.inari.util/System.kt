@@ -18,6 +18,13 @@ actual fun <T : Any?> arraycopy(source: Array<T>, fromS: Int, dest: Array<T>, fr
     source.copyInto(dest, fromD, fromS, size)
 }
 
-actual fun startParallelTask(name: String, task: () -> Unit) {
+actual val currentThreadName: String
+    get() = throw UnsupportedOperationException()
+
+actual fun startParallelTask(name: String, task: () -> Unit, callback: (Error?) -> Unit) {
+    throw UnsupportedOperationException()
+}
+
+actual fun sleepCurrentThread(milliseconds: Long) {
     throw UnsupportedOperationException()
 }

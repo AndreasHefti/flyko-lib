@@ -251,6 +251,34 @@
     },
     {
         "color": "#ffa0a0a4",
+        "id": 26,
+        "members": [
+            {
+                "name": "activation_task",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "build_task",
+                "type": "string",
+                "value": ""
+            }
+        ],
+        "name": "object_tasks",
+        "type": "class",
+        "useAs": [
+            "property",
+            "map",
+            "layer",
+            "object",
+            "tile",
+            "tileset",
+            "wangcolor",
+            "wangset"
+        ]
+    },
+    {
+        "color": "#ffa0a0a4",
         "id": 12,
         "members": [
             {
@@ -286,7 +314,7 @@
             },
             {
                 "name": "tasks",
-                "propertyType": "tasks",
+                "propertyType": "object_tasks",
                 "type": "class",
                 "value": {
                 }
@@ -296,11 +324,6 @@
                 "propertyType": "triggerOn",
                 "type": "string",
                 "value": "CONTACT"
-            },
-            {
-                "name": "triggerTask",
-                "type": "string",
-                "value": ""
             }
         ],
         "name": "room_transition",
@@ -308,32 +331,6 @@
         "useAs": [
             "property",
             "object"
-        ]
-    },
-    {
-        "color": "#ffa0a0a4",
-        "id": 25,
-        "members": [
-            {
-                "name": "area",
-                "type": "string",
-                "value": ""
-            },
-            {
-                "name": "room",
-                "type": "string",
-                "value": ""
-            },
-            {
-                "name": "world",
-                "type": "string",
-                "value": ""
-            }
-        ],
-        "name": "roomKey",
-        "type": "class",
-        "useAs": [
-            "property"
         ]
     },
     {
@@ -398,6 +395,6 @@
             "ACTION",
             "CONDITION"
         ],
-        "valuesAsFlags": true
+        "valuesAsFlags": false
     }
 ]

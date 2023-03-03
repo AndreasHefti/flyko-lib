@@ -10,34 +10,54 @@ import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.Aspects
 import com.inari.util.collection.BitSet
 import com.inari.util.collection.IndexIterator
-import com.inari.util.event.Event
 import kotlin.jvm.JvmField
 
-enum class PauseEventType {
-    PAUSE,
-    RESUME
-}
+object Pausing {
 
-typealias PauseEventListener = (PauseEventType, Aspects?) -> Unit
-val PAUSE_EVENT_TYPE = Event.EventType("PauseEvent")
-class PauseEvent internal constructor(override val eventType: EventType): Event<PauseEventListener>() {
-    internal var type: PauseEventType = PauseEventType.PAUSE
-    internal var groups: Aspects? = null
-    override fun notify(listener: PauseEventListener) = listener(type,  groups)
+    var paused = false
+        private set
 
-    companion object {
-        private val event = PauseEvent(PAUSE_EVENT_TYPE)
-        fun notifyPause(groups: Aspects?) {
-            event.type = PauseEventType.PAUSE
-            event.groups = groups
-            Engine.notify(event)
-        }
-        fun notifyResume() {
-            event.type = PauseEventType.RESUME
-            event.groups = null
-            Engine.notify(event)
-        }
+    private val pausedGroups: Aspects = Component.COMPONENT_GROUP_ASPECT.createAspects()
+
+    fun pause(group: Aspect) {
+        pausedGroups + group
+        paused = !pausedGroups.isEmpty
     }
+
+    fun pauseExclusive(group: Aspect) {
+        pausedGroups.clear()
+        pausedGroups + group
+        paused = !pausedGroups.isEmpty
+    }
+
+    fun pauseAll(groups: Aspects) {
+        pausedGroups + groups
+        paused = !pausedGroups.isEmpty
+    }
+
+    fun pauseAllExclusive(groups: Aspects) {
+        pausedGroups.clear()
+        pausedGroups + groups
+        paused = !pausedGroups.isEmpty
+    }
+
+    fun resume(group: Aspect) {
+        pausedGroups - group
+        paused = !pausedGroups.isEmpty
+    }
+
+    fun resumeAll(groups: Aspects) {
+        pausedGroups - groups
+        paused = !pausedGroups.isEmpty
+    }
+
+    fun resumeAll() {
+        pausedGroups.clear()
+        paused = false
+    }
+
+    fun isPaused(group: Aspect): Boolean = paused && group in pausedGroups
+    fun isPaused(groups: Aspects?): Boolean = paused && (groups != null && pausedGroups.intersects(groups))
 }
 
 abstract class Control protected constructor() : Component(Control) {
@@ -47,37 +67,10 @@ abstract class Control protected constructor() : Component(Control) {
         autoActivation = true
     }
 
-    var paused = false
-        private set
-    private var pausedGroups: Aspects? = null
-    private val pauseEventListener: PauseEventListener = { type, groups ->
-        if (type == PauseEventType.PAUSE) {
-            paused = true
-            pausedGroups = if (groups != null && !groups.isEmpty) groups else null
-        } else {
-            paused = false
-            pausedGroups = null
-        }
-    }
-
-    fun isPaused(group: Aspect): Boolean = paused && (pausedGroups == null || group in pausedGroups!!)
-    fun isPaused(groups: Aspects?): Boolean = paused && (pausedGroups == null ||
-            (groups != null && pausedGroups!!.intersects(groups)))
-
     @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
     var updateResolution: Float
         get() = scheduler.resolution
         set(value) { scheduler = Engine.timer.createUpdateScheduler(value) }
-
-    override fun activate() {
-        super.activate()
-        Engine.registerListener(PAUSE_EVENT_TYPE, pauseEventListener)
-    }
-
-    override fun deactivate() {
-        Engine.disposeListener(PAUSE_EVENT_TYPE, pauseEventListener)
-        super.deactivate()
-    }
 
     protected abstract fun update()
 
@@ -90,12 +83,18 @@ abstract class Control protected constructor() : Component(Control) {
 
         private fun updateAllActiveControls() {
             val iter = Control.activeIndexIterator()
-            while (iter.hasNext()) {
-                val c = Control[iter.next()]
-                if (!c.active) continue
-                if (!c.isPaused(c.groups.aspects) && c.scheduler.needsUpdate())
-                    c.update()
-            }
+            if (Pausing.paused)
+                while (iter.hasNext()) {
+                    val c = Control[iter.next()]
+                    if (c.scheduler.needsUpdate() && !Pausing.isPaused(c.groups))
+                        c.update()
+                }
+            else
+                while (iter.hasNext()) {
+                    val c = Control[iter.next()]
+                    if (c.scheduler.needsUpdate())
+                        c.update()
+                }
         }
     }
 }
@@ -137,7 +136,7 @@ abstract class SingleComponentControl<C : Component> protected constructor(
     override fun update() {
         if (controlledComponentKey.componentIndex > NULL_COMPONENT_INDEX && system.isActive(controlledComponentKey))
             update(system[controlledComponentKey])
-        else if (controlledComponentKey != NO_COMPONENT_KEY)
+        else if (controlledComponentKey.componentIndex == NULL_COMPONENT_INDEX)
             if (deleteOnControlledDelete) Control.delete(this)
             else controlledComponentKey = NO_COMPONENT_KEY
     }
@@ -206,12 +205,19 @@ abstract class EntityControl protected constructor() : Control() {
 
     override fun update() {
         val it = IndexIterator(entityIndexes)
-        while (it.hasNext())
-            update(it.nextInt())
+        if (Pausing.paused)
+            while (it.hasNext()) {
+                val entity = Entity[it.nextInt()]
+                if (!Pausing.isPaused(entity.groups))
+                    update(entity)
+            }
+        else
+            while (it.hasNext())
+                update(Entity[it.nextInt()])
     }
 
     abstract fun matchForControl(entity: Entity): Boolean
-    protected abstract fun update(entityId: Int)
+    protected abstract fun update(entity: Entity)
 }
 
 interface Controlled {

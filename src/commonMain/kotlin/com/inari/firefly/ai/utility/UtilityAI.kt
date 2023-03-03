@@ -42,7 +42,7 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
 
                 if (utility.runningActionIndex >= 0) {
                     val action = this[utility.runningActionIndex] as UtilityAction
-                    val result = action.callAction(entity.index)
+                    val result = action.callAction(entity.key)
                     if (result != RUNNING)
                         utility.runningActionIndex = NULL_COMPONENT_INDEX
                 }
@@ -159,7 +159,7 @@ class UtilityAction private constructor() : UtilityAI() {
         return result
     }
 
-    fun callAction(entityId: Int): OperationResult = actionOperation(entityId)
+    fun callAction(entityKey: ComponentKey): OperationResult = actionOperation(entityKey)
 
     companion object : ComponentSubTypeBuilder<UtilityAI, UtilityAction>(UtilityAI, "UtilityAction") {
         override fun create() = UtilityAction()

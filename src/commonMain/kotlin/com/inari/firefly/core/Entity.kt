@@ -183,7 +183,7 @@ class EMultiplier private constructor() : EntityComponent(EMultiplier) {
 
 class EAttribute private constructor() : EntityComponent(EAttribute) {
 
-    @JvmField internal var attributes = EMPTY_DICTIONARY
+    @JvmField var attributes = EMPTY_DICTIONARY
 
     override fun reset() {
             attributes = EMPTY_DICTIONARY

@@ -1,5 +1,8 @@
 package com.inari.firefly.core.api
 
+import com.inari.firefly.core.Component
+import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
+import com.inari.firefly.core.ComponentKey
 import com.inari.util.VOID_CONSUMER_3
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.collection.Dictionary
@@ -21,23 +24,14 @@ enum class OperationResult {
     RUNNING,
     FAILED
 }
-interface Action {
-    operator fun invoke(index: ComponentIndex): OperationResult
-}
-typealias ActionCallback = (ComponentIndex, OperationResult) -> Unit
-operator fun ActionCallback.invoke() = this(NULL_COMPONENT_INDEX, OperationResult.SUCCESS)
-operator fun ActionCallback.invoke(result: OperationResult) = this(NULL_COMPONENT_INDEX, result)
-@JvmField val SUCCESS_ACTION: Action = object : Action {
-    override fun invoke(index: Int): OperationResult = OperationResult.SUCCESS
-}
-@JvmField val FAILED_ACTION: Action = object : Action {
-    override fun invoke(index: Int): OperationResult = OperationResult.FAILED
-}
-@JvmField val RUNNING_ACTION: Action = object : Action {
-    override fun invoke(index: Int): OperationResult = OperationResult.RUNNING
-}
+typealias Action = (ComponentKey) -> OperationResult
+typealias ActionCallback = (ComponentKey, OperationResult) -> Unit
+operator fun ActionCallback.invoke() = this(NO_COMPONENT_KEY, OperationResult.SUCCESS)
+operator fun ActionCallback.invoke(result: OperationResult) = this(NO_COMPONENT_KEY, result)
+@JvmField val SUCCESS_ACTION: Action = { OperationResult.SUCCESS }
+@JvmField val FAILED_ACTION: Action =  { OperationResult.FAILED }
+@JvmField val RUNNING_ACTION: Action = { OperationResult.RUNNING }
 @JvmField val NO_ACTION: Action = FAILED_ACTION
-
 
 interface NormalOperation {
     operator fun invoke(ci1: ComponentIndex, ci2: ComponentIndex, ci3: ComponentIndex): Float
@@ -50,8 +44,8 @@ interface NormalOperation {
 }
 
 typealias SimpleTask = () -> Unit
-typealias TaskOperation = (ComponentIndex, Dictionary, TaskCallback) -> Unit
-typealias TaskCallback = (ComponentIndex, Dictionary, OperationResult) -> Unit
+typealias TaskOperation = (ComponentKey, Dictionary, TaskCallback) -> Unit
+typealias TaskCallback = (ComponentKey, Dictionary, OperationResult) -> Unit
 @JvmField val VOID_TASK_OPERATION: TaskOperation = VOID_CONSUMER_3
 @JvmField val VOID_TASK_CALLBACK: TaskCallback = VOID_CONSUMER_3
 

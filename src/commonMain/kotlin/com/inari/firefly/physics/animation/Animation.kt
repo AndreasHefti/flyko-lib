@@ -27,13 +27,24 @@ abstract class Animation<D : AnimatedData>(
 
     override fun update() {
         val iter = animatedData.iterator()
-        while (iter.hasNext()) {
-            val it = iter.next()
-            if (it.active)
-                update(it)
-            else if (it.condition(it))
-                it.active = true
-        }
+        if (Pausing.paused)
+            while (iter.hasNext()) {
+                val it = iter.next()
+                if (it.paused) continue
+
+                if (it.active)
+                    update(it)
+                else if (it.condition(it))
+                    it.active = true
+            }
+        else
+            while (iter.hasNext()) {
+                val it = iter.next()
+                if (it.active)
+                    update(it)
+                else if (it.condition(it))
+                    it.active = true
+            }
     }
 
     protected abstract fun update(data: D)
@@ -67,39 +78,40 @@ abstract class Animation<D : AnimatedData>(
             return null
         return accept(data)
     }
-
 }
 
-object DefaultFloatEasing : Animation<EasedFloatAnimation>(DynArray.of(5, 10)) {
+object FloatEasingAnimation: Animation<EasedFloatData>(DynArray.of(5, 10)) {
 
     init {
         Control.registerAsSingleton(this, true)
         Control.activate(this.name)
     }
 
-    override fun update(data: EasedFloatAnimation) {
+    override fun update(data: EasedFloatData) {
         val timeStep: Float = 1f * Engine.timer.timeElapsed / data.duration
         if (data.applyTimeStep(timeStep))
-            // calc and apply eased value
+        // calc and apply eased value
             if (data.inversed)
                 data.accessor(GeomUtils.lerp(data.endValue, data.startValue, data.easing(data.normalizedTime)))
             else
                 data.accessor(GeomUtils.lerp(data.startValue, data.endValue, data.easing(data.normalizedTime)))
     }
 
-    override fun accept(data: AnimatedData): EasedFloatAnimation? =
-        if (data !is EasedFloatAnimation) null
+    override fun accept(data: AnimatedData): EasedFloatData? =
+        if (data !is EasedFloatData) null
         else data
+
+
 }
 
-object BezierCurveAnimationControl: Animation<BezierCurveAnimation>(DynArray.of(5, 10)) {
+object BezierCurveAnimation: Animation<BezierCurveData>(DynArray.of(5, 10)) {
 
     init {
         Control.registerAsSingleton(this, true)
         Control.activate(this.name)
     }
 
-    override fun update(data: BezierCurveAnimation) {
+    override fun update(data: BezierCurveData) {
         val timeStep = Engine.timer.timeElapsed.toFloat() / data.duration
         if (data.applyTimeStep(timeStep))
             if (data.inversed) {
@@ -115,20 +127,19 @@ object BezierCurveAnimationControl: Animation<BezierCurveAnimation>(DynArray.of(
             }
     }
 
-    override fun accept(data: AnimatedData): BezierCurveAnimation? =
-        if (data !is BezierCurveAnimation) null
+    override fun accept(data: AnimatedData): BezierCurveData? =
+        if (data !is BezierCurveData) null
         else data
-
 }
 
-object BezierSplineAnimationControl : Animation<BezierSplineAnimation>(DynArray.of(5, 10)) {
+object BezierSplineAnimation : Animation<BezierSplineData>(DynArray.of(5, 10)) {
 
     init {
         Control.registerAsSingleton(this, true)
         Control.activate(this.name)
     }
 
-    override fun update(data: BezierSplineAnimation) {
+    override fun update(data: BezierSplineData) {
         val timeStep = Engine.timer.timeElapsed.toFloat() / data.duration
         if (data.applyTimeStep(timeStep)) {
             if (data.inversed) {
@@ -150,19 +161,19 @@ object BezierSplineAnimationControl : Animation<BezierSplineAnimation>(DynArray.
         }
     }
 
-    override fun accept(data: AnimatedData): BezierSplineAnimation? =
-        if (data !is BezierSplineAnimation) null
+    override fun accept(data: AnimatedData): BezierSplineData? =
+        if (data !is BezierSplineData) null
         else data
 }
 
-object IntFrameAnimationControl : Animation<IntFrameAnimation>(DynArray.of(5, 10)) {
+object IntFrameAnimation : Animation<IntFrameData>(DynArray.of(5, 10)) {
 
     init {
         Control.registerAsSingleton(this, true)
         Control.activate(this.name)
     }
 
-    override fun update(data: IntFrameAnimation) {
+    override fun update(data: IntFrameData) {
         val timeStep = Engine.timer.timeElapsed.toFloat() / data.duration
         if (data.applyTimeStep(timeStep)) {
             var t = 0f
@@ -175,8 +186,7 @@ object IntFrameAnimationControl : Animation<IntFrameAnimation>(DynArray.of(5, 10
         }
     }
 
-    override fun accept(data: AnimatedData): IntFrameAnimation? =
-        if (data !is IntFrameAnimation) null
+    override fun accept(data: AnimatedData): IntFrameData? =
+        if (data !is IntFrameData) null
         else data
-
 }

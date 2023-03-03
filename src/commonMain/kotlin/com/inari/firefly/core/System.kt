@@ -1,7 +1,7 @@
 package com.inari.firefly.core
 
 import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
-import com.inari.firefly.core.ComponentGroups.Companion.COMPONENT_GROUP_ASPECT
+import com.inari.firefly.core.Component.Companion.COMPONENT_GROUP_ASPECT
 import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.NO_NAME
@@ -20,6 +20,8 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
     val hasComponents: Boolean
     val hasActiveComponents: Boolean
 
+    fun nextIndex(from: Int): ComponentIndex
+    fun nextActiveIndex(from: Int): ComponentIndex
     fun indexIterator(): IntIterator
     fun activeIndexIterator(): IntIterator
 
@@ -90,15 +92,6 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
     fun disposeComponentListener(listener: ComponentEventListener) =
         Engine.disposeListener(componentEventType, listener)
 
-    fun findFirst(filter: (C) -> Boolean): C? {
-        val iter = indexIterator()
-        while (iter.hasNext()) {
-            val c = this[iter.next()]
-            if (filter(c)) return c
-        }
-        return null
-    }
-
     fun forEachDo(
         filter: (C) -> Boolean = TRUE_PREDICATE,
         process: (C) -> Unit
@@ -145,7 +138,8 @@ abstract class ComponentSystem<C : Component>(
     
     init { registerSystem(this) }
 
-    private val _componentKeyMapping: MutableMap<String, ComponentKey> =  HashMap()
+    // TODO private and adapt in SubType
+    internal val _componentKeyMapping: MutableMap<String, ComponentKey> =  HashMap()
     val componentKeyMapping: Map<String, ComponentKey> = _componentKeyMapping
     private val _componentMapping: DynArray<C> = DynArray(50, 100) { size -> allocateArray(size) }
     val componentMapping: DynArrayRO<C> = _componentMapping
@@ -290,6 +284,8 @@ abstract class ComponentSystem<C : Component>(
             _componentKeyMapping.remove(removed.name)?.clearKey()
     }
 
+    override fun nextIndex(from: ComponentIndex) = _componentMapping.nextIndex(from)
+    override fun nextActiveIndex(from: ComponentIndex) = _activeComponentSet.nextIndex(from)
     override fun indexIterator(): IntIterator = IndexIterator(_componentMapping)
     override fun activeIndexIterator(): IntIterator = IndexIterator(_activeComponentSet)
     override fun iterator(): Iterator<C> = IndexedTypeIterator(_componentMapping)
@@ -466,11 +462,12 @@ abstract class ComponentSystem<C : Component>(
     }
     override fun hasKey(name: String): Boolean = name in _componentKeyMapping
 
-    override fun getOrCreateKey(name: String): ComponentKey =
+    override fun getOrCreateKey(name: String): ComponentKey = getOrCreateKey(name, this)
+    internal fun getOrCreateKey(name: String, system: IComponentSystem<*>): ComponentKey =
         if (hasKey(name))
             _componentKeyMapping[name]!!
         else
-            createKey(name)
+            system.createKey(name)
 
     override fun getKey(name: String): ComponentKey =
         if (hasKey(name))
@@ -618,6 +615,8 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
     override val hasActiveComponents: Boolean
         get() = activeSubComponentRefs.nextIndex(0) >= 0
 
+    override fun nextIndex(from: ComponentIndex) = subComponentRefs.nextIndex(from)
+    override fun nextActiveIndex(from: ComponentIndex) = activeSubComponentRefs.nextIndex(from)
     override fun indexIterator(): IntIterator = IndexIterator(subComponentRefs)
     override fun activeIndexIterator(): IntIterator = IndexIterator(activeSubComponentRefs)
     override fun iterator(): Iterator<CC> = IndexedTypeIterator(iterableTypeAdapter)
@@ -632,9 +631,17 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
             delete(iter.next())
     }
 
-    override fun createKey(name: String) = system.createKey(name)
+    override fun createKey(name: String): ComponentKey {
+        if (name == NO_NAME)
+            throw IllegalArgumentException("Key with no name")
+        if (name in system.componentKeyMapping)
+            throw IllegalArgumentException("Key with same name already exists")
+        val newKey = ComponentKey(name, this)
+        system._componentKeyMapping[name] = newKey
+        return newKey
+    }
     override fun hasKey(name: String) = system.hasKey(name)
-    override fun getOrCreateKey(name: String) = system.getOrCreateKey(name)
+    override fun getOrCreateKey(name: String) = system.getOrCreateKey(name, this)
     override fun getKey(name: String) = system.getKey(name)
     override fun getKey(index: ComponentIndex) = system.getKey(index)
     @Suppress("UNCHECKED_CAST")

@@ -58,6 +58,8 @@ actual object GraphicsAPIImpl : GraphicsAPI {
             "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n" +
             "}\n"
 
+    private val defaultShaderProgram = ShaderProgram(DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER)
+
     private val viewports: DynArray<ViewportFBO> = DynArray.of(10, 10)
     private val textures: DynArray<Texture> = DynArray.of(30, 50)
     private val shaders: DynArray<Shader> = DynArray.of(5, 5)
@@ -231,7 +233,7 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         if (shaderId != activeShaderId) {
             spriteBatch.flush()
             if (shaderId < 0) {
-                spriteBatch.shader = null
+                spriteBatch.shader = defaultShaderProgram
                 activeShaderId = -1
             } else {
                 val shaderData = shaders[shaderId]
@@ -243,7 +245,7 @@ actual object GraphicsAPIImpl : GraphicsAPI {
         }
         if (shaderId != activeShapeShaderId)
             if (shaderId < 0)
-                (shapeRenderer.renderer as ImmediateModeRenderer20).shader = null
+                (shapeRenderer.renderer as ImmediateModeRenderer20).shader = defaultShaderProgram
             else {
                 val shader = shaders[shaderId]
                 if (shader != null) {

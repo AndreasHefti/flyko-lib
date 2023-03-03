@@ -1,21 +1,27 @@
 package com.inari.firefly.graphics.view
 
-import com.inari.firefly.core.CReference
-import com.inari.firefly.core.ComponentKey
-import com.inari.firefly.core.ComponentSubTypeBuilder
-import com.inari.firefly.core.Control
+import com.inari.firefly.core.*
 import com.inari.firefly.core.api.Action
 import com.inari.firefly.core.api.ActionCallback
 import com.inari.firefly.core.api.OperationResult.RUNNING
 import com.inari.firefly.core.api.RUNNING_ACTION
 import com.inari.util.VOID_CONSUMER_2
+import com.inari.util.collection.Dictionary
+import com.inari.util.collection.EMPTY_DICTIONARY
 import kotlin.jvm.JvmField
 
 class Scene private constructor(): Control() {
 
-    @JvmField internal var updateOperation: Action = RUNNING_ACTION
-    @JvmField internal var callback: ActionCallback = VOID_CONSUMER_2
+    @JvmField val attributes: Dictionary = EMPTY_DICTIONARY
+    @JvmField val loadTask = CReference(Task)
+    @JvmField val disposeTask = CReference(Task)
+    @JvmField var updateOperation: Action = RUNNING_ACTION
+    @JvmField var callback: ActionCallback = VOID_CONSUMER_2
     @JvmField var deleteAfterRun: Boolean = false
+
+    init {
+        autoActivation = false
+    }
 
     fun withCallback(callback: ActionCallback) {
         this.callback = callback
@@ -25,16 +31,42 @@ class Scene private constructor(): Control() {
         updateOperation = update
     }
 
+    fun withLoadTask(config: (Task.() -> Unit)): ComponentKey {
+        val key = Task.build(config)
+        loadTask(key)
+        return key
+    }
+
+    fun withDisposeTask(config: (Task.() -> Unit)): ComponentKey {
+        val key = Task.build(config)
+        disposeTask(key)
+        return key
+    }
+
+    override fun load() {
+        super.load()
+
+        if (loadTask.exists)
+            Task[loadTask](this.key, attributes)
+    }
+
+    override fun dispose() {
+        if (disposeTask.exists)
+            Task[disposeTask](this.key, attributes)
+
+        super.dispose()
+    }
+
     override fun update() {
         if (!scheduler.needsUpdate())
             return
 
-        val result = updateOperation(index)
+        val result = updateOperation(key)
         if (result == RUNNING)
             return
 
         stopScene(index)
-        callback(index, result)
+        callback(key, result)
         if (deleteAfterRun)
             Scene.system.delete(index)
     }
@@ -47,7 +79,7 @@ class Scene private constructor(): Control() {
         fun runScene(key: ComponentKey, callback: ActionCallback) = runScene(key.componentIndex, callback)
         fun runScene(index: Int, callback: ActionCallback) {
             checkIndex(index)
-            val scene = system[index] as Scene
+            val scene = Scene[index]
             scene.withCallback(callback)
             activate(index)
         }

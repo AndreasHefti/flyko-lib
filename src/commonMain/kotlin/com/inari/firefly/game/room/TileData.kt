@@ -51,6 +51,7 @@ class TileTemplate internal constructor() {
     @JvmField internal var animationData: TileAnimation? = null
 
     @JvmField var name: String = NO_NAME
+    @JvmField var groups: String = NO_NAME
     @Suppress("SetterBackingFieldAssignment")
     var aspects: Aspects = TILE_ASPECT_GROUP.createAspects()
         set(value) {

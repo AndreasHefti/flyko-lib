@@ -8,7 +8,12 @@ import kotlin.jvm.JvmField
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class SimpleCameraController private constructor() : SingleComponentControl<View>(View) {
+interface Camera {
+    fun setPivot(pivot: Vector2f)
+    fun adjust()
+}
+
+class SimpleCameraController private constructor() : SingleComponentControl<View>(View), Camera {
 
     @JvmField var pixelPerfect = false
     @JvmField var pivot: Vector2f = Vector2f()
@@ -18,6 +23,10 @@ class SimpleCameraController private constructor() : SingleComponentControl<View
     private val pos = Vector2f()
     private lateinit var viewChangeEvent: ViewChangeEvent
 
+    override fun setPivot(pivot: Vector2f) {
+        this.pivot = pivot
+    }
+
     override fun register(key: ComponentKey) {
         super.register(key)
         viewChangeEvent = View.createViewChangeEvent(
@@ -26,7 +35,7 @@ class SimpleCameraController private constructor() : SingleComponentControl<View
             false)
     }
 
-    fun adjust() {
+    override fun adjust() {
         if (controlledComponentKey.componentIndex < 0) return
         val view: View = ComponentSystem[controlledComponentKey]
         if (getPos(view.zoom, view.bounds, view.worldPosition)) {

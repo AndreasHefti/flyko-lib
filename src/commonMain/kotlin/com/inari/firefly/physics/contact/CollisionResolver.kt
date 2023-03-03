@@ -50,6 +50,15 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
             Engine.registerListener(UPDATE_EVENT_TYPE, ::update)
         }
 
+        fun updateContacts(entityIndex: EntityIndex) = updateContacts(Entity[entityIndex])
+        fun updateContacts(entity: Entity) {
+            val contacts = entity[EContact]
+            if (!contacts.contactScans.hasAnyScan)
+                return
+
+            scanContacts(entity, contacts)
+        }
+
         private fun update() {
             var i = entitiesWithScan.nextSetBit(0)
             while (i >= 0) {
@@ -80,15 +89,6 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                 val c = contactsComp.contactScans.scans[i++] ?: continue
                 updateContacts(entity, c)
             }
-        }
-
-        fun updateContacts(entityIndex: EntityIndex) = updateContacts(Entity[entityIndex])
-        fun updateContacts(entity: Entity) {
-            val contacts = entity[EContact]
-            if (!contacts.contactScans.hasAnyScan)
-                return
-
-            scanContacts(entity, contacts)
         }
 
         private val originWorldBounds = SystemContactBounds(circle = Vector3i())

@@ -73,7 +73,7 @@ fun main() {
                 zoom = 1f
             }
 
-            Texture {
+            val texKey = Texture {
                 name = "logoTexture"
                 resourceName = "firefly/logo.png"
                 // Create and activate/load a SpriteAsset with reference to the TextureAsset.

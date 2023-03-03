@@ -1,19 +1,17 @@
 package com.inari.firefly
 
-import com.inari.firefly.core.Asset
 import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Entity
 import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.api.InputAPIImpl
 import com.inari.firefly.graphics.sprite.ESprite
-import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.View
-import com.inari.firefly.physics.animation.DefaultFloatEasing
 import com.inari.firefly.physics.animation.EAnimation
-import com.inari.firefly.physics.animation.EasedFloatAnimation
+import com.inari.firefly.physics.animation.EasedFloatData
+import com.inari.firefly.physics.animation.FloatEasingAnimation
 import com.inari.util.VOID_CALL
 import com.inari.util.geom.Easing
 import org.lwjgl.glfw.GLFW
@@ -55,14 +53,14 @@ object InariIntro {
                 tintColor(1f, 1f, 1f, 0f)
             }
             withComponent(EAnimation) {
-                withAnimation(EasedFloatAnimation) {
+                withAnimation(EasedFloatData) {
                     animatedProperty = ESprite.PropertyAccessor.TINT_COLOR_ALPHA
                     resetOnFinish = false
                     easing = Easing.LINEAR
                     startValue = 0f
                     endValue = 1f
                     duration = 1000
-                    animationController(DefaultFloatEasing)
+                    animationController(FloatEasingAnimation)
                 }
             }
         }

@@ -2,10 +2,12 @@ package com.inari.firefly.game.actor.player
 
 import com.inari.firefly.core.*
 import com.inari.firefly.game.actor.player.Player.PlayerEventType.*
+import com.inari.firefly.graphics.view.Camera
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.util.NO_NAME
 import com.inari.util.aspect.Aspect
+import com.inari.util.aspect.Aspects
 import com.inari.util.aspect.IndexedAspectType
 import com.inari.util.event.Event
 import com.inari.util.geom.Vector2f
@@ -31,6 +33,8 @@ class Player private constructor() : Composite(Player), Controlled {
 
     var playerEntityKey = NO_COMPONENT_KEY
 
+    var playerEntity: Entity? = null
+        internal set
     var playerPosition = Vector2f()
         internal set
     var playerPivot = Vector2i()
@@ -38,9 +42,27 @@ class Player private constructor() : Composite(Player), Controlled {
     var playerMovement: EMovement? = null
         internal set
 
+    private var camera: Camera? = null
+
+    override fun addToGroup(group: Aspect): Aspects {
+        val groups = super.addToGroup(group)
+        playerEntity?.addToGroup(group)
+        return groups
+    }
+
+    override fun removeFromGroup(group: Aspect): Aspects {
+        val groups = super.removeFromGroup(group)
+        playerEntity?.removeFromGroup(group)
+        return groups
+    }
+
     fun withPlayerEntity(config: (Entity.() -> Unit)): ComponentKey {
         playerEntityKey = Entity.build(config)
         return playerEntityKey
+    }
+
+    fun withCamera(camera: Camera) {
+        this.camera = camera
     }
 
     override fun initialize() {
@@ -52,12 +74,14 @@ class Player private constructor() : Composite(Player), Controlled {
 
     override fun load() {
         super.load()
-        val playerEntity = Entity[playerEntityKey]
-        playerPosition = playerEntity[ETransform].position
-        playerPivot(playerEntity[ETransform].pivot)
-        if (EMovement in playerEntity.aspects)
-            playerMovement = playerEntity[EMovement]
-
+        playerEntity = Entity[playerEntityKey]
+        playerEntity!!.groups + this.groups
+        playerPosition = playerEntity!![ETransform].position
+        camera?.setPivot(playerPosition)
+        camera?.adjust()
+        playerPivot(playerEntity!![ETransform].pivot)
+        if (EMovement in playerEntity!!.aspects)
+            playerMovement = playerEntity!![EMovement]
 
         send(index, PLAYER_LOADED)
     }

@@ -50,13 +50,17 @@ object TiledRoomLoadTask : StaticTask() {
             this.name = name
             // set attributes and tasks
             this.attributes = tileMapJson.putProperties(Attributes())
-            tileMapJson.mappedProperties["tasks"]?.apply {
-                val initTask = withLifecycleTask {}
-                val iter = LifecycleTaskType.values().iterator()
-                while (iter.hasNext()) {
-                    val it = iter.next()
-                    this.classValue[it.name]?.apply {
-                        initTask.withTask(it, this as String)
+            val roomTasks = tileMapJson.mappedProperties[PROP_ROOM_TASKS]
+            if (roomTasks != null) {
+                val tit = roomTasks.classValue.entries.iterator()
+                while (tit.hasNext()) {
+                    val entry = tit.next()
+                    val type = LifecycleTaskType.valueOf(entry.key)
+                    withLifecycleTask {
+                        this.order = 10
+                        this.attributes = this@Room.attributes
+                        lifecycleType = type
+                        task(entry.value as String)
                     }
                 }
             }
@@ -83,7 +87,8 @@ object TiledRoomLoadTask : StaticTask() {
             val resPath = tileSetDirPath + tileSetRefJson.source.substringAfterLast('/')
             val tiledTileSetAttrs = Attributes() +
                     ( TiledTileSetLoadTask.ATTR_NAME to tileSetRefName ) +
-                    ( TiledTileSetLoadTask.ATTR_RESOURCE to resPath)
+                    ( TiledTileSetLoadTask.ATTR_RESOURCE to resPath) +
+                    ( TiledTileSetLoadTask.ATTR_APPLY_ANIMATION_GROUPS to Room.ROOM_PAUSE_GROUP.aspectName)
 
             TiledTileSetLoadTask(attributes = tiledTileSetAttrs)
 
@@ -98,10 +103,10 @@ object TiledRoomLoadTask : StaticTask() {
             if (layerJson.type == PROP_VALUE_TYPE_LAYER)
                loadTileLayer(tileMap, tileMapJson, layerJson)
             else if (layerJson.type == PROP_VALUE_TYPE_OBJECT)
-                loadObjectLayer(room, tileMapJson, layerJson)
+                loadObjectLayer(room, layerJson)
         }
 
-        callback(-1, attributes, OperationResult.SUCCESS)
+        callback(NO_COMPONENT_KEY, attributes, OperationResult.SUCCESS)
     }
 
     private fun loadTileLayer(
@@ -152,22 +157,18 @@ object TiledRoomLoadTask : StaticTask() {
         }
     }
 
-    private fun loadObjectLayer(room: Room, json: TiledMapJson, layerJson: TiledLayer) {
+    private fun loadObjectLayer(room: Room, layerJson: TiledLayer) {
         val iter = layerJson.objects?.iterator() ?: return
         while (iter.hasNext()) {
             val tiledObj = iter.next()
-            val attributes = tiledObj.toAttributes()
-            val taskProps = tiledObj.mappedProperties["tasks"]
+            val taskProps = tiledObj.mappedProperties[PROP_OBJECT_TASKS]
+            val buildTaskName = taskProps!!.classValue[PROP_OBJECT_BUILD_TASK] ?: continue
 
             room.withLifecycleTask {
                 this.order = 10
-                this.attributes = attributes
-
-                val iter = taskProps!!.classValue.entries.iterator()
-                while (iter.hasNext()) {
-                    val it = iter.next()
-                    withTask(LifecycleTaskType.valueOf(it.key), it.value.toString())
-                }
+                this.attributes = tiledObj.toAttributes()
+                lifecycleType = LifecycleTaskType.ON_ACTIVATION
+                task(buildTaskName as String)
             }
         }
     }

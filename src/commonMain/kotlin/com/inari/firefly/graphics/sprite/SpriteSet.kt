@@ -4,7 +4,7 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BindingIndex
 import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.SpriteData
-import com.inari.firefly.physics.animation.IntFrameAnimation
+import com.inari.firefly.physics.animation.IntFrameData
 import com.inari.util.NO_NAME
 import com.inari.util.ZERO_INT
 import com.inari.util.collection.DynArray
@@ -34,7 +34,7 @@ class SpriteTemplate internal constructor(): SpriteData {
 }
 
 @ComponentDSL
-class SpriteFrame : IntFrameAnimation.IntFrame {
+class SpriteFrame : IntFrameData.IntFrame {
 
     var interval: Long = 0
     var sprite: SpriteTemplate = SpriteTemplate()

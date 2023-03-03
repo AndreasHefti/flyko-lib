@@ -26,6 +26,7 @@ enum class ButtonType {
     QUIT,
     FIRE_1,
     FIRE_2,
+    PAUSE,
 
     BUTTON_A,
     BUTTON_B,

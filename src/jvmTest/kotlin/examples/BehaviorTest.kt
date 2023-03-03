@@ -5,12 +5,9 @@ import com.inari.firefly.ai.behavior.ActionNode
 import com.inari.firefly.ai.behavior.EBehavior
 import com.inari.firefly.ai.behavior.ParallelNode
 import com.inari.firefly.ai.behavior.SequenceNode
-import com.inari.firefly.core.ComponentSystem
 import com.inari.firefly.core.Entity
-import com.inari.firefly.core.api.Action
 import com.inari.firefly.core.api.OperationResult.*
 import com.inari.firefly.core.api.BlendMode
-import com.inari.firefly.core.api.OperationResult
 import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.graphics.FFInfoSystem
 import com.inari.firefly.graphics.FrameRateInfo
@@ -34,34 +31,30 @@ fun main(args: Array<String>) {
                     name = "X"
                     node(ActionNode) {
                         name="GoRight"
-                        actionOperation = object : Action {
-                            override fun invoke(index: Int): OperationResult {
-                                val entity = Entity[index]
-                                val mov = entity[EMovement]
-                                return if (mov.velocity.x < 0)
-                                    SUCCESS
-                                else if (entity[ETransform].position.x > 800f || mov.velocity.x == 0.0f) {
-                                    mov.velocity.x = Random.nextInt(-150, -50).toFloat()
-                                    SUCCESS
-                                } else
-                                    RUNNING
-                            }
+                        actionOperation =  {
+                            val entity = Entity[it]
+                            val mov = entity[EMovement]
+                            if (mov.velocity.x < 0)
+                                SUCCESS
+                            else if (entity[ETransform].position.x > 800f || mov.velocity.x == 0.0f) {
+                                mov.velocity.x = Random.nextInt(-150, -50).toFloat()
+                                SUCCESS
+                            } else
+                                RUNNING
                         }
                     }
                     node(ActionNode) {
                         name="GoLeft"
-                        actionOperation =  object : Action {
-                            override fun invoke(index: Int): OperationResult {
-                                val entity = Entity[index]
-                                val mov = entity[EMovement]
-                                return if (mov.velocity.x > 0)
-                                    SUCCESS
-                                else if (entity[ETransform].position.x < 10f) {
-                                    mov.velocity.x = Random.nextInt(50, 150).toFloat()
-                                    SUCCESS
-                                } else
-                                    RUNNING
-                            }
+                        actionOperation =  {
+                            val entity = Entity[it]
+                            val mov = entity[EMovement]
+                            if (mov.velocity.x > 0)
+                                SUCCESS
+                            else if (entity[ETransform].position.x < 10f) {
+                                mov.velocity.x = Random.nextInt(50, 150).toFloat()
+                                SUCCESS
+                            } else
+                                RUNNING
                         }
                     }
                 }
@@ -69,34 +62,30 @@ fun main(args: Array<String>) {
                     name = "Y"
                     node(ActionNode) {
                         name="GoDown"
-                        actionOperation = object : Action {
-                            override fun invoke(index: Int): OperationResult {
-                                val entity = Entity[index]
-                                val mov = entity[EMovement]
-                                return if (mov.velocity.y < 0)
-                                    SUCCESS
-                                else if (entity[ETransform].position.y > 600f || mov.velocity.y == 0.0f) {
-                                    mov.velocity.y = Random.nextInt(-150, -50).toFloat()
-                                    SUCCESS
-                                } else
-                                    RUNNING
-                            }
+                        actionOperation = {
+                            val entity = Entity[it]
+                            val mov = entity[EMovement]
+                            if (mov.velocity.y < 0)
+                                SUCCESS
+                            else if (entity[ETransform].position.y > 600f || mov.velocity.y == 0.0f) {
+                                mov.velocity.y = Random.nextInt(-150, -50).toFloat()
+                                SUCCESS
+                            } else
+                                RUNNING
                         }
                     }
                     node(ActionNode) {
                         name="GoUp"
-                        actionOperation = object : Action {
-                            override fun invoke(index: Int): OperationResult {
-                                val entity = Entity[index]
-                                val mov = entity[EMovement]
-                                return if (mov.velocity.y > 0)
-                                    SUCCESS
-                                else if (entity[ETransform].position.y < 10f) {
-                                    mov.velocity.y = Random.nextInt(50, 150).toFloat()
-                                    SUCCESS
-                                } else
-                                    RUNNING
-                            }
+                        actionOperation = {
+                            val entity = Entity[it]
+                            val mov = entity[EMovement]
+                            if (mov.velocity.y > 0)
+                                SUCCESS
+                            else if (entity[ETransform].position.y < 10f) {
+                                mov.velocity.y = Random.nextInt(50, 150).toFloat()
+                                SUCCESS
+                            } else
+                                RUNNING
                         }
                     }
                 }

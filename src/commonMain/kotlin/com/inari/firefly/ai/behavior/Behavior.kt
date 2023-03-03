@@ -11,7 +11,7 @@ import kotlin.jvm.JvmField
 
 abstract class BehaviorNode protected constructor(nodeType: ComponentType<out BehaviorNode>) : Component(nodeType) {
 
-    abstract fun tick(entityId: Int): OperationResult
+    abstract fun tick(entityKey: ComponentKey): OperationResult
 
     companion object : AbstractComponentSystem<BehaviorNode>("BehaviorNode") {
         override fun allocateArray(size: Int): Array<BehaviorNode?> = arrayOfNulls(size)
@@ -43,7 +43,7 @@ abstract class BehaviorNode protected constructor(nodeType: ComponentType<out Be
                     else
                         reset(entity.index)
 
-                behavior.treeState = BehaviorNode[behavior.treeIndex].tick(entity.index)
+                behavior.treeState = BehaviorNode[behavior.treeIndex].tick(entity.key)
             }
         }
 
@@ -74,7 +74,7 @@ class ParallelNode private constructor() : BranchNode(ParallelNode) {
 
     @JvmField var successThreshold: Int = 0
 
-    override fun tick(entityId: Int): OperationResult {
+    override fun tick(entityKey: ComponentKey): OperationResult {
         val threshold = if (successThreshold > childrenNodes.size)
             childrenNodes.size
         else
@@ -84,7 +84,7 @@ class ParallelNode private constructor() : BranchNode(ParallelNode) {
         var failuresCount = 0
         var i = childrenNodes.nextSetBit(0)
         loop@ while (i >= 0) {
-            val result = BehaviorNode[i].tick(entityId)
+            val result = BehaviorNode[i].tick(entityKey)
             if (result == SUCCESS) successCount++
             else if (result == FAILED) failuresCount++
             i = childrenNodes.nextSetBit(i + 1)
@@ -101,10 +101,10 @@ class ParallelNode private constructor() : BranchNode(ParallelNode) {
 
 class SelectionNode private constructor() : BranchNode(SelectionNode) {
 
-    override fun tick(entityId: Int): OperationResult {
+    override fun tick(entityKey: ComponentKey): OperationResult {
         var i = childrenNodes.nextSetBit(0)
         loop@ while (i >= 0) {
-            val result = BehaviorNode[i].tick(entityId)
+            val result = BehaviorNode[i].tick(entityKey)
             if (result != FAILED)
                 return result
             i = childrenNodes.nextSetBit(i + 1)
@@ -119,10 +119,10 @@ class SelectionNode private constructor() : BranchNode(SelectionNode) {
 
 class SequenceNode private constructor() : BranchNode(SequenceNode) {
 
-    override fun tick(entityId: Int): OperationResult {
+    override fun tick(entityKey: ComponentKey): OperationResult {
         var i = childrenNodes.nextSetBit(0)
         loop@ while (i >= 0) {
-            val result = BehaviorNode[i].tick(entityId)
+            val result = BehaviorNode[i].tick(entityKey)
             if (result != SUCCESS)
                 return result
             i = childrenNodes.nextSetBit(i + 1)
@@ -150,7 +150,7 @@ class ActionNode private constructor() : BehaviorNode(ActionNode) {
 
     @JvmField var actionOperation: Action = SUCCESS_ACTION
 
-    override fun tick(entityId: Int): OperationResult = actionOperation(entityId)
+    override fun tick(entityKey: ComponentKey): OperationResult = actionOperation(entityKey)
 
     companion object : ComponentSubTypeBuilder<BehaviorNode, ActionNode>(BehaviorNode, "ActionNode") {
         override fun create() = ActionNode()

@@ -28,9 +28,9 @@ class AspectsTest {
         assertEquals("Aspects [aspectType=TestAspect1 {}]", aspects1.toString())
         assertEquals("Aspects [aspectType=TestAspect1 {}]", aspects2.toString())
         assertEquals("Aspects [aspectType=TestAspect1 {}]", aspects3.toString())
-        assertEquals("64", aspects1.size.toString())
-        assertEquals("64", aspects2.size.toString())
-        assertEquals("64", aspects3.size.toString())
+        assertEquals("0", aspects1.size.toString())
+        assertEquals("0", aspects2.size.toString())
+        assertEquals("0", aspects3.size.toString())
 
         aspects1 + aspect1
         aspects1 + aspect3

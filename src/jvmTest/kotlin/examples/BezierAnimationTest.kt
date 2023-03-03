@@ -41,7 +41,7 @@ fun main() {
                     Vector2f(200f, 200f),
                 )
 
-                withAnimation(BezierCurveAnimation) {
+                withAnimation(BezierCurveData) {
                     looping = true
                     inverseOnLoop = true
                     duration = 2500
@@ -50,7 +50,7 @@ fun main() {
                     animatedXProperty = ETransform.PropertyAccessor.POSITION_X
                     animatedYProperty = ETransform.PropertyAccessor.POSITION_Y
                     animatedRotationProperty = ETransform.PropertyAccessor.ROTATION
-                    animationController(BezierCurveAnimationControl)
+                    animationController(BezierCurveAnimation)
                 }
             }
         }
@@ -84,7 +84,7 @@ fun main() {
                     Vector2f(300f, 200f)
                 )
 
-                withAnimation(BezierCurveAnimation) {
+                withAnimation(BezierCurveData) {
                     looping = true
                     inverseOnLoop = true
                     duration = 5000
@@ -93,7 +93,7 @@ fun main() {
                     animatedXProperty = ETransform.PropertyAccessor.POSITION_X
                     animatedYProperty = ETransform.PropertyAccessor.POSITION_Y
                     animatedRotationProperty = ETransform.PropertyAccessor.ROTATION
-                    animationController(BezierCurveAnimationControl)
+                    animationController(BezierCurveAnimation)
                 }
             }
         }

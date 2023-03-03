@@ -1,5 +1,6 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.Component.Companion.COMPONENT_GROUP_ASPECT
 import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.NO_NAME
@@ -15,7 +16,7 @@ import kotlin.jvm.JvmField
 /** Defines the component based builder DSL marker */
 @DslMarker annotation class ComponentDSL
 /** Component event listener expects the component index, component type and the component event type */
-typealias ComponentEventListener = (key: ComponentKey, ComponentEventType) -> Unit
+typealias ComponentEventListener = (ComponentKey, ComponentEventType) -> Unit
 
 enum class ComponentEventType {
     INITIALIZED,
@@ -24,14 +25,6 @@ enum class ComponentEventType {
     DEACTIVATED,
     DISPOSED,
     DELETED
-}
-
-enum class LifecycleTaskType {
-    ON_LOAD,
-    ON_ACTIVATION,
-    ON_DEACTIVATION,
-    ON_DISPOSE,
-    ON_DELETE
 }
 
 interface ComponentType<C : Component> : Aspect {
@@ -93,35 +86,6 @@ sealed interface ComponentBuilder<C : Component> {
     fun buildAndGet(configure: C.() -> Unit): C
 }
 
-class ComponentGroups {
-
-    var aspects: Aspects? = null
-        private set
-    operator fun plus(name: String) {
-        if (aspects == null) aspects = COMPONENT_GROUP_ASPECT.createAspects()
-        aspects!! + COMPONENT_GROUP_ASPECT.createAspect(name)
-    }
-    operator fun minus(name: String) =
-        aspects?.minus(COMPONENT_GROUP_ASPECT[name])
-
-    operator fun contains(name: String): Boolean =
-        aspects?.contains(COMPONENT_GROUP_ASPECT[name]) ?: false
-
-    operator fun plus(aspect: Aspect) {
-        if (aspects == null) aspects = COMPONENT_GROUP_ASPECT.createAspects()
-        aspects!! + aspect
-    }
-    operator fun minus(aspect: Aspect) =
-        aspects?.minus(aspect)
-
-    operator fun contains(aspect: Aspect): Boolean =
-        aspects?.contains(aspect) ?: false
-
-    companion object {
-        @JvmField val COMPONENT_GROUP_ASPECT = IndexedAspectType("COMPONENT_GROUP_ASPECT")
-    }
-}
-
 @ComponentDSL
 abstract class Component protected constructor(
     val componentType: ComponentType<out Component>
@@ -153,7 +117,10 @@ abstract class Component protected constructor(
             field = value
         }
 
-    @JvmField val groups = ComponentGroups()
+    @JvmField val groups = COMPONENT_GROUP_ASPECT.createAspects()
+    open fun addToGroup(group: Aspect) = groups + group
+    open fun removeFromGroup(group: Aspect) = groups - group
+
     @JvmField internal var onStateChange = false
     var initialized: Boolean = false
         internal set
@@ -200,6 +167,7 @@ abstract class Component protected constructor(
             override val aspectIndex = -1
         }
         @JvmField val NO_COMPONENT_KEY = ComponentKey(NO_NAME, NO_COMP_TYPE)
+        @JvmField val COMPONENT_GROUP_ASPECT = IndexedAspectType("COMPONENT_GROUP_ASPECT")
     }
 }
 
@@ -216,16 +184,20 @@ open class AttributedComponent protected constructor(
     }
 }
 
+enum class LifecycleTaskType {
+    ON_LOAD,
+    ON_ACTIVATION,
+    ON_DEACTIVATION,
+    ON_DISPOSE,
+    ON_DELETE
+}
+
 @ComponentDSL
 class LifecycleTask {
-
     @JvmField var order = 1
     @JvmField var attributes = EMPTY_DICTIONARY
-    @JvmField val tasks: Array<String?> = arrayOfNulls(LifecycleTaskType.values().size)
-
-    fun withTask(type: LifecycleTaskType, name: String) {
-        tasks[type.ordinal] = name
-    }
+    @JvmField var lifecycleType = LifecycleTaskType.ON_LOAD
+    @JvmField val task = CReference(Task)
 }
 
 open class Composite protected constructor(
@@ -295,11 +267,11 @@ open class Composite protected constructor(
         val coIter = tasks.iterator()
         while (coIter.hasNext()) {
             val co = coIter.next()
-            if (co.tasks[type.ordinal] != null)
-                if (!Task.exists(co.tasks[type.ordinal]!!))
-                    println("**** WARN: Task ${co.tasks[type.ordinal]} does not exist")
+            if (co.lifecycleType == type)
+                if (!co.task.exists)
+                    println("**** WARN: Task ${co.task} does not exist")
                 else
-                    Task[co.tasks[type.ordinal]!!](this@Composite.index, co.attributes)
+                    Task[co.task](this@Composite.key, co.attributes)
         }
     }
 

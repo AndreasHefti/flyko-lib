@@ -11,6 +11,7 @@ import com.inari.util.collection.DynIntArray
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 import kotlin.math.floor
+import kotlin.native.concurrent.ThreadLocal
 
 interface ViewRenderer {
     val name: String
@@ -101,7 +102,7 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
 
 object ViewSystemRenderer : Renderer() {
 
-    private val RENDERING_CHAIN = mutableListOf<ViewRenderer>()
+    private val RENDERING_CHAIN: DynArray<ViewRenderer> = DynArray.of(5)
     private val CLIP = Vector4i()
 
     // TODO why is this really needed?
@@ -118,8 +119,8 @@ object ViewSystemRenderer : Renderer() {
     private val LAYER_COMPARATOR = Comparator<Int> { a, b ->
         Layer[a].zPosition.compareTo(Layer[b].zPosition)
     }
-    private val RENDERING_CHAIN_COMPARATOR = Comparator<ViewRenderer> { a, b ->
-        a.order.compareTo(b.order)
+    private val RENDERING_CHAIN_COMPARATOR = Comparator<ViewRenderer?> { a, b ->
+        a?.order?.compareTo(b?.order ?: 0) ?: 0
     }
 
     private val onlyBaseView: Boolean get() = VIEW_LAYER_MAPPING.size <= 0
@@ -161,7 +162,7 @@ object ViewSystemRenderer : Renderer() {
     }
 
     internal fun sortRenderingChain() {
-        RENDERING_CHAIN.sortWith(RENDERING_CHAIN_COMPARATOR)
+        RENDERING_CHAIN.sort(RENDERING_CHAIN_COMPARATOR)
     }
 
     fun registerViewRenderer(renderer: ViewRenderer) {

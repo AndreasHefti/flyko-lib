@@ -42,9 +42,9 @@
   <data encoding="csv">
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,
+1,0,0,0,31,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,
 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,1,
-1,0,0,0,13,0,0,0,40,0,0,0,0,0,0,1,1,1,1,1,
+1,0,0,0,13,0,0,0,40,0,0,0,0,0,3,1,1,1,1,1,
 1,5,0,0,1,14,13,0,1,0,0,0,0,0,0,0,0,0,0,1,
 1,6,0,0,1,1,1,0,22,1,1,21,21,11,11,0,2,1,1,1,
 1,1,5,0,0,0,0,0,0,0,0,0,0,0,0,0,23,33,1,1,
@@ -53,17 +53,17 @@
 </data>
  </layer>
  <objectgroup id="4" name="objects">
-  <object id="1" type="room_transition" x="315" y="14" width="10" height="20">
+  <object id="1" type="room_transition" x="318" y="14" width="4" height="20">
    <properties>
     <property name="groups" value="transition"/>
     <property name="target" value="TestRoom2"/>
-    <property name="tasks" type="class" propertytype="tasks">
+    <property name="tasks" type="class" propertytype="object_tasks">
      <properties>
-      <property name="ON_LOAD" value="RoomTransitionBuildTask"/>
+      <property name="activation_task" value="RoomTransitionTask"/>
+      <property name="build_task" value="RoomTransitionBuildTask"/>
      </properties>
     </property>
     <property name="triggerOn" propertytype="triggerOn" value="CONTACT"/>
-    <property name="triggerTask" value="RoomTransition"/>
    </properties>
   </object>
  </objectgroup>
