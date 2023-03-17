@@ -1,6 +1,5 @@
 package com.inari.firefly.core.api
 
-import com.inari.firefly.core.Component
 import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
 import com.inari.firefly.core.ComponentKey
 import com.inari.util.VOID_CONSUMER_3
@@ -24,6 +23,7 @@ enum class OperationResult {
     RUNNING,
     FAILED
 }
+typealias ComponentCall = (ComponentKey) -> Unit
 typealias Action = (ComponentKey) -> OperationResult
 typealias ActionCallback = (ComponentKey, OperationResult) -> Unit
 operator fun ActionCallback.invoke() = this(NO_COMPONENT_KEY, OperationResult.SUCCESS)
@@ -32,6 +32,10 @@ operator fun ActionCallback.invoke(result: OperationResult) = this(NO_COMPONENT_
 @JvmField val FAILED_ACTION: Action =  { OperationResult.FAILED }
 @JvmField val RUNNING_ACTION: Action = { OperationResult.RUNNING }
 @JvmField val NO_ACTION: Action = FAILED_ACTION
+
+typealias Condition = (ComponentKey, ComponentKey) -> Boolean
+@JvmField val TRUE_CONDITION: Condition = { _, _ -> true }
+@JvmField val FALSE_CONDITION: Condition = { _, _ -> false }
 
 interface NormalOperation {
     operator fun invoke(ci1: ComponentIndex, ci2: ComponentIndex, ci3: ComponentIndex): Float

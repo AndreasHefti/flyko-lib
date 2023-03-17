@@ -49,4 +49,8 @@ class CReference internal constructor(
         targetKey = NO_COMPONENT_KEY
         init(targetKey)
     }
+
+    override fun toString(): String {
+        return "${targetType.typeName} ${targetType.subTypeName} $targetKey"
+    }
 }

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.8" tiledversion="1.9.2" class="firefly_tilemap" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="2">
+ <properties>
+  <property name="name" value="map2"/>
+  <property name="tasks" type="class" propertytype="tasks">
+   <properties>
+    <property name="ON_ACTIVATION" value="onActivationRoom"/>
+    <property name="ON_DEACTIVATION" value="onDeactivateRoom"/>
+    <property name="ON_LOAD" value="onLoadRoom"/>
+   </properties>
+  </property>
+  <property name="tileset_refs" value="blueGrid1616"/>
+ </properties>
+ <tileset firstgid="1" source="tiled_tileset.json"/>
+ <layer id="2" name="background1" class="firefly_maplayer" width="20" height="20" opacity="0.5" offsetx="-15" offsety="-10" parallaxx="0.9" parallaxy="0.9">
+  <properties>
+   <property name="layer_tilesets" value="blueGrid1616"/>
+  </properties>
+  <data encoding="csv">
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,
+0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,
+0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,
+0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,
+0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,
+0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,
+0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,
+0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,
+0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+</data>
+ </layer>
+ <layer id="1" name="main_layer" class="firefly_maplayer" width="20" height="20">
+  <properties>
+   <property name="layer_tilesets" value="blueGrid1616"/>
+  </properties>
+  <data encoding="csv">
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+</data>
+ </layer>
+ <objectgroup id="3" name="objects">
+  <object id="1" type="room_transition" x="-1.625" y="285.75" width="4" height="20">
+   <properties>
+    <property name="groups" value="transition"/>
+    <property name="target" value="map1|19|1"/>
+    <property name="tasks" type="class" propertytype="object_tasks">
+     <properties>
+      <property name="activation_task" value="RoomTransitionTask"/>
+      <property name="build_task" value="RoomTransitionBuildTask"/>
+     </properties>
+    </property>
+    <property name="triggerOn" propertytype="triggerOn" value="CONTACT"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

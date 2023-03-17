@@ -6,6 +6,7 @@ import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.NO_NAME
 import com.inari.util.Named
 import com.inari.util.aspect.Aspect
+import com.inari.util.aspect.AspectType
 import com.inari.util.aspect.Aspects
 import com.inari.util.aspect.IndexedAspectType
 import com.inari.util.collection.DynArray

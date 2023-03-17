@@ -126,7 +126,7 @@ object ViewSystemRenderer : Renderer() {
     private val onlyBaseView: Boolean get() = VIEW_LAYER_MAPPING.size <= 0
 
     private fun viewListener(key: ComponentKey, type: ComponentEventType) {
-        if (type == ACTIVATED) VIEW_LAYER_MAPPING[key.componentIndex] = Pair(View[key.componentIndex], DynIntArray())
+        if (type == ACTIVATED) VIEW_LAYER_MAPPING[key.componentIndex] = Pair(View[key.componentIndex], DynIntArray(2, -1))
         else if (type == DEACTIVATED) VIEW_LAYER_MAPPING.remove(key.componentIndex)
         updateReferences()
     }

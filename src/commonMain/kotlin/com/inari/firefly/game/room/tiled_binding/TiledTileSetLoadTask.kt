@@ -1,5 +1,6 @@
 package com.inari.firefly.game.room.tiled_binding
 
+import com.inari.firefly.core.ComponentKey
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.StaticTask
 import com.inari.firefly.core.api.*
@@ -22,7 +23,7 @@ object  TiledTileSetLoadTask : StaticTask() {
     const val ATTR_APPLY_TILE_SET_GROUPS = "applyTileSetGroups"
     const val ATTR_APPLY_ANIMATION_GROUPS = "applyAnimationGroups"
 
-    override fun apply(attributes: Dictionary, callback: TaskCallback) {
+    override fun apply(key : ComponentKey, attributes: Dictionary, callback: TaskCallback) {
 
         // get all needed attributes and check
         val name = attributes[ATTR_NAME] ?: throw IllegalArgumentException("Missing name")

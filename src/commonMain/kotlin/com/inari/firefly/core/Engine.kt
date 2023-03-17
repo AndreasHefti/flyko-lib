@@ -1,6 +1,7 @@
 package com.inari.firefly.core
 
 import com.inari.firefly.core.api.*
+import com.inari.util.collection.Attributes
 import com.inari.util.event.*
 import kotlin.jvm.JvmField
 
@@ -39,6 +40,10 @@ abstract class Engine protected constructor(
     companion object {
         const val SYSTEM_FONT_ASSET = "SYSTEM_FONT_ASSET" + ComponentSystem.STATIC_COMPONENT_MARKER
         const val SYSTEM_FONT = "SYSTEM_FONT" + ComponentSystem.STATIC_COMPONENT_MARKER
+        val GLOBAL_VALUES = Attributes()
+
+        const val GLOBAL_SHOW_GIZMOS = "showGizmos"
+
 
         @JvmField val INFINITE_SCHEDULER: FFTimer.Scheduler = object : FFTimer.Scheduler {
             override val resolution: Float = 60f

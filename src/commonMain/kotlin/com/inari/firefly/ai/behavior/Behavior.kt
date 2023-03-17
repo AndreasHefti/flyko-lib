@@ -6,6 +6,7 @@ import com.inari.firefly.core.api.Action
 import com.inari.firefly.core.api.OperationResult
 import com.inari.firefly.core.api.OperationResult.*
 import com.inari.firefly.core.api.SUCCESS_ACTION
+import com.inari.firefly.core.api.TRUE_CONDITION
 import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
 
@@ -135,22 +136,16 @@ class SequenceNode private constructor() : BranchNode(SequenceNode) {
     }
 }
 
-//class ConditionNode private constructor() : BehaviorNode() {
-//
-//    @JvmField var condition: Action = SUCCESS_ACTION
-//
-//    override fun tick(entityId: Int): OperationResult = condition(entityId)
-//
-//    companion object : ComponentSubTypeBuilder<BehaviorNode, ConditionNode>(BehaviorNode, "ConditionNode") {
-//        override fun create() = ConditionNode()
-//    }
-//}
-
 class ActionNode private constructor() : BehaviorNode(ActionNode) {
 
+    @JvmField var condition = TRUE_CONDITION
     @JvmField var actionOperation: Action = SUCCESS_ACTION
 
-    override fun tick(entityKey: ComponentKey): OperationResult = actionOperation(entityKey)
+    override fun tick(entityKey: ComponentKey): OperationResult =
+        if (condition(entityKey, NO_COMPONENT_KEY))
+            actionOperation(entityKey)
+        else FAILED
+
 
     companion object : ComponentSubTypeBuilder<BehaviorNode, ActionNode>(BehaviorNode, "ActionNode") {
         override fun create() = ActionNode()

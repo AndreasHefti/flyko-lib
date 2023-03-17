@@ -139,45 +139,9 @@ class TileMapLayerData {
     }
 }
 
-//@ComponentDSL
-//class TileMapData {
-//
-//    @JvmField internal val entityCodeMapping = DynIntArray(100, -1, 100)
-//    @JvmField internal val tileSetMapping = DynArray.of<TileSetMapping>(5, 5)
-//    @JvmField internal var tileGridIndex = -1
-//
-//    @JvmField var renderer: EntityRenderer? = null
-//    @JvmField var mapWidth = 0
-//    @JvmField var mapHeight = 0
-//    @JvmField var tileWidth = 0
-//    @JvmField var tileHeight = 0
-//    @JvmField var parallaxFactorX = ZERO_FLOAT
-//    @JvmField var parallaxFactorY = ZERO_FLOAT
-//    @JvmField var position: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT)
-//    @JvmField var spherical: Boolean = false
-//    @JvmField var blend = BlendMode.NORMAL_ALPHA
-//    @JvmField var tint = Vector4f(1f, 1f, 1f, 1f)
-//    @JvmField var layer = CReference(Layer)
-//    @JvmField var mapCodes: IntArray = intArrayOf()
-//    val layerIndex: Int
-//        get() = if (layer.targetKey.instanceIndex >= 0) layer.targetKey.instanceIndex else 0
-//
-//    val withTileSetMapping: (TileSetMapping.() -> Unit) -> Unit = { configure ->
-//        val instance = TileSetMapping()
-//        instance.also(configure)
-//        tileSetMapping.add(instance)
-//    }
-//}
-
 class TileSetMapping {
     var tileSetRef = CReference(TileSet)
     val tileSetIndex: Int
         get() = tileSetRef.targetKey.componentIndex
-//        get() {
-//            val tileSet = TileSet[tileSetRef.targetKey]
-//            if (!tileSet.loaded)
-//                TileSet.load(tileSetRef.targetKey)
-//            return tileSet.index
-//        }
     var codeOffset = 1
 }

@@ -52,6 +52,7 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
     fun isActive(index: ComponentIndex): Boolean
 
     fun load(c: C) = load(c.index)
+    fun load(cRef: CReference) = load(cRef.targetKey)
     fun load(name: String) = load(getKey(name).componentIndex)
     fun load(key: ComponentKey) = load(key.componentIndex)
     fun load(index: ComponentIndex)
@@ -586,9 +587,11 @@ class ComponentEvent internal constructor(override val eventType: EventType): Ev
 }
 
 abstract class AbstractComponentSystem<C : Component>(systemName: String) : ComponentSystem<C>(systemName) {
-    override fun create() = throw UnsupportedOperationException("Asset is abstract use sub type builder instead")
-    override fun delete(index: ComponentIndex) = throw UnsupportedOperationException("Asset is abstract concrete use sub type")
+    override fun create() = throw UnsupportedOperationException("$systemName is abstract use sub type builder instead")
+    override fun delete(index: ComponentIndex) = throw UnsupportedOperationException("$systemName is abstract concrete use sub type")
 }
+
+
 
 abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
      val system: ComponentSystem<C>,

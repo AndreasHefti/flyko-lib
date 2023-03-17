@@ -224,7 +224,7 @@ open class TileMap : Component(TileMap) {
         val iter = tileMapLayerData.iterator()
         while (iter.hasNext()) {
             val mapLayer = iter.next()
-            val iterator = IndexIterator(mapLayer.entityCodeMapping)
+            val iterator = mapLayer.entityCodeMapping.iterator()
             while (iterator.hasNext())
                 Entity.delete(iterator.nextInt())
 

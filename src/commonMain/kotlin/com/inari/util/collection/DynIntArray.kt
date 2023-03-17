@@ -2,7 +2,7 @@ package com.inari.util.collection
 
 import com.inari.util.arraycopy
 
-interface DynIntArrayRO : IndexIterable {
+interface DynIntArrayRO : IntListIterable {
     val nullValue: Int
     val expand: Int
     val isEmpty: Boolean
@@ -10,7 +10,6 @@ interface DynIntArrayRO : IndexIterable {
     val length: Int
     fun isEmpty(index: Int): Boolean
     operator fun contains(value: Int): Boolean
-    operator fun get(index: Int): Int
     fun indexOf(value: Int): Int
     operator fun iterator(): IntIterator
 }
@@ -141,15 +140,16 @@ class DynIntArray(
         array[index]
 
     override fun iterator(): IntIterator =
-        IndexIterator(this)
+        IndexListIterator(this)
 
-    override fun nextIndex(from: Int): Int {
+    override fun nextListIndex(from: Int): Int {
         var currentIndex = from
         while (currentIndex < array.size && array[currentIndex] == nullValue)
             currentIndex++
-        if (currentIndex < array.size)
-            return currentIndex
-        return -1
+        return if (currentIndex < array.size)
+             currentIndex
+        else
+            -1
     }
 
     private fun firstEmptyIndex(): Int =
@@ -171,7 +171,7 @@ class DynIntArray(
      */
     fun sort(comparator: Comparator<Int>) {
         trim_all()
-        array.sortedWith(comparator)
+        array = array.sortedWith(comparator).toIntArray()
     }
 
     fun trim_head_tail() {

@@ -51,12 +51,13 @@ open class Task protected constructor(): Component(Task) {
 abstract class StaticTask protected constructor() : Task() {
 
     init {
-        super.operation = {  _, attributes, callback ->  this.apply(attributes, callback) }
+        super.operation = { key, attributes, callback ->  this.apply(key, attributes, callback) }
         Task.registerAsSingleton(this, true)
         Task.activate(this.index)
     }
 
     protected abstract fun apply(
+        key : ComponentKey,
         attributes: Dictionary = EMPTY_DICTIONARY,
         callback: TaskCallback)
 }

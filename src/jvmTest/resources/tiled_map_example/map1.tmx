@@ -4,15 +4,10 @@
   <export target="example_map1.json" format="json"/>
  </editorsettings>
  <properties>
+  <property name="activation_tasks" value="onActivationRoom"/>
+  <property name="deactivation_tasks" value="onDeactivateRoom"/>
   <property name="groups" value=""/>
-  <property name="name" value="map1"/>
-  <property name="tasks" type="class" propertytype="tasks">
-   <properties>
-    <property name="ON_ACTIVATION" value="onActivationRoom"/>
-    <property name="ON_DEACTIVATION" value="onDeactivateRoom"/>
-    <property name="ON_LOAD" value="onLoadRoom"/>
-   </properties>
-  </property>
+  <property name="name" value="Room1"/>
   <property name="tileset_refs" value="blueGrid1616"/>
  </properties>
  <tileset firstgid="1" source="../tiled_tileset_example/tiled_tileset.json"/>
@@ -53,17 +48,15 @@
 </data>
  </layer>
  <objectgroup id="4" name="objects">
-  <object id="1" type="room_transition" x="318" y="14" width="4" height="20">
+  <object id="1" type="room_transition" x="318" y="16" width="4" height="16">
    <properties>
+    <property name="build_task" value="RoomTransitionBuildTask"/>
+    <property name="condition" value="TransitionEast"/>
     <property name="groups" value="transition"/>
-    <property name="target" value="TestRoom2"/>
-    <property name="tasks" type="class" propertytype="object_tasks">
-     <properties>
-      <property name="activation_task" value="RoomTransitionTask"/>
-      <property name="build_task" value="RoomTransitionBuildTask"/>
-     </properties>
-    </property>
-    <property name="triggerOn" propertytype="triggerOn" value="CONTACT"/>
+    <property name="layerName" value="main_layer"/>
+    <property name="orientation" propertytype="Orientation" value="EAST"/>
+    <property name="target" value="Room2|t2"/>
+    <property name="transitionId" value="t1"/>
    </properties>
   </object>
  </objectgroup>

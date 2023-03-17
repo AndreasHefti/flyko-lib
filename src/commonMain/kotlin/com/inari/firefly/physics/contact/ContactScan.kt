@@ -1,9 +1,8 @@
 package com.inari.firefly.physics.contact
 
+import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.ComponentKey
-import com.inari.firefly.core.api.ComponentIndex
-import com.inari.firefly.core.api.EntityIndex
-import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
+import com.inari.firefly.core.api.*
 import com.inari.firefly.physics.contact.EContact.Companion.CONTACT_TYPE_ASPECT_GROUP
 import com.inari.firefly.physics.contact.EContact.Companion.MATERIAL_ASPECT_GROUP
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_CONTACT_TYPE
@@ -15,6 +14,16 @@ import com.inari.util.collection.DynArrayRO
 import com.inari.util.collection.DynIntArray
 import com.inari.util.geom.*
 import kotlin.jvm.JvmField
+
+typealias ContactCallback = (ComponentKey, FullContactScan) -> Boolean
+val EMPTY_CALLBACK: ContactCallback = { _, _ -> false }
+
+@ComponentDSL
+class ContactCallbackConstraint internal constructor() {
+    @JvmField var materialType: Aspect = UNDEFINED_MATERIAL
+    @JvmField var contactType: Aspect = UNDEFINED_CONTACT_TYPE
+    @JvmField var callback: ContactCallback = EMPTY_CALLBACK
+}
 
 abstract class ContactScan {
 
@@ -28,6 +37,23 @@ abstract class ContactScan {
         otherEntityId: EntityIndex)
 
     abstract fun clear()
+
+    companion object {
+        internal fun scanContact(originWorldContact: SystemContactBounds, otherWorldContact: SystemContactBounds): Boolean =
+            if (originWorldContact.isCircle) {
+                if (otherWorldContact.isCircle)
+                // both are circles
+                    (GeomUtils.intersectCircle(originWorldContact.circle!!, otherWorldContact.circle!!))
+                else
+                    (GeomUtils.intersectCircle(originWorldContact.circle!!, otherWorldContact.bounds))
+            } else {
+                if (otherWorldContact.isCircle)
+                    (GeomUtils.intersectCircle(otherWorldContact.circle!!, originWorldContact.bounds))
+                else
+                    (GeomUtils.intersect(originWorldContact.bounds, otherWorldContact.bounds))
+            }
+    }
+
 }
 
 class ContactScans internal constructor() {
@@ -68,6 +94,16 @@ class ContactScans internal constructor() {
                 return true
         }
         return false
+    }
+
+    fun getFirstFullContact(contactType: Aspect): FullContactScan? {
+        var i = 0
+        while (i < scans.capacity) {
+            val scan = scans[i++] ?: continue
+            if (scan.hasContactOfType(contactType))
+                return scan as FullContactScan
+        }
+        return null
     }
 
     fun hasAnyContactOfType(contactAspect: Aspect): Boolean {
@@ -131,21 +167,7 @@ class SimpleContactScan  internal constructor(
         entities.clear()
     }
 
-    companion object {
-        internal fun scanContact(originWorldContact: SystemContactBounds, otherWorldContact: SystemContactBounds): Boolean =
-            if (originWorldContact.isCircle) {
-                if (otherWorldContact.isCircle)
-                    // both are circles
-                    (GeomUtils.intersectCircle(originWorldContact.circle!!, otherWorldContact.circle!!))
-                else
-                    (GeomUtils.intersectCircle(originWorldContact.circle!!, otherWorldContact.bounds))
-            } else {
-                if (otherWorldContact.isCircle)
-                    (GeomUtils.intersectCircle(otherWorldContact.circle!!, originWorldContact.bounds))
-                else
-                    (GeomUtils.intersect(originWorldContact.bounds, otherWorldContact.bounds))
-            }
-    }
+
 }
 
 class FullContactScan internal constructor(
@@ -261,7 +283,7 @@ class FullContactScan internal constructor(
         return Contact.NO_CONTACT
     }
 
-    fun getFirstContactOfType(contactType: Aspect): Contact {
+    fun getFirstContact(contactType: Aspect): Contact {
         var i = 0
         while (i < contacts.capacity) {
             val contact = contacts[i++] ?: continue
@@ -305,7 +327,7 @@ class FullContactScan internal constructor(
             return
 
         // first check if there is any contact with ordinary shapes
-        if (!SimpleContactScan.scanContact(originWorldContact, otherWorldContact))
+        if (!scanContact(originWorldContact, otherWorldContact))
             return
 
         // we have contact, create full contact scan

@@ -132,6 +132,16 @@
         "id": 19,
         "members": [
             {
+                "name": "activation_tasks",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "deactivation_tasks",
+                "type": "string",
+                "value": ""
+            },
+            {
                 "name": "groups",
                 "type": "string",
                 "value": ""
@@ -140,13 +150,6 @@
                 "name": "name",
                 "type": "string",
                 "value": ""
-            },
-            {
-                "name": "tasks",
-                "propertyType": "tasks",
-                "type": "class",
-                "value": {
-                }
             },
             {
                 "name": "tileset_refs",
@@ -250,32 +253,18 @@
         "valuesAsFlags": false
     },
     {
-        "color": "#ffa0a0a4",
-        "id": 26,
-        "members": [
-            {
-                "name": "activation_task",
-                "type": "string",
-                "value": ""
-            },
-            {
-                "name": "build_task",
-                "type": "string",
-                "value": ""
-            }
+        "id": 25,
+        "name": "Orientation",
+        "storageType": "string",
+        "type": "enum",
+        "values": [
+            "NORTH",
+            "EAST",
+            "SOUTH",
+            "WEST",
+            "NONE"
         ],
-        "name": "object_tasks",
-        "type": "class",
-        "useAs": [
-            "property",
-            "map",
-            "layer",
-            "object",
-            "tile",
-            "tileset",
-            "wangcolor",
-            "wangset"
-        ]
+        "valuesAsFlags": false
     },
     {
         "color": "#ffa0a0a4",
@@ -303,72 +292,47 @@
         "id": 23,
         "members": [
             {
+                "name": "build_task",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "condition",
+                "type": "string",
+                "value": ""
+            },
+            {
                 "name": "groups",
                 "type": "string",
                 "value": ""
             },
             {
-                "name": "target",
+                "name": "layerName",
                 "type": "string",
                 "value": ""
             },
             {
-                "name": "tasks",
-                "propertyType": "object_tasks",
+                "name": "orientation",
+                "propertyType": "Orientation",
+                "type": "string",
+                "value": "NONE"
+            },
+            {
+                "name": "target",
                 "type": "class",
                 "value": {
                 }
             },
             {
-                "name": "triggerOn",
-                "propertyType": "triggerOn",
+                "name": "transitionId",
                 "type": "string",
-                "value": "CONTACT"
+                "value": ""
             }
         ],
         "name": "room_transition",
         "type": "class",
         "useAs": [
             "property",
-            "object"
-        ]
-    },
-    {
-        "color": "#ffa0a0a4",
-        "id": 22,
-        "members": [
-            {
-                "name": "ON_ACTIVATION",
-                "type": "string",
-                "value": ""
-            },
-            {
-                "name": "ON_DEACTIVATION",
-                "type": "string",
-                "value": ""
-            },
-            {
-                "name": "ON_DELETE",
-                "type": "string",
-                "value": ""
-            },
-            {
-                "name": "ON_DISPOSE",
-                "type": "string",
-                "value": ""
-            },
-            {
-                "name": "ON_LOAD",
-                "type": "string",
-                "value": ""
-            }
-        ],
-        "name": "tasks",
-        "type": "class",
-        "useAs": [
-            "property",
-            "map",
-            "layer",
             "object"
         ]
     },

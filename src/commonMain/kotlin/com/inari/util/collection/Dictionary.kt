@@ -7,6 +7,7 @@ interface Dictionary : Iterable<String> {
     operator fun set(prefix: String, dic: Dictionary): Dictionary
     fun names(): Iterator<String>
     override fun iterator(): Iterator<String> = names()
+    fun getBoolean(name: String): Boolean
 }
 val EMPTY_DICTIONARY: Dictionary = object : Dictionary {
     override fun contains(name: String): Boolean = false
@@ -14,7 +15,9 @@ val EMPTY_DICTIONARY: Dictionary = object : Dictionary {
     override fun plus(dic: Dictionary): Dictionary = dic
     override fun set(prefix: String, dic: Dictionary): Dictionary = throw UnsupportedOperationException()
     override fun names(): Iterator<String> = emptyList<String>().iterator()
+    override fun getBoolean(name: String) = false
 }
+
 class Attributes() : Dictionary {
     private val map: MutableMap<String, String> = HashMap(5)
 
@@ -48,5 +51,8 @@ class Attributes() : Dictionary {
         return this
     }
     override fun names(): Iterator<String> = map.keys.iterator()
+    override fun getBoolean(name: String) =
+        map[name]?.toBoolean() ?: false
+
     override fun toString(): String = map.toString()
 }

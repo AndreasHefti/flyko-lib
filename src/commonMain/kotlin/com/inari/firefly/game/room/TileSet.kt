@@ -29,7 +29,7 @@ open class TileSet: Component(TileSet) {
     }
 
     override fun activate() {
-        super.load()
+        super.activate()
 
         // make sure texture for sprite set is defined and loaded
         if (!textureRef.exists)

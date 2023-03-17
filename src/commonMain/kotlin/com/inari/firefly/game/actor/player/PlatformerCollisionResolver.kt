@@ -4,13 +4,9 @@ import com.inari.firefly.core.*
 
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.contact.*
-import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_CONTACT_TYPE
-import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_MATERIAL
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.Movement.BasicMovementAspect.*
 import com.inari.util.ZERO_FLOAT
-import com.inari.util.aspect.Aspect
-import com.inari.util.collection.DynArray
 import com.inari.util.geom.BitMask
 import kotlin.jvm.JvmField
 import kotlin.math.ceil
@@ -52,16 +48,9 @@ class PlatformerCollisionResolver : CollisionResolver() {
     private val contactSensorR3 = BitMask()
 
     private val contactSensorGround = BitMask()
-    private val fullContactCallbacks = DynArray.of<CollisionCallback>()
 
     @JvmField var groundContactOffset = 2
-    @JvmField val fullContactConstraintRef = CReference(ContactConstraint)
     @JvmField val terrainContactConstraintRef = CReference(ContactConstraint) { initTerrainContact() }
-
-    fun withFullContactCallback(
-        material: Aspect = UNDEFINED_MATERIAL,
-        contact: Aspect = UNDEFINED_CONTACT_TYPE,
-        callback: (FullContactScan) -> Boolean) = fullContactCallbacks.add(CollisionCallback(material, contact, callback))
 
 
     fun withTerrainContactConstraint(gapSouth: Int = 5, configure: (ContactConstraint.() -> Unit)): ComponentKey {
@@ -89,21 +78,6 @@ class PlatformerCollisionResolver : CollisionResolver() {
             }
         }
 
-        if (fullContactConstraintRef.exists) {
-            val fullContact = contactScan.getFullScan(fullContactConstraintRef.targetKey.componentIndex)!!
-
-            // process callbacks first if available
-            // stop processing on first callback returns true
-            var i = fullContactCallbacks.nextIndex(0)
-            while (i >= 0) {
-                val it = fullContactCallbacks[i]!!
-                if (fullContact.hasMaterialContact(it.material) && it.callback(fullContact))
-                    return
-                if (fullContact.hasContactOfType(it.contact) && it.callback(fullContact))
-                    return
-                i = fullContactCallbacks.nextIndex(i + 1)
-            }
-        }
     }
 
     private fun resolveTerrainContact(contacts: FullContactScan, entity: Entity, movement: EMovement, prefGround: Boolean) {
@@ -284,9 +258,4 @@ class PlatformerCollisionResolver : CollisionResolver() {
         val VOID_ON_SLOPE_CALLBACK: (Int, Int, FullContactScan) -> Unit = { _,_,_ -> }
     }
 
-    data class CollisionCallback(
-        @JvmField val material: Aspect = UNDEFINED_MATERIAL,
-        @JvmField val contact: Aspect = UNDEFINED_CONTACT_TYPE,
-        @JvmField val callback: (FullContactScan) -> Boolean
-    )
 }

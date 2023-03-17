@@ -3,8 +3,10 @@ package com.inari.firefly.graphics.view
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.Action
 import com.inari.firefly.core.api.ActionCallback
+import com.inari.firefly.core.api.ComponentCall
 import com.inari.firefly.core.api.OperationResult.RUNNING
 import com.inari.firefly.core.api.RUNNING_ACTION
+import com.inari.util.VOID_CONSUMER_1
 import com.inari.util.VOID_CONSUMER_2
 import com.inari.util.collection.Dictionary
 import com.inari.util.collection.EMPTY_DICTIONARY
@@ -15,6 +17,7 @@ class Scene private constructor(): Control() {
     @JvmField val attributes: Dictionary = EMPTY_DICTIONARY
     @JvmField val loadTask = CReference(Task)
     @JvmField val disposeTask = CReference(Task)
+    @JvmField var init: ComponentCall = VOID_CONSUMER_1
     @JvmField var updateOperation: Action = RUNNING_ACTION
     @JvmField var callback: ActionCallback = VOID_CONSUMER_2
     @JvmField var deleteAfterRun: Boolean = false
@@ -48,6 +51,11 @@ class Scene private constructor(): Control() {
 
         if (loadTask.exists)
             Task[loadTask](this.key, attributes)
+    }
+
+    override fun activate() {
+        super.activate()
+        init(this.key)
     }
 
     override fun dispose() {

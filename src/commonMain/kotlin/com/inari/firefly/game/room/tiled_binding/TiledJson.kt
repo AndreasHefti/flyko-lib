@@ -38,12 +38,14 @@ const val VERTICAL_VALUE = "vertical"
 const val FLAG_NAME_HORIZONTAL = "h"
 const val FLAG_NAME_VERTICAL = "v"
 
-const val PROP_ROOM_TASKS = "tasks"
+const val PROP_ROOM_ACTIVATION_TASKS = "activation_tasks"
+const val PROP_ROOM_DEACTIVATION_TASKS = "deactivation_tasks"
+//const val PROP_ROOM_TASKS = "tasks"
 const val PROP_VALUE_TYPE_LAYER = "tilelayer"
 const val PROP_VALUE_TYPE_OBJECT = "objectgroup"
 const val PROP_LAYER_TILE_SETS = "layer_tilesets"
 const val PROP_TILE_SET_REFS = "tileset_refs"
-const val PROP_OBJECT_TASKS = "tasks"
+//const val PROP_OBJECT_TASKS = "tasks"
 const val PROP_OBJECT_BUILD_TASK = "build_task"
 
 @Suppress("UNCHECKED_CAST")

@@ -1,16 +1,18 @@
 package com.inari.firefly.game.room.tiled_binding
 
+import com.inari.firefly.core.ComponentKey
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.LifecycleTaskType
 import com.inari.firefly.core.StaticTask
 import com.inari.firefly.core.api.*
 import com.inari.firefly.game.room.Room
+import com.inari.firefly.game.room.Room.Companion.ATTR_OBJECT_LAYER
+import com.inari.firefly.game.room.Room.Companion.ATTR_OBJECT_VIEW
 import com.inari.firefly.game.room.TileMap
 import com.inari.firefly.game.room.TileSet
+import com.inari.firefly.game.world.Area
 import com.inari.firefly.graphics.view.ViewSystemRenderer
-import com.inari.util.COMMA
-import com.inari.util.EMPTY_STRING
-import com.inari.util.LIST_VALUE_SEPARATOR
+import com.inari.util.*
 import com.inari.util.collection.Attributes
 import com.inari.util.collection.Dictionary
 import com.inari.util.geom.GeomUtils
@@ -18,52 +20,82 @@ import com.inari.util.geom.Vector4f
 
 object TiledRoomLoadTask : StaticTask() {
 
-    const val ATTR_NAME = "tileMapName"
     const val ATTR_RESOURCE = "tiledJsonResource"
     const val ATTR_ENCRYPTION = "encryptionKey"
     const val ATTR_TILE_SET_DIR_PATH = "tilesetDirPath"
-
     const val ATTR_VIEW_NAME = "viewName"
     const val ATTR_CREATE_LAYER = "createLayer"
     const val ATTR_DEFAULT_BLEND = "defaultBlend"
     const val ATTR_DEFAULT_TINT = "defaultTint"
+    const val ATTR_ACTIVATION_TASKS = "activationTasks"
+    const val ATTR_DEACTIVATION_TASKS = "deactivationTasks"
+    const val ATTR_ACTIVATION_SCENE = "activationScene"
+    const val ATTR_DEACTIVATION_SCENE = "deactivationScene"
 
-    override fun apply(attributes: Dictionary, callback: TaskCallback) {
+    override fun apply(key : ComponentKey, attributes: Dictionary, callback: TaskCallback) {
 
         // get all needed attributes and check
-        val name = attributes[ATTR_NAME] ?: throw IllegalArgumentException("Missing name")
         val res = attributes[ATTR_RESOURCE] ?: throw IllegalArgumentException("Missing resource")
-        val viewName = attributes[ATTR_VIEW_NAME] ?: throw IllegalArgumentException("Missing view reference")
+        val viewName = attributes[ATTR_VIEW_NAME] ?:
+            if (key != NO_COMPONENT_KEY)
+                Area[key].viewRef.targetKey.name
+            else
+                throw IllegalArgumentException("Missing view ref")
         val enc = attributes[ATTR_ENCRYPTION]
         val tileSetDirPath = attributes[ATTR_TILE_SET_DIR_PATH] ?: EMPTY_STRING
-
-        println(">LoadTask In")
+        val activationTasks: MutableList<String> = attributes[ATTR_ACTIVATION_TASKS]
+            ?.split(VALUE_SEPARATOR)?.toMutableList() ?: mutableListOf()
+        val deactivationTasks: MutableList<String> = attributes[ATTR_DEACTIVATION_TASKS]
+            ?.split(VALUE_SEPARATOR)?.toMutableList() ?: mutableListOf()
 
         // load tiled JSON resource
         val tileMapJson = Engine.resourceService.loadJSONResource(res, TiledMapJson::class, enc)
+        val name = tileMapJson.mappedProperties[NAME_PROP]?.stringValue ?: throw IllegalArgumentException("Missing name")
         val createLayer = TiledRoomLoadTask.attributes[ATTR_CREATE_LAYER]?.toBoolean() ?: true
 
-        println(">LoadTask > JSON")
 
         // now create Room, TileMap and Objects from TiledMap input
         val roomKey = Room {
             this.name = name
+            if (key != NO_COMPONENT_KEY && key.type == Area)
+                areaRef(key)
             // set attributes and tasks
             this.attributes = tileMapJson.putProperties(Attributes())
-            val roomTasks = tileMapJson.mappedProperties[PROP_ROOM_TASKS]
-            if (roomTasks != null) {
-                val tit = roomTasks.classValue.entries.iterator()
-                while (tit.hasNext()) {
-                    val entry = tit.next()
-                    val type = LifecycleTaskType.valueOf(entry.key)
-                    withLifecycleTask {
-                        this.order = 10
-                        this.attributes = this@Room.attributes
-                        lifecycleType = type
-                        task(entry.value as String)
-                    }
+
+            roomBounds(
+                0f,
+                0f,
+                (tileMapJson.width * tileMapJson.tilewidth).toFloat(),
+                (tileMapJson.height * tileMapJson.tileheight).toFloat())
+
+            activationTasks.addAll(tileMapJson.mappedProperties[PROP_ROOM_ACTIVATION_TASKS]?.stringValue
+                ?.split(VALUE_SEPARATOR) ?: emptyList())
+            deactivationTasks.addAll(tileMapJson.mappedProperties[PROP_ROOM_DEACTIVATION_TASKS]?.stringValue
+                ?.split(VALUE_SEPARATOR) ?: emptyList())
+            val ait = activationTasks.iterator()
+            while (ait.hasNext()) {
+                withLifecycleTask {
+                    this.order = 10
+                    this.attributes = this@Room.attributes
+                    lifecycleType = LifecycleTaskType.ON_ACTIVATION
+                    task(ait.next())
                 }
             }
+            val dit = deactivationTasks.iterator()
+            while (dit.hasNext()) {
+                withLifecycleTask {
+                    this.order = 10
+                    this.attributes = this@Room.attributes
+                    lifecycleType = LifecycleTaskType.ON_DEACTIVATION
+                    task(dit.next())
+                }
+            }
+
+            if (attributes.contains(this@TiledRoomLoadTask.ATTR_ACTIVATION_SCENE))
+                activationScene(attributes[this@TiledRoomLoadTask.ATTR_ACTIVATION_SCENE]!!)
+            if (attributes.contains(this@TiledRoomLoadTask.ATTR_DEACTIVATION_SCENE))
+                deactivationScene(attributes[this@TiledRoomLoadTask.ATTR_DEACTIVATION_SCENE]!!)
+
         }
 
         val tileMapKey = TileMap {
@@ -84,6 +116,9 @@ object TiledRoomLoadTask : StaticTask() {
         while (iter.hasNext()) {
             val tileSetRefJson = iter.next()
             val tileSetRefName = tileSetReferences.next()
+            if (TileSet.exists(tileSetRefName))
+                continue
+
             val resPath = tileSetDirPath + tileSetRefJson.source.substringAfterLast('/')
             val tiledTileSetAttrs = Attributes() +
                     ( TiledTileSetLoadTask.ATTR_NAME to tileSetRefName ) +
@@ -103,7 +138,7 @@ object TiledRoomLoadTask : StaticTask() {
             if (layerJson.type == PROP_VALUE_TYPE_LAYER)
                loadTileLayer(tileMap, tileMapJson, layerJson)
             else if (layerJson.type == PROP_VALUE_TYPE_OBJECT)
-                loadObjectLayer(room, layerJson)
+                loadObjectLayer(viewName, room, layerJson)
         }
 
         callback(NO_COMPONENT_KEY, attributes, OperationResult.SUCCESS)
@@ -157,18 +192,23 @@ object TiledRoomLoadTask : StaticTask() {
         }
     }
 
-    private fun loadObjectLayer(room: Room, layerJson: TiledLayer) {
+    private fun loadObjectLayer(viewName: String, room: Room, layerJson: TiledLayer) {
         val iter = layerJson.objects?.iterator() ?: return
         while (iter.hasNext()) {
             val tiledObj = iter.next()
-            val taskProps = tiledObj.mappedProperties[PROP_OBJECT_TASKS]
-            val buildTaskName = taskProps!!.classValue[PROP_OBJECT_BUILD_TASK] ?: continue
+            val buildTask = tiledObj.mappedProperties[PROP_OBJECT_BUILD_TASK]?.stringValue
+                ?: throw IllegalArgumentException("Missing object build task property")
+
+            val attrs = tiledObj.toAttributes()
+            attrs[ATTR_OBJECT_VIEW] = viewName
+            attrs[ATTR_OBJECT_LAYER] = attrs[ATTR_OBJECT_LAYER]
+                ?: throw IllegalArgumentException("Missing ATTR_OBJECT_LAYER")
 
             room.withLifecycleTask {
                 this.order = 10
-                this.attributes = tiledObj.toAttributes()
+                this.attributes = attrs
                 lifecycleType = LifecycleTaskType.ON_ACTIVATION
-                task(buildTaskName as String)
+                task(buildTask)
             }
         }
     }

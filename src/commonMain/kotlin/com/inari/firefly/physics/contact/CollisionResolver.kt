@@ -4,14 +4,12 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.EntityIndex
-import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGrid
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.Movement
 import com.inari.util.collection.BitSet
-import com.inari.util.event.Event
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector3i
 import kotlin.math.ceil
@@ -62,8 +60,13 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
         private fun update() {
             var i = entitiesWithScan.nextSetBit(0)
             while (i >= 0) {
+
                 val entity = Entity[i]
                 i = entitiesWithScan.nextSetBit(i + 1)
+
+                if (Pausing.isPaused(entity.groups))
+                    continue
+
                 val contacts = entity[EContact]
                 if (!contacts.contactScans.hasAnyScan)
                     continue
@@ -76,10 +79,31 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                     ContactMap.update(entity)
                 }
 
-                if (contacts.notifyContacts && contacts.contactScans.hasAnyContact()) {
-                    contactEvent.entityId = entity.index
-                    Engine.notify(contactEvent)
-                }
+                if (contacts.contactConstraintRef.exists)
+                    processContactCallbacks(entity, contacts)
+            }
+        }
+
+        private fun processContactCallbacks(entity: Entity, contacts: EContact) {
+            val fullContact = contacts.contactScans.getFullScan(contacts.contactConstraintRef.targetKey.componentIndex)
+            if (fullContact == null || !fullContact.hasAnyContact())
+                return
+
+            // process callbacks first if available
+            // stop processing on first callback returns true
+            var i = contacts.contactCallbacks.nextIndex(0)
+            while (i >= 0) {
+                val contactCallback = contacts.contactCallbacks[i]
+                    ?: continue
+
+                val callback =
+                    ((contactCallback.materialType == EContact.UNDEFINED_MATERIAL || fullContact.hasMaterialContact(contactCallback.materialType)) ||
+                            (contactCallback.contactType == EContact.UNDEFINED_CONTACT_TYPE || fullContact.hasContactOfType(contactCallback.contactType)))
+
+                if (callback && contactCallback.callback(entity.key, fullContact))
+                    return
+
+                i = contacts.contactCallbacks.nextIndex(i + 1)
             }
         }
 
@@ -237,13 +261,13 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                 addTransformPos(parentEntity[EChild].parentIndex)
         }
 
-        private val contactEventType = Event.EventType("ContactEvent")
-        private val contactEvent = ContactEvent(contactEventType)
+//        private val contactEventType = Event.EventType("ContactEvent")
+//        private val contactEvent = ContactEvent(contactEventType)
     }
 
-    class ContactEvent(override val eventType: EventType) : Event<(Int) -> Unit>() {
-        var entityId: EntityIndex = NULL_COMPONENT_INDEX
-            internal set
-        override fun notify(listener: (Int) -> Unit) { listener(entityId) }
-    }
+//    class ContactEvent(override val eventType: EventType) : Event<(Int) -> Unit>() {
+//        var entityId: EntityIndex = NULL_COMPONENT_INDEX
+//            internal set
+//        override fun notify(listener: (Int) -> Unit) { listener(entityId) }
+//    }
 }

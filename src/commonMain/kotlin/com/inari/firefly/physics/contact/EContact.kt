@@ -4,13 +4,16 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.api.ComponentIndex
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.IndexedAspectType
+import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 
 class EContact private constructor() : EntityComponent(EContact) {
 
-    @JvmField var collisionResolverRef = CReference(CollisionResolver)
     @JvmField internal val contactScans = ContactScans()
-    @JvmField var notifyContacts = false
+    @JvmField internal val contactCallbacks = DynArray.of<ContactCallbackConstraint>()
+
+    @JvmField var collisionResolverRef = CReference(CollisionResolver)
+    @JvmField val contactConstraintRef = CReference(ContactConstraint)
     @JvmField val contactBounds = ContactBounds()
     val isCircle get() = contactBounds.isCircle
     val hasContactMask get() = contactBounds.hasContactMask
@@ -46,6 +49,12 @@ class EContact private constructor() : EntityComponent(EContact) {
         if (key.type != ContactConstraint)
             throw IllegalArgumentException("Type mismatch: $key.type")
         contactScans.removeScan(index)
+    }
+
+    fun withContactCallbackConstraint(builder: ContactCallbackConstraint.() -> Unit) {
+        val contactCallback = ContactCallbackConstraint()
+        contactCallback.also(builder)
+        contactCallbacks.add(contactCallback)
     }
 
     fun <A : CollisionResolver> withResolver(builder: ComponentBuilder<A>, configure: (A.() -> Unit)): ComponentKey {
