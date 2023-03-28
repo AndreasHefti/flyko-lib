@@ -31,9 +31,9 @@
         "storageType": "string",
         "type": "enum",
         "values": [
-            "contact_type_1",
-            "contact_type_2",
-            "contact_type_3",
+            "environment",
+            "interaction",
+            "trigger",
             "..."
         ],
         "valuesAsFlags": false
@@ -220,7 +220,7 @@
                 "name": "contact_type",
                 "propertyType": "contact_type",
                 "type": "string",
-                "value": "contact_type_1"
+                "value": "environment"
             },
             {
                 "name": "material_type",

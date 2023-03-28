@@ -3,9 +3,10 @@ package com.inari.firefly.core
 import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.aspect.*
+import com.inari.util.collection.AttributesRO
+import com.inari.util.collection.AttributesRO.Companion.EMPTY_ATTRIBUTES
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynFloatArray
-import com.inari.util.collection.EMPTY_DICTIONARY
 import com.inari.util.indexed.AbstractIndexed
 import kotlin.jvm.JvmField
 
@@ -183,10 +184,10 @@ class EMultiplier private constructor() : EntityComponent(EMultiplier) {
 
 class EAttribute private constructor() : EntityComponent(EAttribute) {
 
-    @JvmField var attributes = EMPTY_DICTIONARY
+    @JvmField var attributes = EMPTY_ATTRIBUTES
 
     override fun reset() {
-            attributes = EMPTY_DICTIONARY
+            attributes = EMPTY_ATTRIBUTES
     }
 
     override val componentType = Companion

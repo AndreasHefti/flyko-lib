@@ -55,7 +55,7 @@
     <property name="groups" value="transition"/>
     <property name="layerName" value="main_layer"/>
     <property name="orientation" propertytype="Orientation" value="EAST"/>
-    <property name="target" value="Room2|t2"/>
+    <property name="target" value="Room2,t2"/>
     <property name="transitionId" value="t1"/>
    </properties>
   </object>

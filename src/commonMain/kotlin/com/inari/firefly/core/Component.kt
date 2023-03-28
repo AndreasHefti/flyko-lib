@@ -1,16 +1,13 @@
 package com.inari.firefly.core
 
-import com.inari.firefly.core.Component.Companion.COMPONENT_GROUP_ASPECT
 import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.NO_NAME
 import com.inari.util.Named
 import com.inari.util.aspect.Aspect
-import com.inari.util.aspect.AspectType
-import com.inari.util.aspect.Aspects
 import com.inari.util.aspect.IndexedAspectType
+import com.inari.util.collection.AttributesRO.Companion.EMPTY_ATTRIBUTES
 import com.inari.util.collection.DynArray
-import com.inari.util.collection.EMPTY_DICTIONARY
 import com.inari.util.indexed.AbstractIndexed
 import kotlin.jvm.JvmField
 
@@ -176,7 +173,7 @@ open class AttributedComponent protected constructor(
     subType: ComponentType<out Composite>
 ) : Component(subType) {
 
-    @JvmField var attributes = EMPTY_DICTIONARY
+    @JvmField var attributes = EMPTY_ATTRIBUTES
 
     companion object : ComponentSystem<Composite>("AttributedComponent") {
         override fun allocateArray(size: Int): Array<Composite?> = arrayOfNulls(size)
@@ -196,7 +193,7 @@ enum class LifecycleTaskType {
 @ComponentDSL
 class LifecycleTask {
     @JvmField var order = 1
-    @JvmField var attributes = EMPTY_DICTIONARY
+    @JvmField var attributes = EMPTY_ATTRIBUTES
     @JvmField var lifecycleType = LifecycleTaskType.ON_LOAD
     @JvmField val task = CReference(Task)
 }

@@ -62,6 +62,8 @@
          "id":1,
          "name":"main_layer",
          "opacity":1,
+         "parallaxx":1,
+         "parallaxy":1,
          "properties":[
                 {
                  "name":"layer_tilesets",
@@ -113,7 +115,7 @@
                         {
                          "name":"target",
                          "type":"string",
-                         "value":"Room2|t2"
+                         "value":"Room2,t2"
                         }, 
                         {
                          "name":"transitionId",

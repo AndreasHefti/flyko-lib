@@ -4,7 +4,7 @@ import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
 import com.inari.firefly.core.ComponentKey
 import com.inari.util.VOID_CONSUMER_3
 import com.inari.util.ZERO_FLOAT
-import com.inari.util.collection.Dictionary
+import com.inari.util.collection.AttributesRO
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector3f
 import com.inari.util.geom.Vector4f
@@ -48,8 +48,8 @@ interface NormalOperation {
 }
 
 typealias SimpleTask = () -> Unit
-typealias TaskOperation = (ComponentKey, Dictionary, TaskCallback) -> Unit
-typealias TaskCallback = (ComponentKey, Dictionary, OperationResult) -> Unit
+typealias TaskOperation = (ComponentKey, AttributesRO, TaskCallback) -> Unit
+typealias TaskCallback = (ComponentKey, AttributesRO, OperationResult) -> Unit
 @JvmField val VOID_TASK_OPERATION: TaskOperation = VOID_CONSUMER_3
 @JvmField val VOID_TASK_CALLBACK: TaskCallback = VOID_CONSUMER_3
 

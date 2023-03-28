@@ -2,11 +2,9 @@ package examples.game
 
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.core.Task
+import com.inari.firefly.game.*
 import com.inari.firefly.game.room.Room
-import com.inari.firefly.game.room.tiled_binding.TiledRoomLoadTask
-import com.inari.firefly.game.room.tiled_binding.TiledRoomLoadTask.ATTR_TILE_SET_DIR_PATH
-import com.inari.firefly.game.room.tiled_binding.TiledRoomLoadTask.ATTR_VIEW_NAME
-import com.inari.firefly.game.room.tiled_binding.TiledRoomLoadTask.ATTR_RESOURCE
+import com.inari.firefly.game.room.TiledRoomLoadTask
 import com.inari.firefly.graphics.FFInfoSystem
 import com.inari.firefly.graphics.FrameRateInfo
 import com.inari.firefly.graphics.view.View

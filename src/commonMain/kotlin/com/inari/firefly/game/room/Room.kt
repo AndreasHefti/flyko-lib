@@ -4,19 +4,17 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.firefly.core.api.*
 import com.inari.firefly.game.actor.player.Player
+import com.inari.firefly.game.*
 import com.inari.firefly.game.world.Area
 import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.view.ETransform
-import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.Scene
 import com.inari.firefly.graphics.view.SimpleCameraController
 import com.inari.firefly.physics.contact.EContact
-import com.inari.firefly.physics.contact.FullContactScan
-import com.inari.util.LIST_VALUE_SEPARATOR
+import com.inari.util.COMMA
 import com.inari.util.VOID_CONSUMER_2
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Orientation
-import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 import kotlin.native.concurrent.ThreadLocal
@@ -166,25 +164,6 @@ class Room private constructor() : Composite(Room) {
     companion object : ComponentSubTypeBuilder<Composite, Room>(Composite,"Room") {
         override fun create() = Room()
 
-        const val NAME_DEFAULT_TRANSITION_BUILD_TASK = "RoomTransitionBuildTask"
-
-        const val ATTR_OBJECT_ID = "id"
-        const val ATTR_OBJECT_TYPE = "type"
-        const val ATTR_OBJECT_NAME = "name"
-        const val ATTR_OBJECT_BOUNDS = "bounds"
-        const val ATTR_OBJECT_ROTATION = "rotation"
-        const val ATTR_OBJECT_VISIBLE = "visible"
-        const val ATTR_OBJECT_GROUPS = "groups"
-        const val ATTR_OBJECT_VIEW = "viewName"
-        const val ATTR_OBJECT_LAYER = "layerName"
-
-        const val ATTR_TRANSITION_CONDITION = "condition"
-        const val ATTR_TRANSITION_TARGET = "target"
-        const val ATTR_TRANSITION_BOUNDS = "bounds"
-        const val ATTR_TRANSITION_ID = "transitionId"
-        const val ATTR_TRANSITION_ORIENTATION = "orientation"
-
-
         @JvmField val ROOM_PAUSE_GROUP = COMPONENT_GROUP_ASPECT.createAspect("ROOM_PAUSE_GROUP")
         @JvmField val ROOM_TRANSITION_CONTACT_TYPE = EContact.CONTACT_TYPE_ASPECT_GROUP.createAspect("ROOM_TRANSITION_1")
 
@@ -228,7 +207,7 @@ class Room private constructor() : Composite(Room) {
                 name = NAME_DEFAULT_TRANSITION_BUILD_TASK
                 operation = { roomKey, attributes, _ ->
                     val bounds = Vector4f()
-                    bounds(attributes[ATTR_TRANSITION_BOUNDS]!!)
+                    bounds(attributes[ATTR_OBJECT_BOUNDS]!!)
                     val room = Room[roomKey]
                     room.withLifecycleComponent(
                         Entity {
@@ -258,7 +237,7 @@ class Room private constructor() : Composite(Room) {
                                 condition(attributes[ATTR_TRANSITION_CONDITION]
                                     ?: throw IllegalArgumentException("Missing ATTR_TRANSITION_CONDITION"))
 
-                                val targetsVals = attributes[ATTR_TRANSITION_TARGET]?.split(LIST_VALUE_SEPARATOR)
+                                val targetsVals = attributes[ATTR_TRANSITION_TARGET]?.split(COMMA)
                                     ?: throw IllegalArgumentException("Missing ATTR_TRANSITION_TARGET")
 
                                 targetTransition(targetsVals[1])

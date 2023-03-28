@@ -6,8 +6,8 @@ import com.inari.firefly.core.Entity
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.game.*
+import com.inari.firefly.game.room.JsonTileSetLoadTask
 import com.inari.firefly.game.room.TileSet
-import com.inari.firefly.game.room.TiledTileSetLoadTask
 import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.text.EText
@@ -19,16 +19,17 @@ import com.inari.firefly.physics.animation.IntFrameAnimation
 import com.inari.firefly.physics.animation.IntFrameData
 import com.inari.util.collection.Attributes
 
+
 fun main() {
-    DesktopApp("TiledTileSetTest", 800, 600, debug = true) {
+    DesktopApp("JsonTileSetTest", 800, 600, debug = true) {
 
         // Load TileSet from Tiled JSON file with TiledTileSetLoadTask
-        val tileSetName = "TiledTileSetTest"
+        val tileSetName = "JsonTileSetTest"
         val tiledTileSetAttrs = Attributes() +
-            ( ATTR_TILE_SET_NAME to tileSetName ) +
-            ( ATTR_RESOURCE to "tiled_tileset_example/tiled_tileset.json")
+                ( ATTR_TILE_SET_NAME to tileSetName ) +
+                ( ATTR_RESOURCE to "json_example/tileset0.json")
 
-        TiledTileSetLoadTask(attributes = tiledTileSetAttrs)
+        JsonTileSetLoadTask(attributes = tiledTileSetAttrs)
         TileSet.activate(tileSetName)
 
         // Create View and draw each Tile with its collision mask to screen

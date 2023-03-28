@@ -3,17 +3,14 @@ package examples.game
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.*
+import com.inari.firefly.game.*
 import com.inari.firefly.game.actor.player.PlatformerCollisionResolver
 import com.inari.firefly.game.actor.player.PlatformerHMoveController
 import com.inari.firefly.game.actor.player.PlatformerJumpController
 import com.inari.firefly.game.actor.player.Player
-import com.inari.firefly.game.room.Room
+import com.inari.firefly.game.room.*
 import com.inari.firefly.game.room.Room.Companion.ROOM_TRANSITION_CONTACT_TYPE
-import com.inari.firefly.game.room.RoomCamera
-import com.inari.firefly.game.room.TileMaterialType
-import com.inari.firefly.game.room.tiled_binding.TiledRoomLoadTask
 import com.inari.firefly.game.world.Area
-import com.inari.firefly.game.world.Area.Companion.applyRoomTransition
 import com.inari.firefly.graphics.FFInfoSystem
 import com.inari.firefly.graphics.FrameRateInfo
 import com.inari.firefly.graphics.shape.EShape
@@ -111,20 +108,20 @@ object AreaTest {
             cameraRef(CAMERA_NAME)
             withLifecycleTask {
                 this.attributes = Attributes() +
-                        ( TiledRoomLoadTask.ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
-                        ( TiledRoomLoadTask.ATTR_RESOURCE to "tiled_map_example/example_map1.json") +
-                        ( TiledRoomLoadTask.ATTR_ACTIVATION_SCENE to "RoomActivationScene") +
-                        ( TiledRoomLoadTask.ATTR_DEACTIVATION_SCENE to "RoomDeactivationScene")
+                        ( ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
+                        ( ATTR_RESOURCE to "tiled_map_example/example_map1.json") +
+                        ( ATTR_ACTIVATION_SCENE to "RoomActivationScene") +
+                        ( ATTR_DEACTIVATION_SCENE to "RoomDeactivationScene")
                 lifecycleType = LifecycleTaskType.ON_LOAD
                 task(TiledRoomLoadTask)
             }
 
             withLifecycleTask {
                 this.attributes = Attributes() +
-                        ( TiledRoomLoadTask.ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
-                        ( TiledRoomLoadTask.ATTR_RESOURCE to "tiled_map_example/example_map2.json") +
-                        ( TiledRoomLoadTask.ATTR_ACTIVATION_SCENE to "RoomActivationScene") +
-                        ( TiledRoomLoadTask.ATTR_DEACTIVATION_SCENE to "RoomDeactivationScene")
+                        ( ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
+                        ( ATTR_RESOURCE to "tiled_map_example/example_map2.json") +
+                        ( ATTR_ACTIVATION_SCENE to "RoomActivationScene") +
+                        ( ATTR_DEACTIVATION_SCENE to "RoomDeactivationScene")
                 lifecycleType = LifecycleTaskType.ON_LOAD
                 task(TiledRoomLoadTask)
             }
@@ -167,12 +164,10 @@ object AreaTest {
             init = {
                 val color = entity[EShape].color
                 color.a = 1f
-                //entity[ETransform].position(View[VIEW_NAME].worldPosition)
                 Entity.activate(fadeId)
             }
             updateOperation =  {
                 val color = entity[EShape].color
-                //entity[ETransform].position(View[VIEW_NAME].worldPosition)
                 color.a = color.a - .05f
                 if (color.a <= 0f) {
                     Entity.deactivate(fadeId)
@@ -190,12 +185,10 @@ object AreaTest {
             init = {
                 val color = entity[EShape].color
                 color.a = 0f
-                //entity[ETransform].position(View[VIEW_NAME].worldPosition)
                 Entity.activate(fadeId)
             }
             updateOperation =  {
                 val color = entity[EShape].color
-                //entity[ETransform].position(View[VIEW_NAME].worldPosition)
                 color.a = color.a + .05f
                 if (color.a >= 1f) {
                     Entity.deactivate(fadeId)

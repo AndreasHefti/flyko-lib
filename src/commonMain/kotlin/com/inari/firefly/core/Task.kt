@@ -2,8 +2,9 @@ package com.inari.firefly.core
 
 import com.inari.firefly.core.api.*
 import com.inari.util.VOID_CALL
-import com.inari.util.collection.Dictionary
-import com.inari.util.collection.EMPTY_DICTIONARY
+import com.inari.util.collection.Attributes
+import com.inari.util.collection.AttributesRO
+import com.inari.util.collection.AttributesRO.Companion.EMPTY_ATTRIBUTES
 import com.inari.util.startParallelTask
 import kotlin.jvm.JvmField
 
@@ -14,11 +15,12 @@ open class Task protected constructor(): Component(Task) {
     @JvmField var simpleTask: SimpleTask = VOID_CALL
     @JvmField var operation: TaskOperation = VOID_TASK_OPERATION
     @JvmField var callback: TaskCallback = VOID_TASK_CALLBACK
-    @JvmField var attributes: Dictionary = EMPTY_DICTIONARY
+    @JvmField var attributes: AttributesRO = EMPTY_ATTRIBUTES
 
+    private val tempAttributes = Attributes()
     operator fun invoke(
         componentKey: ComponentKey = NO_COMPONENT_KEY,
-        attributes: Dictionary = EMPTY_DICTIONARY) {
+        attributes: AttributesRO = EMPTY_ATTRIBUTES) {
 
         if (simpleTask != VOID_CALL)
             simpleTask()
@@ -26,8 +28,9 @@ open class Task protected constructor(): Component(Task) {
         if (operation == VOID_TASK_OPERATION)
             return
 
-        val dict = if (this.attributes != EMPTY_DICTIONARY)
-            this.attributes + attributes
+        tempAttributes.clear()
+        val dict = if (this.attributes != EMPTY_ATTRIBUTES)
+            tempAttributes + this.attributes + attributes
             else attributes
 
 
@@ -58,6 +61,6 @@ abstract class StaticTask protected constructor() : Task() {
 
     protected abstract fun apply(
         key : ComponentKey,
-        attributes: Dictionary = EMPTY_DICTIONARY,
+        attributes: AttributesRO = EMPTY_ATTRIBUTES,
         callback: TaskCallback)
 }

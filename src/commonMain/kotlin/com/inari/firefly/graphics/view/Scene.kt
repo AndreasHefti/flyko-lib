@@ -8,13 +8,12 @@ import com.inari.firefly.core.api.OperationResult.RUNNING
 import com.inari.firefly.core.api.RUNNING_ACTION
 import com.inari.util.VOID_CONSUMER_1
 import com.inari.util.VOID_CONSUMER_2
-import com.inari.util.collection.Dictionary
-import com.inari.util.collection.EMPTY_DICTIONARY
+import com.inari.util.collection.AttributesRO
 import kotlin.jvm.JvmField
 
 class Scene private constructor(): Control() {
 
-    @JvmField val attributes: Dictionary = EMPTY_DICTIONARY
+    @JvmField val attributes: AttributesRO = AttributesRO.EMPTY_ATTRIBUTES
     @JvmField val loadTask = CReference(Task)
     @JvmField val disposeTask = CReference(Task)
     @JvmField var init: ComponentCall = VOID_CONSUMER_1

@@ -1,52 +1,17 @@
-package com.inari.firefly.game.room.tiled_binding
+package com.inari.firefly.game.room
 
-import com.inari.firefly.game.room.Room
-import com.inari.util.EMPTY_STRING
-import com.inari.util.NO_NAME
-import com.inari.util.ZERO_FLOAT
+import com.inari.firefly.core.ComponentKey
+import com.inari.firefly.core.Engine
+import com.inari.firefly.core.StaticTask
+import com.inari.firefly.core.api.OperationResult
+import com.inari.firefly.core.api.TaskCallback
+import com.inari.firefly.game.*
+import com.inari.firefly.game.room.*
+import com.inari.util.*
 import com.inari.util.collection.Attributes
+import com.inari.util.collection.AttributesRO
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
-
-const val TILED_PROP_STRING_TYPE = "string"
-const val COMPOSITE_OBJECT_NAME_PREFIX = "Composite"
-const val ATLAS_ASSET_NAME_PREFIX = "atlas_"
-const val COLLISION_ASSET_NAME_PREFIX = "collisionMask_"
-
-const val NAME_PROP = "name"
-const val ATLAS_PROP = "atlas_file_path"
-const val COLLISION_PROP = "collision_bitmask_file_path"
-
-const val MATERIAL_PROP = "material"
-const val MATERIAL_TYPE_PROP = "material_type"
-const val CONTACT_TYPE_PROP = "contact_type"
-const val CONTACT_FULL_PROP = "contact_full_rect"
-const val CONTACT_X_PROP = "contact_mask_x"
-const val CONTACT_Y_PROP = "contact_mask_y"
-const val ATLAS_POS_PROP = "atlas_position"
-const val ATLAS_X_PROP = "x"
-const val ATLAS_Y_PROP = "y"
-const val ATLAS_FLIP_PROP = "atlas_sprite_flip"
-const val BLEND_PROP = "blend_mode"
-const val TINT_PROP = "tint_color"
-const val ASPECT_PROP = "tint"
-const val ANIMATION_PROP = "animation"
-const val RENDERER_PROP = "renderer"
-
-const val HORIZONTAL_VALUE = "horizontal"
-const val VERTICAL_VALUE = "vertical"
-const val FLAG_NAME_HORIZONTAL = "h"
-const val FLAG_NAME_VERTICAL = "v"
-
-const val PROP_ROOM_ACTIVATION_TASKS = "activation_tasks"
-const val PROP_ROOM_DEACTIVATION_TASKS = "deactivation_tasks"
-//const val PROP_ROOM_TASKS = "tasks"
-const val PROP_VALUE_TYPE_LAYER = "tilelayer"
-const val PROP_VALUE_TYPE_OBJECT = "objectgroup"
-const val PROP_LAYER_TILE_SETS = "layer_tilesets"
-const val PROP_TILE_SET_REFS = "tileset_refs"
-//const val PROP_OBJECT_TASKS = "tasks"
-const val PROP_OBJECT_BUILD_TASK = "build_task"
 
 @Suppress("UNCHECKED_CAST")
 class TiledPropertyJson(
@@ -63,7 +28,7 @@ class TiledPropertyJson(
 }
 
 abstract class WithMappedProperties(
-    private val props: Array<TiledPropertyJson> = emptyArray(),
+    val props: Array<TiledPropertyJson> = emptyArray(),
 ) {
     val mappedProperties: Map<String, TiledPropertyJson> =
         props.filter {
@@ -180,14 +145,77 @@ class TiledObject(
 
     fun toAttributes(): Attributes {
         val attributes: Attributes = Attributes() +
-                ( Room.ATTR_OBJECT_ID to id.toString() ) +
-                ( Room.ATTR_OBJECT_TYPE to type ) +
-                ( Room.ATTR_OBJECT_NAME to name ) +
-                ( Room.ATTR_OBJECT_BOUNDS to Vector4f(x, y, width, height).toJsonString() ) +
-                ( Room.ATTR_OBJECT_ROTATION to rotation.toString() ) +
-                ( Room.ATTR_OBJECT_VISIBLE to visible.toString() )
+                ( ATTR_OBJECT_ID to id.toString() ) +
+                ( ATTR_OBJECT_TYPE to type ) +
+                ( ATTR_OBJECT_NAME to name ) +
+                ( ATTR_OBJECT_BOUNDS to Vector4f(x, y, width, height).toJsonString() ) +
+                ( ATTR_OBJECT_ROTATION to rotation.toString() ) +
+                ( ATTR_OBJECT_VISIBLE to visible.toString() )
 
         putProperties(attributes)
         return attributes
+    }
+}
+
+object  TiledTileSetLoadTask : StaticTask() {
+
+    override fun apply(key : ComponentKey, attributes: AttributesRO, callback: TaskCallback) {
+
+        // get all needed attributes and check
+        val res = attributes[ATTR_RESOURCE] ?: throw IllegalArgumentException("Missing resource")
+        val enc = attributes[ATTR_ENCRYPTION]
+        // load tiled JSON resource
+        val tileSetJson = Engine.resourceService.loadJSONResource(res, TiledTileSetJson::class, enc)
+
+        JsonTileSetLoadTask.load(
+            attributes,
+            TiledTileSetConversionTask.convert(tileSetJson))
+
+        callback(NO_COMPONENT_KEY, attributes, OperationResult.SUCCESS)
+    }
+}
+
+object TiledRoomLoadTask : StaticTask() {
+
+    override fun apply(key : ComponentKey, attributes: AttributesRO, callback: TaskCallback) {
+
+        // get all needed attributes and check
+        val res = attributes[ATTR_RESOURCE] ?: throw IllegalArgumentException("Missing resource")
+        val enc = attributes[ATTR_ENCRYPTION]
+        // load tiled JSON resource
+        val tileMapJson = Engine.resourceService.loadJSONResource(res, TiledMapJson::class, enc)
+
+        loadTileSets(attributes, tileMapJson)
+        val converted = TiledRoomConversionTask.convert(attributes, tileMapJson)
+        JsonRoomLoadTask.loadRoom(key, attributes, converted)
+
+        callback(NO_COMPONENT_KEY, attributes, OperationResult.SUCCESS)
+    }
+
+    private fun loadTileSets(attributes: AttributesRO, tileMapJson :  TiledMapJson) {
+        // load mapped tileset json files and create TiledTileSet components for it
+        val tileSetReferences = tileMapJson.mappedProperties[PROP_TILE_SET_REFS]?.stringValue
+            ?.split(LIST_VALUE_SEPARATOR)?.iterator()
+            ?: throw IllegalArgumentException("Missing tileset_refs from TiledMap JSON file")
+
+        val iter = tileMapJson.tilesets.iterator()
+        while (iter.hasNext()) {
+            val tileSetRefJson = iter.next()
+            val tileSetRefName = tileSetReferences.next()
+            if (TileSet.exists(tileSetRefName))
+                continue
+
+            val tileSetDirPath = attributes[ATTR_TILE_SET_DIR_PATH] ?: EMPTY_STRING
+            val resPath = tileSetDirPath + tileSetRefJson.source.substringAfterLast('/')
+            val tiledTileSetAttrs = Attributes() +
+                    ( ATTR_TILE_SET_NAME to tileSetRefName ) +
+                    ( ATTR_RESOURCE to resPath) +
+                    ( ATTR_APPLY_ANIMATION_GROUPS to Room.ROOM_PAUSE_GROUP.aspectName)
+
+            TiledTileSetLoadTask(attributes = tiledTileSetAttrs)
+
+            val tileSet = TileSet[tileSetRefName]
+            tileSet.mappingStartTileId = tileSetRefJson.firstgid
+        }
     }
 }
