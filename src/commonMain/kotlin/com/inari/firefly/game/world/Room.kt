@@ -1,11 +1,10 @@
-package com.inari.firefly.game.room
+package com.inari.firefly.game.world
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.firefly.core.api.*
-import com.inari.firefly.game.actor.player.Player
+import com.inari.firefly.game.actor.Player
 import com.inari.firefly.game.*
-import com.inari.firefly.game.world.Area
 import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.Scene
@@ -231,7 +230,7 @@ class Room private constructor() : Composite(Room) {
                                 }
                             withComponent(EContact) {
                                 contactBounds(0, 0, bounds.width.toInt(), bounds.height.toInt())
-                                contactType = Room.ROOM_TRANSITION_CONTACT_TYPE
+                                contactType = ROOM_TRANSITION_CONTACT_TYPE
                             }
                             withComponent(ERoomTransition) {
                                 condition(attributes[ATTR_TRANSITION_CONDITION]

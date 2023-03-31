@@ -2,10 +2,7 @@ package com.inari.firefly.game.world
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.OperationResult
-import com.inari.firefly.game.actor.player.Player
-import com.inari.firefly.game.room.ERoomTransition
-import com.inari.firefly.game.room.Room
-import com.inari.firefly.game.room.RoomCamera
+import com.inari.firefly.game.actor.Player
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.Scene
 import com.inari.firefly.graphics.view.View

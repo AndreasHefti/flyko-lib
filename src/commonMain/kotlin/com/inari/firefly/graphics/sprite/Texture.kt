@@ -3,7 +3,7 @@ package com.inari.firefly.graphics.sprite
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.TextureData
-import com.inari.firefly.game.room.TileSet
+import com.inari.firefly.game.world.TileSet
 import com.inari.firefly.graphics.text.Font
 import com.inari.util.INT_FUNCTION_IDENTITY
 import com.inari.util.NO_NAME

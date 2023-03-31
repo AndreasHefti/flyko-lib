@@ -1,4 +1,4 @@
-package com.inari.firefly.game.room
+package com.inari.firefly.game.world
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
@@ -16,7 +16,6 @@ import com.inari.util.LIST_VALUE_SEPARATOR
 import com.inari.util.NO_NAME
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.collection.DynArray
-import com.inari.util.collection.IndexIterator
 import kotlin.jvm.JvmField
 import kotlin.math.floor
 

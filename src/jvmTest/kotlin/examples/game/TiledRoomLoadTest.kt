@@ -3,8 +3,8 @@ package examples.game
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.core.Task
 import com.inari.firefly.game.*
-import com.inari.firefly.game.room.Room
-import com.inari.firefly.game.room.TiledRoomLoadTask
+import com.inari.firefly.game.world.Room
+import com.inari.firefly.game.world.TiledRoomLoadTask
 import com.inari.firefly.graphics.FFInfoSystem
 import com.inari.firefly.graphics.FrameRateInfo
 import com.inari.firefly.graphics.view.View

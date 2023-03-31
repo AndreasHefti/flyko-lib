@@ -1,4 +1,4 @@
-package com.inari.firefly.game.room
+package com.inari.firefly.game.world
 
 import com.inari.firefly.core.ComponentKey
 import com.inari.firefly.core.Engine
@@ -8,7 +8,6 @@ import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.OperationResult
 import com.inari.firefly.core.api.TaskCallback
 import com.inari.firefly.game.*
-import com.inari.firefly.game.world.Area
 import com.inari.firefly.graphics.sprite.AccessibleTexture
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ViewSystemRenderer
@@ -196,8 +195,12 @@ object JsonRoomLoadTask : StaticTask() {
 
     private fun loadTileMap(tileMap: TileMap, roomJson: RoomJson, tileMapJson: TileMapJson) {
         val attributes = Attributes().addAll(tileMapJson.props)
-        val defaultBlend = BlendMode.valueOf(TiledRoomLoadTask.attributes[ATTR_DEFAULT_BLEND] ?: "NONE")
-        val defaultTint = Vector4f()(TiledRoomLoadTask.attributes[ATTR_DEFAULT_TINT] ?: "1,1,1,1")
+        val defaultBlend = BlendMode.valueOf(
+            TiledRoomLoadTask.attributes[ATTR_DEFAULT_BLEND]
+            ?: BlendMode.NONE.name)
+        val defaultTint = Vector4f()(
+            TiledRoomLoadTask.attributes[ATTR_DEFAULT_TINT]
+            ?: WHITE.instance().toJsonString())
 
         // tile-sets mapping
         val layerTileSets = tileMapJson.sets.split(LIST_VALUE_SEPARATOR)
@@ -421,7 +424,9 @@ object TiledRoomConversionTask : StaticTask() {
             else if(layer.type == PROP_VALUE_TYPE_OBJECT)
                 objects.addAll(getObjects(tiledRoomJson, layer))
         }
-        val bounds = "0,0,${tiledRoomJson.width * tiledRoomJson.tilewidth},${tiledRoomJson.height * tiledRoomJson.tileheight}"
+        val bounds = "0${COMMA}0" +
+                "$COMMA${tiledRoomJson.width * tiledRoomJson.tilewidth}" +
+                "$COMMA${tiledRoomJson.height * tiledRoomJson.tileheight}"
 
         return RoomJson(
             name = name,                                                            // [room-name]
@@ -438,13 +443,16 @@ object TiledRoomConversionTask : StaticTask() {
             ?: NULL_VALUE
         val tint = tiledLayer.mappedProperties[TINT_PROP]?.stringValue
             ?: NULL_VALUE
-        val parallax = "${tiledLayer.parallaxx},${tiledLayer.parallaxy}"
+        val parallax = "${tiledLayer.parallaxx}$COMMA${tiledLayer.parallaxy}"
         val layerTileSets = tiledLayer.mappedProperties[PROP_LAYER_TILE_SETS]?.stringValue
             ?: throw RuntimeException("Missing tile sets for layer")
 
-        val dimension = "${tiledLayer.offsetx},${tiledLayer.offsety},${tiledRoomJson.width},${tiledRoomJson.height}"
+        val dimension = "${tiledLayer.offsetx}" +
+                "$COMMA${tiledLayer.offsety}" +
+                "$COMMA${tiledRoomJson.width}" +
+                "$COMMA${tiledRoomJson.height}"
         val props = getPropertiesString(tiledLayer.properties)
-        val data = tiledLayer.data?.joinToString(",")
+        val data = tiledLayer.data?.joinToString(COMMA)
             ?: throw RuntimeException("Missing data for layer")
 
         return TileMapJson(
@@ -474,7 +482,9 @@ object TiledRoomConversionTask : StaticTask() {
         val rot = tiledObject.rotation.toString()
         val scale = "${ tiledRoomJson.mappedProperties[SCALE_X] ?: NULL_VALUE },${ tiledRoomJson.mappedProperties[SCALE_Y] ?: NULL_VALUE }"
         val props = getPropertiesString(tiledObject.properties) +
-                "|$ATTR_OBJECT_BOUNDS=$dim|$ATTR_OBJECT_ROTATION=$rot|$ATTR_OBJECT_SCALE=$scale"
+                "$LIST_VALUE_SEPARATOR$ATTR_OBJECT_BOUNDS$KEY_VALUE_SEPARATOR$dim" +
+                "$LIST_VALUE_SEPARATOR$ATTR_OBJECT_ROTATION$KEY_VALUE_SEPARATOR$rot" +
+                "$LIST_VALUE_SEPARATOR$ATTR_OBJECT_SCALE$KEY_VALUE_SEPARATOR$scale"
 
         val buildTask = tiledObject.mappedProperties[PROP_OBJECT_BUILD_TASK]?.stringValue
             ?: throw IllegalArgumentException("Missing object build task property")
@@ -489,14 +499,14 @@ object TiledRoomConversionTask : StaticTask() {
     private fun getPropertiesString(tiledProps: Array<TiledPropertyJson>): String {
         var properties = NULL_VALUE
         val it = tiledProps.iterator()
-        val excludes = setOf("name", "tileset_refs", "blend_mode", "layer_tilesets")
+        val excludes = setOf(NAME_PROP, PROP_TILE_SET_REFS, PROP_LAYER_TILE_SETS)
         while (it.hasNext()) {
             val p = it.next()
             if (p.stringValue != EMPTY_STRING && p.name !in excludes) {
                 if (properties == NULL_VALUE)
-                    properties = "${p.name}=${p.stringValue}"
+                    properties = "${p.name}$KEY_VALUE_SEPARATOR${p.stringValue}"
                 else
-                    properties += "|${p.name}=${p.stringValue}"
+                    properties += "$LIST_VALUE_SEPARATOR${p.name}$KEY_VALUE_SEPARATOR${p.stringValue}"
             }
         }
         return properties
@@ -527,11 +537,13 @@ object TiledTileSetConversionTask : StaticTask() {
             tiles.add(createTileJson(it.next()))
 
         return TileSetJson(
-            type = "tileset",
             name = tiledTileSetJson.name,
             atlas = atlasPath,
             collision =  collisionMapPath,
-            dimension = "${tiledTileSetJson.tilewidth},${tiledTileSetJson.tileheight},${tiledTileSetJson.columns},${tiledTileSetJson.tilecount}",
+            dimension = "${tiledTileSetJson.tilewidth}" +
+                    "$COMMA${tiledTileSetJson.tileheight}" +
+                    "$COMMA${tiledTileSetJson.columns}" +
+                    "$COMMA${tiledTileSetJson.tilecount}",
             tiles = tiles.toTypedArray()
         )
     }
@@ -566,7 +578,13 @@ object TiledTileSetConversionTask : StaticTask() {
         val contactBitmaskY = tiledTile.getSubPropAsInt(MATERIAL_PROP, CONTACT_Y_PROP) ?: -1
         val aspects = tiledTile.mappedProperties[ASPECT_PROP]?.stringValue ?: NULL_VALUE
 
-        return "$atlasX,$atlasY|$spriteFlip|$blend|$tint|$contactType,$materialType|$contactBitmaskX,$contactBitmaskY|$aspects"
+        return "$atlasX$COMMA$atlasY" +
+                "$LIST_VALUE_SEPARATOR$spriteFlip" +
+                "$LIST_VALUE_SEPARATOR$blend" +
+                "$LIST_VALUE_SEPARATOR$tint" +
+                "$LIST_VALUE_SEPARATOR$contactType$COMMA$materialType" +
+                "$LIST_VALUE_SEPARATOR$contactBitmaskX$COMMA$contactBitmaskY" +
+                "$LIST_VALUE_SEPARATOR$aspects"
     }
 
     private fun getAnimation(tiledTile: TiledTileJson): String? =
@@ -576,7 +594,7 @@ object TiledTileSetConversionTask : StaticTask() {
                 val spriteProps = timeSprite[1].split(COLON)
                 val flip = if (spriteProps.size > 2) spriteProps[2] else NULL_VALUE
                 "${timeSprite[0]},${spriteProps[0]},${spriteProps[1]},$flip"
-            }.joinToString("|")
+            }.joinToString(LIST_VALUE_SEPARATOR_STRING)
          else null
 
 }

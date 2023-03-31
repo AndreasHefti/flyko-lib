@@ -1,9 +1,9 @@
-package com.inari.firefly.game.world
+package com.inari.firefly.game.actor
 
 import com.inari.firefly.TestApp
 import com.inari.firefly.core.ComponentSystem
 import com.inari.firefly.core.Entity
-import com.inari.firefly.game.actor.player.Player
+import com.inari.firefly.game.actor.Player
 import kotlin.test.*
 
 
@@ -20,7 +20,6 @@ class PlayerTest {
     }
 
     @Test
-    @Ignore
     fun testCreationWithLoosReference() {
         TestApp
         ComponentSystem.clearSystems()
@@ -46,7 +45,7 @@ class PlayerTest {
             }
             fail("Error expected here")
         } catch (e: Exception) {
-            assertEquals("Key with same name already exists", e.message)
+            assertEquals("Key with same name already exists. Name: player", e.message)
         }
     }
 

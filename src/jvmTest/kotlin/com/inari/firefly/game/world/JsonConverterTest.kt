@@ -4,8 +4,6 @@ import com.inari.firefly.TestApp
 import com.inari.firefly.core.Component
 import com.inari.firefly.core.ComponentSystem
 import com.inari.firefly.game.*
-import com.inari.firefly.game.room.TiledRoomConversionTask
-import com.inari.firefly.game.room.TiledTileSetConversionTask
 import com.inari.util.collection.Attributes
 import kotlin.test.*
 

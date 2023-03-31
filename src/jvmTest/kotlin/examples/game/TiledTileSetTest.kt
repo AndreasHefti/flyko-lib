@@ -6,8 +6,8 @@ import com.inari.firefly.core.Entity
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.game.*
-import com.inari.firefly.game.room.TileSet
-import com.inari.firefly.game.room.TiledTileSetLoadTask
+import com.inari.firefly.game.world.TileSet
+import com.inari.firefly.game.world.TiledTileSetLoadTask
 import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.text.EText

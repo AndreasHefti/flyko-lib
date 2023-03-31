@@ -1,4 +1,4 @@
-package com.inari.firefly.game.actor.player
+package com.inari.firefly.game.actor
 
 import com.inari.firefly.core.*
 

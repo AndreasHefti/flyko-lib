@@ -1,4 +1,4 @@
-package com.inari.firefly.game.room
+package com.inari.firefly.game.world
 
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.Component

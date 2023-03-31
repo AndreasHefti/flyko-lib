@@ -1,11 +1,10 @@
-package com.inari.firefly.game.room
+package com.inari.firefly.game.world
 
 import com.inari.firefly.core.ComponentKey
 import com.inari.firefly.game.NULL_VALUE
 import com.inari.firefly.graphics.sprite.AccessibleTexture
 import com.inari.util.NO_NAME
 import com.inari.util.StringUtils
-import com.inari.util.WHITE
 import com.inari.util.aspect.IndexedAspectType
 import com.inari.util.geom.BitMask
 import com.inari.util.geom.Vector4f
