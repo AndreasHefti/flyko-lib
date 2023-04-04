@@ -1,13 +1,9 @@
 package com.inari.firefly.game.world
 
-import com.inari.firefly.core.ComponentKey
-import com.inari.firefly.core.Engine
-import com.inari.firefly.core.LifecycleTaskType
-import com.inari.firefly.core.StaticTask
+import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.OperationResult
 import com.inari.firefly.core.api.TaskCallback
-import com.inari.firefly.game.*
 import com.inari.firefly.graphics.sprite.AccessibleTexture
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ViewSystemRenderer
@@ -20,15 +16,141 @@ import com.inari.util.collection.AttributesRO
 import com.inari.util.geom.*
 import kotlin.jvm.JvmField
 
-class TileJson(
-    @JvmField val id: String,                           // [index||name]
-    @JvmField val props: String,                        // [AtlasPosition[x,y]]|[Flipping[-||v||h||vh]]|[BlendMode]|[BlendColor]|
-                                                        // [Contact[type,material]]|[ContactMaskPosition[x,y]]|[TileAspects]
-    @JvmField val animation: String?                    // [milliseconds,x,y,[Flipping[-||v||h||vh]]|[...]
-)
+const val ATTR_RESOURCE = "tiledJsonResource"
+const val ATTR_ENCRYPTION = "encryptionKey"
+const val ATTR_TILE_SET_DIR_PATH = "tilesetDirPath"
+const val ATTR_VIEW_NAME = "viewName"
+const val ATTR_CREATE_LAYER = "createLayer"
+const val ATTR_DEFAULT_BLEND = "defaultBlend"
+const val ATTR_DEFAULT_TINT = "defaultTint"
+const val ATTR_ACTIVATION_TASKS = "activationTasks"
+const val ATTR_DEACTIVATION_TASKS = "deactivationTasks"
+const val ATTR_ACTIVATION_SCENE = "activationScene"
+const val ATTR_DEACTIVATION_SCENE = "deactivationScene"
+const val ATTR_TILESET_OVERRIDE_PREFIX = "tsOverride-"
+
+const val ATTR_TILE_SET_NAME = "tileSetName"
+const val ATTR_MAPPING_START_TILE_ID = "mappingStartTileId"
+const val ATTR_APPLY_TILE_SET_GROUPS = "applyTileSetGroups"
+const val ATTR_APPLY_ANIMATION_GROUPS = "applyAnimationGroups"
+const val ATTR_TARGET_FILE = "targetFile"
+
+const val NAME_DEFAULT_TRANSITION_BUILD_TASK = "RoomTransitionBuildTask"
+
+const val ATTR_OBJECT_ID = "id"
+const val ATTR_OBJECT_TYPE = "type"
+const val ATTR_OBJECT_NAME = "name"
+const val ATTR_OBJECT_BOUNDS = "bounds"
+const val ATTR_OBJECT_ROTATION = "rotation"
+const val ATTR_OBJECT_SCALE = "scale"
+const val ATTR_OBJECT_VISIBLE = "visible"
+const val ATTR_OBJECT_GROUPS = "groups"
+const val ATTR_OBJECT_VIEW = "viewName"
+const val ATTR_OBJECT_LAYER = "layerName"
+const val ATTR_OBJECT_ORDER = "order"
+
+const val ATTR_TRANSITION_CONDITION = "condition"
+const val ATTR_TRANSITION_TARGET = "target"
+const val ATTR_TRANSITION_ID = "transitionId"
+const val ATTR_TRANSITION_ORIENTATION = "orientation"
+
+const val TILED_PROP_STRING_TYPE = "string"
+const val COMPOSITE_OBJECT_NAME_PREFIX = "Composite"
+const val ATLAS_ASSET_NAME_PREFIX = "atlas_"
+const val COLLISION_ASSET_NAME_PREFIX = "collisionMask_"
+const val NAME_PROP = "name"
+const val ATLAS_PROP = "atlas_file_path"
+const val COLLISION_PROP = "collision_bitmask_file_path"
+
+const val MATERIAL_PROP = "material"
+const val MATERIAL_TYPE_PROP = "material_type"
+const val CONTACT_TYPE_PROP = "contact_type"
+const val CONTACT_FULL_PROP = "contact_full_rect"
+const val CONTACT_X_PROP = "contact_mask_x"
+const val CONTACT_Y_PROP = "contact_mask_y"
+const val ATLAS_POS_PROP = "atlas_position"
+const val ATLAS_X_PROP = "x"
+const val ATLAS_Y_PROP = "y"
+const val ATLAS_FLIP_PROP = "atlas_sprite_flip"
+const val BLEND_PROP = "blend_mode"
+const val TINT_PROP = "tint_color"
+const val ASPECT_PROP = "tint"
+const val ANIMATION_PROP = "animation"
+const val RENDERER_PROP = "renderer"
+const val SCALE_X = "scale_x"
+const val SCALE_Y = "scale_y"
+
+const val HORIZONTAL_VALUE = "horizontal"
+const val VERTICAL_VALUE = "vertical"
+const val FLAG_NAME_HORIZONTAL = "h"
+const val FLAG_NAME_VERTICAL = "v"
+
+const val PROP_ROOM_ACTIVATION_TASKS = "activation_tasks"
+const val PROP_ROOM_DEACTIVATION_TASKS = "deactivation_tasks"
+const val PROP_VALUE_TYPE_LAYER = "tilelayer"
+const val PROP_VALUE_TYPE_OBJECT = "objectgroup"
+const val PROP_LAYER_TILE_SETS = "layer_tilesets"
+const val PROP_TILE_SET_REFS = "tileset_refs"
+const val PROP_OBJECT_BUILD_TASK = "build_task"
+
 abstract class JsonFile {
     abstract val type: String                           // [FileType[tileset||room||area||world]]
 }
+
+class AreaJson(
+    override val type: String = "area",                             // [type]
+    @JvmField val name: String,                                     // [area-name]
+    @JvmField val camera: String,                                   // [camera-name]
+    @JvmField val loadScene: String,                                // [scene-name]
+    @JvmField val disposeScene: String,                             // [scene-name]
+    @JvmField val roomActivationScene: String,                      // [scene-name]
+    @JvmField val roomDeactivationScene: String,                    // [scene-name]
+    @JvmField val props: String,                                    // [attr1=v1|attr2=v2|...]
+    @JvmField val loadInParallel: Boolean,                          // [true|false]
+    @JvmField val stopLoadSceneWhenLoadFinished: Boolean,           // [true|false]
+    @JvmField val activateAfterLoadScene: Boolean,                  // [true|false]
+    @JvmField val maps: Array<RoomFileReference>
+) : JsonFile()
+
+class RoomFileReference(
+    @JvmField val loadTask: String,                     // [file-load-task-name]
+    @JvmField val filePath: String,                     // [file-path]
+    @JvmField val fileName: String,                     // [file-name]
+    @JvmField val roomActivationScene: String?,         // [scene-name]
+    @JvmField val roomDeactivationScene: String?,       // [scene-name]
+)
+
+class RoomJson(
+    override val type: String = "room",                 // [type]
+    @JvmField val name: String,                         // [room-name]
+    @JvmField val bounds: String,                       // [x,y,width,height]
+    @JvmField val props: String,                        // [attr1=v1|attr2=v2|...]
+    @JvmField val tilesetFiles: Array<TileSetFile>,
+    @JvmField val maps: Array<TileMapJson>,
+    @JvmField val objects: Array<RoomObjectJson>
+) : JsonFile()
+
+class RoomObjectJson(
+    @JvmField val objectType: String,
+    @JvmField val buildTask: String,                    // [taskName]
+    @JvmField val props: String,                        // [attr1=v1|attr2=v2|...]
+)
+
+
+class TileMapJson(
+    @JvmField val layerName: String,                    // [layer-name]
+    @JvmField val opacity: String,                      // [opacity]
+    @JvmField val tileWidth: Int,                       // [tile-width pixels]
+    @JvmField val tileHeight: Int,                      // [tile-height pixels]
+    @JvmField val dimension: String,                    // [x-offset pixel,y-offset pixel,width tiles,height tiles]
+    @JvmField val infinite: Boolean,                    // [true|false]
+    @JvmField val blendMode: String,                    // [blend-mode]
+    @JvmField val tintColor: String,                    // [tint-color]
+    @JvmField val parallax: String,                     // [parallax[x,y] pixels]
+    @JvmField val sets: String,                         // [tileSetName1,tileSetName2...]
+    @JvmField val props: String,                        // [attr1=v1|attr2=v2|...]
+    @JvmField val data: String                          // [map-data]
+)
 
 class TileSetJson(
     override val type: String = "tileset",
@@ -39,42 +161,19 @@ class TileSetJson(
     @JvmField val tiles: Array<TileJson>,
 ) : JsonFile()
 
-class TileMapJson(
-    @JvmField val layerName: String,                    // [layer-name]
-    @JvmField val opacity: String,                      // [opacity]
-    @JvmField val tileWidth: Int,                       // [tile-width pixels]
-    @JvmField val tileHeight: Int,                      // [tile-height pixels]
-    @JvmField val dimension: String,                    // [x-offset pixel,y-offset pixel,width tiles,height tiles]
-    @JvmField val infinite: Boolean,                     // [true|false]
-    @JvmField val blendMode: String,                    // [blend-mode]
-    @JvmField val tintColor: String,                    // [tint-color]
-    @JvmField val parallax: String,                     // [parallax[x,y] pixels]
-    @JvmField val sets: String,                         // [tileSetName1,tileSetName2...]
-    @JvmField val props: String,                        // [attr1=v1|attr2=v2|...]
-    @JvmField val data: String                          // [map-data]
-)
-
-class RoomObjectJson(
-    @JvmField val objectType: String,
-    @JvmField val buildTask: String,                    // [taskName]
-    @JvmField val props: String,                        // [attr1=v1|attr2=v2|...]
-)
-
-class RoomJson(
-    override val type: String = "room",                 // [room-type]
-    @JvmField val name: String,                         // [room-name]
-    @JvmField val bounds: String,                       // [x,y,width,height]
-    @JvmField val props: String,                        // [attr1=v1|attr2=v2|...]
-    @JvmField val tilesetFiles: Array<TileSetFile>,
-    @JvmField val maps: Array<TileMapJson>,
-    @JvmField val objects: Array<RoomObjectJson>
-) : JsonFile()
-
 class TileSetFile(
     @JvmField val name: String,
     @JvmField val offset: Int,
     @JvmField val file: String
 )
+
+class TileJson(
+    @JvmField val id: String,               // [index||name]
+    @JvmField val props: String,            // [AtlasPosition[x,y]]|[Flipping[-||v||h||vh]]|[BlendMode]|[BlendColor]|
+                                            // [Contact[type,material]]|[ContactMaskPosition[x,y]]|[TileAspects]
+    @JvmField val animation: String?        // [milliseconds,x,y,[Flipping[-||v||h||vh]]|[...]
+)
+
 
 object JsonRoomLoadTask : StaticTask() {
 
@@ -112,10 +211,7 @@ object JsonRoomLoadTask : StaticTask() {
 
     fun loadRoom(key : ComponentKey, attributes: AttributesRO, roomJson: RoomJson) {
         val viewName = attributes[ATTR_VIEW_NAME] ?:
-            if (key != NO_COMPONENT_KEY)
-                Area[key].viewRef.targetKey.name
-            else
-                throw IllegalArgumentException("Missing view ref")
+                throw IllegalArgumentException("Missing view attribute")
         val tileSetDirPath = attributes[ATTR_TILE_SET_DIR_PATH] ?: EMPTY_STRING
         val activationTasks: MutableList<String> = attributes[ATTR_ACTIVATION_TASKS]
             ?.split(VALUE_SEPARATOR)?.toMutableList() ?: mutableListOf()
@@ -164,7 +260,6 @@ object JsonRoomLoadTask : StaticTask() {
         val tileMapKey = TileMap {
             this.name = roomJson.name
             viewRef(viewName)
-            autoCreateLayer = createLayer
         }
         val tileMap = TileMap[tileMapKey]
         val room = Room[roomKey]
@@ -214,13 +309,13 @@ object JsonRoomLoadTask : StaticTask() {
             parallaxFactorX = parallax.x - 1
             parallaxFactorY = parallax.y - 1
             layerRef(tileMapJson.layerName)
-            if (tileMapJson.tintColor != NULL_VALUE)
+            if (tileMapJson.tintColor != JSON_NO_VALUE)
                 tint(GeomUtils.colorOf(tileMapJson.tintColor))
             else
                 tint(defaultTint)
-            if (tileMapJson.opacity != NULL_VALUE)
+            if (tileMapJson.opacity != JSON_NO_VALUE)
                 tint.a = tileMapJson.opacity.toFloat()
-            blend = if (tileMapJson.blendMode != NULL_VALUE)
+            blend = if (tileMapJson.blendMode != JSON_NO_VALUE)
                 BlendMode.valueOf(tileMapJson.blendMode)
             else
                 defaultBlend
@@ -282,8 +377,8 @@ object JsonTileSetLoadTask : StaticTask() {
                     this.name = tileSetJson.collision
                     resourceName = tileSetJson.collision
                 }
-            AccessibleTexture.activate(tileSetJson.collision)
-            collisionTexRef = AccessibleTexture.getKey(tileSetJson.collision)
+            Asset.activate(tileSetJson.collision)
+            collisionTexRef = Asset.getKey(tileSetJson.collision)
         }
 
         // create TileSet
@@ -302,10 +397,10 @@ object JsonTileSetLoadTask : StaticTask() {
                 val blend = BlendMode.valueOf(props[2])
                 val tint = TileUtils.getColorFromString(props[3])
                 val contact = props[4].split(VALUE_SEPARATOR)
-                val contactType = if (contact[0] != NULL_VALUE)
+                val contactType = if (contact[0] != JSON_NO_VALUE)
                     EContact.CONTACT_TYPE_ASPECT_GROUP[contact[0]] ?: EContact.CONTACT_TYPE_ASPECT_GROUP.createAspect(contact[0])
                 else UNDEFINED_CONTACT_TYPE
-                val materialType = if (contact[1] != NULL_VALUE)
+                val materialType = if (contact[1] != JSON_NO_VALUE)
                     EContact.MATERIAL_ASPECT_GROUP[contact[1]] ?: EContact.MATERIAL_ASPECT_GROUP.createAspect(contact[1])
                 else UNDEFINED_MATERIAL
                 val contactMaskPos =  Vector2i()(props[5])
@@ -326,7 +421,7 @@ object JsonTileSetLoadTask : StaticTask() {
                     this.contactType = contactType
                     this.contactMask = contactBitMask
 
-                    if (tileAspectsString != NULL_VALUE) {
+                    if (tileAspectsString != JSON_NO_VALUE) {
                         val iter = tileAspectsString.split(VALUE_SEPARATOR)?.iterator()
                         while (iter?.hasNext() == true)
                             this.aspects + iter.next()
@@ -440,9 +535,9 @@ object TiledRoomConversionTask : StaticTask() {
 
     private fun getMap(tiledRoomJson: TiledMapJson, tiledLayer: TiledLayer): TileMapJson {
         val blend = tiledLayer.mappedProperties[BLEND_PROP]?.stringValue
-            ?: NULL_VALUE
+            ?: JSON_NO_VALUE
         val tint = tiledLayer.mappedProperties[TINT_PROP]?.stringValue
-            ?: NULL_VALUE
+            ?: JSON_NO_VALUE
         val parallax = "${tiledLayer.parallaxx}$COMMA${tiledLayer.parallaxy}"
         val layerTileSets = tiledLayer.mappedProperties[PROP_LAYER_TILE_SETS]?.stringValue
             ?: throw RuntimeException("Missing tile sets for layer")
@@ -480,7 +575,7 @@ object TiledRoomConversionTask : StaticTask() {
 
         val dim = "${tiledObject.x},${tiledObject.y},${tiledObject.width},${tiledObject.height}"
         val rot = tiledObject.rotation.toString()
-        val scale = "${ tiledRoomJson.mappedProperties[SCALE_X] ?: NULL_VALUE },${ tiledRoomJson.mappedProperties[SCALE_Y] ?: NULL_VALUE }"
+        val scale = "${ tiledRoomJson.mappedProperties[SCALE_X] ?: JSON_NO_VALUE },${ tiledRoomJson.mappedProperties[SCALE_Y] ?: JSON_NO_VALUE }"
         val props = getPropertiesString(tiledObject.properties) +
                 "$LIST_VALUE_SEPARATOR$ATTR_OBJECT_BOUNDS$KEY_VALUE_SEPARATOR$dim" +
                 "$LIST_VALUE_SEPARATOR$ATTR_OBJECT_ROTATION$KEY_VALUE_SEPARATOR$rot" +
@@ -497,13 +592,13 @@ object TiledRoomConversionTask : StaticTask() {
     }
 
     private fun getPropertiesString(tiledProps: Array<TiledPropertyJson>): String {
-        var properties = NULL_VALUE
+        var properties = JSON_NO_VALUE
         val it = tiledProps.iterator()
         val excludes = setOf(NAME_PROP, PROP_TILE_SET_REFS, PROP_LAYER_TILE_SETS)
         while (it.hasNext()) {
             val p = it.next()
             if (p.stringValue != EMPTY_STRING && p.name !in excludes) {
-                if (properties == NULL_VALUE)
+                if (properties == JSON_NO_VALUE)
                     properties = "${p.name}$KEY_VALUE_SEPARATOR${p.stringValue}"
                 else
                     properties += "$LIST_VALUE_SEPARATOR${p.name}$KEY_VALUE_SEPARATOR${p.stringValue}"
@@ -561,22 +656,22 @@ object TiledTileSetConversionTask : StaticTask() {
 
     private fun getProps(tiledTile: TiledTileJson): String {
         val blend = BlendMode.valueOf(tiledTile.mappedProperties[BLEND_PROP]?.stringValue ?: BlendMode.NONE.name)
-        val tint = tiledTile.mappedProperties[TINT_PROP] ?: NULL_VALUE
+        val tint = tiledTile.mappedProperties[TINT_PROP] ?: JSON_NO_VALUE
         val atlasX = tiledTile.getSubPropAsInt(ATLAS_POS_PROP, ATLAS_X_PROP) ?: -1
         val atlasY = tiledTile.getSubPropAsInt(ATLAS_POS_PROP, ATLAS_Y_PROP) ?: -1
-        var spriteFlip = tiledTile.mappedProperties[ATLAS_FLIP_PROP]?.stringValue ?: NULL_VALUE
+        var spriteFlip = tiledTile.mappedProperties[ATLAS_FLIP_PROP]?.stringValue ?: JSON_NO_VALUE
         if (spriteFlip.contains(COMMA)) {
             val split = spriteFlip.split(COMMA)
             spriteFlip = "${split[0][0]}${split[1][0]}"
-        } else if (spriteFlip != NULL_VALUE)
+        } else if (spriteFlip != JSON_NO_VALUE)
             spriteFlip = spriteFlip[0].toString()
 
 
-        val materialType = tiledTile.getSubPropAsString(MATERIAL_PROP, MATERIAL_TYPE_PROP) ?: NULL_VALUE
-        val contactType = tiledTile.getSubPropAsString(MATERIAL_PROP, CONTACT_TYPE_PROP) ?: NULL_VALUE
+        val materialType = tiledTile.getSubPropAsString(MATERIAL_PROP, MATERIAL_TYPE_PROP) ?: JSON_NO_VALUE
+        val contactType = tiledTile.getSubPropAsString(MATERIAL_PROP, CONTACT_TYPE_PROP) ?: JSON_NO_VALUE
         val contactBitmaskX = tiledTile.getSubPropAsInt(MATERIAL_PROP, CONTACT_X_PROP) ?: -1
         val contactBitmaskY = tiledTile.getSubPropAsInt(MATERIAL_PROP, CONTACT_Y_PROP) ?: -1
-        val aspects = tiledTile.mappedProperties[ASPECT_PROP]?.stringValue ?: NULL_VALUE
+        val aspects = tiledTile.mappedProperties[ASPECT_PROP]?.stringValue ?: JSON_NO_VALUE
 
         return "$atlasX$COMMA$atlasY" +
                 "$LIST_VALUE_SEPARATOR$spriteFlip" +
@@ -592,7 +687,7 @@ object TiledTileSetConversionTask : StaticTask() {
             tiledTile.mappedProperties[ANIMATION_PROP]!!.stringValue.split(COMMA).map {
                 val timeSprite = it.split(UNDERLINE)
                 val spriteProps = timeSprite[1].split(COLON)
-                val flip = if (spriteProps.size > 2) spriteProps[2] else NULL_VALUE
+                val flip = if (spriteProps.size > 2) spriteProps[2] else JSON_NO_VALUE
                 "${timeSprite[0]},${spriteProps[0]},${spriteProps[1]},$flip"
             }.joinToString(LIST_VALUE_SEPARATOR_STRING)
          else null

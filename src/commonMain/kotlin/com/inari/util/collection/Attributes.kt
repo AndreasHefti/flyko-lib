@@ -1,7 +1,7 @@
 package com.inari.util.collection
 
-import com.inari.firefly.game.NULL_VALUE
 import com.inari.util.EMPTY_STRING
+import com.inari.util.JSON_NO_VALUE
 import com.inari.util.KEY_VALUE_SEPARATOR
 import com.inari.util.LIST_VALUE_SEPARATOR
 import kotlin.jvm.JvmField
@@ -50,7 +50,7 @@ class Attributes : AttributesRO {
         return this
     }
     fun addAll(jsonString: String): Attributes {
-        if (EMPTY_STRING == jsonString || NULL_VALUE == jsonString) return this
+        if (EMPTY_STRING == jsonString || JSON_NO_VALUE == jsonString) return this
         val attrs = jsonString.split(LIST_VALUE_SEPARATOR)
         val it = attrs.iterator()
         while (it.hasNext()) {

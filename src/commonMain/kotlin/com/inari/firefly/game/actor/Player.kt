@@ -1,10 +1,15 @@
 package com.inari.firefly.game.actor
 
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.ComponentIndex
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.game.actor.Player.PlayerEventType.*
 import com.inari.firefly.graphics.view.ETransform
+import com.inari.firefly.graphics.view.SimpleCameraController
+import com.inari.firefly.graphics.view.View
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.util.NO_NAME
+import com.inari.util.ZERO_FLOAT
 import com.inari.util.aspect.Aspect
 import com.inari.util.aspect.Aspects
 import com.inari.util.aspect.IndexedAspectType
@@ -19,6 +24,36 @@ data class PlayerOrientation(
     @JvmField val playerPosition: Vector2f = Vector2f()
 )
 
+
+interface PlayerCamera  {
+
+    fun getView(): View?
+    fun initBounds(x: Float = ZERO_FLOAT, y: Float = ZERO_FLOAT, width: Float, height: Float)
+    fun initPlayer(playerId: ComponentIndex)
+    fun adjust()
+}
+
+class SimplePlayerCamera private constructor() : SimpleCameraController(), PlayerCamera {
+
+    override fun getView(): View? =
+        if (controlledComponentKey.componentIndex > NULL_COMPONENT_INDEX)
+            View[controlledComponentKey]
+        else null
+
+    override fun initBounds(x: Float, y: Float, width: Float, height: Float) =
+        snapToBounds(x, y, width, height)
+
+    override fun initPlayer(playerId: ComponentIndex) {
+        val p = Player[playerId]
+        this.pivot = p.playerPosition
+        this.adjust()
+    }
+
+    companion object :  SubComponentBuilder<Control, SimplePlayerCamera>(Control) {
+        override fun create() = SimplePlayerCamera()
+    }
+}
+
 class Player private constructor() : Composite(Player), Controlled {
 
     enum class PlayerEventType {
@@ -30,6 +65,14 @@ class Player private constructor() : Composite(Player), Controlled {
         PLAYER_DEACTIVATED,
         PLAYER_DISPOSED
     }
+
+    @JvmField val cameraRef = CReference(Control) {
+        if (it.componentIndex <= NULL_COMPONENT_INDEX)
+            throw IllegalArgumentException("The PlayerCamera must exist before it can be referenced here")
+        if (Control[it] !is PlayerCamera)
+            throw IllegalArgumentException("The reference must be of type PlayerCamera")
+    }
+    fun adjustCamera() = (Control[cameraRef] as PlayerCamera).adjust()
 
     var playerEntityKey = NO_COMPONENT_KEY
 
@@ -44,7 +87,7 @@ class Player private constructor() : Composite(Player), Controlled {
 
     override fun addToGroup(group: Aspect): Aspects {
         val groups = super.addToGroup(group)
-        playerEntity?.addToGroup(group)
+        playerEntity?.addToGroup(group) ?: Entity[playerEntityKey].addToGroup(group)
         return groups
     }
 

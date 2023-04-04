@@ -76,9 +76,8 @@ class LayerControl : SingleComponentControl<Layer>(Layer) {
     }
 
 
-    companion object : ComponentSubTypeBuilder<Control, LayerControl>(Control, "LayerControl") {
+    companion object : SubComponentBuilder<Control, LayerControl>(Control) {
         override fun create() = LayerControl()
     }
-
 
 }

@@ -50,7 +50,7 @@ class PlatformerHMoveController private constructor() : SingleComponentControl<P
         }
     }
 
-    companion object : ComponentSubTypeBuilder<Control, PlatformerHMoveController>(Control, "PlatformerHMoveController") {
+    companion object : SubComponentBuilder<Control, PlatformerHMoveController>(Control) {
         override fun create() = PlatformerHMoveController()
     }
 }
@@ -99,7 +99,7 @@ class PlatformerJumpController private constructor(): SingleComponentControl<Pla
             jumpAction++
     }
 
-    companion object : ComponentSubTypeBuilder<Control, PlatformerJumpController>(Control, "PlatformerJumpController") {
+    companion object : SubComponentBuilder<Control, PlatformerJumpController>(Control) {
         override fun create() = PlatformerJumpController()
     }
 }

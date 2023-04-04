@@ -105,7 +105,7 @@ class UpdateControl private constructor() : Control() {
 
     override fun update() = updateOp()
 
-    companion object : ComponentSubTypeBuilder<Control, UpdateControl>(Control, "UpdateControl") {
+    companion object : SubComponentBuilder<Control, UpdateControl>(Control) {
         override fun create() = UpdateControl()
     }
 }
@@ -137,11 +137,14 @@ abstract class SingleComponentControl<C : Component> protected constructor(
         if (controlledComponentKey.componentIndex > NULL_COMPONENT_INDEX && system.isActive(controlledComponentKey))
             update(system[controlledComponentKey])
         else if (controlledComponentKey.componentIndex == NULL_COMPONENT_INDEX)
-            if (deleteOnControlledDelete) Control.delete(this)
-            else controlledComponentKey = NO_COMPONENT_KEY
+            if (deleteOnControlledDelete)
+                Control.delete(this)
+            else
+                controlledComponentKey = NO_COMPONENT_KEY
     }
 
     abstract fun update(component: C)
+
 }
 
 

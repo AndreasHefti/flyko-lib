@@ -225,7 +225,7 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
                 return
             val tile = entity[ETile]
             val tileGrid = if (tile.tileGridRef.exists)
-                if (this.exists(tile.tileGridRef.targetKey.componentIndex))
+                if (this.exists(tile.tileGridRef.refIndex))
                     this[tile.tileGridRef.targetKey]
                 else return
             else {

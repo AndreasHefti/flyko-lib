@@ -3,11 +3,7 @@ package examples.game
 import com.inari.firefly.DesktopApp
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.*
-import com.inari.firefly.game.*
-import com.inari.firefly.game.actor.PlatformerCollisionResolver
-import com.inari.firefly.game.actor.PlatformerHMoveController
-import com.inari.firefly.game.actor.PlatformerJumpController
-import com.inari.firefly.game.actor.Player
+import com.inari.firefly.game.actor.*
 import com.inari.firefly.game.world.*
 import com.inari.firefly.game.world.Room.Companion.ROOM_TRANSITION_CONTACT_TYPE
 import com.inari.firefly.graphics.FFInfoSystem
@@ -37,6 +33,8 @@ fun main() {
         AreaTest.initView()
         AreaTest.createArea()
         AreaTest.runArea()
+
+        ComponentSystem.dumpInfo()
     }
 }
 
@@ -63,9 +61,8 @@ object AreaTest {
 //                    adapter.setUniformVec2("u_res", View.baseViewPortProjectionSize)
 //                }
 //            }
-            withControl(RoomCamera) {
+            withControl(SimplePlayerCamera) {
                 name = CAMERA_NAME
-                //snapToBounds(0, 0, 320, 160)
                 pixelPerfect = false
             }
             withLayer {
@@ -103,14 +100,15 @@ object AreaTest {
 
         Area {
             name = AREA_NAME
-            viewRef(VIEW_NAME)
-            cameraRef(CAMERA_NAME)
+            //viewRef(VIEW_NAME)
+            //cameraRef(CAMERA_NAME)
             withLifecycleTask {
                 this.attributes = Attributes() +
                         ( ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
                         ( ATTR_RESOURCE to "tiled_map_example/example_map1.json") +
                         ( ATTR_ACTIVATION_SCENE to "RoomActivationScene") +
-                        ( ATTR_DEACTIVATION_SCENE to "RoomDeactivationScene")
+                        ( ATTR_DEACTIVATION_SCENE to "RoomDeactivationScene") +
+                        ( ATTR_VIEW_NAME to VIEW_NAME )
                 lifecycleType = LifecycleTaskType.ON_LOAD
                 task(TiledRoomLoadTask)
             }
@@ -120,7 +118,8 @@ object AreaTest {
                         ( ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
                         ( ATTR_RESOURCE to "tiled_map_example/example_map2.json") +
                         ( ATTR_ACTIVATION_SCENE to "RoomActivationScene") +
-                        ( ATTR_DEACTIVATION_SCENE to "RoomDeactivationScene")
+                        ( ATTR_DEACTIVATION_SCENE to "RoomDeactivationScene") +
+                        ( ATTR_VIEW_NAME to VIEW_NAME )
                 lifecycleType = LifecycleTaskType.ON_LOAD
                 task(TiledRoomLoadTask)
             }
@@ -134,7 +133,7 @@ object AreaTest {
         createPlayer()
 
         val room = Room[room1Name]
-        room.withPlayer(PLAYER_NAME)
+        room.playerRef(PLAYER_NAME)
         Room.activate(room)
     }
 
@@ -235,6 +234,7 @@ object AreaTest {
         println("Create Player")
         Player {
             name = PLAYER_NAME
+            cameraRef(CAMERA_NAME)
             withPlayerEntity {
                 name = PLAYER_NAME
                 withComponent(ETransform) {

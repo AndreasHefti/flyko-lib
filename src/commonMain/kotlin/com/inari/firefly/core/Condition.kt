@@ -20,7 +20,7 @@ class Conditional private constructor(): ConditionalComponent() {
 
     override fun invoke(key1: ComponentKey, key2: ComponentKey): Boolean = condition(key1, key2)
 
-    companion object : ComponentSubTypeBuilder<ConditionalComponent, Conditional>(ConditionalComponent, "Conditional") {
+    companion object : SubComponentBuilder<ConditionalComponent, Conditional>(ConditionalComponent) {
         override fun create() = Conditional()
     }
 }
@@ -33,7 +33,7 @@ class AndCondition private constructor(): ConditionalComponent() {
     override fun invoke(key1: ComponentKey, key2: ComponentKey): Boolean =
         left.exists && right.exists && ConditionalComponent[left](key1, key2) && ConditionalComponent[right](key1, key2)
 
-    companion object : ComponentSubTypeBuilder<ConditionalComponent, AndCondition>(ConditionalComponent, "AndCondition") {
+    companion object : SubComponentBuilder<ConditionalComponent, AndCondition>(ConditionalComponent) {
         override fun create() = AndCondition()
     }
 }
@@ -46,7 +46,7 @@ class OrCondition private constructor(): ConditionalComponent() {
     override fun invoke(key1: ComponentKey, key2: ComponentKey): Boolean =
         (left.exists && ConditionalComponent[left](key1, key2)) || (right.exists && ConditionalComponent[right](key1, key2))
 
-    companion object : ComponentSubTypeBuilder<ConditionalComponent, OrCondition>(ConditionalComponent, "OrCondition") {
+    companion object : SubComponentBuilder<ConditionalComponent, OrCondition>(ConditionalComponent) {
         override fun create() = OrCondition()
     }
 }

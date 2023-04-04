@@ -5,7 +5,7 @@ import com.inari.util.FALSE_SUPPLIER
 import com.inari.util.TRUE_SUPPLIER
 import kotlin.jvm.JvmField
 
-abstract class Trigger protected constructor(componentType: ComponentType<out Trigger>): Component(componentType) {
+abstract class Trigger protected constructor(): Component(Trigger) {
 
     @JvmField var condition: () -> Boolean = FALSE_SUPPLIER
     @JvmField var call: () -> Boolean = TRUE_SUPPLIER
@@ -32,14 +32,14 @@ interface TriggeredComponent {
 
 }
 
-class UpdateEventTrigger private constructor() : Trigger(UpdateEventTrigger) {
+class UpdateEventTrigger private constructor() : Trigger() {
 
     private val updateEventListener = { doTrigger() }
 
     override fun load() = Engine.registerListener(UPDATE_EVENT_TYPE, updateEventListener)
     override fun dispose() = Engine.disposeListener(UPDATE_EVENT_TYPE, updateEventListener)
 
-    companion object : ComponentSubTypeBuilder<Trigger, UpdateEventTrigger>(Trigger,"UpdateEventTrigger") {
+    companion object : SubComponentBuilder<Trigger, UpdateEventTrigger>(Trigger) {
         override fun create() = UpdateEventTrigger()
     }
 }

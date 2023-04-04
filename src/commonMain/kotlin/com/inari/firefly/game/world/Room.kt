@@ -4,15 +4,13 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.firefly.core.api.*
 import com.inari.firefly.game.actor.Player
-import com.inari.firefly.game.*
+import com.inari.firefly.game.actor.PlayerCamera
 import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.Scene
-import com.inari.firefly.graphics.view.SimpleCameraController
 import com.inari.firefly.physics.contact.EContact
 import com.inari.util.COMMA
 import com.inari.util.VOID_CONSUMER_2
-import com.inari.util.collection.BitSet
 import com.inari.util.geom.Orientation
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
@@ -23,15 +21,12 @@ class ERoomTransition private constructor() : EntityComponent(ERoomTransition) {
     @JvmField val condition = CReference(ConditionalComponent)
     @JvmField val targetRoom = CReference(Room)
     @JvmField val targetTransition = CReference(Entity)
-    @JvmField val cameraRef = CReference(RoomCamera)
     @JvmField var orientation = Orientation.NONE
-
 
     override fun reset() {
         condition.reset()
         targetRoom.reset()
         targetTransition.reset()
-        cameraRef.reset()
     }
 
     override val componentType = Companion
@@ -40,29 +35,16 @@ class ERoomTransition private constructor() : EntityComponent(ERoomTransition) {
     }
 }
 
-class RoomCamera private constructor() : SimpleCameraController() {
-
-    internal fun initPlayer(playerId: Int) {
-        val p = Player[playerId]
-        this.pivot = p.playerPosition
-        this.adjust()
-    }
-
-    companion object : ComponentSubTypeBuilder<Control, RoomCamera>(Control, "RoomCamera") {
-        override fun create() = RoomCamera()
-    }
-
-}
-
 class Room private constructor() : Composite(Room) {
 
     @JvmField val areaRef = CReference(Area)
+    @JvmField val playerRef = CReference(Player)
     @JvmField val roomBounds = Vector4f()
     @JvmField val activationScene = CReference(Scene)
     @JvmField val deactivationScene = CReference(Scene)
     @JvmField var buttonPause = ButtonType.PAUSE
 
-    private val players = BitSet(0)
+    //private val players = BitSet(0)
 
     private var roomLoadTaskRunning = false
     private var roomLoadSceneRunning = false
@@ -70,35 +52,25 @@ class Room private constructor() : Composite(Room) {
     private var started = false
     private var paused = false
 
-    fun withPlayer(player: Player) = withPlayer(player.key)
-    fun withPlayer(name: String) = withPlayer(Player[name])
-    fun withPlayer(key: ComponentKey) {
-        if (key.componentIndex == NULL_COMPONENT_INDEX)
-            return
-
-        players.set(key.componentIndex)
-        val player = Player[key]
-        player.addToGroup(ROOM_PAUSE_GROUP)
+    private fun getCamera(): PlayerCamera {
+        if (playerRef.exists) {
+            val camRef = Player[playerRef].cameraRef
+            if (camRef.exists)
+                return Control[camRef] as PlayerCamera
+            else
+                throw IllegalStateException("No cameraRef defined for player: $playerRef")
+        } else throw IllegalStateException("No playerRef defined for room: ${this.key}")
     }
 
     override fun activate() {
         super.activate()
 
-        var cam: RoomCamera? = null
-        if (areaRef.exists) {
-            val area = Area[areaRef]
-            if (area.cameraRef.exists) {
-                cam = RoomCamera[Area[areaRef].cameraRef]
-                cam.snapToBounds(0f, 0f, roomBounds.width, roomBounds.height)
-            }
-        }
-
-        var pi = players.nextIndex(0)
-        while (pi >= 0) {
-            Player.activate(pi)
-            cam?.initPlayer(pi)
-            pi = players.nextIndex(pi + 1)
-        }
+        val player = Player[playerRef]
+        player.addToGroup(ROOM_PAUSE_GROUP)
+        val cam = getCamera()
+        cam.initBounds( width = roomBounds.width, height = roomBounds.height)
+        Player.activate(player)
+        cam.initPlayer(player.index)
 
         if (activationScene.exists) {
             Pausing.pause(ROOM_PAUSE_GROUP)
@@ -115,7 +87,6 @@ class Room private constructor() : Composite(Room) {
         if (!started || paused)
             return
 
-        println("pause room")
         // pause room pause group
         Pausing.pause(ROOM_PAUSE_GROUP)
         paused = true
@@ -150,11 +121,7 @@ class Room private constructor() : Composite(Room) {
 
     private fun stop() {
         Pausing.resume(ROOM_PAUSE_GROUP)
-        var pi = players.nextIndex(0)
-        while (pi >= 0) {
-            Player.deactivate(pi)
-            pi = players.nextIndex(pi + 1)
-        }
+        Player.deactivate(playerRef)
         super.deactivate()
     }
 
@@ -190,14 +157,12 @@ class Room private constructor() : Composite(Room) {
             var i = nextActiveIndex(0)
             while (i > NULL_COMPONENT_INDEX) {
                 val room = Room[i]
-                if (room.players[p.index])
+                if (room.playerRef.targetKey.componentIndex == p.index)
                     return room
                 i =  nextActiveIndex(i + 1)
             }
             return null
         }
-
-
 
         init {
             Engine.registerListener(UPDATE_EVENT_TYPE, updatePause)

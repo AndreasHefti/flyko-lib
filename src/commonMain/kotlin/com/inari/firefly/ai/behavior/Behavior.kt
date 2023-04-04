@@ -10,7 +10,7 @@ import com.inari.firefly.core.api.TRUE_CONDITION
 import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
 
-abstract class BehaviorNode protected constructor(nodeType: ComponentType<out BehaviorNode>) : Component(nodeType) {
+abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
 
     abstract fun tick(entityKey: ComponentKey): OperationResult
 
@@ -60,7 +60,7 @@ abstract class BehaviorNode protected constructor(nodeType: ComponentType<out Be
     }
 }
 
-abstract class BranchNode internal constructor(nodeType: ComponentType<out BranchNode>) : BehaviorNode(nodeType) {
+abstract class BranchNode internal constructor() : BehaviorNode() {
 
     @JvmField internal val childrenNodes = BitSet()
 
@@ -71,7 +71,7 @@ abstract class BranchNode internal constructor(nodeType: ComponentType<out Branc
     }
 }
 
-class ParallelNode private constructor() : BranchNode(ParallelNode) {
+class ParallelNode private constructor() : BranchNode() {
 
     @JvmField var successThreshold: Int = 0
 
@@ -95,12 +95,12 @@ class ParallelNode private constructor() : BranchNode(ParallelNode) {
         else RUNNING
     }
 
-    companion object : ComponentSubTypeBuilder<BehaviorNode, ParallelNode>(BehaviorNode, "ParallelNode") {
+    companion object : SubComponentBuilder<BehaviorNode, ParallelNode>(BehaviorNode) {
         override fun create() = ParallelNode()
     }
 }
 
-class SelectionNode private constructor() : BranchNode(SelectionNode) {
+class SelectionNode private constructor() : BranchNode() {
 
     override fun tick(entityKey: ComponentKey): OperationResult {
         var i = childrenNodes.nextSetBit(0)
@@ -113,12 +113,12 @@ class SelectionNode private constructor() : BranchNode(SelectionNode) {
         return FAILED
     }
 
-    companion object : ComponentSubTypeBuilder<BehaviorNode, SelectionNode>(BehaviorNode, "SelectionNode") {
+    companion object : SubComponentBuilder<BehaviorNode, SelectionNode>(BehaviorNode) {
         override fun create() = SelectionNode()
     }
 }
 
-class SequenceNode private constructor() : BranchNode(SequenceNode) {
+class SequenceNode private constructor() : BranchNode() {
 
     override fun tick(entityKey: ComponentKey): OperationResult {
         var i = childrenNodes.nextSetBit(0)
@@ -131,12 +131,12 @@ class SequenceNode private constructor() : BranchNode(SequenceNode) {
         return SUCCESS
     }
 
-    companion object : ComponentSubTypeBuilder<BehaviorNode, SequenceNode>(BehaviorNode, "SequenceNode") {
+    companion object : SubComponentBuilder<BehaviorNode, SequenceNode>(BehaviorNode) {
         override fun create() = SequenceNode()
     }
 }
 
-class ActionNode private constructor() : BehaviorNode(ActionNode) {
+class ActionNode private constructor() : BehaviorNode() {
 
     @JvmField var condition = TRUE_CONDITION
     @JvmField var actionOperation: Action = SUCCESS_ACTION
@@ -147,7 +147,7 @@ class ActionNode private constructor() : BehaviorNode(ActionNode) {
         else FAILED
 
 
-    companion object : ComponentSubTypeBuilder<BehaviorNode, ActionNode>(BehaviorNode, "ActionNode") {
+    companion object : SubComponentBuilder<BehaviorNode, ActionNode>(BehaviorNode) {
         override fun create() = ActionNode()
     }
 }

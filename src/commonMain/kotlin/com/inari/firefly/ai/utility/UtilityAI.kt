@@ -96,7 +96,7 @@ class Consideration private constructor() : UtilityAI() {
     override fun getUtilityValue(entityId: Int, intentionId: Int): Float =
         quantifier(normalOperation(entityId, intentionId, NULL_COMPONENT_INDEX)) * weighting
 
-    companion object : ComponentSubTypeBuilder<UtilityAI, Consideration>(UtilityAI, "Consideration") {
+    companion object : SubComponentBuilder<UtilityAI, Consideration>(UtilityAI) {
         override fun create() = Consideration()
     }
 }
@@ -127,7 +127,7 @@ class Intention private constructor() : UtilityAI() {
         return result
     }
 
-    companion object : ComponentSubTypeBuilder<UtilityAI, Intention>(UtilityAI, "Intention") {
+    companion object : SubComponentBuilder<UtilityAI, Intention>(UtilityAI) {
         override fun create() = Intention()
     }
 }
@@ -161,7 +161,7 @@ class UtilityAction private constructor() : UtilityAI() {
 
     fun callAction(entityKey: ComponentKey): OperationResult = actionOperation(entityKey)
 
-    companion object : ComponentSubTypeBuilder<UtilityAI, UtilityAction>(UtilityAI, "UtilityAction") {
+    companion object : SubComponentBuilder<UtilityAI, UtilityAction>(UtilityAI) {
         override fun create() = UtilityAction()
     }
 }

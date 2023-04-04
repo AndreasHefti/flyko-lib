@@ -161,7 +161,7 @@ class SimpleContactMap private constructor(): ContactMap() {
         return IndexIterator(selfExcluded)
     }
 
-    companion object : ComponentSubTypeBuilder<ContactMap, SimpleContactMap>(ContactMap, "SimpleContactMap") {
+    companion object : SubComponentBuilder<ContactMap, SimpleContactMap>(ContactMap) {
         override fun create() = SimpleContactMap()
     }
 }

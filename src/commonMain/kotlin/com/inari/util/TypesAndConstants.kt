@@ -8,6 +8,7 @@ import kotlin.jvm.JvmField
 const val ZERO_INT = 0
 const val ZERO_FLOAT = 0.0f
 const val UNDERLINE = "_"
+const val JSON_NO_VALUE = "-"
 const val COLON = ":"
 const val EMPTY_STRING = ""
 const val COMMA = ","

@@ -16,8 +16,6 @@ import kotlin.native.concurrent.ThreadLocal
 
 class Area private constructor() : Composite(Area) {
 
-    @JvmField val viewRef = CReference(View)
-    @JvmField val cameraRef = CReference(RoomCamera)
     @JvmField val loadScene = CReference(Scene)
     @JvmField val disposeScene = CReference(Scene)
     @JvmField var loadInParallel = true
@@ -107,7 +105,7 @@ class Area private constructor() : Composite(Area) {
             val newRoom = Room[transition.targetRoom]
             val player = Player[playerName]
 
-            newRoom.withPlayer(player)
+            newRoom.playerRef(player)
             Room.activate(newRoom)
 
             val targetEntity = Entity[transition.targetTransition]
@@ -125,7 +123,7 @@ class Area private constructor() : Composite(Area) {
                 else -> {}
             }
 
-            RoomCamera[Area[newRoom.areaRef].cameraRef].adjust()
+            player.adjustCamera()
         }
     }
 }

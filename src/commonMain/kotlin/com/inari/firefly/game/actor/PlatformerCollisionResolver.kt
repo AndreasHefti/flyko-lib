@@ -250,12 +250,8 @@ class PlatformerCollisionResolver : CollisionResolver() {
         contactSensorGround.reset(groundContactOffset, constraint.bounds.height - gapSouth, constraint.bounds.width - 2 * groundContactOffset, 1)
     }
 
-    companion object : ComponentSubTypeBuilder<CollisionResolver, PlatformerCollisionResolver>(
-        CollisionResolver,
-        "PlatformerCollisionResolver") {
-
+    companion object : SubComponentBuilder<CollisionResolver, PlatformerCollisionResolver>(CollisionResolver) {
         override fun create() = PlatformerCollisionResolver()
         val VOID_ON_SLOPE_CALLBACK: (Int, Int, FullContactScan) -> Unit = { _,_,_ -> }
     }
-
 }

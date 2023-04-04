@@ -22,7 +22,6 @@ import kotlin.math.floor
 open class TileMap : Component(TileMap) {
 
     @JvmField var viewRef = CReference(View)
-    @JvmField var autoCreateLayer = true
 
     private val tileMapLayerData = DynArray.of<TileMapLayerData>(5, 5)
     private var parallax = false
@@ -39,26 +38,20 @@ open class TileMap : Component(TileMap) {
     override fun load() {
         super.load()
 
-        // check view reference is set and valid
-        if (!viewRef.exists)
-            throw IllegalStateException("No View reference exists")
-
-        // check or create needed layer for view
+        // check needed layer for view
         val iter = tileMapLayerData.iterator()
         while (iter.hasNext()) {
             val lData = iter.next()
-            if (autoCreateLayer && !lData.layerRef.exists) {
-                Layer {
-                    name = lData.layerRef.targetKey.name
-                    this.viewRef(this@TileMap.viewRef)
-                    position(lData.position)
-                }
-            } else if (!lData.layerRef.exists)
+            if (!lData.layerRef.exists)
                 throw IllegalStateException("No Layer with name ${lData.layerRef.targetKey.name} exists")
         }
     }
 
     override fun activate() {
+        // check view reference is set and valid
+        if (!viewRef.exists)
+            throw IllegalStateException("No View reference exists")
+
         super.activate()
         val iter = tileMapLayerData.iterator()
         while (iter.hasNext()) {

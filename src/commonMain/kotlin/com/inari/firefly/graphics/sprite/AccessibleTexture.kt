@@ -3,6 +3,7 @@ package com.inari.firefly.graphics.sprite
 import com.inari.firefly.core.Asset
 import com.inari.firefly.core.ComponentSubTypeBuilder
 import com.inari.firefly.core.Engine
+import com.inari.firefly.core.SubComponentBuilder
 
 class AccessibleTexture private constructor() : Texture() {
 
@@ -19,7 +20,7 @@ class AccessibleTexture private constructor() : Texture() {
         super.dispose()
     }
 
-    companion object : ComponentSubTypeBuilder<Asset, AccessibleTexture>(Asset,"BitmaskTexture") {
+    companion object : SubComponentBuilder<Asset, AccessibleTexture>(Asset) {
         override fun create() = AccessibleTexture()
     }
 }

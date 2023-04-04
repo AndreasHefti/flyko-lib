@@ -6,7 +6,6 @@ import com.inari.firefly.core.StaticTask
 import com.inari.firefly.core.api.OperationResult
 import com.inari.firefly.core.api.TaskCallback
 import com.inari.firefly.game.*
-import com.inari.firefly.game.room.*
 import com.inari.util.*
 import com.inari.util.collection.Attributes
 import com.inari.util.collection.AttributesRO

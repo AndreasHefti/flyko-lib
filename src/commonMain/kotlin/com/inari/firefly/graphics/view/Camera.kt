@@ -81,7 +81,7 @@ open class SimpleCameraController protected constructor() : SingleComponentContr
         return pos.x != 0f || pos.y != 0f
     }
 
-    companion object : ComponentSubTypeBuilder<Control, SimpleCameraController>(Control, "SimpleCameraController") {
+    companion object : SubComponentBuilder<Control, SimpleCameraController>(Control) {
         override fun create() = SimpleCameraController()
     }
 

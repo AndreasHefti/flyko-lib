@@ -40,7 +40,7 @@ class TestCameraController private constructor() : SingleComponentControl<View>(
         Engine.notify(viewChangeEvent)
     }
 
-    companion object : ComponentSubTypeBuilder<Control, TestCameraController>(Control, "TestCameraController") {
+    companion object : SubComponentBuilder<Control, TestCameraController>(Control) {
         override fun create() = TestCameraController()
     }
 }

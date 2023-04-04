@@ -1,8 +1,9 @@
 package com.inari.firefly.game.world
 
+import com.inari.firefly.core.Asset
 import com.inari.firefly.core.ComponentKey
-import com.inari.firefly.game.NULL_VALUE
 import com.inari.firefly.graphics.sprite.AccessibleTexture
+import com.inari.util.JSON_NO_VALUE
 import com.inari.util.NO_NAME
 import com.inari.util.StringUtils
 import com.inari.util.aspect.IndexedAspectType
@@ -17,7 +18,7 @@ object TileUtils {
     @JvmField val UNDEFINED_TILE_ASPECT = TILE_ASPECT_GROUP.createAspect("UNDEFINED_TILE_ASPECT")
 
     fun getColorFromString(stringValue: String): Vector4f? {
-        if (StringUtils.isBlank(stringValue) || stringValue == NULL_VALUE)
+        if (StringUtils.isBlank(stringValue) || stringValue == JSON_NO_VALUE)
             return null
 
         return try {
@@ -58,9 +59,9 @@ object TileUtils {
             return bitMaskCache[name]
 
         // load bitmask texture asset to sample bitmask from texture
-        val bitmaskTextureAsset = AccessibleTexture[bitmaskTextureAssetKey]
+        val bitmaskTextureAsset = Asset[bitmaskTextureAssetKey] as AccessibleTexture
         if (!bitmaskTextureAsset.loaded)
-            AccessibleTexture.load(bitmaskTextureAssetKey)
+            Asset.load(bitmaskTextureAssetKey)
 
         val bitset = BitMask(0, 0, bounds.width, bounds.height)
         var x = bounds.x * bounds.width

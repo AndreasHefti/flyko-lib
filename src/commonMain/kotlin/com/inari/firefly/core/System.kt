@@ -60,6 +60,7 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
     fun loadGroup(group: Aspect)
 
     fun activate(c: C) = activate(c.index)
+    fun activate(cRef: CReference) = activate(cRef.targetKey)
     fun activate(name: String) = activate(getKey(name).componentIndex)
     fun activate(key: ComponentKey) = activate(key.componentIndex)
     fun activate(index: ComponentIndex)
@@ -67,6 +68,7 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
     fun activateGroup(group: Aspect)
 
     fun deactivate(c: C) = deactivate(c.index)
+    fun deactivate(cRef: CReference) = deactivate(cRef.targetKey)
     fun deactivate(name: String) = deactivate(getKey(name).componentIndex)
     fun deactivate(key: ComponentKey) = deactivate(key.componentIndex)
     fun deactivate(index: ComponentIndex)
@@ -74,6 +76,7 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
     fun deactivateGroup(group: Aspect)
 
     fun dispose(c: C) = dispose(c.index)
+    fun dispose(cRef: CReference) = dispose(cRef.targetKey)
     fun dispose(name: String) = dispose(getKey(name).componentIndex)
     fun dispose(key: ComponentKey) = dispose(key.componentIndex)
     fun dispose(index: Int)
@@ -81,6 +84,7 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
     fun disposeGroup(group: Aspect)
 
     fun delete(c: C) = delete(c.index)
+    fun delete(cRef: CReference) = delete(cRef.targetKey)
     fun delete(name: String) = delete(getKey(name).componentIndex)
     fun delete(key: ComponentKey) = delete(checkKey(key).componentIndex)
     fun delete(index: ComponentIndex)
@@ -136,8 +140,6 @@ abstract class ComponentSystem<C : Component>(
     final override val aspectIndex: Int = typeAspect.aspectIndex
     final override val aspectName: String = typeAspect.aspectName
     final override val aspectType: AspectType = typeAspect.aspectType
-    
-    init { registerSystem(this) }
 
     // TODO private and adapt in SubType
     internal val _componentKeyMapping: MutableMap<String, ComponentKey> =  HashMap()
@@ -147,6 +149,8 @@ abstract class ComponentSystem<C : Component>(
     private val _activeComponentSet: BitSet = BitSet()
     val activeComponentSet: IndexIterable = _activeComponentSet
     private val _eventPool = ArrayDeque<ComponentEvent>()
+
+    init { registerSystem(this) }
 
     // **** MISC ****
     // **************
@@ -501,10 +505,13 @@ abstract class ComponentSystem<C : Component>(
 
     companion object {
         const val STATIC_COMPONENT_MARKER = "_STAT_"
-        private const val SINGLETON_MARKER = "_SINGL_"
+        private const val SINGLETON_MARKER = "_SINGLETON_"
 
         private val COMPONENT_SYSTEM_MAPPING = mutableMapOf<String, IComponentSystem<*>>()
         internal fun registerSystem(system: IComponentSystem<*>) {
+            if (system.subTypeName in COMPONENT_SYSTEM_MAPPING)
+                throw IllegalArgumentException("Subsystem of type: ${system.systemName} is already registered and is not of type AbstractSubTypeSystem")
+
             COMPONENT_SYSTEM_MAPPING[system.subTypeName] = system
         }
 
@@ -587,16 +594,33 @@ class ComponentEvent internal constructor(override val eventType: EventType): Ev
 }
 
 abstract class AbstractComponentSystem<C : Component>(systemName: String) : ComponentSystem<C>(systemName) {
-    override fun create() = throw UnsupportedOperationException("$systemName is abstract use sub type builder instead")
-    override fun delete(index: ComponentIndex) = throw UnsupportedOperationException("$systemName is abstract concrete use sub type")
+    override fun create(): C = throw UnsupportedOperationException("$systemName is abstract use sub type builder instead")
 }
 
-
+abstract class  SubComponentBuilder<C : Component, CC : C>(
+    val system: ComponentSystem<C>
+) :  ComponentBuilder<CC>  {
+    override fun build(configure: CC.() -> Unit): ComponentKey {
+        val comp: CC = create()
+        comp.also(configure)
+        val key = system.registerComponent(comp)
+        system.initComponent(comp)
+        return key
+    }
+    override fun buildAndGet(configure: CC.() -> Unit): CC {
+        val comp: CC = create()
+        comp.also(configure)
+        system.registerComponent(comp)
+        system.initComponent(comp)
+        return comp
+    }
+    abstract fun create(): CC
+}
 
 abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
      val system: ComponentSystem<C>,
      final override val subTypeName: String
- ) : ComponentBuilder<CC>, IComponentSystem<CC> {
+ ) : IComponentSystem<CC> {
 
     private val subComponentRefs = BitSet()
     private val activeSubComponentRefs = BitSet()
@@ -606,11 +630,6 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
     final override val aspectIndex: Int = system.aspectIndex
     final override val aspectName: String = system.aspectName
     final override val aspectType: AspectType = system.aspectType
-
-    init {
-        @Suppress("LeakingThis")
-        ComponentSystem.registerSystem(this)
-    }
 
     override val componentEventType: Event.EventType = system.componentEventType
     override val hasComponents: Boolean
@@ -626,6 +645,11 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
     private val iterableTypeAdapter: IndexedTypeIterable<CC> = object : IndexedTypeIterable<CC> {
         override fun get(index: Int): CC? = if (subComponentRefs[index]) this@ComponentSubTypeBuilder[index] else null
         override fun nextIndex(from: Int): Int = subComponentRefs.nextIndex(from)
+    }
+
+    init {
+        @Suppress("LeakingThis")
+        ComponentSystem.registerSystem(this)
     }
 
     override fun clearSystem() {
@@ -698,5 +722,3 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
 
     abstract fun create(): CC
 }
-
-
