@@ -83,7 +83,7 @@ abstract class Animation<D : AnimatedData>(
 object FloatEasingAnimation: Animation<EasedFloatData>(DynArray.of(5, 10)) {
 
     init {
-        Control.registerAsSingleton(this, true)
+        @Suppress("LeakingThis") registerStatic(this)
         Control.activate(this.name)
     }
 
@@ -107,7 +107,7 @@ object FloatEasingAnimation: Animation<EasedFloatData>(DynArray.of(5, 10)) {
 object BezierCurveAnimation: Animation<BezierCurveData>(DynArray.of(5, 10)) {
 
     init {
-        Control.registerAsSingleton(this, true)
+        @Suppress("LeakingThis") registerStatic(this)
         Control.activate(this.name)
     }
 
@@ -135,7 +135,7 @@ object BezierCurveAnimation: Animation<BezierCurveData>(DynArray.of(5, 10)) {
 object BezierSplineAnimation : Animation<BezierSplineData>(DynArray.of(5, 10)) {
 
     init {
-        Control.registerAsSingleton(this, true)
+        @Suppress("LeakingThis") registerStatic(this)
         Control.activate(this.name)
     }
 
@@ -169,7 +169,7 @@ object BezierSplineAnimation : Animation<BezierSplineData>(DynArray.of(5, 10)) {
 object IntFrameAnimation : Animation<IntFrameData>(DynArray.of(5, 10)) {
 
     init {
-        Control.registerAsSingleton(this, true)
+        @Suppress("LeakingThis") registerStatic(this)
         Control.activate(this.name)
     }
 

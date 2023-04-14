@@ -89,6 +89,7 @@ abstract class Component protected constructor(
     val componentType: ComponentType<out Component>
 ) : AbstractIndexed(componentType.typeName), Named {
 
+    @JvmField var survivesSystemClear = false
     @JvmField var autoLoad = false
     @JvmField var autoActivation = false
 

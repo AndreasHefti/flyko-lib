@@ -16,11 +16,11 @@ import com.inari.util.collection.AttributesRO
 import com.inari.util.geom.*
 import kotlin.jvm.JvmField
 
-const val ATTR_RESOURCE = "tiledJsonResource"
+// Task attribute names
+const val ATTR_RESOURCE = "jsonFileResource"
 const val ATTR_ENCRYPTION = "encryptionKey"
 const val ATTR_TILE_SET_DIR_PATH = "tilesetDirPath"
 const val ATTR_VIEW_NAME = "viewName"
-const val ATTR_CREATE_LAYER = "createLayer"
 const val ATTR_DEFAULT_BLEND = "defaultBlend"
 const val ATTR_DEFAULT_TINT = "defaultTint"
 const val ATTR_ACTIVATION_TASKS = "activationTasks"
@@ -35,8 +35,6 @@ const val ATTR_APPLY_TILE_SET_GROUPS = "applyTileSetGroups"
 const val ATTR_APPLY_ANIMATION_GROUPS = "applyAnimationGroups"
 const val ATTR_TARGET_FILE = "targetFile"
 
-const val NAME_DEFAULT_TRANSITION_BUILD_TASK = "RoomTransitionBuildTask"
-
 const val ATTR_OBJECT_ID = "id"
 const val ATTR_OBJECT_TYPE = "type"
 const val ATTR_OBJECT_NAME = "name"
@@ -49,11 +47,13 @@ const val ATTR_OBJECT_VIEW = "viewName"
 const val ATTR_OBJECT_LAYER = "layerName"
 const val ATTR_OBJECT_ORDER = "order"
 
+const val ATTR_TRANSITION_BUILD_TASK = "RoomTransitionBuildTask"
 const val ATTR_TRANSITION_CONDITION = "condition"
 const val ATTR_TRANSITION_TARGET = "target"
 const val ATTR_TRANSITION_ID = "transitionId"
 const val ATTR_TRANSITION_ORIENTATION = "orientation"
 
+// JSON names
 const val TILED_PROP_STRING_TYPE = "string"
 const val COMPOSITE_OBJECT_NAME_PREFIX = "Composite"
 const val ATLAS_ASSET_NAME_PREFIX = "atlas_"
@@ -94,37 +94,38 @@ const val PROP_TILE_SET_REFS = "tileset_refs"
 const val PROP_OBJECT_BUILD_TASK = "build_task"
 
 abstract class JsonFile {
-    abstract val type: String                           // [FileType[tileset||room||area||world]]
+    abstract val type: String                                       // [FileType[tileset||room||area||world]]
 }
 
 class AreaJson(
     override val type: String = "area",                             // [type]
     @JvmField val name: String,                                     // [area-name]
-    @JvmField val camera: String,                                   // [camera-name]
-    @JvmField val loadScene: String,                                // [scene-name]
-    @JvmField val disposeScene: String,                             // [scene-name]
-    @JvmField val roomActivationScene: String,                      // [scene-name]
-    @JvmField val roomDeactivationScene: String,                    // [scene-name]
-    @JvmField val props: String,                                    // [attr1=v1|attr2=v2|...]
-    @JvmField val loadInParallel: Boolean,                          // [true|false]
-    @JvmField val stopLoadSceneWhenLoadFinished: Boolean,           // [true|false]
-    @JvmField val activateAfterLoadScene: Boolean,                  // [true|false]
-    @JvmField val maps: Array<RoomFileReference>
+    @JvmField val view: String = NO_NAME,                           // [camera-name]
+    @JvmField val camera: String = NO_NAME,                         // [camera-name]
+    @JvmField val loadScene: String = NO_NAME,                      // [scene-name]
+    @JvmField val disposeScene: String = NO_NAME,                   // [scene-name]
+    @JvmField val roomActivationScene: String = NO_NAME,            // [scene-name]
+    @JvmField val roomDeactivationScene: String = NO_NAME,          // [scene-name]
+    @JvmField val props: String?,                                   // [attr1=v1|attr2=v2|...]
+    @JvmField val loadInParallel: Boolean = false,                  // [true|false]
+    @JvmField val stopLoadSceneWhenLoadFinished: Boolean = true,    // [true|false]
+    @JvmField val activateAfterLoadScene: Boolean = true,           // [true|false]
+    @JvmField val rooms: Array<RoomFileReference>
 ) : JsonFile()
 
 class RoomFileReference(
-    @JvmField val loadTask: String,                     // [file-load-task-name]
-    @JvmField val filePath: String,                     // [file-path]
-    @JvmField val fileName: String,                     // [file-name]
-    @JvmField val roomActivationScene: String?,         // [scene-name]
-    @JvmField val roomDeactivationScene: String?,       // [scene-name]
+    @JvmField val loadTask: String,                                 // [file-load-task-name]
+    @JvmField val fileName: String,                                 // [file-name]
+    @JvmField val tileSetFilePath: String = EMPTY_STRING,           // [file-path]
+    @JvmField val roomActivationScene: String = NO_NAME,            // [scene-name]
+    @JvmField val roomDeactivationScene: String = NO_NAME,          // [scene-name]
 )
 
 class RoomJson(
-    override val type: String = "room",                 // [type]
-    @JvmField val name: String,                         // [room-name]
-    @JvmField val bounds: String,                       // [x,y,width,height]
-    @JvmField val props: String,                        // [attr1=v1|attr2=v2|...]
+    override val type: String = "room",                             // [type]
+    @JvmField val name: String,                                     // [room-name]
+    @JvmField val bounds: String,                                   // [x,y,width,height]
+    @JvmField val props: String?,                                   // [attr1=v1|attr2=v2|...]
     @JvmField val tilesetFiles: Array<TileSetFile>,
     @JvmField val maps: Array<TileMapJson>,
     @JvmField val objects: Array<RoomObjectJson>
@@ -133,7 +134,7 @@ class RoomJson(
 class RoomObjectJson(
     @JvmField val objectType: String,
     @JvmField val buildTask: String,                    // [taskName]
-    @JvmField val props: String,                        // [attr1=v1|attr2=v2|...]
+    @JvmField val props: String?,                       // [attr1=v1|attr2=v2|...]
 )
 
 
@@ -148,7 +149,7 @@ class TileMapJson(
     @JvmField val tintColor: String,                    // [tint-color]
     @JvmField val parallax: String,                     // [parallax[x,y] pixels]
     @JvmField val sets: String,                         // [tileSetName1,tileSetName2...]
-    @JvmField val props: String,                        // [attr1=v1|attr2=v2|...]
+    @JvmField val props: String?,                       // [attr1=v1|attr2=v2|...]
     @JvmField val data: String                          // [map-data]
 )
 
@@ -174,8 +175,58 @@ class TileJson(
     @JvmField val animation: String?        // [milliseconds,x,y,[Flipping[-||v||h||vh]]|[...]
 )
 
+object JsonAreaLoadTask : StaticTask() {
+
+    init {
+        JsonRoomLoadTask
+        TiledRoomLoadTask
+    }
+
+    override fun apply(key : ComponentKey, attributes: AttributesRO, callback: TaskCallback) {
+        // get all needed attributes and check
+        val res = attributes[ATTR_RESOURCE] ?: throw IllegalArgumentException("Missing resource")
+        val enc = attributes[ATTR_ENCRYPTION]
+        // load tiled JSON resource
+        val areaJson = Engine.resourceService.loadJSONResource(res, AreaJson::class, enc)
+
+        Area {
+            name = areaJson.name
+            loadScene(areaJson.loadScene)
+            disposeScene(areaJson.disposeScene)
+            loadInParallel = areaJson.loadInParallel
+            stopLoadSceneWhenLoadFinished = areaJson.stopLoadSceneWhenLoadFinished
+            activateAfterLoadScene = areaJson.activateAfterLoadScene
+            roomViewName = areaJson.view
+            roomCameraName = areaJson.camera
+            roomActivationSceneName = areaJson.roomActivationScene
+            roomDeactivationSceneName = areaJson.roomDeactivationScene
+
+            val roomIt = areaJson.rooms.iterator()
+            while (roomIt.hasNext()) {
+                val roomJson = roomIt.next()
+
+                val roomLoadAttrs = Attributes() + ( ATTR_RESOURCE to roomJson.fileName)
+                if (roomJson.tileSetFilePath != EMPTY_STRING)
+                    roomLoadAttrs + ( ATTR_TILE_SET_DIR_PATH to roomJson.tileSetFilePath )
+                if (roomJson.roomActivationScene != NO_NAME)
+                    roomLoadAttrs + ( ATTR_ACTIVATION_SCENE to roomJson.roomActivationScene )
+                if (roomJson.roomDeactivationScene != NO_NAME)
+                    roomLoadAttrs + ( ATTR_DEACTIVATION_SCENE to roomJson.roomDeactivationScene )
+
+                withRoomLoadTask(roomLoadAttrs, Task[roomJson.loadTask])
+            }
+        }
+    }
+
+}
+
 
 object JsonRoomLoadTask : StaticTask() {
+
+    init {
+        JsonTileSetLoadTask
+        TiledTileSetLoadTask
+    }
 
     override fun apply(key : ComponentKey, attributes: AttributesRO, callback: TaskCallback) {
         // get all needed attributes and check
@@ -197,7 +248,6 @@ object JsonRoomLoadTask : StaticTask() {
             if (TileSet.exists(tileSetRef.name))
                 continue
 
-            //val resPath = tileSetDirPath + tileSetRefJson.source.substringAfterLast('/')
             val tiledTileSetAttrs = Attributes() +
                     ( ATTR_TILE_SET_NAME to tileSetRef.name ) +
                     ( ATTR_RESOURCE to tileSetRef.file) +
@@ -210,22 +260,26 @@ object JsonRoomLoadTask : StaticTask() {
     }
 
     fun loadRoom(key : ComponentKey, attributes: AttributesRO, roomJson: RoomJson) {
+        val areaKey = if (key != NO_COMPONENT_KEY && key.type == Area) key else null
+        val view = Area.getDefaultView(key)
         val viewName = attributes[ATTR_VIEW_NAME] ?:
+                view?.name ?:
                 throw IllegalArgumentException("Missing view attribute")
-        val tileSetDirPath = attributes[ATTR_TILE_SET_DIR_PATH] ?: EMPTY_STRING
         val activationTasks: MutableList<String> = attributes[ATTR_ACTIVATION_TASKS]
             ?.split(VALUE_SEPARATOR)?.toMutableList() ?: mutableListOf()
         val deactivationTasks: MutableList<String> = attributes[ATTR_DEACTIVATION_TASKS]
             ?.split(VALUE_SEPARATOR)?.toMutableList() ?: mutableListOf()
-        val createLayer = attributes[ATTR_CREATE_LAYER]?.toBoolean() ?: true
-        println(" name: ${roomJson.name}")
+
         // now create Room, TileMap and Objects from TiledMap input
         val roomKey = Room {
             this.name = roomJson.name
-            if (key != NO_COMPONENT_KEY && key.type == Area)
-                areaRef(key)
+            areaRef(areaKey ?: NO_COMPONENT_KEY)
             // set attributes
-            this.attributes = Attributes().addAll(roomJson.props)
+            val attrs = Attributes()
+            if (roomJson.props != null)
+                attrs.addAll(roomJson.props)
+            this.attributes = attrs
+
             roomBounds(roomJson.bounds)
             // tasks
             activationTasks.addAll(attributes[PROP_ROOM_ACTIVATION_TASKS]?.split(VALUE_SEPARATOR)
@@ -253,8 +307,12 @@ object JsonRoomLoadTask : StaticTask() {
 
             if (attributes.contains(ATTR_ACTIVATION_SCENE))
                 activationScene(attributes[ATTR_ACTIVATION_SCENE]!!)
+            else if (areaRef.exists && Area[areaRef].roomActivationSceneName != NO_NAME)
+                activationScene(Area[areaRef].roomActivationSceneName)
             if (attributes.contains(ATTR_DEACTIVATION_SCENE))
                 deactivationScene(attributes[ATTR_DEACTIVATION_SCENE]!!)
+            else if (areaRef.exists && Area[areaRef].roomDeactivationSceneName != NO_NAME)
+                deactivationScene(Area[areaRef].roomDeactivationSceneName)
         }
 
         val tileMapKey = TileMap {
@@ -276,7 +334,10 @@ object JsonRoomLoadTask : StaticTask() {
     }
 
     private fun loadObject(viewName: String, room: Room, objectJson: RoomObjectJson) {
-        val attributes = Attributes().addAll(objectJson.props)
+        val attributes = Attributes()
+        if (objectJson.props != null)
+            attributes.addAll(objectJson.props)
+
         attributes[ATTR_OBJECT_VIEW] = viewName
         val order = attributes[ATTR_OBJECT_ORDER]?.toInt() ?: 10
 
@@ -289,7 +350,10 @@ object JsonRoomLoadTask : StaticTask() {
     }
 
     private fun loadTileMap(tileMap: TileMap, roomJson: RoomJson, tileMapJson: TileMapJson) {
-        val attributes = Attributes().addAll(tileMapJson.props)
+        val attributes = Attributes()
+        if (tileMapJson.props != null)
+            attributes.addAll(tileMapJson.props)
+
         val defaultBlend = BlendMode.valueOf(
             TiledRoomLoadTask.attributes[ATTR_DEFAULT_BLEND]
             ?: BlendMode.NONE.name)
@@ -342,7 +406,6 @@ object JsonRoomLoadTask : StaticTask() {
             }
         }
     }
-
 }
 
 object JsonTileSetLoadTask : StaticTask() {

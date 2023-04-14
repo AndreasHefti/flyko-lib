@@ -38,8 +38,8 @@ abstract class Engine protected constructor(
     }
 
     companion object {
-        const val SYSTEM_FONT_ASSET = "SYSTEM_FONT_ASSET" + ComponentSystem.STATIC_COMPONENT_MARKER
-        const val SYSTEM_FONT = "SYSTEM_FONT" + ComponentSystem.STATIC_COMPONENT_MARKER
+        const val SYSTEM_FONT_ASSET = "SYSTEM_FONT_ASSET"
+        const val SYSTEM_FONT = "SYSTEM_FONT"
         val GLOBAL_VALUES = Attributes()
 
         const val GLOBAL_SHOW_GIZMOS = "showGizmos"

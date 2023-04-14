@@ -47,7 +47,7 @@ object Movement : EntityControl() {
     private var deltaTimeInSeconds: Float = 0.0f
 
     init {
-        Control.registerAsSingleton(this, true)
+        @Suppress("LeakingThis") registerStatic(this)
         Control.activate(this.index)
     }
 

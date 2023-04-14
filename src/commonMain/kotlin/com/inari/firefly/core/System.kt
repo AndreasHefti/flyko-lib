@@ -218,13 +218,12 @@ abstract class ComponentSystem<C : Component>(
 
         var index = _componentMapping.nextIndex(0)
         while (index > NULL_COMPONENT_INDEX) {
-            val c = _componentMapping[index]!!
-            if (!c.name.contains(STATIC_COMPONENT_MARKER))
-                this.internalDelete(index)
+            this.internalDelete(index)
             index = _componentMapping.nextIndex(index + 1)
         }
 
         try {
+            // TODO cleanup lambdas
             _componentKeyMapping
                 .filter { it.value.componentIndex <= NULL_COMPONENT_INDEX }
                 .map { it.key }
@@ -266,14 +265,12 @@ abstract class ComponentSystem<C : Component>(
         return key
     }
 
-    fun registerAsSingleton(component: C, static: Boolean = false) {
-        val namePrefix = component::class.simpleName!! + SINGLETON_MARKER
-        val name = namePrefix + if (static) STATIC_COMPONENT_MARKER else ""
-        if (_componentKeyMapping.containsKey(name))
-            throw IllegalStateException("$namePrefix is singleton and already exists")
+    fun registerStatic(component: C) {
+        if (component.name == NO_NAME)
+            component.name = component::class.simpleName!!
 
         component.onStateChange = true
-        component.name = name
+        component.survivesSystemClear = true
         registerComponent(component)
         component.iInitialize()
         component.initialized = true
@@ -423,7 +420,7 @@ abstract class ComponentSystem<C : Component>(
 
         if (!checkIndex(index)) return
         val comp = this[index]
-        if (comp.onStateChange) return
+        if (comp.onStateChange || comp.survivesSystemClear) return
 
         if (comp.loaded) // dispose first when still loaded
             dispose(index)
@@ -504,8 +501,8 @@ abstract class ComponentSystem<C : Component>(
         Engine.disposeListener(componentEventType, listener)
 
     companion object {
-        const val STATIC_COMPONENT_MARKER = "_STAT_"
-        private const val SINGLETON_MARKER = "_SINGLETON_"
+//        const val STATIC_COMPONENT_MARKER = "_STAT_"
+//        private const val SINGLETON_MARKER = "_SINGLETON_"
 
         private val COMPONENT_SYSTEM_MAPPING = mutableMapOf<String, IComponentSystem<*>>()
         internal fun registerSystem(system: IComponentSystem<*>) {

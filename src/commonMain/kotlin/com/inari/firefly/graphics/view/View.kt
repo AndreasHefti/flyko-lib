@@ -128,8 +128,9 @@ class View private constructor(): Component(View), ViewData, Controlled {
         private val viewChangeEvent = ViewChangeEvent(VIEW_CHANGE_EVENT_TYPE)
 
         val BASE_VIEW_KEY = View {
+            survivesSystemClear = true
             autoActivation = true
-            name = "BASE_VIEW$STATIC_COMPONENT_MARKER"
+            name = "BASE_VIEW"
             bounds(0, 0, Engine.graphics.screenWidth, Engine.graphics.screenHeight)
             isBase = true
         }

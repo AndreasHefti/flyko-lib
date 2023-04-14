@@ -5,7 +5,6 @@ import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Entity
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.ShapeType
-import com.inari.firefly.game.*
 import com.inari.firefly.game.world.ATTR_RESOURCE
 import com.inari.firefly.game.world.ATTR_TILE_SET_NAME
 import com.inari.firefly.game.world.TileSet

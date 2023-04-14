@@ -1,5 +1,23 @@
 {
-  "type":"area",
-  "name":"TestArea",
-
+  "type": "area",
+  "name": "TestArea",
+  "view": "testView",
+  "camera": "Player_Camera",
+  "roomActivationScene": "RoomActivationScene",
+  "roomDeactivationScene": "RoomDeactivationScene",
+  "loadInParallel": false,
+  "stopLoadSceneWhenLoadFinished": true,
+  "activateAfterLoadScene": true,
+  "rooms": [
+    {
+      "loadTask": "TiledRoomLoadTask",
+      "fileName": "tiled_map_example/example_map1.json",
+      "tileSetFilePath": "tiled_tileset_example/"
+    },
+    {
+      "loadTask": "TiledRoomLoadTask",
+      "fileName": "tiled_map_example/example_map2.json",
+      "tileSetFilePath": "tiled_tileset_example/"
+    }
+  ]
 }

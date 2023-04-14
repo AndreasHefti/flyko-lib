@@ -3,11 +3,14 @@ package com.inari.firefly.game.world
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.OperationResult
 import com.inari.firefly.game.actor.Player
+import com.inari.firefly.game.actor.PlayerCamera
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.Scene
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.physics.contact.ContactCallback
 import com.inari.firefly.physics.contact.FullContactScan
+import com.inari.util.NO_NAME
+import com.inari.util.collection.Attributes
 import com.inari.util.geom.Orientation
 import com.inari.util.geom.Vector2f
 import com.inari.util.startParallelTask
@@ -22,8 +25,33 @@ class Area private constructor() : Composite(Area) {
     @JvmField var stopLoadSceneWhenLoadFinished = true
     @JvmField var activateAfterLoadScene = true
 
+    @JvmField var roomViewName = NO_NAME
+    @JvmField var roomCameraName = NO_NAME
+    @JvmField var roomActivationSceneName: String = NO_NAME
+    @JvmField var roomDeactivationSceneName: String = NO_NAME
+
+
     private var loadTaskRunning = false
     private var loadSceneRunning = false
+
+    fun withRoomLoadTask(attributes: Attributes, taskName: String) {
+        withLifecycleTask {
+            this.attributes = attributes
+            lifecycleType = LifecycleTaskType.ON_LOAD
+            task(taskName)
+        }
+    }
+
+    fun withRoomLoadTask(attributes: Attributes, task: Task) =
+        withRoomLoadTask(attributes, task.key)
+
+    fun withRoomLoadTask(attributes: Attributes, taskKey: ComponentKey) {
+        withLifecycleTask {
+            this.attributes = attributes
+            lifecycleType = LifecycleTaskType.ON_LOAD
+            task(taskKey)
+        }
+    }
 
     override fun load() {
         if (loadTaskRunning) return
@@ -84,13 +112,13 @@ class Area private constructor() : Composite(Area) {
 
                 if (room.deactivationScene.exists) {
                     Scene[room.deactivationScene].callback = { _, _ ->
-                        loadNextRoom(playerEntityKey.name, entity, transition)
+                        activateNextRoom(playerEntityKey.name, entity, transition)
                         Room.dispose(room)
                     }
                     Room.deactivate(room)
                 } else {
                     Room.deactivate(room)
-                    loadNextRoom(playerEntityKey.name, entity, transition)
+                    activateNextRoom(playerEntityKey.name, entity, transition)
                     Room.dispose(room)
                 }
                 return true
@@ -98,9 +126,27 @@ class Area private constructor() : Composite(Area) {
             return false
         }
 
+        fun getDefaultView(areaKey: ComponentKey): View? {
+            if (areaKey == NO_COMPONENT_KEY)
+                return null
+            val area = Area[areaKey]
+            if (area.roomViewName == NO_NAME)
+                return getDefaultCamera(areaKey)?.getView()
+            return View[area.roomViewName]
+        }
+
+        fun getDefaultCamera(areaKey: ComponentKey): PlayerCamera? {
+            if (areaKey == NO_COMPONENT_KEY)
+                return null
+            val area = Area[areaKey]
+            if (area.roomCameraName == NO_NAME)
+                return null
+            return Control[area.roomCameraName] as PlayerCamera
+        }
+
         private val playerToTransition = Vector2f()
         private val playerTargetPos = Vector2f()
-        private fun loadNextRoom(playerName: String, entity: Entity, transition: ERoomTransition) {
+        private fun activateNextRoom(playerName: String, entity: Entity, transition: ERoomTransition) {
 
             val newRoom = Room[transition.targetRoom]
             val player = Player[playerName]

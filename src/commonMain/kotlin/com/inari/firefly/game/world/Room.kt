@@ -44,8 +44,6 @@ class Room private constructor() : Composite(Room) {
     @JvmField val deactivationScene = CReference(Scene)
     @JvmField var buttonPause = ButtonType.PAUSE
 
-    //private val players = BitSet(0)
-
     private var roomLoadTaskRunning = false
     private var roomLoadSceneRunning = false
 
@@ -168,7 +166,7 @@ class Room private constructor() : Composite(Room) {
             Engine.registerListener(UPDATE_EVENT_TYPE, updatePause)
 
             Task {
-                name = NAME_DEFAULT_TRANSITION_BUILD_TASK
+                name = ATTR_TRANSITION_BUILD_TASK
                 operation = { roomKey, attributes, _ ->
                     val bounds = Vector4f()
                     bounds(attributes[ATTR_OBJECT_BOUNDS]!!)

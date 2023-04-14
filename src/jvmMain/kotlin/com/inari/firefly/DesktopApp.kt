@@ -94,10 +94,12 @@ class DesktopApp(
 
     private fun loadSystemFont() {
         Texture.build {
+            survivesSystemClear = true
             name = Engine.SYSTEM_FONT_ASSET
             resourceName = "firefly/fireflyMicroFont.png"
 
             withFont {
+                survivesSystemClear = true
                 name = Engine.SYSTEM_FONT
                 charWidth = 8
                 charHeight = 16

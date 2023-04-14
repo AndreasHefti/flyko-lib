@@ -55,7 +55,7 @@ abstract class StaticTask protected constructor() : Task() {
 
     init {
         super.operation = { key, attributes, callback ->  this.apply(key, attributes, callback) }
-        Task.registerAsSingleton(this, true)
+        @Suppress("LeakingThis") Task.registerStatic(this)
         Task.activate(this.index)
     }
 

@@ -57,7 +57,7 @@ fun main() {
 
         Texture {
             name = "SpriteTextureAsset"
-            resourceName = "tiles/outline_16_16.png"
+            resourceName = "firefly/atlas1616.png"
         }
 
         Sprite {

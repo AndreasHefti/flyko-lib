@@ -97,33 +97,26 @@ object AreaTest {
     fun  createArea() {
 
         initTasksAndScenes()
+        JsonAreaLoadTask( attributes = Attributes() + ( ATTR_RESOURCE to "json_example/area.json"))
 
-        Area {
-            name = AREA_NAME
-            //viewRef(VIEW_NAME)
-            //cameraRef(CAMERA_NAME)
-            withLifecycleTask {
-                this.attributes = Attributes() +
-                        ( ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
-                        ( ATTR_RESOURCE to "tiled_map_example/example_map1.json") +
-                        ( ATTR_ACTIVATION_SCENE to "RoomActivationScene") +
-                        ( ATTR_DEACTIVATION_SCENE to "RoomDeactivationScene") +
-                        ( ATTR_VIEW_NAME to VIEW_NAME )
-                lifecycleType = LifecycleTaskType.ON_LOAD
-                task(TiledRoomLoadTask)
-            }
-
-            withLifecycleTask {
-                this.attributes = Attributes() +
-                        ( ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
-                        ( ATTR_RESOURCE to "tiled_map_example/example_map2.json") +
-                        ( ATTR_ACTIVATION_SCENE to "RoomActivationScene") +
-                        ( ATTR_DEACTIVATION_SCENE to "RoomDeactivationScene") +
-                        ( ATTR_VIEW_NAME to VIEW_NAME )
-                lifecycleType = LifecycleTaskType.ON_LOAD
-                task(TiledRoomLoadTask)
-            }
-        }
+//        Area {
+//            name = AREA_NAME
+//            roomCameraName = CAMERA_NAME
+//            roomActivationSceneName = "RoomActivationScene"
+//            roomDeactivationSceneName = "RoomDeactivationScene"
+//            withRoomLoadTask(
+//                Attributes() +
+//                        ( ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
+//                        ( ATTR_RESOURCE to "tiled_map_example/example_map1.json"),
+//                TiledRoomLoadTask
+//            )
+//            withRoomLoadTask(
+//                Attributes() +
+//                        ( ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
+//                        ( ATTR_RESOURCE to "tiled_map_example/example_map2.json"),
+//                TiledRoomLoadTask
+//            )
+//        }
     }
 
     fun runArea() {
