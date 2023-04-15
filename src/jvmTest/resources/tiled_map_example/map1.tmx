@@ -59,7 +59,7 @@
     <property name="transitionId" value="r1t1"/>
    </properties>
   </object>
-  <object id="6" type="room_transition" x="256" y="157" width="48" height="6">
+  <object id="6" type="room_transition" x="256" y="157" width="48" height="11.625">
    <properties>
     <property name="build_task" value="RoomTransitionBuildTask"/>
     <property name="condition" value="TransitionSouth"/>

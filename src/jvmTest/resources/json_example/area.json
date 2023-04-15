@@ -18,6 +18,11 @@
       "loadTask": "TiledRoomLoadTask",
       "fileName": "tiled_map_example/example_map2.json",
       "tileSetFilePath": "tiled_tileset_example/"
+    },
+    {
+      "loadTask": "TiledRoomLoadTask",
+      "fileName": "tiled_map_example/example_map3.json",
+      "tileSetFilePath": "tiled_tileset_example/"
     }
   ]
 }
