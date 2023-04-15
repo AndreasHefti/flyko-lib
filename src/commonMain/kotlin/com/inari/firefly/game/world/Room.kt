@@ -4,6 +4,10 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.firefly.core.api.*
 import com.inari.firefly.game.actor.Player
+import com.inari.firefly.game.actor.Player.Companion.PLAYER_GOES_EAST_CONDITION
+import com.inari.firefly.game.actor.Player.Companion.PLAYER_GOES_NORTH_CONDITION
+import com.inari.firefly.game.actor.Player.Companion.PLAYER_GOES_SOUTH_CONDITION
+import com.inari.firefly.game.actor.Player.Companion.PLAYER_GOES_WEST_CONDITION
 import com.inari.firefly.game.actor.PlayerCamera
 import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.view.ETransform
@@ -162,8 +166,43 @@ class Room private constructor() : Composite(Room) {
             return null
         }
 
+        const val PLAYER_ROOM_TRANSITION_SCAN_CONDITION = "TransitionPlayerScan"
+        const val PLAYER_ROOM_TRANSITION_EAST_CONDITION = "TransitionEast"
+        const val PLAYER_ROOM_TRANSITION_WEST_CONDITION = "TransitionWest"
+        const val PLAYER_ROOM_TRANSITION_SOUTH_CONDITION = "TransitionSouth"
+        const val PLAYER_ROOM_TRANSITION_NORTH_CONDITION = "TransitionNorth"
         init {
             Engine.registerListener(UPDATE_EVENT_TYPE, updatePause)
+
+            Conditional {
+                name = PLAYER_ROOM_TRANSITION_SCAN_CONDITION
+                condition = { playerKey, _ ->
+                    val player = Player[playerKey.name]
+                    val scan = player.playerEntity?.get(EContact)?.contactScans?.getFirstFullContact(ROOM_TRANSITION_CONTACT_TYPE)
+                    scan != null && scan.contactMask.cardinality > 8
+                }
+            }
+            AndCondition {
+                name = PLAYER_ROOM_TRANSITION_EAST_CONDITION
+                left(PLAYER_ROOM_TRANSITION_SCAN_CONDITION)
+                right(PLAYER_GOES_EAST_CONDITION)
+            }
+            AndCondition {
+                name = PLAYER_ROOM_TRANSITION_WEST_CONDITION
+                left(PLAYER_ROOM_TRANSITION_SCAN_CONDITION)
+                right(PLAYER_GOES_WEST_CONDITION)
+            }
+
+            AndCondition {
+                name = PLAYER_ROOM_TRANSITION_SOUTH_CONDITION
+                left(PLAYER_ROOM_TRANSITION_SCAN_CONDITION)
+                right(PLAYER_GOES_SOUTH_CONDITION)
+            }
+            AndCondition {
+                name = PLAYER_ROOM_TRANSITION_NORTH_CONDITION
+                left(PLAYER_ROOM_TRANSITION_SCAN_CONDITION)
+                right(PLAYER_GOES_NORTH_CONDITION)
+            }
 
             Task {
                 name = ATTR_TRANSITION_BUILD_TASK

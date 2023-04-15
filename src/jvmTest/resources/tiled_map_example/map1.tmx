@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.9.2" class="firefly_tilemap" orientation="orthogonal" renderorder="right-down" width="20" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="2">
+<map version="1.8" tiledversion="1.9.2" class="firefly_tilemap" orientation="orthogonal" renderorder="right-down" width="20" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="7">
  <editorsettings>
   <export target="example_map1.json" format="json"/>
  </editorsettings>
@@ -42,9 +42,9 @@
 1,0,0,0,13,0,0,0,40,0,0,0,0,0,3,1,1,1,1,1,
 1,5,0,0,1,14,13,0,1,0,0,0,0,0,0,0,0,0,0,1,
 1,6,0,0,1,1,1,0,22,1,1,21,21,11,11,0,2,1,1,1,
-1,1,5,0,0,0,0,0,0,0,0,0,0,0,0,0,23,33,1,1,
-1,1,6,0,0,3,7,13,0,3,4,14,13,3,13,0,3,13,36,1,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+1,1,5,0,0,0,0,0,0,0,0,0,0,0,0,0,23,33,0,1,
+1,1,6,0,0,3,7,13,0,3,4,14,13,3,13,0,0,0,0,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1
 </data>
  </layer>
  <objectgroup id="4" name="objects">
@@ -55,8 +55,19 @@
     <property name="groups" value="transition"/>
     <property name="layerName" value="main_layer"/>
     <property name="orientation" propertytype="Orientation" value="EAST"/>
-    <property name="target" value="Room2,t2"/>
-    <property name="transitionId" value="t1"/>
+    <property name="target" value="Room2,r2t1"/>
+    <property name="transitionId" value="r1t1"/>
+   </properties>
+  </object>
+  <object id="6" type="room_transition" x="256" y="157" width="48" height="6">
+   <properties>
+    <property name="build_task" value="RoomTransitionBuildTask"/>
+    <property name="condition" value="TransitionSouth"/>
+    <property name="groups" value="transition"/>
+    <property name="layerName" value="main_layer"/>
+    <property name="orientation" propertytype="Orientation" value="SOUTH"/>
+    <property name="target" value="Room3,r3t1"/>
+    <property name="transitionId" value="r1t2"/>
    </properties>
   </object>
  </objectgroup>

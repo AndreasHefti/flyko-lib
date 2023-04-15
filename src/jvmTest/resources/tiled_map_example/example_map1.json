@@ -55,15 +55,13 @@
             1, 0, 0, 0, 13, 0, 0, 0, 40, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1,
             1, 5, 0, 0, 1, 14, 13, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
             1, 6, 0, 0, 1, 1, 1, 0, 22, 1, 1, 21, 21, 11, 11, 0, 2, 1, 1, 1,
-            1, 1, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 33, 1, 1,
-            1, 1, 6, 0, 0, 3, 7, 13, 0, 3, 4, 14, 13, 3, 13, 0, 3, 13, 36, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            1, 1, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 33, 0, 1,
+            1, 1, 6, 0, 0, 3, 7, 13, 0, 3, 4, 14, 13, 3, 13, 0, 0, 0, 0, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1],
          "height":10,
          "id":1,
          "name":"main_layer",
          "opacity":1,
-         "parallaxx":1,
-         "parallaxy":1,
          "properties":[
                 {
                  "name":"layer_tilesets",
@@ -115,12 +113,12 @@
                         {
                          "name":"target",
                          "type":"string",
-                         "value":"Room2,t2"
+                         "value":"Room2,r2t1"
                         }, 
                         {
                          "name":"transitionId",
                          "type":"string",
-                         "value":"t1"
+                         "value":"r1t1"
                         }],
                  "rotation":0,
                  "type":"room_transition",
@@ -128,6 +126,54 @@
                  "width":4,
                  "x":318,
                  "y":16
+                }, 
+                {
+                 "height":6,
+                 "id":6,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"build_task",
+                         "type":"string",
+                         "value":"RoomTransitionBuildTask"
+                        }, 
+                        {
+                         "name":"condition",
+                         "type":"string",
+                         "value":"TransitionSouth"
+                        }, 
+                        {
+                         "name":"groups",
+                         "type":"string",
+                         "value":"transition"
+                        }, 
+                        {
+                         "name":"layerName",
+                         "type":"string",
+                         "value":"main_layer"
+                        }, 
+                        {
+                         "name":"orientation",
+                         "propertytype":"Orientation",
+                         "type":"string",
+                         "value":"SOUTH"
+                        }, 
+                        {
+                         "name":"target",
+                         "type":"string",
+                         "value":"Room3,r3t1"
+                        }, 
+                        {
+                         "name":"transitionId",
+                         "type":"string",
+                         "value":"r1t2"
+                        }],
+                 "rotation":0,
+                 "type":"room_transition",
+                 "visible":true,
+                 "width":48,
+                 "x":256,
+                 "y":157
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -136,7 +182,7 @@
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":2,
+ "nextobjectid":7,
  "orientation":"orthogonal",
  "properties":[
         {

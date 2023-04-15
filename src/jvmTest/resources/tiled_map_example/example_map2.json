@@ -118,12 +118,12 @@
                         {
                          "name":"target",
                          "type":"string",
-                         "value":"Room1,t1"
+                         "value":"Room1,r1t1"
                         }, 
                         {
                          "name":"transitionId",
                          "type":"string",
-                         "value":"t2"
+                         "value":"r2t1"
                         }],
                  "rotation":0,
                  "type":"room_transition",

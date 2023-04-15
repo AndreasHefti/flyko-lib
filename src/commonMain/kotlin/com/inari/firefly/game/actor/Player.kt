@@ -160,12 +160,9 @@ class Player private constructor() : Composite(Player), Controlled {
     companion object : ComponentSubTypeBuilder<Composite, Player>(Composite, "Player") {
         override fun create() = Player()
 
-        @JvmField
-        val PLAYER_ASPECT_GROUP = IndexedAspectType("PLAYER_ASPECT_GROUP")
-        @JvmField
-        val UNDEFINED_PLAYER_ASPECT = PLAYER_ASPECT_GROUP.createAspect("UNDEFINED")
-        @JvmField
-        val PLAYER_EVENT_TYPE = Event.EventType("PlayerEvent")
+        @JvmField val PLAYER_ASPECT_GROUP = IndexedAspectType("PLAYER_ASPECT_GROUP")
+        @JvmField val UNDEFINED_PLAYER_ASPECT = PLAYER_ASPECT_GROUP.createAspect("UNDEFINED")
+        @JvmField val PLAYER_EVENT_TYPE = Event.EventType("PlayerEvent")
         private val EVENT = PlayerEvent(PLAYER_EVENT_TYPE)
         private fun send(playerIndex: Int, type: PlayerEventType, changeAspect: Aspect = UNDEFINED_PLAYER_ASPECT) {
             EVENT.playerIndex = playerIndex
@@ -179,6 +176,29 @@ class Player private constructor() : Composite(Player), Controlled {
             if (pIndex < 0)
                 throw IllegalStateException("No Player found")
             return Player[pIndex]
+        }
+
+        const val PLAYER_GOES_EAST_CONDITION = "PlayerGoesEast"
+        const val PLAYER_GOES_WEST_CONDITION = "PlayerGoesWest"
+        const val PLAYER_GOES_SOUTH_CONDITION = "PlayerGoesSouth"
+        const val PLAYER_GOES_NORTH_CONDITION = "PlayerGoesNorth"
+        init {
+            Conditional {
+                name = PLAYER_GOES_EAST_CONDITION
+                condition = { playerKey, _ -> (Player[playerKey.name].playerMovement?.velocity?.x ?: 0f) > 0f }
+            }
+            Conditional {
+                name = PLAYER_GOES_WEST_CONDITION
+                condition = { playerKey, _ -> (Player[playerKey.name].playerMovement?.velocity?.x ?: 0f) < 0f }
+            }
+            Conditional {
+                name = PLAYER_GOES_SOUTH_CONDITION
+                condition = { playerKey, _ -> (Player[playerKey.name].playerMovement?.velocity?.y ?: 0f) > 0f }
+            }
+            Conditional {
+                name = PLAYER_GOES_NORTH_CONDITION
+                condition = { playerKey, _ -> (Player[playerKey.name].playerMovement?.velocity?.y ?: 0f) < 0f }
+            }
         }
     }
 }

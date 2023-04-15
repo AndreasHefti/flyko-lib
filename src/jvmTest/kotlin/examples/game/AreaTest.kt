@@ -95,28 +95,8 @@ object AreaTest {
     }
 
     fun  createArea() {
-
         initTasksAndScenes()
         JsonAreaLoadTask( attributes = Attributes() + ( ATTR_RESOURCE to "json_example/area.json"))
-
-//        Area {
-//            name = AREA_NAME
-//            roomCameraName = CAMERA_NAME
-//            roomActivationSceneName = "RoomActivationScene"
-//            roomDeactivationSceneName = "RoomDeactivationScene"
-//            withRoomLoadTask(
-//                Attributes() +
-//                        ( ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
-//                        ( ATTR_RESOURCE to "tiled_map_example/example_map1.json"),
-//                TiledRoomLoadTask
-//            )
-//            withRoomLoadTask(
-//                Attributes() +
-//                        ( ATTR_TILE_SET_DIR_PATH to "tiled_tileset_example/" ) +
-//                        ( ATTR_RESOURCE to "tiled_map_example/example_map2.json"),
-//                TiledRoomLoadTask
-//            )
-//        }
     }
 
     fun runArea() {
@@ -188,33 +168,6 @@ object AreaTest {
                 else
                     OperationResult.RUNNING
             }
-        }
-
-        Conditional {
-            name = "TransitionPlayerScan"
-            condition = { playerKey, _ ->
-                val player = Player[playerKey.name]
-                val scan = player.playerEntity?.get(EContact)?.contactScans?.getFirstFullContact(Room.ROOM_TRANSITION_CONTACT_TYPE)
-                scan != null && scan.contactMask.cardinality > 8
-            }
-        }
-        Conditional {
-            name = "PlayerGoesEast"
-            condition = { playerKey, _ -> (Player[playerKey.name].playerMovement?.velocity?.x ?: 0f) > 0f }
-        }
-        Conditional {
-            name = "PlayerGoesWest"
-            condition = { playerKey, _ -> (Player[playerKey.name].playerMovement?.velocity?.x ?: 0f) < 0f }
-        }
-        AndCondition {
-            name = "TransitionEast"
-            left("TransitionPlayerScan")
-            right("PlayerGoesEast")
-        }
-        AndCondition {
-            name = "TransitionWest"
-            left("TransitionPlayerScan")
-            right("PlayerGoesWest")
         }
     }
 

@@ -72,8 +72,8 @@
     <property name="groups" value="transition"/>
     <property name="layerName" value="main_layer"/>
     <property name="orientation" propertytype="Orientation" value="WEST"/>
-    <property name="target" value="Room1,t1"/>
-    <property name="transitionId" value="t2"/>
+    <property name="target" value="Room1,r1t1"/>
+    <property name="transitionId" value="r2t1"/>
    </properties>
   </object>
  </objectgroup>

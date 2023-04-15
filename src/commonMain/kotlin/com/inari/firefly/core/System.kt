@@ -222,14 +222,11 @@ abstract class ComponentSystem<C : Component>(
             index = _componentMapping.nextIndex(index + 1)
         }
 
-        try {
-            // TODO cleanup lambdas
-            _componentKeyMapping
-                .filter { it.value.componentIndex <= NULL_COMPONENT_INDEX }
-                .map { it.key }
-                .forEach { _componentKeyMapping.remove(it) }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        val iter = _componentKeyMapping.iterator()
+        while (iter.hasNext()) {
+            val entry = iter.next()
+            if (entry.value.componentIndex <= NULL_COMPONENT_INDEX)
+                _componentKeyMapping.remove(entry.key)
         }
 
         _eventPool.clear()
@@ -501,8 +498,6 @@ abstract class ComponentSystem<C : Component>(
         Engine.disposeListener(componentEventType, listener)
 
     companion object {
-//        const val STATIC_COMPONENT_MARKER = "_STAT_"
-//        private const val SINGLETON_MARKER = "_SINGLETON_"
 
         private val COMPONENT_SYSTEM_MAPPING = mutableMapOf<String, IComponentSystem<*>>()
         internal fun registerSystem(system: IComponentSystem<*>) {
