@@ -35,7 +35,7 @@ abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
                 i = entityIds.nextSetBit(i + 1)
 
                 val behavior = entity[EBehavior]
-                if (!behavior.active || behavior.treeIndex < 0 || !behavior.scheduler.needsUpdate())
+                if (!behavior.active || behavior.behaviorTreeRef.targetKey.componentIndex < 0 || !behavior.scheduler.needsUpdate())
                     return
 
                 if (behavior.treeState === SUCCESS)

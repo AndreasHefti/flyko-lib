@@ -6,6 +6,7 @@ import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.NO_NAME
 import com.inari.util.Named
 import com.inari.util.VOID_CONSUMER
+import kotlin.jvm.JvmField
 
 class CReference internal constructor(
     val targetType: ComponentType<*>,

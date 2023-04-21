@@ -20,6 +20,8 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
     val hasComponents: Boolean
     val hasActiveComponents: Boolean
 
+    fun setMinCapacity(c: Int)
+
     fun nextIndex(from: Int): ComponentIndex
     fun nextActiveIndex(from: Int): ComponentIndex
     fun indexIterator(): IntIterator
@@ -160,6 +162,8 @@ abstract class ComponentSystem<C : Component>(
         get() = !_componentMapping.isEmpty
     override val hasActiveComponents: Boolean
         get() = !_activeComponentSet.isEmpty
+
+    override fun setMinCapacity(c: Int) = _componentMapping.ensureCapacity(c)
 
     override fun toString(): String =
         "System: $typeName" +
@@ -628,6 +632,8 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
         get() = !subComponentRefs.isEmpty
     override val hasActiveComponents: Boolean
         get() = activeSubComponentRefs.nextIndex(0) >= 0
+
+    override fun setMinCapacity(c: Int) = system.setMinCapacity(c)
 
     override fun nextIndex(from: ComponentIndex) = subComponentRefs.nextIndex(from)
     override fun nextActiveIndex(from: ComponentIndex) = activeSubComponentRefs.nextIndex(from)

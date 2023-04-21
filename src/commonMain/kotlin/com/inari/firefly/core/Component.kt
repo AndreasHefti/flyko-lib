@@ -30,45 +30,32 @@ interface ComponentType<C : Component> : Aspect {
     val subTypeName: String
 }
 
-sealed interface ComponentId {
-    val type: ComponentType<*>
-    val componentIndex: ComponentIndex
-}
-
 class ComponentKey internal constructor (
-    name: String,
-    override val type: ComponentType<*>
-) : ComponentId {
-
-    // DEBUG  init {
-    // DEBUG        println("-> new ComponentKey: $name : ${type.typeName} : ${type.subTypeName}")
-    // DEBUG   }
+    @JvmField val name: String,
+    @JvmField val type: ComponentType<*>
+) {
 
     internal constructor(index: ComponentIndex, type: ComponentType<*>) : this(NO_NAME, type) {
         componentIndex = index
     }
 
-    var name: String = name
-        private set
-    override var componentIndex: ComponentIndex = NULL_COMPONENT_INDEX
+    var componentIndex: ComponentIndex = NULL_COMPONENT_INDEX
         internal set
 
     override fun toString(): String =
         "CKey($name, ${type.aspectName}, $componentIndex)"
 
+    internal fun clearKey() {
+        componentIndex = NULL_COMPONENT_INDEX
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
         other as ComponentKey
-        if (name != other.name) return false
-        if (type.aspectName != other.type.aspectName) return false
+        if (type.aspectIndex != other.type.aspectIndex) return false
+        if (name.hashCode() != other.name.hashCode()) return false
         return true
-    }
-
-    internal fun clearKey() {
-        // DEBUG  println("-> clear ComponentKey: $name $type")
-        name = NO_NAME
-        componentIndex = NULL_COMPONENT_INDEX
     }
 
     override fun hashCode(): Int {

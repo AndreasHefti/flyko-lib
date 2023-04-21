@@ -361,7 +361,7 @@ class DynArray<T> constructor(
         return builder.toString()
     }
 
-    private fun ensureCapacity(index: Int) {
+    fun ensureCapacity(index: Int) {
         if (this === NULL_ARRAY)
             throw RuntimeException("EMPTY_ARRAY is immutable")
 
