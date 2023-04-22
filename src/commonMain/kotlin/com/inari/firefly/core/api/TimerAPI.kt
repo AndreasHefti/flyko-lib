@@ -7,38 +7,23 @@ import kotlin.native.concurrent.ThreadLocal
 @ThreadLocal
 object FFTimer : TimerAPI() {
 
-    private var lastUpdateTime: Long = 0
+    private var lastUpdateTime: Long = timeMillis()
 
     override var time: Long = 0
         private set
     override var timeElapsed: Long = 0
         private set
 
-
     private val schedulers: DynArray<UpdateScheduler> = DynArray.of( 20)
 
-    override val tickAction: () -> Unit
-        get() = {
-            if (lastUpdateTime == 0L) {
-                lastUpdateTime = timeMillis()
-            } else {
-                val currentTime = timeMillis()
-                time += timeElapsed
-                timeElapsed = currentTime - lastUpdateTime
-                lastUpdateTime = currentTime
-            }
-        }
-
-    override fun toString(): String {
-        val builder = StringBuilder()
-        builder.append("FFTimer [lastUpdateTime=")
-        builder.append(lastUpdateTime)
-        builder.append(", time=")
-        builder.append(time)
-        builder.append(", timeElapsed=")
-        builder.append(timeElapsed)
-        builder.append("]")
-        return builder.toString()
+    override fun init() {
+        lastUpdateTime = timeMillis()
+    }
+    override fun tick() {
+        val currentTime = timeMillis()
+        time += timeElapsed
+        timeElapsed = currentTime - lastUpdateTime
+        lastUpdateTime = currentTime
     }
 
     interface Scheduler {
@@ -59,16 +44,15 @@ object FFTimer : TimerAPI() {
                 lastUpdate = lastUpdateTime
                 tick++
                 needsUpdate = true
-            } else if (updated) {
+            } else /* if (updated) */ {
                 needsUpdate = false
-                updated = false
+                //updated = false
             }
         }
 
         override fun needsUpdate(): Boolean {
-            if (needsUpdate) {
-                updated = true
-            }
+//            if (needsUpdate)
+//                updated = true
             return needsUpdate
         }
 
@@ -77,13 +61,24 @@ object FFTimer : TimerAPI() {
             tick = 0
         }
     }
+
+    override fun toString(): String {
+        val builder = StringBuilder()
+        builder.append("FFTimer [lastUpdateTime=")
+        builder.append(lastUpdateTime)
+        builder.append(", time=")
+        builder.append(time)
+        builder.append(", timeElapsed=")
+        builder.append(timeElapsed)
+        builder.append("]")
+        return builder.toString()
+    }
 }
 
 abstract class TimerAPI {
 
     abstract val time: Long
     abstract val timeElapsed: Long
-    abstract val tickAction: () -> Unit
 
     private val schedulers: DynArray<FFTimer.UpdateScheduler> = DynArray.of( 20)
 
@@ -97,13 +92,19 @@ abstract class TimerAPI {
     }
 
     fun createUpdateScheduler(resolution: Float): FFTimer.UpdateScheduler {
+        val it = schedulers.iterator()
+        while (it.hasNext()) {
+            val s = it.next()
+            if (s.resolution == resolution) {
+                return s
+            }
+        }
         val updateScheduler = FFTimer.UpdateScheduler(resolution)
         schedulers.add(updateScheduler)
         return updateScheduler
     }
 
-    internal fun tick() {
-        tickAction()
-    }
+    abstract fun init()
+    abstract fun tick()
 
 }

@@ -71,7 +71,7 @@ object Movement : EntityControl() {
         if (!movement.active || !movement.scheduler.needsUpdate())
             return
 
-        val dtEntity = deltaTimeInSeconds * (60 / movement.scheduler.resolution)
+        val dtEntity = deltaTimeInSeconds * (60f / min(60f, movement.scheduler.resolution))
 
         val transform = entity[ETransform]
         movement.integrator.integrate(movement, transform, dtEntity)

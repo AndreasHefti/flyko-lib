@@ -70,6 +70,8 @@ class DesktopApp(
         SimpleSpriteRenderer.init()
         SimpleTextRenderer.init()
         SimpleShapeRenderer.init()
+        // init timer
+        Engine.timer.init()
 
         InariIntro.show {
             ComponentSystem.clearSystems()

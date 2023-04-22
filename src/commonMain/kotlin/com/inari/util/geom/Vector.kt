@@ -491,16 +491,16 @@ open class Vector2f constructor(
         override fun invoke(): Float = v1
     }
 
-    var x: Float
+    inline var x: Float
         get() = v0
         set(value) { v0 = value }
-    var y: Float
+    inline var y: Float
         get() = v1
         set(value) { v1 = value }
-    var r: Float
+    inline var r: Float
         get() = v0
         set(value) { v0 = value }
-    var g: Float
+    inline var g: Float
         get() = v1
         set(value) { v1 = value }
 

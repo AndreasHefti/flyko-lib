@@ -298,8 +298,8 @@ actual object GraphicsAPIImpl : GraphicsAPI {
             transform.pivot.y,
             sprite.regionWidth.toFloat(),
             sprite.regionHeight.toFloat(),
-            transform.scale.v0,
-            transform.scale.v1,
+            transform.scale.x,
+            transform.scale.y,
             transform.rotation
         )
     }

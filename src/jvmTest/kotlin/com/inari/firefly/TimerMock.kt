@@ -7,7 +7,10 @@ object TestTimer : TimerAPI() {
     override var time: Long = 0
     override var timeElapsed: Long = 0
 
-    override val tickAction = {
+    override fun init() {
+        time = 0
+    }
+    override fun tick() {
         time++
         timeElapsed++
         Unit
