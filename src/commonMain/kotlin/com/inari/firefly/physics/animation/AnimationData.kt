@@ -7,21 +7,20 @@ import com.inari.util.*
 import com.inari.util.geom.*
 import kotlin.jvm.JvmField
 
-interface AnimatedDataBuilder<D : AnimatedData> {
+interface AnimatedDataBuilder<D : AnimatedData<D>> {
     fun create(): D
 }
 
-abstract class AnimatedData {
+abstract class AnimatedData<AD : AnimatedData<AD>> {
 
     var entityIndex: EntityIndex = NULL_COMPONENT_INDEX
         internal set
     val paused: Boolean
         get() = entityIndex != NULL_COMPONENT_INDEX && active && Pausing.isPaused(Entity[entityIndex].groups)
-    var active = false
-        internal set
-    var finished = false
-        internal set
 
+    @JvmField var active = false
+    @JvmField var finished = false
+    @JvmField var autoActivation = true
     @JvmField var duration = 0L
     @JvmField var normalizedTime = 0f
     @JvmField var suspend = false
@@ -29,20 +28,27 @@ abstract class AnimatedData {
     @JvmField var inverseOnLoop = false
     @JvmField var resetOnFinish = true
     @JvmField var inversed = false
-    @JvmField var nextAnimation: AnimatedData? = null
-    @JvmField var condition: (AnimatedData) -> Boolean = { !finished }
+    @JvmField var nextAnimation: AnimatedData<*>? = null
     @JvmField var callback: () -> Unit = VOID_CALL
-    @JvmField val animationController = CReference(Control)
+    @JvmField val integratorRef = CReference(AnimationIntegrator)
 
-    fun <AD : AnimatedData> withNextAnimation(builder: AnimatedDataBuilder<AD>, configure: AD.() -> Unit) {
-        val result = builder.create()
-        result.also(configure)
-        nextAnimation = result
-    }
+    private lateinit var integrator: AnimationIntegrator<AD>
+    protected abstract var defaultIntegrator: AnimationIntegrator<AD>
+    protected abstract var data: AD
 
     internal fun init(entityIndex: Int) {
         this.entityIndex = entityIndex
+        if (autoActivation)
+            active = true
         initialize()
+        @Suppress("UNCHECKED_CAST")
+        integrator = if (integratorRef.exists)
+            AnimationIntegrator[integratorRef] as AnimationIntegrator<AD>
+        else defaultIntegrator
+    }
+
+    internal fun update() {
+        if (active) integrator(data)
     }
 
     internal fun applyTimeStep(timeStep: Float): Boolean {
@@ -50,13 +56,11 @@ abstract class AnimatedData {
         if (normalizedTime >= 1.0f) {
             normalizedTime = 0.0f
             if (suspend || !looping) {
-                finish()
+                 finish()
                 nextAnimation?.active = true
                 return false
-            } else {
-                if (inverseOnLoop)
-                    inversed = !inversed
-            }
+            } else if (inverseOnLoop)
+                inversed = !inversed
         }
         return true
     }
@@ -74,18 +78,16 @@ abstract class AnimatedData {
 }
 
 @ComponentDSL
-class EasedFloatData private constructor() : AnimatedData() {
+class EasedFloatData private constructor() : AnimatedData<EasedFloatData>() {
 
     @JvmField var startValue = 0f
     @JvmField var endValue = 0f
     @JvmField var easing: EasingFunction = Easing.LINEAR
     @JvmField var animatedProperty: (Int) -> FloatPropertyAccessor = { _ -> throw IllegalStateException() }
 
+    override var data = this
+    override var defaultIntegrator: AnimationIntegrator<EasedFloatData> = FloatEasingAnimation
     internal lateinit var accessor: FloatPropertyAccessor
-
-    companion object : AnimatedDataBuilder<EasedFloatData> {
-        override fun create() = EasedFloatData()
-    }
 
     override fun initialize() {
         accessor = animatedProperty(entityIndex)
@@ -93,9 +95,12 @@ class EasedFloatData private constructor() : AnimatedData() {
 
     override fun reset() = accessor(startValue)
 
+    companion object : AnimatedDataBuilder<EasedFloatData> {
+        override fun create() = EasedFloatData()
+    }
 }
 
-abstract class CurveData protected constructor() : AnimatedData() {
+abstract class CurveData<D : AnimatedData<D>> protected constructor() : AnimatedData<D>() {
 
     @JvmField var animatedXProperty: (Int) -> FloatPropertyAccessor = VOID_FLOAT_PROPERTY_ACCESSOR_PROVIDER
     @JvmField var animatedYProperty: (Int) -> FloatPropertyAccessor = VOID_FLOAT_PROPERTY_ACCESSOR_PROVIDER
@@ -114,10 +119,13 @@ abstract class CurveData protected constructor() : AnimatedData() {
 }
 
 @ComponentDSL
-class BezierCurveData private constructor() : CurveData() {
+class BezierCurveData private constructor() : CurveData<BezierCurveData>() {
 
     @JvmField var curve = CubicBezierCurve()
     @JvmField var easing: EasingFunction = Easing.LINEAR
+
+    override var data = this
+    override var defaultIntegrator: AnimationIntegrator<BezierCurveData> = BezierCurveAnimation
 
     override fun reset() {
         accessorX(curve.p0.x)
@@ -131,17 +139,16 @@ class BezierCurveData private constructor() : CurveData() {
 }
 
 @ComponentDSL
-class BezierSplineData private constructor() : CurveData() {
+class BezierSplineData private constructor() : CurveData<BezierSplineData>() {
+
+    override var data = this
+    override var defaultIntegrator: AnimationIntegrator<BezierSplineData> = BezierSplineAnimation
 
     var spline = BezierSpline()
         set(value) {
             field = value
             duration = value.splineDuration
         }
-
-    companion object : AnimatedDataBuilder<BezierSplineData> {
-        override fun create() = BezierSplineData()
-    }
 
     override fun reset() {
         spline.getAtNormalized(ZERO_FLOAT).curve.also {
@@ -150,23 +157,25 @@ class BezierSplineData private constructor() : CurveData() {
             accessorRot(GeomUtils.radToDeg(CubicBezierCurve.bezierCurveAngleX(it, ZERO_FLOAT)))
         }
     }
+
+    companion object : AnimatedDataBuilder<BezierSplineData> {
+        override fun create() = BezierSplineData()
+    }
 }
 
 @ComponentDSL
-class IntFrameData private constructor() : AnimatedData() {
+class IntFrameData private constructor() : AnimatedData<IntFrameData>() {
 
-    var timeline: Array<out IntFrame> = emptyArray()
-        set(value) {
-            field = value
-            duration = field.fold(0L) { acc, frame -> acc + frame.timeInterval }
-        }
-
+    @JvmField var timeline: Array<out IntFrame> = emptyArray()
     @JvmField var animatedProperty: (Int) -> IntPropertyAccessor = { _ -> throw IllegalStateException() }
 
+    override var data = this
+    override var defaultIntegrator: AnimationIntegrator<IntFrameData> = IntFrameAnimation
     internal lateinit var accessor: IntPropertyAccessor
 
     override fun initialize() {
         accessor = animatedProperty(entityIndex)
+        duration = timeline.fold(0L) { acc, frame -> acc + frame.timeInterval }
     }
 
     override fun reset() = accessor(timeline[0].value)
@@ -179,6 +188,5 @@ class IntFrameData private constructor() : AnimatedData() {
         val timeInterval: Long
         val value: Int
     }
-
 }
 

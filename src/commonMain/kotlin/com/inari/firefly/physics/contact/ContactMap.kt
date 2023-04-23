@@ -5,7 +5,7 @@ import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.view.*
-import com.inari.firefly.physics.movement.Movement
+import com.inari.firefly.physics.movement.MovementSystem
 import com.inari.util.collection.BitSet
 import com.inari.util.collection.IndexIterator
 import com.inari.util.geom.Vector4i
@@ -116,7 +116,7 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
             }
         }
 
-        private val moveListener: (Movement.MoveEvent) -> Unit = {
+        private val moveListener: (MovementSystem.MoveEvent) -> Unit = {
             var index =  activeComponentSet.nextIndex(0)
             while (index >= 0) {
                 ContactMap[index].updateAll(it.entities)
@@ -127,7 +127,7 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
         init {
             Entity.registerComponentListener(entityListener)
             View.registerComponentListener(viewListener)
-            Engine.registerListener(Movement.moveEvent, moveListener)
+            Engine.registerListener(MovementSystem.moveEvent, moveListener)
         }
 
         fun update(entity: Entity) {

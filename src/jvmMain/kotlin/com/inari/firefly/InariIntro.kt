@@ -60,7 +60,7 @@ object InariIntro {
                     startValue = 0f
                     endValue = 1f
                     duration = 1000
-                    animationController(FloatEasingAnimation)
+                    integratorRef(FloatEasingAnimation)
                 }
             }
         }

@@ -16,7 +16,7 @@ import kotlin.math.min
 import kotlin.native.concurrent.ThreadLocal
 
 @ThreadLocal
-object Movement : EntityControl() {
+object MovementSystem : EntityControl() {
 
     @JvmField val MOVEMENT_ASPECT_GROUP = IndexedAspectType("MOVEMENT_ASPECT_GROUP")
     @JvmField val UNDEFINED_MOVEMENT = MOVEMENT_ASPECT_GROUP.createAspect("UNDEFINED_MOVEMENT")

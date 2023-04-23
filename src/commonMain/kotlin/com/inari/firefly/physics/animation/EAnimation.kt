@@ -2,39 +2,38 @@ package com.inari.firefly.physics.animation
 
 import com.inari.firefly.core.EntityComponent
 import com.inari.firefly.core.EntityComponentBuilder
-import com.inari.util.collection.DynArray
-import kotlin.jvm.JvmField
+import com.inari.util.collection.BitSet
+import com.inari.util.collection.IndexIterator
 
 class EAnimation private constructor() : EntityComponent(EAnimation) {
 
-    @JvmField internal val animations = DynArray.of<AnimatedData>(2, 5)
+    private val dataRefs = BitSet()
 
-    fun <AD : AnimatedData> withAnimation(builder: AnimatedDataBuilder<AD>, configure: AD.() -> Unit) {
+    fun <AD : AnimatedData<AD>> withAnimation(builder: AnimatedDataBuilder<AD>, configure: AD.() -> Unit) {
         val result = builder.create()
         result.also(configure)
-        animations + result
+        dataRefs.set(AnimationSystem.animations.add(result))
     }
 
     override fun activate() {
         super.activate()
-        val iter = animations.iterator()
-        while (iter.hasNext()) {
-            val it = iter.next()
-            it.init(entityIndex)
-            if (it.condition(it))
-                it.active = true
-        }
+        val iter = IndexIterator(dataRefs)
+        while (iter.hasNext())
+            AnimationSystem.animations[iter.next()]?.init(entityIndex)
     }
 
     override fun deactivate() {
-        val iter = animations.iterator()
+        val iter = IndexIterator(dataRefs)
         while (iter.hasNext())
-            iter.next().active = false
+            AnimationSystem.animations[iter.next()]?.active = false
         super.deactivate()
     }
 
     override fun reset() {
-        animations.clear()
+        val iter = IndexIterator(dataRefs)
+        while (iter.hasNext())
+            AnimationSystem.animations.remove(iter.next())
+        dataRefs.clear()
     }
 
     override val componentType = Companion

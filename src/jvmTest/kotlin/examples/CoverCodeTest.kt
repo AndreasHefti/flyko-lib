@@ -58,12 +58,12 @@ fun main() {
                 withAnimation(EasedFloatData) {
                     looping = true
                     inverseOnLoop = true
-                    easing = Easing.BACK_OUT
+                    easing = Easing.LINEAR
                     startValue = 50f
                     endValue = 400f
                     duration = 1000
                     animatedProperty = ETransform.PropertyAccessor.POSITION_X
-                    animationController(FloatEasingAnimation)
+                    //animationController(FloatEasingAnimation)
                 }
             }
         }

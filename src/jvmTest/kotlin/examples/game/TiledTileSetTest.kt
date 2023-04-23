@@ -79,7 +79,7 @@ fun main() {
                             animatedProperty = ESprite.PropertyAccessor.SPRITE_INDEX
                             looping = true
                             timeline = this@apply.frames.toArray()
-                            animationController(IntFrameAnimation)
+                            //animationController(IntFrameAnimation)
                         }
                     }
                 }

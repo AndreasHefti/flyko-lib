@@ -1,7 +1,7 @@
 package com.inari.firefly.physics.movement
 
 import com.inari.firefly.graphics.view.ETransform
-import com.inari.firefly.physics.movement.Movement.BasicMovementAspect.*
+import com.inari.firefly.physics.movement.MovementSystem.BasicMovementAspect.*
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 import kotlin.math.max

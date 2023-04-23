@@ -50,7 +50,7 @@ fun main() {
                     animatedXProperty = ETransform.PropertyAccessor.POSITION_X
                     animatedYProperty = ETransform.PropertyAccessor.POSITION_Y
                     animatedRotationProperty = ETransform.PropertyAccessor.ROTATION
-                    animationController(BezierCurveAnimation)
+                    //animationController(BezierCurveAnimation)
                 }
             }
         }
@@ -93,7 +93,7 @@ fun main() {
                     animatedXProperty = ETransform.PropertyAccessor.POSITION_X
                     animatedYProperty = ETransform.PropertyAccessor.POSITION_Y
                     animatedRotationProperty = ETransform.PropertyAccessor.ROTATION
-                    animationController(BezierCurveAnimation)
+                    //animationController(BezierCurveAnimation)
                 }
             }
         }

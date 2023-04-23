@@ -8,7 +8,7 @@ import com.inari.firefly.graphics.tile.ETile
 import com.inari.firefly.graphics.tile.TileGrid
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.movement.EMovement
-import com.inari.firefly.physics.movement.Movement
+import com.inari.firefly.physics.movement.MovementSystem
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector3i
@@ -43,7 +43,7 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
         }
 
         init {
-            Movement // load movement first to ensure Contact MapUpdate first
+            MovementSystem // load movement first to ensure Contact MapUpdate first
             Entity.registerComponentListener(::entityListener)
             Engine.registerListener(UPDATE_EVENT_TYPE, ::update)
         }

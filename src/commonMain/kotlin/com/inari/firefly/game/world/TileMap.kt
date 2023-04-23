@@ -165,7 +165,7 @@ open class TileMap : Component(TileMap) {
                                     animatedProperty = ETile.PropertyAccessor.SPRITE
                                     looping = true
                                     timeline = tile.animationData!!.frames.toArray()
-                                    animationController(IntFrameAnimation)
+                                    //animationController(IntFrameAnimation)
                                 }
                             }
                         }

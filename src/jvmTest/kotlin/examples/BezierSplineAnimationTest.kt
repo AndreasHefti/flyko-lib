@@ -65,7 +65,7 @@ fun main() {
                     animatedXProperty = ETransform.PropertyAccessor.POSITION_X
                     animatedYProperty = ETransform.PropertyAccessor.POSITION_Y
                     animatedRotationProperty = ETransform.PropertyAccessor.ROTATION
-                    animationController(BezierSplineAnimation)
+                    //animationController(BezierSplineAnimation)
                 }
             }
         }

@@ -5,7 +5,7 @@ import com.inari.firefly.core.*
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.contact.*
 import com.inari.firefly.physics.movement.EMovement
-import com.inari.firefly.physics.movement.Movement.BasicMovementAspect.*
+import com.inari.firefly.physics.movement.MovementSystem.BasicMovementAspect.*
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.geom.BitMask
 import kotlin.jvm.JvmField

@@ -5,110 +5,62 @@ import com.inari.util.collection.DynArray
 import com.inari.util.geom.CubicBezierCurve.Companion.bezierCurveAngleX
 import com.inari.util.geom.CubicBezierCurve.Companion.bezierCurvePoint
 import com.inari.util.geom.GeomUtils
+import kotlin.jvm.JvmField
+import kotlin.native.concurrent.ThreadLocal
 
-abstract class Animation<D : AnimatedData>(
-    private val animatedData: DynArray<D>
-) : Control() {
+@ThreadLocal
+object AnimationSystem : Control() {
 
-    private val entityListener: (ComponentKey, ComponentEventType) -> Unit = { key, type ->
-        if (type == ComponentEventType.ACTIVATED) notifyActivation(Entity[key])
-        else if (type == ComponentEventType.DEACTIVATED) notifyDeactivation(Entity[key])
-    }
-
-    override fun load() {
-        super.load()
-        Entity.registerComponentListener(entityListener)
-    }
-
-    override fun dispose() {
-        Entity.disposeComponentListener(entityListener)
-        super.dispose()
-    }
-
-    override fun update() {
-        val iter = animatedData.iterator()
-        if (Pausing.paused)
-            while (iter.hasNext()) {
-                val it = iter.next()
-                if (it.paused) continue
-
-                if (it.active)
-                    update(it)
-                else if (it.condition(it))
-                    it.active = true
-            }
-        else
-            while (iter.hasNext()) {
-                val it = iter.next()
-                if (it.active)
-                    update(it)
-                else if (it.condition(it))
-                    it.active = true
-            }
-    }
-
-    protected abstract fun update(data: D)
-    protected abstract fun accept(data: AnimatedData): D?
-
-    private fun notifyActivation(entity: Entity) {
-        if (EAnimation !in entity.aspects) return
-        val eAnimation = entity[EAnimation]
-        val iter = eAnimation.animations.iterator()
-        while (iter.hasNext()) {
-            val it = iter.next()
-            val data = iAccept(it)
-            if (data != null) animatedData.add(data)
-        }
-    }
-
-    private fun notifyDeactivation(entity: Entity) {
-        if (EAnimation !in entity.aspects) return
-        val eAnimation = entity[EAnimation]
-        val iter = eAnimation.animations.iterator()
-        while (iter.hasNext()) {
-            val it = iter.next()
-            val data = iAccept(it)
-            if (data != null) animatedData.remove(data)
-        }
-    }
-
-    private fun iAccept(data: AnimatedData): D? {
-        if ( data.animationController.targetKey.componentIndex >= 0 &&
-            data.animationController.targetKey.componentIndex != this.index)
-            return null
-        return accept(data)
-    }
-}
-
-object FloatEasingAnimation: Animation<EasedFloatData>(DynArray.of(5, 10)) {
+    @JvmField internal val animations = DynArray.of<AnimatedData<*>>(2, 5)
 
     init {
         @Suppress("LeakingThis") registerStatic(this)
-        Control.activate(this.name)
+        Control.activate(this.index)
+    }
+
+    override fun update() {
+        val iter = animations.iterator()
+        val paused = Pausing.paused
+        while (iter.hasNext()) {
+            val it = iter.next()
+            if (paused && it.paused) continue
+
+            it.update()
+        }
+    }
+}
+
+abstract class AnimationIntegrator<D : AnimatedData<D>> : Component(AnimationIntegrator) {
+
+    internal operator fun invoke(data: D) = update(data)
+    protected abstract fun update(data: D)
+
+    companion object : AbstractComponentSystem<AnimationIntegrator<*>>("AnimationIntegrator") {
+        override fun allocateArray(size: Int): Array<AnimationIntegrator<*>?> = arrayOfNulls(size)
+    }
+}
+
+object FloatEasingAnimation: AnimationIntegrator<EasedFloatData>() {
+
+    init {
+        @Suppress("LeakingThis") registerStatic(this)
     }
 
     override fun update(data: EasedFloatData) {
         val timeStep: Float = 1f * Engine.timer.timeElapsed / data.duration
         if (data.applyTimeStep(timeStep))
-        // calc and apply eased value
+            // calc and apply eased value
             if (data.inversed)
                 data.accessor(GeomUtils.lerp(data.endValue, data.startValue, data.easing(data.normalizedTime)))
             else
                 data.accessor(GeomUtils.lerp(data.startValue, data.endValue, data.easing(data.normalizedTime)))
     }
-
-    override fun accept(data: AnimatedData): EasedFloatData? =
-        if (data !is EasedFloatData) null
-        else data
-
-
 }
 
-object BezierCurveAnimation: Animation<BezierCurveData>(DynArray.of(5, 10)) {
+object BezierCurveAnimation: AnimationIntegrator<BezierCurveData>() {
 
     init {
         @Suppress("LeakingThis") registerStatic(this)
-        Control.activate(this.name)
     }
 
     override fun update(data: BezierCurveData) {
@@ -126,17 +78,12 @@ object BezierCurveAnimation: Animation<BezierCurveData>(DynArray.of(5, 10)) {
                 data.accessorRot(GeomUtils.radToDeg(bezierCurveAngleX(data.curve, data.easing(data.normalizedTime))))
             }
     }
-
-    override fun accept(data: AnimatedData): BezierCurveData? =
-        if (data !is BezierCurveData) null
-        else data
 }
 
-object BezierSplineAnimation : Animation<BezierSplineData>(DynArray.of(5, 10)) {
+object BezierSplineAnimation : AnimationIntegrator<BezierSplineData>() {
 
     init {
         @Suppress("LeakingThis") registerStatic(this)
-        Control.activate(this.name)
     }
 
     override fun update(data: BezierSplineData) {
@@ -160,17 +107,12 @@ object BezierSplineAnimation : Animation<BezierSplineData>(DynArray.of(5, 10)) {
             }
         }
     }
-
-    override fun accept(data: AnimatedData): BezierSplineData? =
-        if (data !is BezierSplineData) null
-        else data
 }
 
-object IntFrameAnimation : Animation<IntFrameData>(DynArray.of(5, 10)) {
+object IntFrameAnimation : AnimationIntegrator<IntFrameData>() {
 
     init {
         @Suppress("LeakingThis") registerStatic(this)
-        Control.activate(this.name)
     }
 
     override fun update(data: IntFrameData) {
@@ -185,8 +127,4 @@ object IntFrameAnimation : Animation<IntFrameData>(DynArray.of(5, 10)) {
             data.accessor(data.timeline[i].value)
         }
     }
-
-    override fun accept(data: AnimatedData): IntFrameData? =
-        if (data !is IntFrameData) null
-        else data
 }

@@ -66,7 +66,7 @@ fun main() {
                     endValue = 400f
                     duration = 5000
                     animatedProperty = ETransform.PropertyAccessor.POSITION_X
-                    animationController(FloatEasingAnimation)
+                    //animationController(FloatEasingAnimation)
                 }
             }
         }
