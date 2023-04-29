@@ -151,11 +151,10 @@ class BezierSplineData private constructor() : CurveData<BezierSplineData>() {
         }
 
     override fun reset() {
-        spline.getAtNormalized(ZERO_FLOAT).curve.also {
-            accessorX(it.p0.x)
-            accessorY(it.p0.y)
-            accessorRot(GeomUtils.radToDeg(CubicBezierCurve.bezierCurveAngleX(it, ZERO_FLOAT)))
-        }
+        val c = spline.getAtNormalized(ZERO_FLOAT).curve
+        accessorX(c.p0.x)
+        accessorY(c.p0.y)
+        accessorRot(GeomUtils.radToDeg(CubicBezierCurve.bezierCurveAngleX(c, ZERO_FLOAT)))
     }
 
     companion object : AnimatedDataBuilder<BezierSplineData> {
@@ -175,7 +174,9 @@ class IntFrameData private constructor() : AnimatedData<IntFrameData>() {
 
     override fun initialize() {
         accessor = animatedProperty(entityIndex)
-        duration = timeline.fold(0L) { acc, frame -> acc + frame.timeInterval }
+        duration = 0L
+        for (i in timeline.indices)
+            duration += timeline[i].timeInterval
     }
 
     override fun reset() = accessor(timeline[0].value)

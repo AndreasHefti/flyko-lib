@@ -132,7 +132,7 @@ abstract class EntityComponentBuilder<C : EntityComponent>(
 ) : EntityComponentType<C>(typeName) {
 
     private fun doBuild(comp: C, configure: C.() -> Unit, entity: Entity): C {
-        comp.also(configure)
+        configure(comp)
         comp.entityIndex = entity.index
         entity.components.set(comp.componentType, comp)
         if (entity.active)

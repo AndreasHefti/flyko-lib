@@ -72,22 +72,31 @@ class FiniteStateMachine : Control() {
 
     fun withStateChange(configure: (StateChange.() -> Unit)) {
         val stateChange = StateChange()
-        stateChange.also(configure)
+        configure(stateChange)
         stateChanges + stateChange
         if (stateChange.fromState == currentState)
-            currentStateChanges + stateChange
+            stateStateChanges + stateChange
     }
 
-    fun findStateChangeForTargetState(targetStateName: String): StateChange? =
-        stateChanges.firstOrNull {
-            it.fromState == currentState && targetStateName == it.toState
+    fun findStateChangeForTargetState(targetStateName: String): StateChange? {
+        val it = stateChanges.iterator()
+        while (it.hasNext()) {
+            val sc = it.next()
+            if (sc.fromState == currentState && targetStateName == sc.toState)
+                return sc
         }
+        return null
+    }
 
-
-    fun findStateChangeForCurrentState(stateChangeName: String): StateChange? =
-        stateChanges.firstOrNull {
-            stateChangeName == it.name && it.fromState == currentState
+    fun findStateChangeForCurrentState(stateChangeName: String): StateChange? {
+        val it = stateChanges.iterator()
+        while (it.hasNext()) {
+            val sc = it.next()
+            if (stateChangeName == sc.name && sc.fromState == currentState)
+                return sc
         }
+        return null
+    }
 
     override fun activate() {
         currentState = startState

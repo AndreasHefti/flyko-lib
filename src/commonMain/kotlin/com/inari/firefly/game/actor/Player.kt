@@ -153,7 +153,6 @@ class Player private constructor() : Composite(Player), Controlled {
 
         @Suppress("OVERRIDE_BY_INLINE")
         override inline fun notify(listener: (PlayerEvent) -> Unit) = listener(this)
-
     }
 
     @ThreadLocal

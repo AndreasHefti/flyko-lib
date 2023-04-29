@@ -182,10 +182,6 @@ class DynArray<T> constructor(
     override operator fun get(index: Int): T? =
         array[index]
 
-    fun getFirstNotNull(): T = array.first { it != null }!!
-
-    fun getLastNotNull(): T = array.last { it != null }!!
-
     /** Indicates if there is an object referenced by the specified id. If there is no object referenced
      * by the index, false is returned also in the case, the index is out of bounds.
      *

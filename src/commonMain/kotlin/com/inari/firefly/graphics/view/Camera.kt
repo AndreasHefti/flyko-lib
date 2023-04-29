@@ -28,7 +28,7 @@ open class SimpleCameraController protected constructor() : SingleComponentContr
         viewChangeEvent = View.createViewChangeEvent(
             key.componentIndex,
             View.ViewChangeEvent.Type.ORIENTATION,
-            false)
+            pixelPerfect )
     }
 
     fun adjust() {

@@ -203,7 +203,7 @@ open class Composite protected constructor(
 
     fun withLifecycleTask(configure: (LifecycleTask.() -> Unit)): LifecycleTask {
         val lifecycleTask = LifecycleTask()
-        lifecycleTask.also(configure)
+        configure(lifecycleTask)
         tasks + lifecycleTask
         sortTasks()
         return lifecycleTask

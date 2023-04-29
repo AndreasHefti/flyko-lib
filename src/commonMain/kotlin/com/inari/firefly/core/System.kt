@@ -193,7 +193,7 @@ abstract class ComponentSystem<C : Component>(
     protected abstract fun create(): C
     override fun build(configure: C.() -> Unit): ComponentKey {
         val comp: C = create()
-        comp.also(configure)
+        configure(comp)
         val key = registerComponent(comp)
         initComponent(comp)
         return key
@@ -201,7 +201,7 @@ abstract class ComponentSystem<C : Component>(
 
     override fun buildAndGet(configure: C.() -> Unit): C {
         val comp: C = create()
-        comp.also(configure)
+        configure(comp)
         registerComponent(comp)
         initComponent(comp)
         return comp
@@ -598,14 +598,14 @@ abstract class  SubComponentBuilder<C : Component, CC : C>(
 ) :  ComponentBuilder<CC>  {
     override fun build(configure: CC.() -> Unit): ComponentKey {
         val comp: CC = create()
-        comp.also(configure)
+        configure(comp)
         val key = system.registerComponent(comp)
         system.initComponent(comp)
         return key
     }
     override fun buildAndGet(configure: CC.() -> Unit): CC {
         val comp: CC = create()
-        comp.also(configure)
+        configure(comp)
         system.registerComponent(comp)
         system.initComponent(comp)
         return comp
@@ -697,7 +697,7 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
     override fun deleteGroup(group: Aspect) = system.deleteGroup(group)
     override fun build(configure: CC.() -> Unit): ComponentKey {
         val comp: CC = create()
-        comp.also(configure)
+        configure(comp)
         val key = system.registerComponent(comp)
         system.initComponent(comp)
         subComponentRefs.set(key.componentIndex)
@@ -705,7 +705,7 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
     }
     override fun buildAndGet(configure: CC.() -> Unit): CC {
         val comp: CC = create()
-        comp.also(configure)
+        configure(comp)
         system.registerComponent(comp)
         subComponentRefs.set(comp.index)
         system.initComponent(comp)
