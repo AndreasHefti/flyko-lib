@@ -3,7 +3,7 @@ package com.inari.firefly.game.world
 import com.inari.firefly.core.ComponentKey
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.StaticTask
-import com.inari.firefly.core.api.OperationResult
+import com.inari.firefly.core.api.ActionResult
 import com.inari.firefly.core.api.TaskCallback
 import com.inari.firefly.game.*
 import com.inari.util.*
@@ -170,7 +170,7 @@ object  TiledTileSetLoadTask : StaticTask() {
             attributes,
             TiledTileSetConversionTask.convert(tileSetJson))
 
-        callback(NO_COMPONENT_KEY, attributes, OperationResult.SUCCESS)
+        callback(NO_COMPONENT_KEY, attributes, ActionResult.SUCCESS)
     }
 }
 
@@ -188,7 +188,7 @@ object TiledRoomLoadTask : StaticTask() {
         val converted = TiledRoomConversionTask.convert(attributes, tileMapJson)
         JsonRoomLoadTask.loadRoom(key, attributes, converted)
 
-        callback(NO_COMPONENT_KEY, attributes, OperationResult.SUCCESS)
+        callback(NO_COMPONENT_KEY, attributes, ActionResult.SUCCESS)
     }
 
     private fun loadTileSets(attributes: AttributesRO, tileMapJson :  TiledMapJson) {

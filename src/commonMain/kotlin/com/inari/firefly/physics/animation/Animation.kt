@@ -30,21 +30,14 @@ object AnimationSystem : Control() {
     }
 }
 
-abstract class AnimationIntegrator<D : AnimatedData<D>> : Component(AnimationIntegrator) {
+abstract class AnimationIntegrator<D : AnimatedData<D>> {
 
     internal operator fun invoke(data: D) = update(data)
     protected abstract fun update(data: D)
 
-    companion object : AbstractComponentSystem<AnimationIntegrator<*>>("AnimationIntegrator") {
-        override fun allocateArray(size: Int): Array<AnimationIntegrator<*>?> = arrayOfNulls(size)
-    }
 }
 
 object FloatEasingAnimation: AnimationIntegrator<EasedFloatData>() {
-
-    init {
-        @Suppress("LeakingThis") registerStatic(this)
-    }
 
     override fun update(data: EasedFloatData) {
         val timeStep: Float = 1f * Engine.timer.timeElapsed / data.duration
@@ -58,10 +51,6 @@ object FloatEasingAnimation: AnimationIntegrator<EasedFloatData>() {
 }
 
 object BezierCurveAnimation: AnimationIntegrator<BezierCurveData>() {
-
-    init {
-        @Suppress("LeakingThis") registerStatic(this)
-    }
 
     override fun update(data: BezierCurveData) {
         val timeStep = Engine.timer.timeElapsed.toFloat() / data.duration
@@ -81,10 +70,6 @@ object BezierCurveAnimation: AnimationIntegrator<BezierCurveData>() {
 }
 
 object BezierSplineAnimation : AnimationIntegrator<BezierSplineData>() {
-
-    init {
-        @Suppress("LeakingThis") registerStatic(this)
-    }
 
     override fun update(data: BezierSplineData) {
         val timeStep = Engine.timer.timeElapsed.toFloat() / data.duration
@@ -110,10 +95,6 @@ object BezierSplineAnimation : AnimationIntegrator<BezierSplineData>() {
 }
 
 object IntFrameAnimation : AnimationIntegrator<IntFrameData>() {
-
-    init {
-        @Suppress("LeakingThis") registerStatic(this)
-    }
 
     override fun update(data: IntFrameData) {
         val timeStep = Engine.timer.timeElapsed.toFloat() / data.duration

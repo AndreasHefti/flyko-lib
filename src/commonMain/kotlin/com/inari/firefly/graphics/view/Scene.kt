@@ -1,25 +1,21 @@
 package com.inari.firefly.graphics.view
 
 import com.inari.firefly.core.*
-import com.inari.firefly.core.api.Action
-import com.inari.firefly.core.api.ActionCallback
-import com.inari.firefly.core.api.ComponentCall
-import com.inari.firefly.core.api.OperationResult.RUNNING
-import com.inari.firefly.core.api.RUNNING_ACTION
-import com.inari.util.VOID_CONSUMER_1
+import com.inari.firefly.core.api.*
+import com.inari.firefly.core.api.ActionResult.RUNNING
 import com.inari.util.VOID_CONSUMER_2
 import com.inari.util.collection.AttributesRO
 import kotlin.jvm.JvmField
 
 class Scene private constructor(): Control() {
 
-    @JvmField val attributes: AttributesRO = AttributesRO.EMPTY_ATTRIBUTES
+    @JvmField val attributes = AttributesRO.EMPTY_ATTRIBUTES
     @JvmField val loadTask = CReference(Task)
     @JvmField val disposeTask = CReference(Task)
-    @JvmField var init: ComponentCall = VOID_CONSUMER_1
-    @JvmField var updateOperation: Action = RUNNING_ACTION
-    @JvmField var callback: ActionCallback = VOID_CONSUMER_2
-    @JvmField var deleteAfterRun: Boolean = false
+    @JvmField var initAction = VOID_ACTION
+    @JvmField var updateAction = VOID_ACTION
+    @JvmField var callback = NO_ACTION_CALLBACK
+    @JvmField var deleteAfterRun = false
 
     init {
         autoActivation = false
@@ -30,7 +26,7 @@ class Scene private constructor(): Control() {
     }
 
     fun withUpdate(update: Action) {
-        updateOperation = update
+        updateAction = update
     }
 
     fun withLoadTask(config: (Task.() -> Unit)): ComponentKey {
@@ -54,7 +50,7 @@ class Scene private constructor(): Control() {
 
     override fun activate() {
         super.activate()
-        init(this.key)
+        initAction(this.key)
     }
 
     override fun dispose() {
@@ -68,7 +64,7 @@ class Scene private constructor(): Control() {
         if (!scheduler.needsUpdate())
             return
 
-        val result = updateOperation(key)
+        val result = updateAction(key)
         if (result == RUNNING)
             return
 

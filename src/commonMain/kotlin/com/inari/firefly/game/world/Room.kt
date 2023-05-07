@@ -176,7 +176,7 @@ class Room private constructor() : Composite(Room) {
 
             Conditional {
                 name = PLAYER_ROOM_TRANSITION_SCAN_CONDITION
-                condition = { playerKey, _ ->
+                condition = { playerKey ->
                     val player = Player[playerKey.name]
                     val scan = player.playerEntity?.get(EContact)?.contactScans?.getFirstFullContact(ROOM_TRANSITION_CONTACT_TYPE)
                     scan != null && scan.contactMask.cardinality > 8

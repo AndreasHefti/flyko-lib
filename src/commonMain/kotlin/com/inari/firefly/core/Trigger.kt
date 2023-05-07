@@ -1,19 +1,32 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
-import com.inari.util.FALSE_SUPPLIER
-import com.inari.util.TRUE_SUPPLIER
+import com.inari.firefly.core.api.ButtonType
+import com.inari.firefly.core.api.FFTimer
+import com.inari.firefly.core.api.InputDevice
+import com.inari.firefly.core.api.VOID_ACTION
 import kotlin.jvm.JvmField
 
 abstract class Trigger protected constructor(): Component(Trigger) {
 
-    @JvmField var condition: () -> Boolean = FALSE_SUPPLIER
-    @JvmField var call: () -> Boolean = TRUE_SUPPLIER
+    @JvmField var componentRef = NO_COMPONENT_KEY
+    @JvmField var conditionRef = CReference(ConditionalComponent)
+    @JvmField var action = VOID_ACTION
+    @JvmField var deleteAfterFired = false
 
-    protected fun doTrigger() {
-        if (condition())
-            if (!call())
-                ComponentSystem.delete(this.key)
+    fun withCondition(configure: (Conditional.() -> Unit)): ComponentKey {
+        val key = Conditional.build(configure)
+        conditionRef(key)
+        return key
+    }
+
+    protected fun checkTrigger() {
+        if (conditionRef.exists && ConditionalComponent[conditionRef](componentRef)) {
+            action(componentRef)
+            if (deleteAfterFired)
+                Trigger.delete(this)
+        }
     }
 
     companion object : ComponentSystem<Trigger>("Trigger") {
@@ -32,14 +45,40 @@ interface TriggeredComponent {
 
 }
 
-class UpdateEventTrigger private constructor() : Trigger() {
+open class UpdateEventTrigger private constructor() : Trigger() {
 
-    private val updateEventListener = { doTrigger() }
+    @JvmField internal var scheduler: FFTimer.Scheduler = INFINITE_SCHEDULER
+    var updateResolution: Float
+        get() = scheduler.resolution
+        set(value) { scheduler = Engine.timer.createUpdateScheduler(value) }
 
-    override fun load() = Engine.registerListener(UPDATE_EVENT_TYPE, updateEventListener)
-    override fun dispose() = Engine.disposeListener(UPDATE_EVENT_TYPE, updateEventListener)
+    private fun update() {
+        if (scheduler.needsUpdate())
+            checkTrigger()
+    }
+
+    override fun load() = Engine.registerListener(UPDATE_EVENT_TYPE, ::update)
+    override fun dispose() = Engine.disposeListener(UPDATE_EVENT_TYPE, ::update)
 
     companion object : SubComponentBuilder<Trigger, UpdateEventTrigger>(Trigger) {
         override fun create() = UpdateEventTrigger()
+    }
+}
+
+class InputButtonTrigger private constructor() : Trigger() {
+
+    @JvmField var inputDevice: InputDevice = Engine.input.getDefaultDevice()
+    @JvmField var triggerButton = ButtonType.ENTER
+
+    private fun update() {
+        if (inputDevice.buttonPressed(triggerButton))
+            checkTrigger()
+    }
+
+    override fun load() = Engine.registerListener(UPDATE_EVENT_TYPE, ::update)
+    override fun dispose() = Engine.disposeListener(UPDATE_EVENT_TYPE, ::update)
+
+    companion object : SubComponentBuilder<Trigger, InputButtonTrigger>(Trigger) {
+        override fun create() = InputButtonTrigger()
     }
 }

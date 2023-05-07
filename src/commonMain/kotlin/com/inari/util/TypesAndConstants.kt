@@ -45,8 +45,6 @@ const val LONG_MASK = 0x3f
 @JvmField val TRUE_SUPPLIER = { true }
 @JvmField val FALSE_PREDICATE: (Any) -> Boolean = { false }
 @JvmField val TRUE_PREDICATE: (Any) -> Boolean = { true }
-@JvmField val VOID_CONSUMER: (Any) -> Unit = { _ -> }
-@JvmField val VOID_INT_CONSUMER: (Int) -> Unit = VOID_CONSUMER
 @JvmField val VOID_CALL: () -> Unit = {}
 
 @JvmField val BLACK = ImmutableVector4f(0f, 0f, 0f, 1f)
@@ -82,3 +80,4 @@ val VOID_INT_PROPERTY_ACCESSOR_PROVIDER: (Int) -> IntPropertyAccessor = { _ -> V
 @JvmField val VOID_CONSUMER_1: (Any) -> Unit = { _ -> }
 @JvmField val VOID_CONSUMER_2: (Any, Any) -> Unit = { _, _ -> }
 @JvmField val VOID_CONSUMER_3: (Any, Any, Any) -> Unit = { _, _, _ -> }
+@JvmField val VOID_INT_CONSUMER: (Int) -> Unit = VOID_CONSUMER_1

@@ -37,7 +37,7 @@ open class Task protected constructor(): Component(Task) {
         if (noneBlocking)
             startParallelTask(name, { operation(componentKey, dict, callback) }) {
                 if (it != null)
-                    callback(componentKey, dict, OperationResult.FAILED)
+                    callback(componentKey, dict, ActionResult.FAILED)
             }
         else
             operation(componentKey, dict, callback)

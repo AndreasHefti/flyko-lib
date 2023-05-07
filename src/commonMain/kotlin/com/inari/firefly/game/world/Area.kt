@@ -1,7 +1,7 @@
 package com.inari.firefly.game.world
 
 import com.inari.firefly.core.*
-import com.inari.firefly.core.api.OperationResult
+import com.inari.firefly.core.api.ActionResult
 import com.inari.firefly.game.actor.Player
 import com.inari.firefly.game.actor.PlayerCamera
 import com.inari.firefly.graphics.view.ETransform
@@ -73,7 +73,7 @@ class Area private constructor() : Composite(Area) {
                 if (loadScene.exists) {
                     loadSceneRunning = true
                     Scene.runScene(loadScene) { _, result ->
-                        if (result == OperationResult.SUCCESS && activateAfterLoadScene)
+                        if (result == ActionResult.SUCCESS && activateAfterLoadScene)
                             Area.activate(this)
                         loadSceneRunning = false
                     }
@@ -85,7 +85,7 @@ class Area private constructor() : Composite(Area) {
                 if (loadScene.exists) {
                     loadSceneRunning = true
                     Scene.runScene(loadScene) { _, result ->
-                        if (result == OperationResult.SUCCESS && activateAfterLoadScene)
+                        if (result == ActionResult.SUCCESS && activateAfterLoadScene)
                             Area.activate(this)
                         loadSceneRunning = false
                     }

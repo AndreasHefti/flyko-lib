@@ -5,14 +5,10 @@ import com.inari.firefly.ai.behavior.ActionNode
 import com.inari.firefly.ai.behavior.EBehavior
 import com.inari.firefly.ai.behavior.ParallelNode
 import com.inari.firefly.ai.behavior.SequenceNode
-import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Entity
-import com.inari.firefly.core.api.OperationResult.*
-import com.inari.firefly.core.api.BlendMode
-import com.inari.firefly.core.api.ShapeType
+import com.inari.firefly.core.api.ActionResult.*
 import com.inari.firefly.graphics.FFInfoSystem
 import com.inari.firefly.graphics.FrameRateInfo
-import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ETransform

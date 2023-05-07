@@ -10,6 +10,7 @@ import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
 import com.inari.util.geom.Vector2f
+import org.lwjgl.glfw.GLFW
 
 fun main() {
     DesktopApp("LayerControlTest", 800, 600) {
@@ -53,7 +54,7 @@ fun main() {
 
         ComponentSystem.dumpInfo()
 
-        it.addExitKeyTrigger(Input.Keys.SPACE)
+        it.setExitKeys(GLFW.GLFW_KEY_SPACE, GLFW.GLFW_KEY_ESCAPE)
         it.onDispose = {
             println("****************************************** onDispose")
             View.delete(viewKey)

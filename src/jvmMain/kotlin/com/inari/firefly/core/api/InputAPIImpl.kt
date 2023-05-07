@@ -77,12 +77,12 @@ actual object InputAPIImpl : InputAPI {
 
     actual override fun setKeyCallback(callback: KeyCallback) {
         val w = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
-        GLFW.glfwSetKeyCallback(w) { _, key, scancode, action, _ -> callback.invoke(key, scancode, action) }
+        GLFW.glfwSetKeyCallback(w) { _, key, scancode, action, _ -> callback(key, scancode, action) }
     }
 
     actual override fun setMouseButtonCallback(callback: MouseCallback) {
         val w = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
-        GLFW.glfwSetMouseButtonCallback(w) { _, key, action, _ -> callback.invoke(key, action) }
+        GLFW.glfwSetMouseButtonCallback(w) { _, key, action, _ -> callback(key, action) }
     }
 
     private var buttonCallbackUpdate: () -> Unit = VOID_CALL

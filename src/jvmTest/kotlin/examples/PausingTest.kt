@@ -8,7 +8,7 @@ import com.inari.firefly.ai.behavior.SequenceNode
 import com.inari.firefly.core.*
 import com.inari.firefly.core.Component.Companion.COMPONENT_GROUP_ASPECT
 import com.inari.firefly.core.api.*
-import com.inari.firefly.core.api.OperationResult.*
+import com.inari.firefly.core.api.ActionResult.*
 import com.inari.firefly.graphics.FFInfoSystem
 import com.inari.firefly.graphics.FrameRateInfo
 import com.inari.firefly.graphics.shape.EShape

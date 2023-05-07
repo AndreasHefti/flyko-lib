@@ -30,21 +30,16 @@ abstract class AnimatedData<AD : AnimatedData<AD>> {
     @JvmField var inversed = false
     @JvmField var nextAnimation: AnimatedData<*>? = null
     @JvmField var callback: () -> Unit = VOID_CALL
-    @JvmField val integratorRef = CReference(AnimationIntegrator)
+    abstract val integrator: AnimationIntegrator<AD>
 
-    private lateinit var integrator: AnimationIntegrator<AD>
-    protected abstract var defaultIntegrator: AnimationIntegrator<AD>
-    protected abstract var data: AD
+    @Suppress("LeakingThis", "UNCHECKED_CAST")
+    private val data: AD = this as AD
 
     internal fun init(entityIndex: Int) {
         this.entityIndex = entityIndex
         if (autoActivation)
             active = true
         initialize()
-        @Suppress("UNCHECKED_CAST")
-        integrator = if (integratorRef.exists)
-            AnimationIntegrator[integratorRef] as AnimationIntegrator<AD>
-        else defaultIntegrator
     }
 
     internal fun update() {
@@ -85,8 +80,7 @@ class EasedFloatData private constructor() : AnimatedData<EasedFloatData>() {
     @JvmField var easing: EasingFunction = Easing.LINEAR
     @JvmField var animatedProperty: (Int) -> FloatPropertyAccessor = { _ -> throw IllegalStateException() }
 
-    override var data = this
-    override var defaultIntegrator: AnimationIntegrator<EasedFloatData> = FloatEasingAnimation
+    override var integrator = FloatEasingAnimation
     internal lateinit var accessor: FloatPropertyAccessor
 
     override fun initialize() {
@@ -124,8 +118,7 @@ class BezierCurveData private constructor() : CurveData<BezierCurveData>() {
     @JvmField var curve = CubicBezierCurve()
     @JvmField var easing: EasingFunction = Easing.LINEAR
 
-    override var data = this
-    override var defaultIntegrator: AnimationIntegrator<BezierCurveData> = BezierCurveAnimation
+    override val integrator = BezierCurveAnimation
 
     override fun reset() {
         accessorX(curve.p0.x)
@@ -141,8 +134,7 @@ class BezierCurveData private constructor() : CurveData<BezierCurveData>() {
 @ComponentDSL
 class BezierSplineData private constructor() : CurveData<BezierSplineData>() {
 
-    override var data = this
-    override var defaultIntegrator: AnimationIntegrator<BezierSplineData> = BezierSplineAnimation
+    override val integrator =  BezierSplineAnimation
 
     var spline = BezierSpline()
         set(value) {
@@ -168,8 +160,7 @@ class IntFrameData private constructor() : AnimatedData<IntFrameData>() {
     @JvmField var timeline: Array<out IntFrame> = emptyArray()
     @JvmField var animatedProperty: (Int) -> IntPropertyAccessor = { _ -> throw IllegalStateException() }
 
-    override var data = this
-    override var defaultIntegrator: AnimationIntegrator<IntFrameData> = IntFrameAnimation
+    override val integrator = IntFrameAnimation
     internal lateinit var accessor: IntPropertyAccessor
 
     override fun initialize() {

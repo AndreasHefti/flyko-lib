@@ -184,19 +184,19 @@ class Player private constructor() : Composite(Player), Controlled {
         init {
             Conditional {
                 name = PLAYER_GOES_EAST_CONDITION
-                condition = { playerKey, _ -> (Player[playerKey.name].playerMovement?.velocity?.x ?: 0f) > 0f }
+                condition = { playerKey -> (Player[playerKey.name].playerMovement?.velocity?.x ?: 0f) > 0f }
             }
             Conditional {
                 name = PLAYER_GOES_WEST_CONDITION
-                condition = { playerKey, _ -> (Player[playerKey.name].playerMovement?.velocity?.x ?: 0f) < 0f }
+                condition = { playerKey -> (Player[playerKey.name].playerMovement?.velocity?.x ?: 0f) < 0f }
             }
             Conditional {
                 name = PLAYER_GOES_SOUTH_CONDITION
-                condition = { playerKey, _ -> (Player[playerKey.name].playerMovement?.velocity?.y ?: 0f) > 0f }
+                condition = { playerKey -> (Player[playerKey.name].playerMovement?.velocity?.y ?: 0f) > 0f }
             }
             Conditional {
                 name = PLAYER_GOES_NORTH_CONDITION
-                condition = { playerKey, _ -> (Player[playerKey.name].playerMovement?.velocity?.y ?: 0f) < 0f }
+                condition = { playerKey -> (Player[playerKey.name].playerMovement?.velocity?.y ?: 0f) < 0f }
             }
         }
     }

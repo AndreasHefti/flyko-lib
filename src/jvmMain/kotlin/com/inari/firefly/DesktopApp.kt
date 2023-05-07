@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.inari.firefly.core.*
+import com.inari.firefly.core.api.ActionResult
 import com.inari.firefly.core.api.DesktopAppAdapter
 import com.inari.firefly.graphics.shape.SimpleShapeRenderer
 import com.inari.firefly.graphics.sprite.MultiPositionSpriteRenderer
@@ -16,8 +17,7 @@ import com.inari.firefly.graphics.text.SimpleTextRenderer
 import com.inari.firefly.graphics.tile.SimpleTileGridRenderer
 import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
-import com.inari.util.VOID_CONSUMER
-import org.lwjgl.glfw.GLFW
+import com.inari.util.VOID_CONSUMER_1
 
 
 class DesktopApp(
@@ -31,7 +31,7 @@ class DesktopApp(
     val initializer: (DesktopApp) -> Unit
 ) : ApplicationAdapter() {
 
-    var onDispose: (DesktopApp) -> Unit = VOID_CONSUMER
+    var onDispose: (DesktopApp) -> Unit = VOID_CONSUMER_1
 
     init {
         try {
@@ -128,17 +128,15 @@ class DesktopApp(
 
     override fun dispose() = onDispose(this)
 
-    fun addExitKeyTrigger(key: Int) {
-        Trigger
-        UpdateEventTrigger.build {
-            autoActivation = true
-            call = {
-                DesktopAppAdapter.exit()
-                true
-            }
-            condition = {
-                Gdx.input.isKeyPressed( key )
-            }
+    fun setExitKey(key: Int) {
+        Engine.input.setKeyCallback { k, _, a ->
+            if (a == 1 && k == key) DesktopAppAdapter.exit()
+        }
+    }
+
+    fun setExitKeys(vararg keys: Int) {
+        Engine.input.setKeyCallback { k, _, a ->
+            if (a == 1 &&     k in keys) DesktopAppAdapter.exit()
         }
     }
 }

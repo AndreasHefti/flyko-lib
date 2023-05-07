@@ -8,7 +8,7 @@ import com.inari.firefly.core.api.ShaderData
 import com.inari.firefly.core.api.ShaderUpdate
 import com.inari.util.NO_NAME
 import com.inari.util.NO_PROGRAM
-import com.inari.util.VOID_CONSUMER
+import com.inari.util.VOID_CONSUMER_1
 
 class Shader private constructor(): Asset(Shader), ShaderData {
 
@@ -18,7 +18,7 @@ class Shader private constructor(): Asset(Shader), ShaderData {
     override var fragmentShaderResourceName: String = NO_NAME
         set(value) { field = checkNotLoaded(value, "fragmentShaderResourceName") }
     override var fragmentShaderProgram: String = NO_PROGRAM
-    override var shaderUpdate: (ShaderUpdate) -> Unit = VOID_CONSUMER
+    override var shaderUpdate: (ShaderUpdate) -> Unit = VOID_CONSUMER_1
         set(value) { field = checkNotLoaded(value, "shaderInit") }
 
     override fun load() {

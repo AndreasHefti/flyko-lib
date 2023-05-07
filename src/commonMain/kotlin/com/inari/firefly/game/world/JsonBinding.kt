@@ -2,7 +2,7 @@ package com.inari.firefly.game.world
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BlendMode
-import com.inari.firefly.core.api.OperationResult
+import com.inari.firefly.core.api.ActionResult
 import com.inari.firefly.core.api.TaskCallback
 import com.inari.firefly.graphics.sprite.AccessibleTexture
 import com.inari.firefly.graphics.sprite.Texture
@@ -238,7 +238,7 @@ object JsonRoomLoadTask : StaticTask() {
         loadTileSets(attributes, roomJson)
         loadRoom(key, attributes, roomJson)
 
-        callback(NO_COMPONENT_KEY, attributes, OperationResult.SUCCESS)
+        callback(NO_COMPONENT_KEY, attributes, ActionResult.SUCCESS)
     }
 
     fun loadTileSets(attributes: AttributesRO, roomJson: RoomJson) {
@@ -416,7 +416,7 @@ object JsonTileSetLoadTask : StaticTask() {
         val enc = attributes[ATTR_ENCRYPTION]
 
         load(attributes, Engine.resourceService.loadJSONResource(res, TileSetJson::class, enc))
-        callback(NO_COMPONENT_KEY, attributes, OperationResult.SUCCESS)
+        callback(NO_COMPONENT_KEY, attributes, ActionResult.SUCCESS)
     }
 
     internal fun load(attributes: AttributesRO, tileSetJson: TileSetJson) {

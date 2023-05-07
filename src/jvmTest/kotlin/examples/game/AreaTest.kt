@@ -132,20 +132,21 @@ object AreaTest {
         Scene {
             name = "RoomActivationScene"
             val entity = Entity[fadeId]
-            init = {
+            initAction = {
                 val color = entity[EShape].color
                 color.a = 1f
                 Entity.activate(fadeId)
+                ActionResult.SUCCESS
             }
-            updateOperation =  {
+            updateAction =  {
                 val color = entity[EShape].color
                 color.a = color.a - .05f
                 if (color.a <= 0f) {
                     Entity.deactivate(fadeId)
-                    OperationResult.SUCCESS
+                    ActionResult.SUCCESS
                 }
                 else
-                    OperationResult.RUNNING
+                    ActionResult.RUNNING
             }
         }
 
@@ -153,20 +154,21 @@ object AreaTest {
             name = "RoomDeactivationScene"
             //var fadeProgress = false
             val entity = Entity[fadeId]
-            init = {
+            initAction = {
                 val color = entity[EShape].color
                 color.a = 0f
                 Entity.activate(fadeId)
+                ActionResult.SUCCESS
             }
-            updateOperation =  {
+            updateAction =  {
                 val color = entity[EShape].color
                 color.a = color.a + .05f
                 if (color.a >= 1f) {
                     Entity.deactivate(fadeId)
-                    OperationResult.SUCCESS
+                    ActionResult.SUCCESS
                 }
                 else
-                    OperationResult.RUNNING
+                    ActionResult.RUNNING
             }
         }
     }

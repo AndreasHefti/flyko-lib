@@ -3,16 +3,16 @@ package com.inari.firefly.ai.behavior
 import com.inari.firefly.core.*
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
 import com.inari.firefly.core.api.Action
-import com.inari.firefly.core.api.OperationResult
-import com.inari.firefly.core.api.OperationResult.*
-import com.inari.firefly.core.api.SUCCESS_ACTION
+import com.inari.firefly.core.api.ActionResult
+import com.inari.firefly.core.api.ActionResult.*
 import com.inari.firefly.core.api.TRUE_CONDITION
+import com.inari.firefly.core.api.VOID_ACTION
 import com.inari.util.collection.BitSet
 import kotlin.jvm.JvmField
 
 abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
 
-    abstract fun tick(entityKey: ComponentKey): OperationResult
+    abstract fun tick(entityKey: ComponentKey): ActionResult
 
     companion object : AbstractComponentSystem<BehaviorNode>("BehaviorNode") {
         override fun allocateArray(size: Int): Array<BehaviorNode?> = arrayOfNulls(size)
@@ -75,7 +75,7 @@ class ParallelNode private constructor() : BranchNode() {
 
     @JvmField var successThreshold: Int = 0
 
-    override fun tick(entityKey: ComponentKey): OperationResult {
+    override fun tick(entityKey: ComponentKey): ActionResult {
         val threshold = if (successThreshold > childrenNodes.size)
             childrenNodes.size
         else
@@ -102,7 +102,7 @@ class ParallelNode private constructor() : BranchNode() {
 
 class SelectionNode private constructor() : BranchNode() {
 
-    override fun tick(entityKey: ComponentKey): OperationResult {
+    override fun tick(entityKey: ComponentKey): ActionResult {
         var i = childrenNodes.nextSetBit(0)
         loop@ while (i >= 0) {
             val result = BehaviorNode[i].tick(entityKey)
@@ -120,7 +120,7 @@ class SelectionNode private constructor() : BranchNode() {
 
 class SequenceNode private constructor() : BranchNode() {
 
-    override fun tick(entityKey: ComponentKey): OperationResult {
+    override fun tick(entityKey: ComponentKey): ActionResult {
         var i = childrenNodes.nextSetBit(0)
         loop@ while (i >= 0) {
             val result = BehaviorNode[i].tick(entityKey)
@@ -139,10 +139,10 @@ class SequenceNode private constructor() : BranchNode() {
 class ActionNode private constructor() : BehaviorNode() {
 
     @JvmField var condition = TRUE_CONDITION
-    @JvmField var actionOperation: Action = SUCCESS_ACTION
+    @JvmField var actionOperation: Action = VOID_ACTION
 
-    override fun tick(entityKey: ComponentKey): OperationResult =
-        if (condition(entityKey, NO_COMPONENT_KEY))
+    override fun tick(entityKey: ComponentKey): ActionResult =
+        if (condition(entityKey))
             actionOperation(entityKey)
         else FAILED
 

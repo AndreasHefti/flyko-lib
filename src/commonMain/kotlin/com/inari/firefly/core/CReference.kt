@@ -5,12 +5,11 @@ import com.inari.firefly.core.api.ComponentIndex
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.NO_NAME
 import com.inari.util.Named
-import com.inari.util.VOID_CONSUMER
-import kotlin.jvm.JvmField
+import com.inari.util.VOID_CONSUMER_1
 
 class CReference internal constructor(
     val targetType: ComponentType<*>,
-    val init: (ComponentKey) -> Unit = VOID_CONSUMER
+    val init: (ComponentKey) -> Unit = VOID_CONSUMER_1
 ) {
 
     var targetKey: ComponentKey = NO_COMPONENT_KEY

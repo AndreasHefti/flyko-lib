@@ -207,10 +207,8 @@ class StateChangeEvent(override val eventType: EventType) : Event<(StateChangeEv
 
 class StateMachineEventTrigger  private constructor() : Trigger() {
 
-    private val stateChangeEventListener = { doTrigger() }
-
-    override fun load() = Engine.registerListener(FiniteStateMachine.STATE_CHANGE_EVENT_TYPE, stateChangeEventListener)
-    override fun dispose() = Engine.disposeListener(FiniteStateMachine.STATE_CHANGE_EVENT_TYPE, stateChangeEventListener)
+    override fun load() = Engine.registerListener(FiniteStateMachine.STATE_CHANGE_EVENT_TYPE, ::checkTrigger)
+    override fun dispose() = Engine.disposeListener(FiniteStateMachine.STATE_CHANGE_EVENT_TYPE, ::checkTrigger)
 
     companion object : SubComponentBuilder<Trigger, StateMachineEventTrigger>(Trigger) {
         override fun create() = StateMachineEventTrigger()

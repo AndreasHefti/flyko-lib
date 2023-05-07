@@ -6,7 +6,7 @@ import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.EntityComponent
 import com.inari.firefly.core.EntityComponentBuilder
 import com.inari.firefly.core.api.FFTimer
-import com.inari.firefly.core.api.OperationResult.SUCCESS
+import com.inari.firefly.core.api.ActionResult.SUCCESS
 import kotlin.jvm.JvmField
 
 class EBehavior private constructor() : EntityComponent(EBehavior) {

@@ -2,8 +2,8 @@ package com.inari.firefly.core.api
 
 import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
 import com.inari.firefly.core.ComponentKey
-import com.inari.util.VOID_CONSUMER_3
-import com.inari.util.ZERO_FLOAT
+import com.inari.firefly.physics.contact.EMPTY_CALLBACK
+import com.inari.util.*
 import com.inari.util.collection.AttributesRO
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector3f
@@ -18,24 +18,21 @@ typealias ComponentIndex = Int
 typealias EntityIndex = Int
 typealias BindingIndex = Int
 
-enum class OperationResult {
+enum class ActionResult {
     SUCCESS,
     RUNNING,
     FAILED
 }
-typealias ComponentCall = (ComponentKey) -> Unit
-typealias Action = (ComponentKey) -> OperationResult
-typealias ActionCallback = (ComponentKey, OperationResult) -> Unit
-operator fun ActionCallback.invoke() = this(NO_COMPONENT_KEY, OperationResult.SUCCESS)
-operator fun ActionCallback.invoke(result: OperationResult) = this(NO_COMPONENT_KEY, result)
-@JvmField val SUCCESS_ACTION: Action = { OperationResult.SUCCESS }
-@JvmField val FAILED_ACTION: Action =  { OperationResult.FAILED }
-@JvmField val RUNNING_ACTION: Action = { OperationResult.RUNNING }
-@JvmField val NO_ACTION: Action = FAILED_ACTION
 
-typealias Condition = (ComponentKey, ComponentKey) -> Boolean
-@JvmField val TRUE_CONDITION: Condition = { _, _ -> true }
-@JvmField val FALSE_CONDITION: Condition = { _, _ -> false }
+typealias Action = (ComponentKey) -> ActionResult
+typealias ActionCallback = (ComponentKey, ActionResult) -> Unit
+@JvmField val VOID_ACTION: Action = { ActionResult.SUCCESS }
+@JvmField val NO_ACTION_CALLBACK: ActionCallback = VOID_CONSUMER_2
+operator fun Action.invoke() = this(NO_COMPONENT_KEY)
+
+typealias Condition = (ComponentKey) -> Boolean
+@JvmField val TRUE_CONDITION: Condition = TRUE_PREDICATE
+@JvmField val FALSE_CONDITION: Condition = FALSE_PREDICATE
 
 interface NormalOperation {
     operator fun invoke(ci1: ComponentIndex, ci2: ComponentIndex, ci3: ComponentIndex): Float
@@ -49,7 +46,7 @@ interface NormalOperation {
 
 typealias SimpleTask = () -> Unit
 typealias TaskOperation = (ComponentKey, AttributesRO, TaskCallback) -> Unit
-typealias TaskCallback = (ComponentKey, AttributesRO, OperationResult) -> Unit
+typealias TaskCallback = (ComponentKey, AttributesRO, ActionResult) -> Unit
 @JvmField val VOID_TASK_OPERATION: TaskOperation = VOID_CONSUMER_3
 @JvmField val VOID_TASK_CALLBACK: TaskCallback = VOID_CONSUMER_3
 

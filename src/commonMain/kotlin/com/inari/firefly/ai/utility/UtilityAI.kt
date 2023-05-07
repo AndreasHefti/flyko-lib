@@ -2,7 +2,7 @@ package com.inari.firefly.ai.utility
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.*
-import com.inari.firefly.core.api.OperationResult.RUNNING
+import com.inari.firefly.core.api.ActionResult.RUNNING
 import com.inari.util.VOID_CALL
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Easing
@@ -134,7 +134,7 @@ class Intention private constructor() : UtilityAI() {
 
 class UtilityAction private constructor() : UtilityAI() {
 
-    @JvmField var actionOperation: Action = SUCCESS_ACTION
+    @JvmField var actionOperation: Action = VOID_ACTION
     @JvmField val considerations = BitSet()
 
     fun withConsideration(key: ComponentKey) {
@@ -159,7 +159,7 @@ class UtilityAction private constructor() : UtilityAI() {
         return result
     }
 
-    fun callAction(entityKey: ComponentKey): OperationResult = actionOperation(entityKey)
+    fun callAction(entityKey: ComponentKey): ActionResult = actionOperation(entityKey)
 
     companion object : SubComponentBuilder<UtilityAI, UtilityAction>(UtilityAI) {
         override fun create() = UtilityAction()
