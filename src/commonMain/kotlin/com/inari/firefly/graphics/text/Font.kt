@@ -61,7 +61,7 @@ class Font private constructor(): Asset(Font) {
     override fun dispose() {
         val iterator = charSpriteMap.iterator()
         while (iterator.hasNext())
-            Engine.graphics.disposeSprite(iterator.next())
+            Engine.graphics.disposeSprite(iterator.nextInt())
 
         charSpriteMap.clear()
         Engine.graphics.disposeTexture(tmpSpriteData.textureIndex)

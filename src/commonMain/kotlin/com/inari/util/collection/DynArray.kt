@@ -240,6 +240,12 @@ class DynArray<T> constructor(
         return result
     }
 
+    fun removeAll(indices: BitSet) {
+        val iterator = IndexIterator(indices)
+        while (iterator.hasNext())
+            remove(iterator.nextInt())
+    }
+
     /** This removes all given equal instances to a given value instance from the DynArray.
      * Use equals to check equality and sets a null value on specified index where an equal instance is found
      *

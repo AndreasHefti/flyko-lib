@@ -122,7 +122,7 @@ object AreaTest {
             }
             withComponent(EShape) {
                 type = ShapeType.RECTANGLE
-                color(0f, 0f, 0f, 1f)
+                color1(0f, 0f, 0f, 1f)
                 vertices = floatArrayOf(0f, 0f, 2000f, 2000f)
                 blend = BlendMode.NORMAL_ALPHA
                 fill = true
@@ -133,13 +133,13 @@ object AreaTest {
             name = "RoomActivationScene"
             val entity = Entity[fadeId]
             initAction = {
-                val color = entity[EShape].color
+                val color = entity[EShape].color1
                 color.a = 1f
                 Entity.activate(fadeId)
                 ActionResult.SUCCESS
             }
             updateAction =  {
-                val color = entity[EShape].color
+                val color = entity[EShape].color1
                 color.a = color.a - .05f
                 if (color.a <= 0f) {
                     Entity.deactivate(fadeId)
@@ -155,13 +155,13 @@ object AreaTest {
             //var fadeProgress = false
             val entity = Entity[fadeId]
             initAction = {
-                val color = entity[EShape].color
+                val color = entity[EShape].color1
                 color.a = 0f
                 Entity.activate(fadeId)
                 ActionResult.SUCCESS
             }
             updateAction =  {
-                val color = entity[EShape].color
+                val color = entity[EShape].color1
                 color.a = color.a + .05f
                 if (color.a >= 1f) {
                     Entity.deactivate(fadeId)
@@ -236,7 +236,7 @@ object AreaTest {
                         type = ShapeType.RECTANGLE
                         vertices = floatArrayOf(6f, 8f, 4f, 4f, 4f, 1f, 8f, 19f)
                         fill = false
-                        color(1f, 0f, 0f, 1f)
+                        color1(1f, 0f, 0f, 1f)
                         blend = BlendMode.NORMAL_ALPHA
                     }
             }

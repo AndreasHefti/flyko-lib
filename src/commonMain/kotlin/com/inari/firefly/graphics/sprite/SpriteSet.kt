@@ -4,7 +4,6 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.api.BindingIndex
 import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.SpriteData
-import com.inari.firefly.physics.animation.IntFrameData
 import com.inari.util.NO_NAME
 import com.inari.util.ZERO_INT
 import com.inari.util.collection.DynArray
@@ -19,8 +18,7 @@ class SpriteTemplate internal constructor(): SpriteData {
     override var hFlip = false
     override var vFlip = false
 
-    var spriteIndex = NULL_BINDING_INDEX
-        internal set
+    @JvmField var spriteIndex = NULL_BINDING_INDEX
     override var textureIndex = NULL_BINDING_INDEX
         internal set
 
@@ -34,30 +32,16 @@ class SpriteTemplate internal constructor(): SpriteData {
 }
 
 @ComponentDSL
-class SpriteFrame : IntFrameData.IntFrame {
+class SpriteFrame {
 
-    var interval: Long = 0
-    var sprite: SpriteTemplate = SpriteTemplate()
+    @JvmField var interval: Long = 0
+    @JvmField var sprite: SpriteTemplate = SpriteTemplate()
 
     val spriteTemplate: (SpriteTemplate.() -> Unit) -> Unit = { configure ->
         val sprite = SpriteTemplate()
         sprite.also(configure)
         this.sprite = sprite
     }
-
-    override val timeInterval: Long
-        get() { return interval }
-
-    override val value: Int
-        get() = sprite.spriteIndex
-
-//    companion object {
-//        val of: (SpriteFrame.() -> Unit) -> SpriteFrame = { configure ->
-//            val instance = SpriteFrame()
-//            instance.also(configure)
-//            instance
-//        }
-//    }
 }
 
 class SpriteSet private constructor(): Asset(SpriteSet) {

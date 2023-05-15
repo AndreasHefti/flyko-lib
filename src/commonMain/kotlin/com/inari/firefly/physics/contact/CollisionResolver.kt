@@ -198,7 +198,7 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                 val iterator = contactMap[originWorldBounds.bounds, entity]
                 mapIndex = contactMaps.nextSetBit(mapIndex + 1)
                 while (iterator.hasNext()) {
-                    val otherEntity = Entity[iterator.next()]
+                    val otherEntity = Entity[iterator.nextInt()]
                     val otherContact = otherEntity[EContact]
                     val otherWorldPos = getWorldPos(otherEntity, otherEntity[ETransform])
 

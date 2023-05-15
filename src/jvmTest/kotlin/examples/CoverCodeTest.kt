@@ -7,8 +7,7 @@ import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.physics.animation.EAnimation
-import com.inari.firefly.physics.animation.EasedFloatData
-import com.inari.firefly.physics.animation.FloatEasingAnimation
+import com.inari.firefly.physics.animation.EasedValueAnimation
 import com.inari.util.geom.Easing
 
 fun main() {
@@ -27,6 +26,7 @@ fun main() {
                 vFlip = false
             }
         }
+
         // Create an Entity positioned on the base View on x=50/y=150, and the formerly
         // created sprite with a tint color. This also automatically loads the needed assets if not already done
         Entity {
@@ -45,7 +45,7 @@ fun main() {
             }
             withComponent(EAnimation) {
                 // with an active easing animation on the sprite alpha blending value...
-                withAnimation(EasedFloatData) {
+                withAnimation(EasedValueAnimation) {
                     looping = true
                     inverseOnLoop = true
                     easing = Easing.LINEAR
@@ -55,7 +55,7 @@ fun main() {
                     animatedProperty = ESprite.PropertyAccessor.TINT_COLOR_ALPHA
                 }
                 // and with an active easing animation on the sprites position on the x axis...
-                withAnimation(EasedFloatData) {
+                withAnimation(EasedValueAnimation) {
                     looping = true
                     inverseOnLoop = true
                     easing = Easing.LINEAR

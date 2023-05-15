@@ -24,8 +24,8 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
 
     fun nextIndex(from: Int): ComponentIndex
     fun nextActiveIndex(from: Int): ComponentIndex
-    fun indexIterator(): IntIterator
-    fun activeIndexIterator(): IntIterator
+    fun indexIterator(): IndexIterator
+    fun activeIndexIterator(): IndexIterator
 
     fun createKey(name: String): ComponentKey
     fun hasKey(name: String): Boolean
@@ -117,7 +117,7 @@ interface IComponentSystem<C : Component> : ComponentBuilder<C>, ComponentType<C
     ) {
         val iter = activeIndexIterator()
         while (iter.hasNext()) {
-            val c = this[iter.next()]
+            val c = this[iter.nextInt()]
             if (!c.active) continue
             if (filter(c))
                 process(c)
@@ -289,8 +289,8 @@ abstract class ComponentSystem<C : Component>(
 
     override fun nextIndex(from: ComponentIndex) = _componentMapping.nextIndex(from)
     override fun nextActiveIndex(from: ComponentIndex) = _activeComponentSet.nextIndex(from)
-    override fun indexIterator(): IntIterator = IndexIterator(_componentMapping)
-    override fun activeIndexIterator(): IntIterator = IndexIterator(_activeComponentSet)
+    override fun indexIterator() = IndexIterator(_componentMapping)
+    override fun activeIndexIterator() = IndexIterator(_activeComponentSet)
     override fun iterator(): Iterator<C> = IndexedTypeIterator(_componentMapping)
 
     override operator fun get(index: ComponentIndex): C = _componentMapping[index]
@@ -637,8 +637,8 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
 
     override fun nextIndex(from: ComponentIndex) = subComponentRefs.nextIndex(from)
     override fun nextActiveIndex(from: ComponentIndex) = activeSubComponentRefs.nextIndex(from)
-    override fun indexIterator(): IntIterator = IndexIterator(subComponentRefs)
-    override fun activeIndexIterator(): IntIterator = IndexIterator(activeSubComponentRefs)
+    override fun indexIterator() = IndexIterator(subComponentRefs)
+    override fun activeIndexIterator() = IndexIterator(activeSubComponentRefs)
     override fun iterator(): Iterator<CC> = IndexedTypeIterator(iterableTypeAdapter)
     private val iterableTypeAdapter: IndexedTypeIterable<CC> = object : IndexedTypeIterable<CC> {
         override fun get(index: Int): CC? = if (subComponentRefs[index]) this@ComponentSubTypeBuilder[index] else null
@@ -653,7 +653,7 @@ abstract class ComponentSubTypeBuilder<C : Component, CC : C>(
     override fun clearSystem() {
         val iter = IndexIterator(subComponentRefs)
         while (iter.hasNext())
-            delete(iter.next())
+            delete(iter.nextInt())
     }
 
     override fun createKey(name: String): ComponentKey {

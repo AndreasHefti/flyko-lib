@@ -10,8 +10,7 @@ import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.physics.animation.EAnimation
-import com.inari.firefly.physics.animation.EasedFloatData
-import com.inari.firefly.physics.animation.FloatEasingAnimation
+import com.inari.firefly.physics.animation.EasedValueAnimation
 import com.inari.util.VOID_CALL
 import com.inari.util.geom.Easing
 import org.lwjgl.glfw.GLFW
@@ -53,19 +52,16 @@ object InariIntro {
                 tintColor(1f, 1f, 1f, 0f)
             }
             withComponent(EAnimation) {
-                withAnimation(EasedFloatData) {
+                withAnimation(EasedValueAnimation) {
                     animatedProperty = ESprite.PropertyAccessor.TINT_COLOR_ALPHA
                     resetOnFinish = false
                     easing = Easing.LINEAR
                     startValue = 0f
                     endValue = 1f
                     duration = 1000
-                    integrator = FloatEasingAnimation
                 }
             }
         }
-
-
 
         Engine.input.setKeyCallback { _, _, _ -> dispose() }
         Engine.input.setMouseButtonCallback { _, _ -> dispose() }

@@ -13,7 +13,7 @@ import kotlin.jvm.JvmField
 abstract class EntityComponentType<C : EntityComponent>(
     val typeName: String
 ) : Aspect {
-    val typeAspect: Aspect = Entity.ENTITY_COMPONENT_ASPECTS.createAspect(typeName)
+    @JvmField val typeAspect: Aspect = Entity.ENTITY_COMPONENT_ASPECTS.createAspect(typeName)
     override val aspectIndex: Int = typeAspect.aspectIndex
     override val aspectName: String = typeAspect.aspectName
     override val aspectType: AspectType = typeAspect.aspectType
@@ -39,6 +39,8 @@ abstract class EntityComponent protected constructor(
 class Entity internal constructor(): Component(Entity), Controlled, AspectAware {
 
     /** The set of EntityComponent of a specified Entity. EntityComponent are indexed by type for fast accesses */
+    // TODO try to replace this with an aspect type mapping to an array index of overall EntityComponent array
+    // every EntityComponent holds a global array of its EntityComponent and the entity just maps the indices
     internal val components: AspectSet<EntityComponent> = AspectSet.of(ENTITY_COMPONENT_ASPECTS)
     /** The Aspects that reflects the EntityComponent types that are hold by this Entity */
     override val aspects: Aspects = components.aspects
@@ -65,6 +67,8 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
     override fun toString(): String = "${super.toString()} | $aspects"
 
     companion object : ComponentSystem<Entity>("Entity")  {
+        override fun allocateArray(size: Int): Array<Entity?> = arrayOfNulls(size)
+        override fun create() = Entity()
 
         val ENTITY_COMPONENT_ASPECTS = IndexedAspectType("ENTITY_COMPONENT_ASPECTS")
         private val entityListener: ComponentEventListener = { index, eType ->
@@ -116,20 +120,19 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
 
         private fun dispose(entityComponent: EntityComponent) {
             entityComponent.reset()
+            entityComponent.entityIndex = NULL_COMPONENT_INDEX
             getOrCreate(entityComponent.componentType.aspectIndex).add(entityComponent)
         }
-
-        override fun allocateArray(size: Int): Array<Entity?> {
-            return arrayOfNulls(size)
-        }
-
-        override fun create(): Entity = Entity()
     }
 }
 
 abstract class EntityComponentBuilder<C : EntityComponent>(
-    typeName: String
+    typeName: String,
+    /* TODO arrayAllocator: (Int, Int) -> DynArray<C> */
 ) : EntityComponentType<C>(typeName) {
+
+    // TODO
+    //@JvmField internal val components = arrayAllocator(50, 100)
 
     private fun doBuild(comp: C, configure: C.() -> Unit, entity: Entity): C {
         configure(comp)

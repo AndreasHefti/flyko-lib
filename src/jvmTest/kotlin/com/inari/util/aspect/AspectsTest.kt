@@ -1,4 +1,4 @@
-package com.inari.firefly.util.aspect
+
 
 import com.inari.util.aspect.IndexedAspectType
 import kotlin.test.Test

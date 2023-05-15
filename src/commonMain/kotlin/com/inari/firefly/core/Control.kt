@@ -85,13 +85,13 @@ abstract class Control protected constructor() : Component(Control) {
             val iter = Control.activeIndexIterator()
             if (Pausing.paused)
                 while (iter.hasNext()) {
-                    val c = Control[iter.next()]
+                    val c = Control[iter.nextInt()]
                     if (c.scheduler.needsUpdate() && !Pausing.isPaused(c.groups))
                         c.update()
                 }
             else
                 while (iter.hasNext()) {
-                    val c = Control[iter.next()]
+                    val c = Control[iter.nextInt()]
                     if (c.scheduler.needsUpdate())
                         c.update()
                 }

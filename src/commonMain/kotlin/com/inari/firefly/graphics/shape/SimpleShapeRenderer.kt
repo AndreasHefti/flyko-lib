@@ -21,7 +21,7 @@ object SimpleShapeRenderer : EntityRenderer("SimpleShapeRenderer") {
         val iter = entities.iterator()
         while (iter.hasNext()) {
             val entity = iter.next()
-            graphics.renderShape(entity[EShape], entity[ETransform])
+            graphics.renderShape(entity[EShape].data, entity[ETransform])
         }
     }
 }

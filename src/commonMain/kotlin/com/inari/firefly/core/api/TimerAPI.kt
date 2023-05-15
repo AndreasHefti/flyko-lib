@@ -2,17 +2,13 @@ package com.inari.firefly.core.api
 
 import com.inari.util.collection.DynArray
 import com.inari.util.timeMillis
+import kotlin.jvm.JvmField
 import kotlin.native.concurrent.ThreadLocal
 
 @ThreadLocal
 object FFTimer : TimerAPI() {
 
     private var lastUpdateTime: Long = timeMillis()
-
-    override var time: Long = 0
-        private set
-    override var timeElapsed: Long = 0
-        private set
 
     private val schedulers: DynArray<UpdateScheduler> = DynArray.of( 20)
 
@@ -44,15 +40,11 @@ object FFTimer : TimerAPI() {
                 lastUpdate = lastUpdateTime
                 tick++
                 needsUpdate = true
-            } else /* if (updated) */ {
+            } else
                 needsUpdate = false
-                //updated = false
-            }
         }
 
         override fun needsUpdate(): Boolean {
-//            if (needsUpdate)
-//                updated = true
             return needsUpdate
         }
 
@@ -77,8 +69,8 @@ object FFTimer : TimerAPI() {
 
 abstract class TimerAPI {
 
-    abstract val time: Long
-    abstract val timeElapsed: Long
+    @JvmField var time: Long = -1
+    @JvmField var timeElapsed: Long = -1
 
     private val schedulers: DynArray<FFTimer.UpdateScheduler> = DynArray.of( 20)
 

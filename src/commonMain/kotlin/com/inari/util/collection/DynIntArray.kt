@@ -11,7 +11,7 @@ interface DynIntArrayRO : IntListIterable {
     fun isEmpty(index: Int): Boolean
     operator fun contains(value: Int): Boolean
     fun indexOf(value: Int): Int
-    operator fun iterator(): IntIterator
+    operator fun iterator(): IndexListIterator
 }
 
 class DynIntArray(
@@ -139,7 +139,7 @@ class DynIntArray(
     override fun get(index: Int): Int =
         array[index]
 
-    override fun iterator(): IntIterator =
+    override fun iterator(): IndexListIterator =
         IndexListIterator(this)
 
     override fun nextListIndex(from: Int): Int {

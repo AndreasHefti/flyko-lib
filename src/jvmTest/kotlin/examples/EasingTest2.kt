@@ -12,8 +12,7 @@ import com.inari.firefly.graphics.text.EText
 import com.inari.firefly.graphics.text.SimpleTextRenderer
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.animation.EAnimation
-import com.inari.firefly.physics.animation.EasedFloatData
-import com.inari.firefly.physics.animation.FloatEasingAnimation
+import com.inari.firefly.physics.animation.EasedValueAnimation
 import com.inari.firefly.util.geom.EasingTest
 
 fun main() {
@@ -58,7 +57,7 @@ fun main() {
                 vertices = floatArrayOf(100f, ypos, 20f, 20f)
             }
             withComponent(EAnimation) {
-                withAnimation(EasedFloatData) {
+                withAnimation(EasedValueAnimation) {
                     looping = true
                     inverseOnLoop = true
                     easing = type.func
@@ -66,7 +65,6 @@ fun main() {
                     endValue = 400f
                     duration = 5000
                     animatedProperty = ETransform.PropertyAccessor.POSITION_X
-                    //animationController(FloatEasingAnimation)
                 }
             }
         }

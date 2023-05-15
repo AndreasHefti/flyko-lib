@@ -21,7 +21,6 @@ interface AspectType {
     fun typeCheck(aspect: Aspect): Boolean
     operator fun get(name: String): Aspect?
     operator fun get(index: Int): Aspect?
-
 }
 
 class IndexedAspectType(

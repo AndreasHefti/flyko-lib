@@ -7,8 +7,11 @@ import com.inari.firefly.ai.behavior.ParallelNode
 import com.inari.firefly.ai.behavior.SequenceNode
 import com.inari.firefly.core.Entity
 import com.inari.firefly.core.api.ActionResult.*
+import com.inari.firefly.core.api.BlendMode
+import com.inari.firefly.core.api.ShapeType
 import com.inari.firefly.graphics.FFInfoSystem
 import com.inari.firefly.graphics.FrameRateInfo
+import com.inari.firefly.graphics.shape.EShape
 import com.inari.firefly.graphics.sprite.ESprite
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.firefly.graphics.view.ETransform
@@ -104,24 +107,24 @@ fun main(args: Array<String>) {
 
         Entity.setMinCapacity(100000)
         val vert = floatArrayOf(0f, 0f, 10f, 20f)
-        for (i in 1..20000) {
+        for (i in 1..50000) {
             Entity {
                 autoActivation = true
                 withComponent(ETransform) {
                     viewRef(0)
                     position(Random.nextInt(0,800), Random.nextInt(0,600))
                 }
-                withComponent(ESprite) {
-                    spriteRef("nanoSprite")
-                }
-//                withComponent(EShape) {
-//                    type = ShapeType.RECTANGLE
-//                    fill = true
-//                    segments = 10
-//                    color1(Random.nextFloat(), Random.nextFloat(), Random.nextFloat(), Random.nextFloat())
-//                    vertices = vert
-//                    blend = BlendMode.NORMAL_ALPHA
+//                withComponent(ESprite) {
+//                    spriteRef("nanoSprite")
 //                }
+                withComponent(EShape) {
+                    type = ShapeType.RECTANGLE
+                    fill = true
+                    segments = 10
+                    color1(Random.nextFloat(), Random.nextFloat(), Random.nextFloat(), Random.nextFloat())
+                    vertices = vert
+                    blend = BlendMode.NORMAL_ALPHA
+                }
                 withComponent(EMovement) {
                     velocity.x = 0f
                     //updateResolution = 1f

@@ -190,16 +190,16 @@ enum class ShapeType {
     TRIANGLE
 }
 
-interface ShapeData {
-    val type: ShapeType
-    val vertices: FloatArray
-    val segments: Int
-    val color1: Vector4f
-    val color2: Vector4f?
-    val color3: Vector4f?
-    val color4: Vector4f?
-    val blend: BlendMode
-    val fill: Boolean
+class ShapeData {
+    @JvmField var type: ShapeType = ShapeType.POINT
+    @JvmField var vertices: FloatArray = floatArrayOf()
+    @JvmField var segments: Int = 0
+    @JvmField val color1: Vector4f = Vector4f()
+    @JvmField var color2: Vector4f? = null
+    @JvmField var color3: Vector4f? = null
+    @JvmField var color4: Vector4f? = null
+    @JvmField var blend: BlendMode = BlendMode.NONE
+    @JvmField var fill: Boolean = true
 }
 
 interface FrameBufferData {

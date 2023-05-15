@@ -12,19 +12,36 @@ import com.inari.util.FloatPropertyAccessor
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
-class EShape private constructor() : EntityComponent(EShape), ShapeData {
+class EShape private constructor() : EntityComponent(EShape) {
 
-    override var type: ShapeType = ShapeType.POINT
-    override var vertices: FloatArray = floatArrayOf()
-    override var segments: Int = -1
-    val color: Vector4f
-        get() = color1
-    override val color1 = Vector4f(1f, 1f, 1f, 1f)
-    override var color2 = null
-    override var color3 = null
-    override var color4 = null
-    override var blend = BlendMode.NONE
-    override var fill = false
+    @JvmField val data = ShapeData()
+
+    var type: ShapeType
+        get() = data.type
+        set(value) { data.type = value }
+    var vertices: FloatArray
+        get() = data.vertices
+        set(value) { data.vertices = value }
+    var segments: Int
+        get() = data.segments
+        set(value) { data.segments = value }
+    val color1: Vector4f
+        get() = data.color1
+    var color2: Vector4f?
+        get() = data.color2
+        set(value) { data.color2 = value }
+    var color3: Vector4f?
+        get() = data.color3
+        set(value) { data.color3 = value }
+    var color4: Vector4f?
+        get() = data.color4
+        set(value) { data.color4 = value }
+    var blend: BlendMode
+        get() = data.blend
+        set(value) { data.blend = value }
+    var fill: Boolean
+        get() = data.fill
+        set(value) { data.fill = value }
 
     override fun reset() {
         type = ShapeType.POINT
@@ -41,10 +58,10 @@ class EShape private constructor() : EntityComponent(EShape), ShapeData {
     object PropertyAccessor {
         fun getInstance(index: EntityIndex) = ComponentSystem[Entity, index][EShape]
         fun getColor(index: EntityIndex) = getInstance(index).color1
-        fun getColorRed(index: EntityIndex) = getColor(index).getV0PropertyAccessor()
-        fun getColorGreen(index: EntityIndex) = getColor(index).getV1PropertyAccessor()
-        fun getColorBlue(index: EntityIndex) = getColor(index).getV2PropertyAccessor()
-        fun getColorAlpha(index: EntityIndex) = getColor(index).getV3PropertyAccessor()
+        fun getColorRed(index: EntityIndex) = getColor(index).v0PropertyAccessor
+        fun getColorGreen(index: EntityIndex) = getColor(index).v1PropertyAccessor
+        fun getColorBlue(index: EntityIndex) = getColor(index).v2PropertyAccessor
+        fun getColorAlpha(index: EntityIndex) = getColor(index).v3PropertyAccessor
         @JvmField val COLOR_RED: (EntityIndex) -> FloatPropertyAccessor = this::getColorRed
         @JvmField val COLOR_GREEN: (EntityIndex) -> FloatPropertyAccessor = this::getColorGreen
         @JvmField val COLOR_BLUE: (EntityIndex) -> FloatPropertyAccessor = this::getColorBlue

@@ -13,11 +13,11 @@ interface IndexedTypeIterable<T> : IndexIterable  {
     operator fun get(index: Int): T?
 }
 
-class IndexIterator private constructor(private var ref: IndexIterable) : IntIterator() {
+class IndexIterator private constructor(private var ref: IndexIterable) {
 
-    var nextIndex = ref.nextIndex(0)
-    override fun hasNext(): Boolean = nextIndex >= 0
-    override fun nextInt(): Int {
+    private var nextIndex = ref.nextIndex(0)
+    fun hasNext(): Boolean = nextIndex >= 0
+    fun nextInt(): Int {
         val i = nextIndex
         nextIndex = ref.nextIndex(nextIndex + 1)
         if (!hasNext())
@@ -48,11 +48,11 @@ class IndexIterator private constructor(private var ref: IndexIterable) : IntIte
     }
 }
 
-class IndexListIterator private constructor(private var ref: IntListIterable) : IntIterator() {
+class IndexListIterator private constructor(private var ref: IntListIterable) {
 
     var nextIndex = ref.nextListIndex(0)
-    override fun hasNext(): Boolean = nextIndex >= 0
-    override fun nextInt(): Int {
+    fun hasNext(): Boolean = nextIndex >= 0
+    fun nextInt(): Int {
         val i = nextIndex
         nextIndex = ref.nextListIndex(nextIndex + 1)
         if (!hasNext())

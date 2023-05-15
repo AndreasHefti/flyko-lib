@@ -4,9 +4,6 @@ import com.inari.firefly.core.api.TimerAPI
 
 object TestTimer : TimerAPI() {
 
-    override var time: Long = 0
-    override var timeElapsed: Long = 0
-
     override fun init() {
         time = 0
     }

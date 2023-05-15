@@ -2,7 +2,6 @@ package com.inari.util.geom
 
 
 import com.inari.util.DO_NOTHING
-import com.inari.util.VOID_CALL
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Direction.*
 import kotlin.jvm.JvmField
@@ -82,22 +81,22 @@ object GeomUtils {
     fun magnitude(v: Vector3f) = sqrt(v.v0 * v.v0 + v.v1 * v.v1 + v.v2 * v.v2 )
     fun magnitude(v: Vector4f) = sqrt(v.v0 * v.v0 + v.v1 * v.v1 + v.v2 * v.v2 + v.v3 * v.v3)
 
-    fun lerp(v0: Int, v1: Int, t: Float): Int = ((1 - t) * v0 + t * v1).toInt()
-    fun lerp(v0: Float, v1: Float, t: Float): Float = (1 - t) * v0 + t * v1
-    fun lerp(v0: Vector2i, v1: Vector2i, t: Float, target: Vector2i) {
+    inline fun lerp(v0: Int, v1: Int, t: Float): Int = ((1 - t) * v0 + t * v1).toInt()
+    inline fun lerp(v0: Float, v1: Float, t: Float): Float = (1 - t) * v0 + t * v1
+    inline fun lerp(v0: Vector2i, v1: Vector2i, t: Float, target: Vector2i) {
         target.x = lerp(v0.x, v1.x, t)
         target.y = lerp(v0.y, v1.y, t)
     }
-    fun lerp(v0: Vector2f, v1: Vector2f, t: Float, target: Vector2f) {
+    inline fun lerp(v0: Vector2f, v1: Vector2f, t: Float, target: Vector2f) {
         target.v0 = lerp(v0.v0, v1.v0, t)
         target.v1 = lerp(v0.v1, v1.v1, t)
     }
-    fun lerp(v0: Vector3f, v1: Vector3f, t: Float, target: Vector3f) {
+    inline fun lerp(v0: Vector3f, v1: Vector3f, t: Float, target: Vector3f) {
         target.v0 = lerp(v0.v0, v1.v0, t)
         target.v1 = lerp(v0.v1, v1.v1, t)
         target.v2 = lerp(v0.v2, v1.v2, t)
     }
-    fun lerp(v0: Vector4f, v1: Vector4f, t: Float, target: Vector4f) {
+    inline fun lerp(v0: Vector4f, v1: Vector4f, t: Float, target: Vector4f) {
         target.v0 = lerp(v0.v0, v1.v0, t)
         target.v1 = lerp(v0.v1, v1.v1, t)
         target.v2 = lerp(v0.v2, v1.v2, t)

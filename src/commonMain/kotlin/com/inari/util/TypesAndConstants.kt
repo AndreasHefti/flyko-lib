@@ -56,21 +56,17 @@ interface Named {
 
 interface FloatPropertyAccessor {
     operator fun invoke(value: Float)
-    operator fun invoke(): Float
 }
 
 interface IntPropertyAccessor {
     operator fun invoke(value: Int)
-    operator fun invoke(): Int
 }
 
 val VOID_FLOAT_PROPERTY_ACCESSOR = object : FloatPropertyAccessor {
     override fun invoke(value: Float) {}
-    override fun invoke(): Float = ZERO_FLOAT
 }
 val VOID_INT_PROPERTY_ACCESSOR = object : IntPropertyAccessor {
-    override fun invoke(value: Int) {}
-    override fun invoke(): Int = ZERO_INT
+    override inline fun invoke(value: Int) {}
 }
 
 val VOID_FLOAT_PROPERTY_ACCESSOR_PROVIDER: (Int) -> FloatPropertyAccessor = { _ -> VOID_FLOAT_PROPERTY_ACCESSOR }

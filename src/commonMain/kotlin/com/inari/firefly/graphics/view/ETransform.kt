@@ -22,6 +22,10 @@ class ETransform private constructor() : EntityComponent(ETransform), TransformD
     override val scale: Vector2f = Vector2f(1.0f, 1.0f)
     override var rotation: Float = ZERO_FLOAT
 
+    @JvmField val rotationPropertyAccessor: FloatPropertyAccessor = object : FloatPropertyAccessor {
+        override fun invoke(value: Float) { rotation = value }
+    }
+
     override fun activate() {
         super.activate()
         // if view is not defined yet, set the base view for default
@@ -31,11 +35,6 @@ class ETransform private constructor() : EntityComponent(ETransform), TransformD
             View.activate(viewRef.targetKey)
         if (layerRef.exists)
             Layer.activate(layerRef.targetKey)
-    }
-
-    fun getRotationPropertyAccessor(): FloatPropertyAccessor = object : FloatPropertyAccessor {
-        override fun invoke(value: Float) { rotation = value }
-        override fun invoke(): Float = rotation
     }
 
     fun move(dx: Float = ZERO_FLOAT, dy: Float = ZERO_FLOAT) {
@@ -61,14 +60,14 @@ class ETransform private constructor() : EntityComponent(ETransform), TransformD
     }
 
     object PropertyAccessor {
-        fun getInstance(index: Int) = ComponentSystem[Entity, index][ETransform]
-        fun getPos(index: Int) = getInstance(index).position
-        fun getScale(index: Int) = getInstance(index).scale
-        fun getPosXAccessor(index: Int) = getPos(index).getV0PropertyAccessor()
-        fun getPosYAccessor(index: Int) = getPos(index).getV1PropertyAccessor()
-        fun getScaleXAccessor(index: Int) = getScale(index).getV0PropertyAccessor()
-        fun getScaleYAccessor(index: Int) = getScale(index).getV1PropertyAccessor()
-        fun getRotationAccessor(index: Int) = getInstance(index).getRotationPropertyAccessor()
+        private inline fun getInstance(index: Int) = ComponentSystem[Entity, index][ETransform]
+        private inline fun getPos(index: Int) = getInstance(index).position
+        private inline fun getScale(index: Int) = getInstance(index).scale
+        private inline fun getPosXAccessor(index: Int) = getPos(index).v0PropertyAccessor
+        private inline fun getPosYAccessor(index: Int) = getPos(index).v1PropertyAccessor
+        private inline fun getScaleXAccessor(index: Int) = getScale(index).v0PropertyAccessor
+        private inline fun getScaleYAccessor(index: Int) = getScale(index).v1PropertyAccessor
+        private inline fun getRotationAccessor(index: Int) = getInstance(index).rotationPropertyAccessor
         @JvmField val POSITION_X: (Int) -> FloatPropertyAccessor = this::getPosXAccessor
         @JvmField val POSITION_Y: (Int) -> FloatPropertyAccessor = this::getPosYAccessor
         @JvmField val SCALE_X: (Int) -> FloatPropertyAccessor = this::getScaleXAccessor

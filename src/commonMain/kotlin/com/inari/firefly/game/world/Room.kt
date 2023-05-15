@@ -227,7 +227,7 @@ class Room private constructor() : Composite(Room) {
                                     type = ShapeType.RECTANGLE
                                     vertices = floatArrayOf(0f,0f,bounds.width, bounds.height)
                                     fill = false
-                                    color(1f, 0f, 0f, 1f)
+                                    color1(1f, 0f, 0f, 1f)
                                     blend = BlendMode.NORMAL_ALPHA
                                 }
                             withComponent(EContact) {

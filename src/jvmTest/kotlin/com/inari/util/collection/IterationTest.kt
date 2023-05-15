@@ -20,11 +20,11 @@ class IterationTest {
         intArray[6] = 7
 
         iter = intArray.iterator()
-        assertEquals("2", iter.next().toString())
-        assertEquals("3", iter.next().toString())
-        assertEquals("4", iter.next().toString())
-        assertEquals("5", iter.next().toString())
-        assertEquals("6", iter.next().toString())
-        assertEquals("7", iter.next().toString())
+        assertEquals("2", iter.nextInt().toString())
+        assertEquals("3", iter.nextInt().toString())
+        assertEquals("4", iter.nextInt().toString())
+        assertEquals("5", iter.nextInt().toString())
+        assertEquals("6", iter.nextInt().toString())
+        assertEquals("7", iter.nextInt().toString())
     }
 }

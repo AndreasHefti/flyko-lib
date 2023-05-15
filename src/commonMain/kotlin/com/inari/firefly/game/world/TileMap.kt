@@ -8,8 +8,7 @@ import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.Layer
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.physics.animation.EAnimation
-import com.inari.firefly.physics.animation.IntFrameAnimation
-import com.inari.firefly.physics.animation.IntFrameData
+import com.inari.firefly.physics.animation.SpriteFrameAnimation
 import com.inari.firefly.physics.contact.EContact
 import com.inari.util.DO_NOTHING
 import com.inari.util.LIST_VALUE_SEPARATOR
@@ -161,11 +160,10 @@ open class TileMap : Component(TileMap) {
 
                         if (tile.animationData != null) {
                             withComponent(EAnimation) {
-                                withAnimation(IntFrameData) {
+                                withAnimation(SpriteFrameAnimation) {
                                     animatedProperty = ETile.PropertyAccessor.SPRITE
                                     looping = true
                                     timeline = tile.animationData!!.frames.toArray()
-                                    //animationController(IntFrameAnimation)
                                 }
                             }
                         }

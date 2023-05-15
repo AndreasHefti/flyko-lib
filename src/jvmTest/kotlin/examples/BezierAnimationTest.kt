@@ -30,7 +30,7 @@ fun main() {
             withComponent(EShape) {
                 type = ShapeType.RECTANGLE
                 fill = true
-                color(1f, 0f, 0f, 1f)
+                color1(1f, 0f, 0f, 1f)
                 vertices = floatArrayOf(-10f, -10f, 20f, 20f)
             }
             withComponent(EAnimation) {
@@ -41,7 +41,7 @@ fun main() {
                     Vector2f(200f, 200f),
                 )
 
-                withAnimation(BezierCurveData) {
+                withAnimation(BezierCurveAnimation) {
                     looping = true
                     inverseOnLoop = true
                     duration = 2500
@@ -50,7 +50,6 @@ fun main() {
                     animatedXProperty = ETransform.PropertyAccessor.POSITION_X
                     animatedYProperty = ETransform.PropertyAccessor.POSITION_Y
                     animatedRotationProperty = ETransform.PropertyAccessor.ROTATION
-                    //animationController(BezierCurveAnimation)
                 }
             }
         }
@@ -84,7 +83,7 @@ fun main() {
                     Vector2f(300f, 200f)
                 )
 
-                withAnimation(BezierCurveData) {
+                withAnimation(BezierCurveAnimation) {
                     looping = true
                     inverseOnLoop = true
                     duration = 5000
@@ -93,7 +92,6 @@ fun main() {
                     animatedXProperty = ETransform.PropertyAccessor.POSITION_X
                     animatedYProperty = ETransform.PropertyAccessor.POSITION_Y
                     animatedRotationProperty = ETransform.PropertyAccessor.ROTATION
-                    //animationController(BezierCurveAnimation)
                 }
             }
         }

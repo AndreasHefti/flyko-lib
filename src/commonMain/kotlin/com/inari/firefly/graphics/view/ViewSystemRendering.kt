@@ -11,7 +11,6 @@ import com.inari.util.collection.DynIntArray
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 import kotlin.math.floor
-import kotlin.native.concurrent.ThreadLocal
 
 interface ViewRenderer {
     val name: String
@@ -207,7 +206,7 @@ object ViewSystemRenderer : Renderer() {
         if (layers != null && !layers.isEmpty) {
             val layerIterator = layers.iterator()
             while (layerIterator.hasNext()) {
-                val layerIndex = layerIterator.next()
+                val layerIndex = layerIterator.nextInt()
                 val layer = Layer[layerIndex]
 
                 // apply layer offset

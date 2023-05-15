@@ -23,7 +23,7 @@ class View private constructor(): Component(View), ViewData, Controlled {
     override val tintColor = Vector4f( 1f, 1f, 1f, 1f )
     override var blendMode = BlendMode.NONE
     override var zoom = 1.0f
-    override var  fboScale = 1.0f
+    override var fboScale = 1.0f
     @JvmField val shader = CReference(Shader)
     override var shaderIndex = NULL_BINDING_INDEX
         internal set

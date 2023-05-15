@@ -34,7 +34,7 @@ class BitSetTest {
         val iterator = IndexIterator(bitset)
         val buffer = StringBuffer()
         while (iterator.hasNext())
-            buffer.append("${iterator.next()},")
+            buffer.append("${iterator.nextInt()},")
 
 
         assertEquals("0,1,3,4,5,", buffer.toString())

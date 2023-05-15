@@ -16,8 +16,7 @@ import com.inari.firefly.graphics.text.Font
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.View
 import com.inari.firefly.physics.animation.EAnimation
-import com.inari.firefly.physics.animation.IntFrameAnimation
-import com.inari.firefly.physics.animation.IntFrameData
+import com.inari.firefly.physics.animation.SpriteFrameAnimation
 import com.inari.util.collection.Attributes
 
 fun main() {
@@ -75,11 +74,10 @@ fun main() {
 
                 it.animationData?.apply {
                     this@Entity.withComponent(EAnimation) {
-                        withAnimation(IntFrameData) {
+                        withAnimation(SpriteFrameAnimation) {
                             animatedProperty = ESprite.PropertyAccessor.SPRITE_INDEX
                             looping = true
                             timeline = this@apply.frames.toArray()
-                            //animationController(IntFrameAnimation)
                         }
                     }
                 }

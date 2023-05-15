@@ -24,6 +24,10 @@ class ETile private constructor(): EntityComponent(ETile), SpriteRenderable {
     @JvmField val spriteRef = CReference(Sprite)
     @JvmField val spriteSetRef = CReference(SpriteSet)
 
+    @JvmField val spriteRefPropertyAccessor: IntPropertyAccessor = object : IntPropertyAccessor {
+        override fun invoke(value: Int) { spriteIndex = value }
+    }
+
     override fun activate() {
         if (tileGridRef.exists)
             TileGrid.load(tileGridRef.targetKey)
@@ -45,19 +49,16 @@ class ETile private constructor(): EntityComponent(ETile), SpriteRenderable {
         blendMode = BlendMode.NONE
     }
 
-    fun getSpriteIndexPropertyAccessor(): IntPropertyAccessor = object : IntPropertyAccessor {
-        override fun invoke(value: Int) { spriteIndex = value }
-        override fun invoke(): Int = spriteIndex
-    }
+
 
     object PropertyAccessor {
-        fun getInstance(index: EntityIndex) = ComponentSystem[Entity, index][ETile]
-        fun getTintColor(index: EntityIndex) = getInstance(index).tintColor
-        fun getTintColorRed(index: EntityIndex) = getTintColor(index).getV0PropertyAccessor()
-        fun getTintColorGreen(index: EntityIndex) = getTintColor(index).getV1PropertyAccessor()
-        fun getTintColorBlue(index: EntityIndex) = getTintColor(index).getV2PropertyAccessor()
-        fun getTintColorAlpha(index: EntityIndex) = getTintColor(index).getV3PropertyAccessor()
-        fun getSpriteIndex(index: EntityIndex) = getInstance(index).getSpriteIndexPropertyAccessor()
+        private inline fun getInstance(index: EntityIndex) = ComponentSystem[Entity, index][ETile]
+        private inline fun getTintColor(index: EntityIndex) = getInstance(index).tintColor
+        private inline fun getTintColorRed(index: EntityIndex) = getTintColor(index).v0PropertyAccessor
+        private inline fun getTintColorGreen(index: EntityIndex) = getTintColor(index).v1PropertyAccessor
+        private inline fun getTintColorBlue(index: EntityIndex) = getTintColor(index).v2PropertyAccessor
+        private inline fun getTintColorAlpha(index: EntityIndex) = getTintColor(index).v3PropertyAccessor
+        private inline fun getSpriteIndex(index: EntityIndex) = getInstance(index).spriteRefPropertyAccessor
         @JvmField val TINT_COLOR_RED: (EntityIndex) -> FloatPropertyAccessor = this::getTintColorRed
         @JvmField val TINT_COLOR_GREEN: (EntityIndex) -> FloatPropertyAccessor = this::getTintColorGreen
         @JvmField val TINT_COLOR_BLUE: (EntityIndex) -> FloatPropertyAccessor = this::getTintColorBlue
