@@ -3,10 +3,7 @@ package com.inari.firefly.graphics.particle
 import com.inari.firefly.core.Asset
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentDSL
-import com.inari.firefly.core.api.BlendMode
-import com.inari.firefly.core.api.ComponentIndex
-import com.inari.firefly.core.api.SpriteRenderable
-import com.inari.firefly.core.api.TransformDataImpl
+import com.inari.firefly.core.api.*
 import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.geom.Vector2f
@@ -14,20 +11,20 @@ import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
 @ComponentDSL
-abstract class Particle protected constructor() {
+abstract class Particle protected constructor() : TransformData() {
 
-    @JvmField
-    internal val transformData = TransformDataImpl()
+//    @JvmField
+//    internal val transformData = TransformDataImpl()
 
-    val position: Vector2f
-        get() = transformData.position
-    val pivot: Vector2f
-        get() = transformData.pivot
-    val scale: Vector2f
-        get() = transformData.scale
-    var rotation: Float
-        get() = transformData.rotation
-        set(value) { transformData.rotation = value }
+//    val position: Vector2f
+//        get() = transformData.position
+//    val pivot: Vector2f
+//        get() = transformData.pivot
+//    val scale: Vector2f
+//        get() = transformData.scale
+//    var rotation: Float
+//        get() = transformData.rotation
+//        set(value) { transformData.rotation = value }
     @JvmField var xVelocity: Float  = ZERO_FLOAT
     @JvmField var yVelocity: Float  = ZERO_FLOAT
     @JvmField var mass: Float  = 1f
@@ -37,13 +34,19 @@ abstract class Particle protected constructor() {
     }
 }
 
-class SpriteParticle(): Particle(), SpriteRenderable {
+class SpriteParticle: Particle() {
 
-    val spriteRef = CReference(Sprite)
-    override val spriteIndex: ComponentIndex
-        get() = Asset.resolveAssetIndex(spriteRef.targetKey)
-    override val tintColor = Vector4f()
-    override val blendMode = BlendMode.NORMAL_ALPHA
+    @JvmField val renderData = SpriteRenderable()
+
+    var spriteIndex: BindingIndex
+        get() = renderData.spriteIndex
+        set(value) { renderData.spriteIndex = value }
+    val tintColor
+        get() = renderData.tintColor
+    var blendMode
+        get() = renderData.blendMode
+        set(value) { renderData.blendMode = value }
+    @JvmField val spriteRef = CReference(Sprite)
 
     companion object : ParticleBuilder<SpriteParticle> {
         override fun createEmpty(): SpriteParticle =

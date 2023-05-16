@@ -2,7 +2,6 @@ package com.inari.firefly.core.api
 
 import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
 import com.inari.firefly.core.ComponentKey
-import com.inari.firefly.physics.contact.EMPTY_CALLBACK
 import com.inari.util.*
 import com.inari.util.collection.AttributesRO
 import com.inari.util.geom.Vector2f
@@ -116,28 +115,21 @@ interface ViewData {
     val isBase: Boolean
 }
 
-interface TransformData {
-    val position: Vector2f
-    val pivot: Vector2f
-    val scale: Vector2f
-    val rotation: Float
+open class TransformData {
+    @JvmField val position = Vector2f()
+    @JvmField val pivot = Vector2f()
+    @JvmField val scale = Vector2f(1f, 1f)
+    @JvmField var rotation = ZERO_FLOAT
     val hasRotation: Boolean get() = rotation != ZERO_FLOAT
     val hasScale: Boolean get() = scale.v0 != 1.0f || scale.v1 != 1.0f
 }
 
-class TransformDataImpl() : TransformData {
-    override val position = Vector2f()
-    override val pivot = Vector2f()
-    override val scale = Vector2f()
-    override var rotation = 1.0f
-}
-
-interface ShaderData {
-    val vertexShaderResourceName: String
-    val vertexShaderProgram: String
-    val fragmentShaderResourceName: String
-    val fragmentShaderProgram: String
-    val shaderUpdate: (ShaderUpdate) -> Unit
+class ShaderData {
+    @JvmField var vertexShaderResourceName = NO_NAME
+    @JvmField var vertexShaderProgram = NO_PROGRAM
+    @JvmField var fragmentShaderResourceName = NO_NAME
+    @JvmField var fragmentShaderProgram = NO_PROGRAM
+    @JvmField var shaderUpdate: (ShaderUpdate) -> Unit = VOID_CONSUMER_1
 }
 
 interface ShaderUpdate {
@@ -149,33 +141,27 @@ interface ShaderUpdate {
     fun bindViewTexture(bindingName: String, value: Int)
 }
 
-interface TextureData {
-    val resourceName: String
-    val isMipmap: Boolean
-    val wrapS: Int
-    val wrapT: Int
-    val minFilter: Int
-    val magFilter: Int
-    val colorConverter: (Int) -> Int
+class TextureData {
+    @JvmField var resourceName = NO_NAME
+    @JvmField var isMipmap = false
+    @JvmField var wrapS = -1
+    @JvmField var wrapT = -1
+    @JvmField var minFilter = -1
+    @JvmField var magFilter = -1
+    @JvmField var colorConverter: (Int) -> Int = INT_FUNCTION_IDENTITY
 }
 
-interface SpriteData {
-    val textureIndex: BindingIndex
-    val textureBounds: Vector4i
-    val hFlip: Boolean
-    val vFlip: Boolean
+class SpriteData {
+    @JvmField var textureIndex: BindingIndex = -1
+    @JvmField var textureBounds = Vector4i(ZERO_INT, ZERO_INT, ZERO_INT, ZERO_INT)
+    @JvmField var hFlip = false
+    @JvmField var vFlip = false
 }
 
-interface SpriteRenderable {
-    val spriteIndex: BindingIndex
-    val tintColor: Vector4f
-    val blendMode: BlendMode
-}
-
-class SpriteRenderableImpl : SpriteRenderable {
-    override var spriteIndex: BindingIndex = NULL_BINDING_INDEX
-    override val tintColor = Vector4f(1f, 1f, 1f, 1f)
-    override var blendMode = BlendMode.NORMAL_ALPHA
+class SpriteRenderable {
+    @JvmField var spriteIndex: BindingIndex = NULL_BINDING_INDEX
+    @JvmField val tintColor = Vector4f(1f, 1f, 1f, 1f)
+    @JvmField var blendMode = BlendMode.NORMAL_ALPHA
 }
 
 enum class ShapeType {
@@ -191,23 +177,13 @@ enum class ShapeType {
 }
 
 class ShapeData {
-    @JvmField var type: ShapeType = ShapeType.POINT
-    @JvmField var vertices: FloatArray = floatArrayOf()
-    @JvmField var segments: Int = 0
-    @JvmField val color1: Vector4f = Vector4f()
+    @JvmField var type = ShapeType.POINT
+    @JvmField var vertices = floatArrayOf()
+    @JvmField var segments = 0
+    @JvmField val color1 = Vector4f()
     @JvmField var color2: Vector4f? = null
     @JvmField var color3: Vector4f? = null
     @JvmField var color4: Vector4f? = null
-    @JvmField var blend: BlendMode = BlendMode.NONE
-    @JvmField var fill: Boolean = true
-}
-
-interface FrameBufferData {
-    val bounds: Vector4i
-    val clearColor: Vector4f
-    val tintColor: Vector4f
-    val blendMode: BlendMode
-    val shaderRef: BindingIndex
-    val zoom: Float
-    val fboScale: Float
+    @JvmField var blend = BlendMode.NONE
+    @JvmField var fill = true
 }

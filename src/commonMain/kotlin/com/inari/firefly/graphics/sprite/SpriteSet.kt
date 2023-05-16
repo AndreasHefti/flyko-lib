@@ -11,16 +11,23 @@ import com.inari.util.collection.DynArrayRO
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
-class SpriteTemplate internal constructor(): SpriteData {
+class SpriteTemplate internal constructor() {
 
+    @JvmField val spriteData = SpriteData()
     @JvmField var name = NO_NAME
-    override val textureBounds = Vector4i()
-    override var hFlip = false
-    override var vFlip = false
-
     @JvmField var spriteIndex = NULL_BINDING_INDEX
-    override var textureIndex = NULL_BINDING_INDEX
-        internal set
+
+    val textureBounds: Vector4i
+        get() = spriteData.textureBounds
+    var hFlip: Boolean
+        get() = spriteData.hFlip
+        set(value) { spriteData.hFlip = value }
+    var vFlip: Boolean
+        get() = spriteData.vFlip
+        set(value) { spriteData.vFlip = value }
+    var textureIndex: BindingIndex
+        get() = spriteData.textureIndex
+        internal set(value) { spriteData.textureIndex = value }
 
     fun reset() {
         spriteIndex = NULL_BINDING_INDEX
@@ -76,7 +83,7 @@ class SpriteSet private constructor(): Asset(SpriteSet) {
         for (i in 0 until spriteData.capacity) {
             val sprite = spriteData[i] ?: continue
             sprite.textureIndex = textureIndex
-            sprite.spriteIndex = Engine.graphics.createSprite(sprite)
+            sprite.spriteIndex = Engine.graphics.createSprite(sprite.spriteData)
         }
     }
 

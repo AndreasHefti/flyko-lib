@@ -7,19 +7,27 @@ import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.ShaderData
 import com.inari.firefly.core.api.ShaderUpdate
 import com.inari.util.NO_NAME
-import com.inari.util.NO_PROGRAM
-import com.inari.util.VOID_CONSUMER_1
+import kotlin.jvm.JvmField
 
-class Shader private constructor(): Asset(Shader), ShaderData {
+class Shader private constructor(): Asset(Shader) {
 
-    override var vertexShaderResourceName: String = NO_NAME
-        set(value) { field = checkNotLoaded(value, "vertexShaderResourceName") }
-    override var vertexShaderProgram: String = NO_PROGRAM
-    override var fragmentShaderResourceName: String = NO_NAME
-        set(value) { field = checkNotLoaded(value, "fragmentShaderResourceName") }
-    override var fragmentShaderProgram: String = NO_PROGRAM
-    override var shaderUpdate: (ShaderUpdate) -> Unit = VOID_CONSUMER_1
-        set(value) { field = checkNotLoaded(value, "shaderInit") }
+    @JvmField val renderData = ShaderData()
+
+    var vertexShaderResourceName: String
+        get() = renderData.vertexShaderResourceName
+        set(value) { renderData.vertexShaderResourceName = checkNotLoaded(value, "vertexShaderResourceName") }
+    var vertexShaderProgram: String
+        get() = renderData.vertexShaderProgram
+        set(value) { renderData.vertexShaderProgram = value }
+    var fragmentShaderResourceName: String
+        get() = renderData.fragmentShaderResourceName
+        set(value) { renderData.fragmentShaderResourceName = checkNotLoaded(value, "fragmentShaderResourceName") }
+    var fragmentShaderProgram: String
+        get() = renderData.fragmentShaderProgram
+        set(value) { renderData.fragmentShaderProgram = value }
+    var shaderUpdate: (ShaderUpdate) -> Unit
+        get() = renderData.shaderUpdate
+        set(value) { renderData.shaderUpdate = checkNotLoaded(value, "shaderInit") }
 
     override fun load() {
         super.load()
@@ -34,7 +42,7 @@ class Shader private constructor(): Asset(Shader), ShaderData {
         if (fragmentShaderResourceName != NO_NAME)
             fragmentShaderProgram = loadShaderProgram(fragmentShaderResourceName)
 
-        assetIndex = Engine.graphics.createShader(this)
+        assetIndex = Engine.graphics.createShader(this.renderData)
     }
 
     override fun dispose() {

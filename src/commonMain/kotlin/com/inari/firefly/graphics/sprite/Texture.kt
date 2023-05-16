@@ -5,30 +5,38 @@ import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.TextureData
 import com.inari.firefly.game.world.TileSet
 import com.inari.firefly.graphics.text.Font
-import com.inari.util.INT_FUNCTION_IDENTITY
-import com.inari.util.NO_NAME
+import kotlin.jvm.JvmField
 
-open class Texture protected constructor() : Asset(Texture), TextureData {
+open class Texture protected constructor() : Asset(Texture) {
+
+    @JvmField val textureData = TextureData()
 
     var width: Int = -1
         private set
     var height: Int = -1
         private set
 
-    override var resourceName = NO_NAME
-        set(value) { field = checkNotLoaded(value, "ResourceName") }
-    override var isMipmap = false
-        set(value) { field = checkNotLoaded(value, "MipMap") }
-    override var wrapS = -1
-        set(value) { field = checkNotLoaded(value, "WrapS") }
-    override var wrapT = -1
-        set(value) { field = checkNotLoaded(value, "WrapT") }
-    override var minFilter = -1
-        set(value) { field = checkNotLoaded(value, "MinFilter") }
-    override var magFilter = -1
-        set(value) { field = checkNotLoaded(value, "MagFilter") }
-    override var colorConverter = INT_FUNCTION_IDENTITY
-        set(value) { field = checkNotLoaded(value, "ColorConverter") }
+    var resourceName
+        get() = textureData.resourceName
+        set(value) { textureData.resourceName = checkNotLoaded(value, "ResourceName") }
+    var isMipmap
+        get() = textureData.isMipmap
+        set(value) { textureData.isMipmap = checkNotLoaded(value, "MipMap") }
+    var wrapS
+        get() = textureData.wrapS
+        set(value) { textureData.wrapS = checkNotLoaded(value, "WrapS") }
+    var wrapT
+        get() = textureData.wrapT
+        set(value) { textureData.wrapT = checkNotLoaded(value, "WrapT") }
+    var minFilter
+        get() = textureData.minFilter
+        set(value) { textureData.minFilter = checkNotLoaded(value, "MinFilter") }
+    var magFilter
+        get() = textureData.magFilter
+        set(value) { textureData.magFilter = checkNotLoaded(value, "MagFilter") }
+    var colorConverter
+        get() = textureData.colorConverter
+        set(value) { textureData.colorConverter = checkNotLoaded(value, "ColorConverter") }
 
     fun withSprite(configure: (Sprite.() -> Unit)): ComponentKey {
         val sprite = Sprite.buildAndGet(configure)
@@ -57,7 +65,7 @@ open class Texture protected constructor() : Asset(Texture), TextureData {
     override fun load() {
         if (assetIndex > NULL_BINDING_INDEX)
             return
-        val textData = Engine.graphics.createTexture(this)
+        val textData = Engine.graphics.createTexture(this.textureData)
         assetIndex = textData.first
         width = textData.second
         height = textData.third

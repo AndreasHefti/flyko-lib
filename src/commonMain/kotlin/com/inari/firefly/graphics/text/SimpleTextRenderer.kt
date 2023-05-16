@@ -3,7 +3,7 @@ package com.inari.firefly.graphics.text
 import com.inari.firefly.core.EChild
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Entity
-import com.inari.firefly.core.api.SpriteRenderableImpl
+import com.inari.firefly.core.api.SpriteRenderable
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.EntityRenderer
 import com.inari.util.collection.DynArray
@@ -12,7 +12,7 @@ object SimpleTextRenderer : EntityRenderer("SimpleTextRenderer") {
 
     init { order = 50 }
 
-    private val textRenderable = SpriteRenderableImpl()
+    private val textRenderable = SpriteRenderable()
 
     override fun acceptEntity(entity: Entity) =
         entity.aspects.include(MATCHING_ASPECTS) &&
@@ -37,7 +37,7 @@ object SimpleTextRenderer : EntityRenderer("SimpleTextRenderer") {
 
             textRenderable.tintColor(text.tint)
             textRenderable.blendMode = text.blend
-            transformCollector(transform)
+            transformCollector(transform.renderData)
             if (EChild in entity.aspects)
                 collectTransformData(entity[EChild].parent.targetKey.componentIndex, transformCollector)
 

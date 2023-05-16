@@ -4,7 +4,7 @@ import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.EntityComponent
 import com.inari.firefly.core.EntityComponentBuilder
 import com.inari.firefly.core.api.BlendMode
-import com.inari.firefly.core.api.TransformDataImpl
+import com.inari.firefly.core.api.TransformData
 import com.inari.util.collection.DynArray
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector4f
@@ -13,7 +13,7 @@ import kotlin.jvm.JvmField
 @ComponentDSL
 class CharacterMetaData internal constructor(){
 
-    @JvmField internal val transformData = TransformDataImpl()
+    @JvmField internal val transformData = TransformData()
 
     val position: Vector2f
         get() = transformData.position

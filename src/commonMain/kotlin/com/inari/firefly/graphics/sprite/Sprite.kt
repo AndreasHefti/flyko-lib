@@ -4,6 +4,7 @@ import com.inari.firefly.core.Asset
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentSubTypeBuilder
 import com.inari.firefly.core.Engine
+import com.inari.firefly.core.api.BindingIndex
 import com.inari.firefly.core.api.NULL_BINDING_INDEX
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.core.api.SpriteData
@@ -11,16 +12,22 @@ import com.inari.util.ZERO_INT
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
-class Sprite private constructor(): Asset(Sprite), SpriteData {
+class Sprite private constructor(): Asset(Sprite) {
 
-    override var textureIndex = NULL_COMPONENT_INDEX
-        internal set
+    @JvmField val spriteData = SpriteData()
     @JvmField val textureRef = CReference(Texture)
-    val textureRegion: Vector4i
-        get() = textureBounds
-    override val textureBounds: Vector4i = Vector4i(ZERO_INT, ZERO_INT, ZERO_INT, ZERO_INT)
-    override var hFlip: Boolean = false
-    override var vFlip: Boolean = false
+
+    var textureIndex: BindingIndex
+        get() = spriteData.textureIndex
+        internal set(value) { spriteData.textureIndex = value }
+    val textureBounds: Vector4i
+        get() = spriteData.textureBounds
+    var hFlip: Boolean
+        get() = spriteData.hFlip
+        set(value) { spriteData.hFlip = value }
+    var vFlip: Boolean
+        get() = spriteData.vFlip
+        set(value) { spriteData.vFlip = value }
 
     override fun load() {
         super.load()
@@ -33,7 +40,7 @@ class Sprite private constructor(): Asset(Sprite), SpriteData {
         if (!tex.loaded)
             Texture.load(textureRef.targetKey)
         textureIndex = tex.assetIndex
-        assetIndex = Engine.graphics.createSprite(this)
+        assetIndex = Engine.graphics.createSprite(this.spriteData)
     }
 
     override fun dispose() {

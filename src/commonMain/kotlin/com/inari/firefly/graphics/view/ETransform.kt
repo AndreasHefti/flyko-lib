@@ -8,19 +8,26 @@ import com.inari.util.ZERO_INT
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 
-class ETransform private constructor() : EntityComponent(ETransform), TransformData, ViewLayerAware {
+class ETransform private constructor() : EntityComponent(ETransform), ViewLayerAware {
+
+    @JvmField val renderData = TransformData()
+
+    @JvmField val viewRef = CReference(View)
+    @JvmField val layerRef = CReference(Layer)
+    val position: Vector2f
+        get() = renderData.position
+    val pivot: Vector2f
+        get() = renderData.pivot
+    val scale: Vector2f
+        get() = renderData.scale
+    var rotation: Float
+        get() = renderData.rotation
+        set(value) { renderData.rotation = value }
 
     override val viewIndex: Int
         get() = viewRef.targetKey.componentIndex
     override val layerIndex: Int
         get() = if (layerRef.exists) layerRef.targetKey.componentIndex else 0
-    val viewRef = CReference(View)
-    val layerRef = CReference(Layer)
-
-    override val position: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT)
-    override val pivot: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT)
-    override val scale: Vector2f = Vector2f(1.0f, 1.0f)
-    override var rotation: Float = ZERO_FLOAT
 
     @JvmField val rotationPropertyAccessor: FloatPropertyAccessor = object : FloatPropertyAccessor {
         override fun invoke(value: Float) { rotation = value }

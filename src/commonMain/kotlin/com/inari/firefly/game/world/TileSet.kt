@@ -45,13 +45,13 @@ open class TileSet: Component(TileSet) {
             val tileTemplate = iter.next()
             val spriteTemplate = tileTemplate.spriteTemplate
             spriteTemplate.textureIndex = textureIndex
-            spriteTemplate.spriteIndex = Engine.graphics.createSprite(spriteTemplate)
+            spriteTemplate.spriteIndex = Engine.graphics.createSprite(spriteTemplate.spriteData)
             if (tileTemplate.animationData != null) {
                 val iter = tileTemplate.animationData!!.sprites.values.iterator()
                 while (iter.hasNext()) {
                     val aSpriteTemplate = iter.next()
                     aSpriteTemplate.textureIndex = textureIndex
-                    aSpriteTemplate.spriteIndex = Engine.graphics.createSprite(aSpriteTemplate)
+                    aSpriteTemplate.spriteIndex = Engine.graphics.createSprite(aSpriteTemplate.spriteData)
                 }
             }
         }

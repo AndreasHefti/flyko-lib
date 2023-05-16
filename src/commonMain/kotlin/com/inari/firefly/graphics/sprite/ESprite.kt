@@ -1,26 +1,27 @@
 package com.inari.firefly.graphics.sprite
 
 import com.inari.firefly.core.*
-import com.inari.firefly.core.api.BlendMode
-import com.inari.firefly.core.api.ComponentIndex
-import com.inari.firefly.core.api.NULL_BINDING_INDEX
-import com.inari.firefly.core.api.SpriteRenderable
+import com.inari.firefly.core.api.*
 import com.inari.util.FloatPropertyAccessor
 import com.inari.util.IntPropertyAccessor
-import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
-class ESprite private constructor() : EntityComponent(ESprite), SpriteRenderable {
+class ESprite private constructor() : EntityComponent(ESprite) {
 
-    override var spriteIndex = NULL_BINDING_INDEX
-    override val tintColor = Vector4f(1f, 1f, 1f, 1f)
-    override var blendMode = BlendMode.NONE
+    @JvmField val renderData = SpriteRenderable()
 
+    var spriteIndex: BindingIndex
+        get() = renderData.spriteIndex
+        set(value) { renderData.spriteIndex = value }
+    val tintColor
+        get() = renderData.tintColor
+    var blendMode
+        get() = renderData.blendMode
+        set(value) { renderData.blendMode = value }
     @JvmField val spriteRef = CReference(Sprite)
     @JvmField val spriteSetRef = CReference(SpriteSet)
-
     @JvmField val spriteRefPropertyAccessor: IntPropertyAccessor = object : IntPropertyAccessor {
-        override fun invoke(value: Int) { spriteIndex = value }
+        override fun invoke(value: Int) { renderData.spriteIndex = value }
     }
 
     override fun activate() {
@@ -44,7 +45,7 @@ class ESprite private constructor() : EntityComponent(ESprite), SpriteRenderable
 
     object PropertyAccessor {
         private inline fun getInstance(index: ComponentIndex) = ComponentSystem[Entity, index][ESprite]
-        private inline fun getTintColor(index: ComponentIndex) = getInstance(index).tintColor
+        private inline fun getTintColor(index: ComponentIndex) = getInstance(index).renderData.tintColor
         private inline fun getTintColorRed(index: ComponentIndex) = getTintColor(index).v0PropertyAccessor
         private inline fun getTintColorGreen(index: ComponentIndex) = getTintColor(index).v1PropertyAccessor
         private inline fun getTintColorBlue(index: ComponentIndex) = getTintColor(index).v2PropertyAccessor

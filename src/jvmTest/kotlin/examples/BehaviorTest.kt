@@ -114,17 +114,17 @@ fun main(args: Array<String>) {
                     viewRef(0)
                     position(Random.nextInt(0,800), Random.nextInt(0,600))
                 }
-//                withComponent(ESprite) {
-//                    spriteRef("nanoSprite")
-//                }
-                withComponent(EShape) {
-                    type = ShapeType.RECTANGLE
-                    fill = true
-                    segments = 10
-                    color1(Random.nextFloat(), Random.nextFloat(), Random.nextFloat(), Random.nextFloat())
-                    vertices = vert
-                    blend = BlendMode.NORMAL_ALPHA
+                withComponent(ESprite) {
+                    spriteRef("nanoSprite")
                 }
+//                withComponent(EShape) {
+//                    type = ShapeType.RECTANGLE
+//                    fill = true
+//                    segments = 10
+//                    color1(Random.nextFloat(), Random.nextFloat(), Random.nextFloat(), Random.nextFloat())
+//                    vertices = vert
+//                    blend = BlendMode.NORMAL_ALPHA
+//                }
                 withComponent(EMovement) {
                     velocity.x = 0f
                     //updateResolution = 1f

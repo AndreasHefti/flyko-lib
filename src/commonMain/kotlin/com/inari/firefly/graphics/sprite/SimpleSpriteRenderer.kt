@@ -25,7 +25,7 @@ object SimpleSpriteRenderer : EntityRenderer("SimpleSpriteRenderer") {
         val iter = entities.iterator()
         while (iter.hasNext()) {
             val entity = iter.next()
-            graphics.renderSprite(entity[ESprite], entity[ETransform])
+            graphics.renderSprite(entity[ESprite].renderData, entity[ETransform].renderData)
         }
     }
 

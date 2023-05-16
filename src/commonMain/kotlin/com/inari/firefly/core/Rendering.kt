@@ -14,12 +14,7 @@ abstract class Renderer {
 
 }
 
-class Transform constructor(
-    override val position: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT),
-    override val pivot: Vector2f = Vector2f(ZERO_FLOAT, ZERO_FLOAT),
-    override val scale: Vector2f = Vector2f(1.0f, 1.0f),
-    override var rotation: Float = ZERO_FLOAT
-) : TransformData {
+class Transform : TransformData() {
 
     operator fun plus(td: TransformData): Transform {
         position + td.position

@@ -9,7 +9,6 @@ import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.core.api.SpriteData
 import com.inari.firefly.graphics.sprite.Texture
 import com.inari.util.collection.DynIntArray
-import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 
 class Font private constructor(): Asset(Font) {
@@ -28,23 +27,18 @@ class Font private constructor(): Asset(Font) {
         get() = dChar.toChar()
         set(value) { dChar = value.code }
 
-    private val tmpSpriteData = object : SpriteData {
-        override var textureIndex = NULL_BINDING_INDEX
-        override val textureBounds = Vector4i()
-        override val hFlip = false
-        override val vFlip = false
-    }
+    private val spriteData = SpriteData()
 
     override fun load() {
-        tmpSpriteData.textureIndex = resolveAssetIndex(textureRef.targetKey)
-        tmpSpriteData.textureBounds(0, 0, charWidth, charHeight)
+        spriteData.textureIndex = resolveAssetIndex(textureRef.targetKey)
+        spriteData.textureBounds(0, 0, charWidth, charHeight)
         for (y in charMap.indices) {
             for (x in charMap[y].indices) {
-                tmpSpriteData.textureBounds(
+                spriteData.textureBounds(
                     x * charWidth + xOffset,
                     y * charHeight + yOffset)
 
-                val charSpriteId = Engine.graphics.createSprite(tmpSpriteData)
+                val charSpriteId = Engine.graphics.createSprite(spriteData)
                 charSpriteMap[charMap[y][x].code] = charSpriteId
             }
         }
@@ -64,8 +58,8 @@ class Font private constructor(): Asset(Font) {
             Engine.graphics.disposeSprite(iterator.nextInt())
 
         charSpriteMap.clear()
-        Engine.graphics.disposeTexture(tmpSpriteData.textureIndex)
-        tmpSpriteData.textureIndex = NULL_BINDING_INDEX
+        Engine.graphics.disposeTexture(spriteData.textureIndex)
+        spriteData.textureIndex = NULL_BINDING_INDEX
     }
 
     companion object : ComponentSubTypeBuilder<Asset, Font>(Asset,"Font") {

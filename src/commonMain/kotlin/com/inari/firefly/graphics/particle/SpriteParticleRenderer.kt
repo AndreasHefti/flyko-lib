@@ -30,9 +30,9 @@ object SpriteParticleRenderer : EntityRenderer("SpriteParticleRenderer") {
                 if (particle !is SpriteParticle)
                     continue
 
-                transformCollector(transform)
-                transformCollector + particle.transformData
-                graphics.renderSprite(particle, transformCollector.data)
+                transformCollector(transform.renderData)
+                transformCollector + particle
+                graphics.renderSprite(particle.renderData, transformCollector.data)
             }
         }
     }

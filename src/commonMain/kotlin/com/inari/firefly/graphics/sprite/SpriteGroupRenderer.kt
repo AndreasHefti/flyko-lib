@@ -24,9 +24,9 @@ object SpriteGroupRenderer : EntityRenderer("SpriteGroupRenderer") {
             val transform = entity[ETransform]
             val group = entity[EChild]
 
-            transformCollector(transform)
+            transformCollector(transform.renderData)
             collectTransformData(group.parentIndex, transformCollector)
-            graphics.renderSprite(sprite, transformCollector.data)
+            graphics.renderSprite(sprite.renderData, transformCollector.data)
         }
     }
 

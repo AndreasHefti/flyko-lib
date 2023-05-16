@@ -14,34 +14,34 @@ import kotlin.jvm.JvmField
 
 class EShape private constructor() : EntityComponent(EShape) {
 
-    @JvmField val data = ShapeData()
+    @JvmField val renderData = ShapeData()
 
     var type: ShapeType
-        get() = data.type
-        set(value) { data.type = value }
+        get() = renderData.type
+        set(value) { renderData.type = value }
     var vertices: FloatArray
-        get() = data.vertices
-        set(value) { data.vertices = value }
+        get() = renderData.vertices
+        set(value) { renderData.vertices = value }
     var segments: Int
-        get() = data.segments
-        set(value) { data.segments = value }
+        get() = renderData.segments
+        set(value) { renderData.segments = value }
     val color1: Vector4f
-        get() = data.color1
+        get() = renderData.color1
     var color2: Vector4f?
-        get() = data.color2
-        set(value) { data.color2 = value }
+        get() = renderData.color2
+        set(value) { renderData.color2 = value }
     var color3: Vector4f?
-        get() = data.color3
-        set(value) { data.color3 = value }
+        get() = renderData.color3
+        set(value) { renderData.color3 = value }
     var color4: Vector4f?
-        get() = data.color4
-        set(value) { data.color4 = value }
+        get() = renderData.color4
+        set(value) { renderData.color4 = value }
     var blend: BlendMode
-        get() = data.blend
-        set(value) { data.blend = value }
+        get() = renderData.blend
+        set(value) { renderData.blend = value }
     var fill: Boolean
-        get() = data.fill
-        set(value) { data.fill = value }
+        get() = renderData.fill
+        set(value) { renderData.fill = value }
 
     override fun reset() {
         type = ShapeType.POINT

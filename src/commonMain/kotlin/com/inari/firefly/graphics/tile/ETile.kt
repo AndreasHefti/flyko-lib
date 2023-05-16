@@ -1,25 +1,27 @@
 package com.inari.firefly.graphics.tile
 
 import com.inari.firefly.core.*
-import com.inari.firefly.core.api.BlendMode
-import com.inari.firefly.core.api.EntityIndex
-import com.inari.firefly.core.api.NULL_BINDING_INDEX
-import com.inari.firefly.core.api.SpriteRenderable
+import com.inari.firefly.core.api.*
 import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.SpriteSet
 import com.inari.util.FloatPropertyAccessor
 import com.inari.util.IntPropertyAccessor
 import com.inari.util.geom.Vector2i
-import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
-class ETile private constructor(): EntityComponent(ETile), SpriteRenderable {
+class ETile private constructor(): EntityComponent(ETile) {
 
-    override var spriteIndex = NULL_BINDING_INDEX
-    override val tintColor = Vector4f(1f, 1f, 1f, 1f)
-    override var blendMode = BlendMode.NONE
+    @JvmField val renderData = SpriteRenderable()
+
+    var spriteIndex: BindingIndex
+        get() = renderData.spriteIndex
+        set(value) { renderData.spriteIndex = value }
+    val tintColor
+        get() = renderData.tintColor
+    var blendMode
+        get() = renderData.blendMode
+        set(value) { renderData.blendMode = value }
     @JvmField val position: Vector2i = Vector2i()
-
     @JvmField val tileGridRef = CReference(TileGrid)
     @JvmField val spriteRef = CReference(Sprite)
     @JvmField val spriteSetRef = CReference(SpriteSet)
@@ -48,8 +50,6 @@ class ETile private constructor(): EntityComponent(ETile), SpriteRenderable {
         tintColor(1f, 1f, 1f, 1f)
         blendMode = BlendMode.NONE
     }
-
-
 
     object PropertyAccessor {
         private inline fun getInstance(index: EntityIndex) = ComponentSystem[Entity, index][ETile]

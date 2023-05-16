@@ -28,7 +28,7 @@ fun main() {
         Sprite {
             name = "SpriteAsset"
             textureRef("SpriteTextureAsset")
-            textureRegion(3 * 16, 16, 16, 16)
+            textureBounds(3 * 16, 16, 16, 16)
         }
 
         Entity {

@@ -87,7 +87,7 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
 
         val parent = Entity[parentId]
         val parentTransform = parent[ETransform]
-        transformCollector + parentTransform
+        transformCollector + parentTransform.renderData
         if (EChild in parent.aspects)
             collectTransformData(parent[EChild].parent.targetKey.componentIndex, transformCollector)
     }

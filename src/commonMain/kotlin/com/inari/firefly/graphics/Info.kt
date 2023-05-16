@@ -117,24 +117,12 @@ object FFInfoSystem : System {
         fun update(buffer: StringBuilder, bufferStartPointer: Int)
     }
 
-    private val textRenderable = SpriteRenderableImpl()
+    private val textRenderable = SpriteRenderable()
     private val infoDisplayBackground = object {
 
         @JvmField val color = Vector4f(0.8f, 0.8f, 0.8f, 0.5f)
         @JvmField val rectVertices: FloatArray = floatArrayOf(0f, 0f, 0f, 0f)
         @JvmField val data = ShapeData()
-//        @JvmField val data = object : ShapeData {
-//            override val type = ShapeType.RECTANGLE
-//            override val vertices = rectVertices
-//            override val segments = 0
-//            override val color1 = color
-//            override val color2 = color
-//            override val color3 = color
-//            override val color4 = color
-//            override val blend = BlendMode.NORMAL_ALPHA
-//            override val fill = true
-//
-//        }
     }
 }
 

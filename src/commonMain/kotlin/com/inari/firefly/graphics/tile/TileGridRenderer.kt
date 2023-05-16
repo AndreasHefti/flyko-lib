@@ -29,7 +29,7 @@ object SimpleTileGridRenderer : EntityRenderer("SimpleTileGridRenderer") {
             Engine.graphics.applyViewportOffset(-tileGrid.position.x, -tileGrid.position.y)
             while (iterator.hasNext()) {
                 graphics.renderSprite(
-                    Entity[iterator.next()][ETile],
+                    Entity[iterator.next()][ETile].renderData,
                     iterator.worldPosition.x,
                     iterator.worldPosition.y
                 )
@@ -66,9 +66,9 @@ object FullTileGridRenderer : EntityRenderer("FullTileGridRenderer") {
                 while (iterator.hasNext()) {
                     val entity = Entity[iterator.next()]
 
-                    transformCollector(entity[ETransform])
+                    transformCollector(entity[ETransform].renderData)
                     transformCollector + iterator.worldPosition
-                    graphics.renderSprite(entity[ETile], transformCollector.data)
+                    graphics.renderSprite(entity[ETile].renderData, transformCollector.data)
                 }
                 Engine.graphics.applyViewportOffset(tileGrid.position.x, tileGrid.position.y)
             }

@@ -196,7 +196,7 @@ object AreaTest {
                         autoActivation = true
                         name = "playerSprite"
                         textureRef("tiled_tileset_example/atlas1616.png")
-                        textureRegion(7 * 16, 1 * 16, 16, 16)
+                        textureBounds(7 * 16, 1 * 16, 16, 16)
                     })
                     blendMode = BlendMode.NORMAL_ALPHA
                 }
