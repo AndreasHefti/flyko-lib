@@ -99,7 +99,7 @@ class DynArray<T> constructor(
     val arrayAllocation: (Int) -> Array<T?>
 ) : DynArrayRO<T> {
 
-    private lateinit var array: Array<T?>
+    @JvmField var array: Array<T?> = arrayAllocation(initialCapacity)
 
     override var size: Int = 0
         private set
@@ -390,7 +390,7 @@ class DynArray<T> constructor(
 
     companion object {
 
-        @JvmField val NULL_ARRAY: DynArrayRO<Any> = of(-1, -1)
+        @JvmField val NULL_ARRAY: DynArrayRO<Any> = of(0, 0)
         @Suppress("UNCHECKED_CAST")
         inline fun <reified T> nullArray() : DynArray<T> = NULL_ARRAY as DynArray<T>
 

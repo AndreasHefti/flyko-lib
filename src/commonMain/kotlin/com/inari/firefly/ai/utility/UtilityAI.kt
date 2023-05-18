@@ -33,16 +33,15 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
         private fun update() {
             var i = entityIds.nextSetBit(0)
             while (i >= 0) {
-                val entity = Entity[i]
-                i = entityIds.nextSetBit(i + 1)
-
-                val utility = entity[EUtility]
-                if (!utility.scheduler.needsUpdate())
-                    return
+                val utility = EUtility[i]
+                if (!utility.scheduler.needsUpdate()) {
+                    i = entityIds.nextSetBit(i + 1)
+                    continue
+                }
 
                 if (utility.runningActionIndex >= 0) {
                     val action = this[utility.runningActionIndex] as UtilityAction
-                    val result = action.callAction(entity.key)
+                    val result = action.callAction(i)
                     if (result != RUNNING)
                         utility.runningActionIndex = NULL_COMPONENT_INDEX
                 }
@@ -53,7 +52,7 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
                     var id = NULL_COMPONENT_INDEX
                     var intIndex = utility.intentions.nextSetBit(0)
                     while (intIndex >= 0) {
-                        val uv = this[intIndex].getUtilityValue(entity.index, NULL_COMPONENT_INDEX)
+                        val uv = this[intIndex].getUtilityValue(i, NULL_COMPONENT_INDEX)
                         if (uv > maxUtilityValue) {
                             maxUtilityValue = uv
                             id = intIndex
@@ -67,7 +66,7 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
                         maxUtilityValue = 0f
                         intIndex = utility.actions.nextSetBit(0)
                         while (intIndex >= 0) {
-                            val uv = this[intIndex].getUtilityValue(entity.index, intention.index)
+                            val uv = this[intIndex].getUtilityValue(i, intention.index)
                             if (uv > maxUtilityValue) {
                                 maxUtilityValue = uv
                                 id = intIndex
@@ -77,6 +76,7 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
                             utility.runningActionIndex = id
                     }
                 }
+                i = entityIds.nextSetBit(i + 1)
             }
         }
 
@@ -159,7 +159,8 @@ class UtilityAction private constructor() : UtilityAI() {
         return result
     }
 
-    fun callAction(entityKey: ComponentKey): ActionResult = actionOperation(entityKey)
+    fun callAction(entityKey: ComponentKey): ActionResult = actionOperation(entityKey.componentIndex)
+    fun callAction(index: EntityIndex): ActionResult = actionOperation(index)
 
     companion object : SubComponentBuilder<UtilityAI, UtilityAction>(UtilityAI) {
         override fun create() = UtilityAction()

@@ -23,7 +23,7 @@ abstract class Trigger protected constructor(): Component(Trigger) {
 
     protected fun checkTrigger() {
         if (conditionRef.exists && ConditionalComponent[conditionRef](componentRef)) {
-            action(componentRef)
+            action(componentRef.componentIndex)
             if (deleteAfterFired)
                 Trigger.delete(this)
         }

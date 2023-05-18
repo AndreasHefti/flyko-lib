@@ -1,13 +1,12 @@
 package com.inari.firefly.graphics.particle
 
-import com.inari.firefly.core.Asset
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentDSL
-import com.inari.firefly.core.api.*
+import com.inari.firefly.core.api.BindingIndex
+import com.inari.firefly.core.api.SpriteRenderable
+import com.inari.firefly.core.api.TransformData
 import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.util.ZERO_FLOAT
-import com.inari.util.geom.Vector2f
-import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
 @ComponentDSL

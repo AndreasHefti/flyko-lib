@@ -1,6 +1,7 @@
 package com.inari.util.collection
 
 import com.inari.util.arraycopy
+import kotlin.jvm.JvmField
 
 interface DynIntArrayRO : IntListIterable {
     val nullValue: Int
@@ -20,7 +21,7 @@ class DynIntArray(
     override val expand: Int = 10
 ) : DynIntArrayRO {
 
-    private var array: IntArray = IntArray(initSize) { nullValue }
+    @JvmField var array: IntArray = IntArray(initSize) { nullValue }
     override var size = 0
         private set
     override val isEmpty: Boolean
@@ -136,7 +137,8 @@ class DynIntArray(
         array[index2] = tmp
     }
 
-    override fun get(index: Int): Int =
+    @Suppress("OVERRIDE_BY_INLINE")
+    override inline fun get(index: Int): Int =
         array[index]
 
     override fun iterator(): IndexListIterator =

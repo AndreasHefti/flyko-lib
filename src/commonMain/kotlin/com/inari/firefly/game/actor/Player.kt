@@ -2,6 +2,8 @@ package com.inari.firefly.game.actor
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.ComponentIndex
+import com.inari.firefly.core.api.Condition
+import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.game.actor.Player.PlayerEventType.*
 import com.inari.firefly.graphics.view.ETransform
@@ -74,16 +76,11 @@ class Player private constructor() : Composite(Player), Controlled {
     }
     fun adjustCamera() = (Control[cameraRef] as PlayerCamera).adjust()
 
-    var playerEntityKey = NO_COMPONENT_KEY
-
-    var playerEntity: Entity? = null
-        internal set
-    var playerPosition = Vector2f()
-        internal set
-    var playerPivot = Vector2i()
-        internal set
-    var playerMovement: EMovement? = null
-        internal set
+    @JvmField var playerEntityKey = NO_COMPONENT_KEY
+    @JvmField var playerEntity: Entity? = null
+    @JvmField var playerPosition = Vector2f()
+    @JvmField var playerPivot = Vector2i()
+    @JvmField var playerMovement: EMovement? = null
 
     override fun addToGroup(group: Aspect): Aspects {
         val groups = super.addToGroup(group)
@@ -170,6 +167,8 @@ class Player private constructor() : Composite(Player), Controlled {
             Engine.notify(EVENT)
         }
 
+        inline fun byEntityId(index: EntityIndex): Player = this[Entity[index].name]
+
         fun findFirstActive(): Player {
             val pIndex = activeComponentSet.nextIndex(0)
             if (pIndex < 0)
@@ -184,19 +183,27 @@ class Player private constructor() : Composite(Player), Controlled {
         init {
             Conditional {
                 name = PLAYER_GOES_EAST_CONDITION
-                condition = { playerKey -> (Player[playerKey.name].playerMovement?.velocity?.x ?: 0f) > 0f }
+                condition = object : Condition {
+                    override fun invoke(index: EntityIndex) = EMovement[index].velocity.x > ZERO_FLOAT
+                }
             }
             Conditional {
                 name = PLAYER_GOES_WEST_CONDITION
-                condition = { playerKey -> (Player[playerKey.name].playerMovement?.velocity?.x ?: 0f) < 0f }
+                condition = object : Condition {
+                    override fun invoke(index: EntityIndex) = EMovement[index].velocity.x < ZERO_FLOAT
+                }
             }
             Conditional {
                 name = PLAYER_GOES_SOUTH_CONDITION
-                condition = { playerKey -> (Player[playerKey.name].playerMovement?.velocity?.y ?: 0f) > 0f }
+                condition = object : Condition {
+                    override fun invoke(index: EntityIndex) = EMovement[index].velocity.y > ZERO_FLOAT
+                }
             }
             Conditional {
                 name = PLAYER_GOES_NORTH_CONDITION
-                condition = { playerKey -> (Player[playerKey.name].playerMovement?.velocity?.y ?: 0f) < 0f }
+                condition = object : Condition {
+                    override fun invoke(index: EntityIndex) = EMovement[index].velocity.y < ZERO_FLOAT
+                }
             }
         }
     }

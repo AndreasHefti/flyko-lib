@@ -15,6 +15,7 @@ import com.inari.firefly.graphics.view.Scene
 import com.inari.firefly.physics.contact.EContact
 import com.inari.util.COMMA
 import com.inari.util.VOID_CONSUMER_2
+import com.inari.util.collection.DynArray
 import com.inari.util.geom.Orientation
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
@@ -35,6 +36,7 @@ class ERoomTransition private constructor() : EntityComponent(ERoomTransition) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<ERoomTransition>("ERoomTransition") {
+        override fun allocateArray() = DynArray.of<ERoomTransition>()
         override fun create() = ERoomTransition()
     }
 }
@@ -67,12 +69,14 @@ class Room private constructor() : Composite(Room) {
     override fun activate() {
         super.activate()
 
-        val player = Player[playerRef]
-        player.addToGroup(ROOM_PAUSE_GROUP)
-        val cam = getCamera()
-        cam.initBounds( width = roomBounds.width, height = roomBounds.height)
-        Player.activate(player)
-        cam.initPlayer(player.index)
+        if (playerRef.exists) {
+            val player = Player[playerRef]
+            player.addToGroup(ROOM_PAUSE_GROUP)
+            val cam = getCamera()
+            cam.initBounds(width = roomBounds.width, height = roomBounds.height)
+            Player.activate(player)
+            cam.initPlayer(player.index)
+        }
 
         if (activationScene.exists) {
             Pausing.pause(ROOM_PAUSE_GROUP)
@@ -176,10 +180,11 @@ class Room private constructor() : Composite(Room) {
 
             Conditional {
                 name = PLAYER_ROOM_TRANSITION_SCAN_CONDITION
-                condition = { playerKey ->
-                    val player = Player[playerKey.name]
-                    val scan = player.playerEntity?.get(EContact)?.contactScans?.getFirstFullContact(ROOM_TRANSITION_CONTACT_TYPE)
-                    scan != null && scan.contactMask.cardinality > 8
+                condition = object : Condition {
+                    override fun invoke(index: EntityIndex): Boolean {
+                        val scan = EContact[index].contactScans.getFirstFullContact(ROOM_TRANSITION_CONTACT_TYPE)
+                        return scan != null && scan.contactMask.cardinality > 8
+                    }
                 }
             }
             AndCondition {

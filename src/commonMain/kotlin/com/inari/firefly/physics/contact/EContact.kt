@@ -75,6 +75,7 @@ class EContact private constructor() : EntityComponent(EContact) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<EContact>("EContact") {
+        override fun allocateArray() = DynArray.of<EContact>()
         override fun create() = EContact()
 
         @JvmField val MATERIAL_ASPECT_GROUP = IndexedAspectType("MATERIAL_ASPECT_GROUP")

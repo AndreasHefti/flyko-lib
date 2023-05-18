@@ -8,6 +8,7 @@ import com.inari.firefly.core.EntityComponentBuilder
 import com.inari.firefly.core.api.FFTimer
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.collection.BitSet
+import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 
 class EUtility  private constructor() : EntityComponent(EUtility) {
@@ -58,6 +59,7 @@ class EUtility  private constructor() : EntityComponent(EUtility) {
 
     override val componentType = EUtility
     companion object : EntityComponentBuilder<EUtility>("EUtility") {
+        override fun allocateArray() = DynArray.of<EUtility>()
         override fun create() = EUtility()
     }
 }

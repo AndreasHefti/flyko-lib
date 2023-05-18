@@ -3,7 +3,6 @@ package com.inari.firefly.graphics.view
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.*
 import com.inari.firefly.core.api.ActionResult.RUNNING
-import com.inari.util.VOID_CONSUMER_2
 import com.inari.util.collection.AttributesRO
 import kotlin.jvm.JvmField
 
@@ -14,7 +13,7 @@ class Scene private constructor(): Control() {
     @JvmField val disposeTask = CReference(Task)
     @JvmField var initAction = VOID_ACTION
     @JvmField var updateAction = VOID_ACTION
-    @JvmField var callback = NO_ACTION_CALLBACK
+    @JvmField var callback = VOID_ACTION_CALLBACK
     @JvmField var deleteAfterRun = false
 
     init {
@@ -50,7 +49,7 @@ class Scene private constructor(): Control() {
 
     override fun activate() {
         super.activate()
-        initAction(this.key)
+        initAction(this.key.componentIndex)
     }
 
     override fun dispose() {
@@ -64,12 +63,12 @@ class Scene private constructor(): Control() {
         if (!scheduler.needsUpdate())
             return
 
-        val result = updateAction(key)
+        val result = updateAction(key.componentIndex)
         if (result == RUNNING)
             return
 
         stopScene(index)
-        callback(key, result)
+        callback(key.componentIndex, result)
         if (deleteAfterRun)
             Scene.system.delete(index)
     }

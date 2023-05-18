@@ -8,6 +8,7 @@ import com.inari.firefly.core.api.FFTimer
 import com.inari.firefly.physics.movement.MovementSystem.MOVEMENT_ASPECT_GROUP
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.aspect.Aspects
+import com.inari.util.collection.DynArray
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 
@@ -53,6 +54,7 @@ class EMovement private constructor() : EntityComponent(EMovement) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<EMovement>("EMovement") {
+        override fun allocateArray() = DynArray.of<EMovement>()
         init { MovementSystem } // make sure MovementControl is initialised
         override fun create() = EMovement()
     }

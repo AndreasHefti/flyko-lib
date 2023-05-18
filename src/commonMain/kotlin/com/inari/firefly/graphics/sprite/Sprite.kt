@@ -6,9 +6,7 @@ import com.inari.firefly.core.ComponentSubTypeBuilder
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.api.BindingIndex
 import com.inari.firefly.core.api.NULL_BINDING_INDEX
-import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.core.api.SpriteData
-import com.inari.util.ZERO_INT
 import com.inari.util.geom.Vector4i
 import kotlin.jvm.JvmField
 

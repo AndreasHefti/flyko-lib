@@ -3,10 +3,12 @@ package com.inari.firefly.graphics.text
 import com.inari.firefly.core.EChild
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Entity
+import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.core.api.SpriteRenderable
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.EntityRenderer
-import com.inari.util.collection.DynArray
+import com.inari.util.ZERO_INT
+import com.inari.util.collection.DynIntArray
 
 object SimpleTextRenderer : EntityRenderer("SimpleTextRenderer") {
 
@@ -14,32 +16,32 @@ object SimpleTextRenderer : EntityRenderer("SimpleTextRenderer") {
 
     private val textRenderable = SpriteRenderable()
 
-    override fun acceptEntity(entity: Entity) =
-        entity.aspects.include(MATCHING_ASPECTS) &&
-                entity[EText].renderer == this
+    override fun acceptEntity(index: EntityIndex) =
+        Entity[index].include(MATCHING_ASPECTS) &&
+                EText[index].renderer == this
 
 
-    override fun sort(entities: DynArray<Entity>) {
+    override fun sort(entities: DynIntArray) {
         // no sorting here
     }
 
-    override fun render(entities: DynArray<Entity>) {
-        val graphics = Engine.graphics
-        var i = 0
-        while (i < entities.capacity) {
-            val entity = entities[i++] ?: continue
-
-            val text = entity[EText]
-            val transform = entity[ETransform]
-            val metadata = if (entity.has(ETextMeta)) entity[ETextMeta] else null
+    val graphics = Engine.graphics
+    override fun render(entities: DynIntArray) {
+        var i = entities.nextListIndex(0)
+        while (i >= ZERO_INT) {
+            val index = entities[i]
+            val text = EText[index]
+            val transform = ETransform[index]
+            val metadata: ETextMeta? = ETextMeta.getIfExists(index)
+            val child = EChild.getIfExists(index)
             val font = Font[text.fontRef.targetKey]
             val chars = text.text
 
             textRenderable.tintColor(text.tint)
             textRenderable.blendMode = text.blend
             transformCollector(transform.renderData)
-            if (EChild in entity.aspects)
-                collectTransformData(entity[EChild].parent.targetKey.componentIndex, transformCollector)
+            if (child != null)
+                collectTransformData(child.parent.targetKey.componentIndex, transformCollector)
 
             val horizontalStep = (font.charWidth + font.charSpace) * transform.scale.v0
             val verticalStep = (font.charHeight + font.lineSpace) * transform.scale.v1
@@ -83,6 +85,8 @@ object SimpleTextRenderer : EntityRenderer("SimpleTextRenderer") {
                 }
                 transformCollector.data.position.x += horizontalStep
             }
+
+            i = entities.nextListIndex(i + 1)
         }
     }
 

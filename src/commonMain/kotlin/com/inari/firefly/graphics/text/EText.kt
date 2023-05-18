@@ -5,6 +5,7 @@ import com.inari.firefly.core.EntityComponent
 import com.inari.firefly.core.EntityComponentBuilder
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.graphics.view.EntityRenderer
+import com.inari.util.collection.DynArray
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
@@ -32,6 +33,7 @@ class EText private constructor() : EntityComponent(EText) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<EText>("EText") {
+        override fun allocateArray() = DynArray.of<EText>()
         override fun create() = EText()
     }
 }

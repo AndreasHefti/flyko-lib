@@ -39,8 +39,8 @@ class ComponentKey internal constructor (
         componentIndex = index
     }
 
-    var componentIndex: ComponentIndex = NULL_COMPONENT_INDEX
-        internal set
+    @JvmField var componentIndex: ComponentIndex = NULL_COMPONENT_INDEX
+        //internal set
 
     override fun toString(): String =
         "CKey($name, ${type.aspectName}, $componentIndex)"

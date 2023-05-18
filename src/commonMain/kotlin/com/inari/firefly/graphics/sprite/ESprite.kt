@@ -4,6 +4,7 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.api.*
 import com.inari.util.FloatPropertyAccessor
 import com.inari.util.IntPropertyAccessor
+import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 
 class ESprite private constructor() : EntityComponent(ESprite) {
@@ -60,6 +61,7 @@ class ESprite private constructor() : EntityComponent(ESprite) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<ESprite>("ESprite") {
+        override fun allocateArray() = DynArray.of<ESprite>()
         override fun create() = ESprite()
     }
 }

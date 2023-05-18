@@ -1,9 +1,10 @@
 package com.inari.firefly.core
 
+import com.inari.firefly.core.Entity.Companion.ENTITY_COMPONENT_BUILDER
 import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
+import com.inari.util.ZERO_INT
 import com.inari.util.aspect.*
-import com.inari.util.collection.AttributesRO
 import com.inari.util.collection.AttributesRO.Companion.EMPTY_ATTRIBUTES
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynFloatArray
@@ -30,35 +31,45 @@ abstract class EntityComponent protected constructor(
 
     internal fun iActivate() = activate()
     internal fun iDeactivate() = deactivate()
+    internal fun iDispose()  {
+        reset()
+        ENTITY_COMPONENT_BUILDER[this.componentType.aspectIndex]
+            ?.components?.remove(this.entityIndex)
+        this.entityIndex = NULL_COMPONENT_INDEX
+    }
     protected open fun activate() {}
     protected open fun deactivate() {}
-    abstract fun reset()
+    protected abstract fun reset()
     abstract val componentType: EntityComponentType<out EntityComponent>
 }
 
 class Entity internal constructor(): Component(Entity), Controlled, AspectAware {
 
-    /** The set of EntityComponent of a specified Entity. EntityComponent are indexed by type for fast accesses */
-    // TODO try to replace this with an aspect type mapping to an array index of overall EntityComponent array
-    // every EntityComponent holds a global array of its EntityComponent and the entity just maps the indices
-    internal val components: AspectSet<EntityComponent> = AspectSet.of(ENTITY_COMPONENT_ASPECTS)
     /** The Aspects that reflects the EntityComponent types that are hold by this Entity */
-    override val aspects: Aspects = components.aspects
+    override val aspects: Aspects = ENTITY_COMPONENT_ASPECTS.createAspects()  //components.aspects
+    inline operator fun contains(cType: EntityComponentType<*>) = aspects.contains(cType.typeAspect)
+    inline fun include(aspects: Aspects) = this.aspects.include(aspects)
+    inline fun exclude(aspects: Aspects) = this.aspects.exclude(aspects)
 
     override fun activate() {
-        val iter = components.iterator()
-        while (iter.hasNext())
-            components.get(iter.next())?.iActivate()
+        var i = aspects.bitSet.nextSetBit(0)
+        while (i >= ZERO_INT) {
+            ENTITY_COMPONENT_BUILDER[i]?.components?.get(index)?.iActivate()
+            i = aspects.bitSet.nextSetBit(i + 1)
+        }
     }
     override fun deactivate() {
-        val iter = components.iterator()
-        while (iter.hasNext())
-            components.get(iter.next())?.iDeactivate()
+        var i = aspects.bitSet.nextSetBit(0)
+        while (i >= ZERO_INT) {
+            ENTITY_COMPONENT_BUILDER[i]?.components?.get(index)?.iDeactivate()
+            i = aspects.bitSet.nextSetBit(i + 1)
+        }
     }
 
-    fun has(cType: EntityComponentType<*>): Boolean = aspects.contains(cType.typeAspect)
     @Suppress("UNCHECKED_CAST")
-    operator fun <C : EntityComponent> get(type: EntityComponentType<C>): C = components.get(type)!! as C
+    operator fun <C : EntityComponent> get(type: EntityComponentType<C>): C =
+        ENTITY_COMPONENT_BUILDER[type.aspectIndex]?.components?.get(index)!! as C
+
     fun <C : EntityComponent> withComponent(cBuilder: EntityComponentBuilder<C>, configure: (C.() -> Unit)): C =
         cBuilder.builder(this)(configure)
     fun <C : EntityComponent> withComponent(cBuilder: EntityComponentBuilderAdapter<C>, configure: (C.() -> Unit)): C =
@@ -70,7 +81,8 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
         override fun allocateArray(size: Int): Array<Entity?> = arrayOfNulls(size)
         override fun create() = Entity()
 
-        val ENTITY_COMPONENT_ASPECTS = IndexedAspectType("ENTITY_COMPONENT_ASPECTS")
+        @JvmField internal val ENTITY_COMPONENT_BUILDER = DynArray.of<EntityComponentBuilder<*>>()
+        @JvmField val ENTITY_COMPONENT_ASPECTS = IndexedAspectType("ENTITY_COMPONENT_ASPECTS")
         private val entityListener: ComponentEventListener = { index, eType ->
             if (eType == ComponentEventType.DISPOSED)
                 disposeEntity(Entity[index])
@@ -109,35 +121,45 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
         }
 
         private fun disposeEntity(entity: Entity) {
-            val iter = entity.components.iterator()
-            while (iter.hasNext())
-                dispose(entity.components.get(iter.next())!!)
+            var i = entity.aspects.bitSet.nextSetBit(0)
+            while (i >= ZERO_INT) {
+                val comp = ENTITY_COMPONENT_BUILDER[i]?.components?.get(entity.index)
+                if (comp != null)
+                    dispose(comp)
+                i = entity.aspects.bitSet.nextSetBit(i + 1)
+            }
 
-            entity.components.clear()
+            entity.aspects.clear()
             entity.disposeIndex()
             disposedEntities.add(entity)
         }
 
         private fun dispose(entityComponent: EntityComponent) {
-            entityComponent.reset()
-            entityComponent.entityIndex = NULL_COMPONENT_INDEX
+            entityComponent.iDispose()
             getOrCreate(entityComponent.componentType.aspectIndex).add(entityComponent)
         }
     }
 }
 
-abstract class EntityComponentBuilder<C : EntityComponent>(
-    typeName: String,
-    /* TODO arrayAllocator: (Int, Int) -> DynArray<C> */
-) : EntityComponentType<C>(typeName) {
+abstract class EntityComponentBuilder<C : EntityComponent>(typeName: String) : EntityComponentType<C>(typeName) {
 
-    // TODO
-    //@JvmField internal val components = arrayAllocator(50, 100)
+    init {
+        @Suppress("LeakingThis")
+        ENTITY_COMPONENT_BUILDER[aspectIndex] = this
+    }
+
+    @Suppress("LeakingThis")
+    @JvmField val components = allocateArray()
+    inline operator fun get(index: EntityIndex): C = components.array[index]!!
+    inline operator fun get(entity: Entity): C = components.array[entity.index]!!
+    inline operator fun contains(index: Int): Boolean = index < components.array.size && components.array[index] != null
+    inline fun getIfExists(index: Int): C? =  if (index in this) this[index] else null
 
     private fun doBuild(comp: C, configure: C.() -> Unit, entity: Entity): C {
         configure(comp)
         comp.entityIndex = entity.index
-        entity.components.set(comp.componentType, comp)
+        components[entity.index] = comp
+        entity.aspects[this] = true
         if (entity.active)
             comp.iActivate()
         return comp
@@ -145,6 +167,8 @@ abstract class EntityComponentBuilder<C : EntityComponent>(
     internal fun builder(entity: Entity): (C.() -> Unit) -> C = {
             configure -> doBuild(Entity.getComponent(this), configure, entity)
     }
+
+    protected abstract fun allocateArray(): DynArray<C>
     abstract fun create(): C
 
 }
@@ -167,6 +191,7 @@ class EChild private constructor() : EntityComponent(EChild) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<EChild>("EChild") {
+        override fun allocateArray() = DynArray.of<EChild>()
         override fun create() = EChild()
     }
 }
@@ -181,6 +206,7 @@ class EMultiplier private constructor() : EntityComponent(EMultiplier) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<EMultiplier>("EMultiplier") {
+        override fun allocateArray() = DynArray.of<EMultiplier>()
         override fun create() = EMultiplier()
     }
 }
@@ -195,6 +221,7 @@ class EAttribute private constructor() : EntityComponent(EAttribute) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<EAttribute>("EAttribute") {
+        override fun allocateArray() = DynArray.of<EAttribute>()
         override fun create() = EAttribute()
     }
 }

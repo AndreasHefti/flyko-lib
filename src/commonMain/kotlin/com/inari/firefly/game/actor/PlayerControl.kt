@@ -1,9 +1,13 @@
 package com.inari.firefly.game.actor
 
-import com.inari.firefly.core.*
+import com.inari.firefly.core.Control
+import com.inari.firefly.core.Engine
+import com.inari.firefly.core.SingleComponentControl
+import com.inari.firefly.core.SubComponentBuilder
 import com.inari.firefly.core.api.ButtonType
 import com.inari.firefly.core.api.InputDevice
-import com.inari.firefly.physics.movement.MovementSystem.BasicMovementAspect.*
+import com.inari.firefly.physics.movement.MovementSystem.BasicMovementAspect.DOUBLE_JUMP
+import com.inari.firefly.physics.movement.MovementSystem.BasicMovementAspect.JUMP
 import com.inari.util.ZERO_FLOAT
 import kotlin.jvm.JvmField
 import kotlin.math.max

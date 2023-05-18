@@ -5,6 +5,7 @@ import com.inari.firefly.core.api.TransformData
 import com.inari.util.FloatPropertyAccessor
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.ZERO_INT
+import com.inari.util.collection.DynArray
 import com.inari.util.geom.Vector2f
 import kotlin.jvm.JvmField
 
@@ -84,6 +85,7 @@ class ETransform private constructor() : EntityComponent(ETransform), ViewLayerA
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<ETransform>("ETransform") {
+        override fun allocateArray() = DynArray.of<ETransform>()
         override fun create() = ETransform()
     }
 }

@@ -5,8 +5,9 @@ import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.EntityComponent
 import com.inari.firefly.core.EntityComponentBuilder
-import com.inari.firefly.core.api.FFTimer
 import com.inari.firefly.core.api.ActionResult.SUCCESS
+import com.inari.firefly.core.api.FFTimer
+import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 
 class EBehavior private constructor() : EntityComponent(EBehavior) {
@@ -32,6 +33,7 @@ class EBehavior private constructor() : EntityComponent(EBehavior) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<EBehavior>("EBehavior") {
+        override fun allocateArray() = DynArray.of<EBehavior>()
         override fun create() = EBehavior()
     }
 }

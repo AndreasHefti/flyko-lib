@@ -31,6 +31,14 @@ fun main() {
                 }
             }
             withControl(TestCameraController) {}
+            withLayer {
+                name = "background1"
+                zPosition = 0
+            }
+            withLayer {
+                name = "main_layer"
+                zPosition = 1
+            }
         }
 
         Task {

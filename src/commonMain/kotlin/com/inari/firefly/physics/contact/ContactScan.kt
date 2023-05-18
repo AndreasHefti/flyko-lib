@@ -2,7 +2,9 @@ package com.inari.firefly.physics.contact
 
 import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.ComponentKey
-import com.inari.firefly.core.api.*
+import com.inari.firefly.core.api.ComponentIndex
+import com.inari.firefly.core.api.EntityIndex
+import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.physics.contact.EContact.Companion.CONTACT_TYPE_ASPECT_GROUP
 import com.inari.firefly.physics.contact.EContact.Companion.MATERIAL_ASPECT_GROUP
 import com.inari.firefly.physics.contact.EContact.Companion.UNDEFINED_CONTACT_TYPE

@@ -235,7 +235,7 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
                 else return
             }
 
-            if (entity.has(EMultiplier)) {
+            if (EMultiplier.components.contains(entity.index)) {
                 val multiplier = entity[EMultiplier]
                 val pi = multiplier.positions.iterator()
                 while (pi.hasNext()) {

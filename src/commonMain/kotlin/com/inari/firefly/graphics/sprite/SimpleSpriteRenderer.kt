@@ -5,27 +5,32 @@ import com.inari.firefly.core.EMultiplier
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Entity
 import com.inari.firefly.core.Entity.Companion.ENTITY_COMPONENT_ASPECTS
+import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.EntityRenderer
-import com.inari.util.collection.DynArray
+import com.inari.util.ZERO_INT
+import com.inari.util.collection.DynIntArray
 
 object SimpleSpriteRenderer : EntityRenderer("SimpleSpriteRenderer") {
 
     init { order = 35 }
 
-    override fun acceptEntity(entity: Entity) =
-        entity.aspects.include(MATCHING_ASPECTS) && entity.aspects.exclude(EXCLUDING_ASPECTS)
+    override fun acceptEntity(index: EntityIndex): Boolean {
+        val entity = Entity[index]
+        return entity.include(MATCHING_ASPECTS) && entity.exclude(EXCLUDING_ASPECTS)
+    }
 
-    override fun sort(entities: DynArray<Entity>) {
+    override fun sort(entities: DynIntArray) {
         // no sorting
     }
 
-    override fun render(entities: DynArray<Entity>) {
-        val graphics = Engine.graphics
-        val iter = entities.iterator()
-        while (iter.hasNext()) {
-            val entity = iter.next()
-            graphics.renderSprite(entity[ESprite].renderData, entity[ETransform].renderData)
+    private val graphics = Engine.graphics
+    override fun render(entities: DynIntArray) {
+        var i = entities.nextListIndex(0)
+        while (i >= ZERO_INT) {
+            val index = entities[i]
+            graphics.renderSprite(ESprite[index].renderData, ETransform[index].renderData)
+            i = entities.nextListIndex(i + 1)
         }
     }
 

@@ -35,12 +35,14 @@ class CReference internal constructor(
         init(targetKey)
     }
     operator fun invoke(key: ComponentKey) {
-        if (key.type.aspectIndex != this.targetType.aspectIndex) throw IllegalArgumentException("Reference type mismatch")
+        if (key != NO_COMPONENT_KEY && key.type.aspectIndex != this.targetType.aspectIndex)
+            throw IllegalArgumentException("Reference type mismatch")
         targetKey = key
         init(targetKey)
     }
     operator fun invoke(ref: CReference) {
-        if (ref.targetType.aspectIndex != this.targetType.aspectIndex) throw IllegalArgumentException("Reference type mismatch")
+        if (ref.targetType.aspectIndex != this.targetType.aspectIndex)
+            throw IllegalArgumentException("Reference type mismatch")
         targetKey = ref.targetKey
         init(targetKey)
     }

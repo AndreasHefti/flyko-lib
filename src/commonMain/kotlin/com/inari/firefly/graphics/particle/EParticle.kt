@@ -25,6 +25,7 @@ class EParticle private constructor() : EntityComponent(EParticle) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<EParticle>("EParticle") {
+        override fun allocateArray() = DynArray.of<EParticle>()
         override fun create() = EParticle()
     }
 }

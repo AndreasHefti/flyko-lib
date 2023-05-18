@@ -53,6 +53,7 @@ class ETextMeta private constructor() : EntityComponent(ETextMeta) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<ETextMeta>("ETextMeta") {
+        override fun allocateArray() = DynArray.of<ETextMeta>()
         override fun create() = ETextMeta()
     }
 }

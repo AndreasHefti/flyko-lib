@@ -9,6 +9,7 @@ import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.core.api.ShapeData
 import com.inari.firefly.core.api.ShapeType
 import com.inari.util.FloatPropertyAccessor
+import com.inari.util.collection.DynArray
 import com.inari.util.geom.Vector4f
 import kotlin.jvm.JvmField
 
@@ -70,6 +71,7 @@ class EShape private constructor() : EntityComponent(EShape) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<EShape>("EShape") {
+        override fun allocateArray() = DynArray.of<EShape>()
         override fun create() = EShape()
     }
 }

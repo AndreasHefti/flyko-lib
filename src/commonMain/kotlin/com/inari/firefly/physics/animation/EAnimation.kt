@@ -1,10 +1,10 @@
 package com.inari.firefly.physics.animation
 
 import com.inari.firefly.core.ComponentBuilder
-import com.inari.firefly.core.ComponentSystem
 import com.inari.firefly.core.EntityComponent
 import com.inari.firefly.core.EntityComponentBuilder
 import com.inari.util.collection.BitSet
+import com.inari.util.collection.DynArray
 import com.inari.util.collection.IndexIterator
 
 class EAnimation private constructor() : EntityComponent(EAnimation) {
@@ -47,6 +47,7 @@ class EAnimation private constructor() : EntityComponent(EAnimation) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<EAnimation>("EAnimation") {
+        override fun allocateArray() = DynArray.of<EAnimation>()
         override fun create() = EAnimation()
     }
 }

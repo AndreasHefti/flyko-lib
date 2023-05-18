@@ -1,7 +1,9 @@
 package com.inari.firefly.game.actor
 
-import com.inari.firefly.core.*
-
+import com.inari.firefly.core.CReference
+import com.inari.firefly.core.ComponentKey
+import com.inari.firefly.core.Entity
+import com.inari.firefly.core.SubComponentBuilder
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.contact.*
 import com.inari.firefly.physics.movement.EMovement

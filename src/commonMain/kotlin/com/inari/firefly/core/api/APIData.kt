@@ -23,15 +23,24 @@ enum class ActionResult {
     FAILED
 }
 
-typealias Action = (ComponentKey) -> ActionResult
-typealias ActionCallback = (ComponentKey, ActionResult) -> Unit
-@JvmField val VOID_ACTION: Action = { ActionResult.SUCCESS }
-@JvmField val NO_ACTION_CALLBACK: ActionCallback = VOID_CONSUMER_2
-operator fun Action.invoke() = this(NO_COMPONENT_KEY)
+interface Action {
+    operator fun invoke(index: EntityIndex = -1): ActionResult
+}
+typealias ActionCallback = (index: EntityIndex, ActionResult) -> Unit
+@JvmField val VOID_ACTION: Action = object : Action {
+    override fun invoke(index: EntityIndex) = ActionResult.SUCCESS
+}
+@JvmField val VOID_ACTION_CALLBACK: ActionCallback = VOID_CONSUMER_2
 
-typealias Condition = (ComponentKey) -> Boolean
-@JvmField val TRUE_CONDITION: Condition = TRUE_PREDICATE
-@JvmField val FALSE_CONDITION: Condition = FALSE_PREDICATE
+interface Condition {
+    operator fun invoke(index: EntityIndex = -1): Boolean
+}
+@JvmField val TRUE_CONDITION = object : Condition {
+    override fun invoke(index: EntityIndex) = true
+}
+@JvmField val FALSE_CONDITION = object : Condition {
+    override fun invoke(index: EntityIndex) = false
+}
 
 interface NormalOperation {
     operator fun invoke(ci1: ComponentIndex, ci2: ComponentIndex, ci3: ComponentIndex): Float

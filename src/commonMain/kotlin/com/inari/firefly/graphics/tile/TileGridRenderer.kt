@@ -1,21 +1,23 @@
 package com.inari.firefly.graphics.tile
 
 import com.inari.firefly.core.Engine
-import com.inari.firefly.core.Entity
+import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.graphics.view.EntityRenderer
-import com.inari.util.collection.DynArray
+import com.inari.util.collection.DynIntArray
 import com.inari.util.geom.Vector4i
 
 object SimpleTileGridRenderer : EntityRenderer("SimpleTileGridRenderer") {
-    override fun acceptEntity(entity: Entity) = false
 
-    override fun sort(entities: DynArray<Entity>) {
+    override fun acceptEntity(index: EntityIndex) = false
+
+    override fun sort(entities: DynIntArray) {
         // not sorting
     }
 
+    val graphics = Engine.graphics
     override fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i) {
-        val graphics = Engine.graphics
+
         val tileGrids = TileGrid[viewIndex, layerIndex]
         if (tileGrids.isEmpty) return
 
@@ -29,7 +31,7 @@ object SimpleTileGridRenderer : EntityRenderer("SimpleTileGridRenderer") {
             Engine.graphics.applyViewportOffset(-tileGrid.position.x, -tileGrid.position.y)
             while (iterator.hasNext()) {
                 graphics.renderSprite(
-                    Entity[iterator.next()][ETile].renderData,
+                    ETile[iterator.next()].renderData,
                     iterator.worldPosition.x,
                     iterator.worldPosition.y
                 )
@@ -39,15 +41,15 @@ object SimpleTileGridRenderer : EntityRenderer("SimpleTileGridRenderer") {
         }
     }
 
-    override fun render(entities: DynArray<Entity>) =
+    override fun render(entities: DynIntArray) =
         throw UnsupportedOperationException()
 }
 
 object FullTileGridRenderer : EntityRenderer("FullTileGridRenderer") {
 
-    override fun acceptEntity(entity: Entity) = false
+    override fun acceptEntity(index: EntityIndex) = false
 
-    override fun sort(entities: DynArray<Entity>) {
+    override fun sort(entities: DynIntArray) {
         // not sorting
     }
 
@@ -64,11 +66,10 @@ object FullTileGridRenderer : EntityRenderer("FullTileGridRenderer") {
                 val iterator = tileGrid.tileGridIterator(clip)
                 Engine.graphics.applyViewportOffset(-tileGrid.position.x, -tileGrid.position.y)
                 while (iterator.hasNext()) {
-                    val entity = Entity[iterator.next()]
-
-                    transformCollector(entity[ETransform].renderData)
+                    val index = iterator.next()
+                    transformCollector(ETransform[index].renderData)
                     transformCollector + iterator.worldPosition
-                    graphics.renderSprite(entity[ETile].renderData, transformCollector.data)
+                    graphics.renderSprite(ETile[index].renderData, transformCollector.data)
                 }
                 Engine.graphics.applyViewportOffset(tileGrid.position.x, tileGrid.position.y)
             }
@@ -76,6 +77,6 @@ object FullTileGridRenderer : EntityRenderer("FullTileGridRenderer") {
         }
     }
 
-    override fun render(entities: DynArray<Entity>) =
+    override fun render(entities: DynIntArray) =
         throw UnsupportedOperationException()
 }

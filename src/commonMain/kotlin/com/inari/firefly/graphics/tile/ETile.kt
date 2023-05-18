@@ -6,6 +6,7 @@ import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.SpriteSet
 import com.inari.util.FloatPropertyAccessor
 import com.inari.util.IntPropertyAccessor
+import com.inari.util.collection.DynArray
 import com.inari.util.geom.Vector2i
 import kotlin.jvm.JvmField
 
@@ -68,6 +69,7 @@ class ETile private constructor(): EntityComponent(ETile) {
 
     override val componentType = Companion
     companion object : EntityComponentBuilder<ETile>("ETile") {
+        override fun allocateArray() = DynArray.of<ETile>()
         override fun create() = ETile()
     }
 }

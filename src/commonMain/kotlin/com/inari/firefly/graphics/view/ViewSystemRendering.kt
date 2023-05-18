@@ -2,6 +2,7 @@ package com.inari.firefly.graphics.view
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.ComponentEventType.*
+import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.core.api.ViewData
 import com.inari.firefly.graphics.view.ViewSystemRenderer.disposeViewRenderer
 import com.inari.firefly.graphics.view.ViewSystemRenderer.registerViewRenderer
@@ -30,7 +31,7 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
             ViewSystemRenderer.sortRenderingChain()
         }
 
-    private val entities: DynArray<DynArray<DynArray<Entity>>> = DynArray.of(10, 2)
+    private val entities: DynArray<DynArray<DynIntArray>> = DynArray.of(10, 2)
 
     private fun entityListener(key: ComponentKey, type: ComponentEventType) {
         if (type == ACTIVATED) registerEntity(key.componentIndex)
@@ -42,44 +43,42 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
         Entity.registerComponentListener(this::entityListener)
     }
 
-    private fun registerEntity(index: Int) {
-        val entity = Entity[index]
-        if (!acceptEntity(entity))
+    private fun registerEntity(index: EntityIndex) {
+        if (!acceptEntity(index))
             return
-        val transform = entity[ETransform]
+        val transform = ETransform[index]
         if (transform.viewIndex !in entities)
             entities[transform.viewIndex] = DynArray.of(10, 2)
         val views = entities[transform.viewIndex]!!
         if (transform.layerIndex !in views)
-            views[transform.layerIndex] = DynArray.of()
+            views[transform.layerIndex] = DynIntArray(50, -1, 100)
         val layer = views[transform.layerIndex]!!
-        layer.add(entity)
+        layer.add(index)
         sort(layer)
     }
-    private fun disposeEntity(index: Int) {
-        val entity = Entity[index]
-        if (!acceptEntity(entity))
+    private fun disposeEntity(index: EntityIndex) {
+        if (!acceptEntity(index))
             return
-        val transform = entity[ETransform]
+        val transform = ETransform[index]
         if (transform.viewIndex !in entities)
             return
         val views = entities[transform.viewIndex]!!
         if (transform.layerIndex !in views)
             return
         val layer = views[transform.layerIndex]!!
-        layer.remove(entity)
+        layer.remove(index)
         sort(layer)
     }
 
-    protected abstract fun acceptEntity(entity: Entity): Boolean
-    protected abstract fun sort(entities: DynArray<Entity>)
+    protected abstract fun acceptEntity(index: EntityIndex): Boolean
+    protected abstract fun sort(entities: DynIntArray)
 
     override fun render(viewIndex: Int, layerIndex: Int, clip: Vector4i) {
         val entitiesToRender = entities[viewIndex]?.get(layerIndex) ?: return
         render(entitiesToRender)
     }
 
-    abstract fun render(entities: DynArray<Entity>)
+    abstract fun render(entities: DynIntArray)
 
     protected fun collectTransformData(parentId: Int, transformCollector: TransformDataCollector) {
         if (parentId < 0)

@@ -119,7 +119,7 @@ class EasedValueAnimation private constructor() : Animation(EasedValueAnimation)
                 accessor = VOID_FLOAT_PROPERTY_ACCESSOR
                 multiAccessor = false
             }
-        } else if (accessor == animatedProperty(index))
+         } else
             accessor = VOID_FLOAT_PROPERTY_ACCESSOR
     }
 
