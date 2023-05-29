@@ -68,14 +68,13 @@ class ETransform private constructor() : EntityComponent(ETransform), ViewLayerA
     }
 
     object PropertyAccessor {
-        private inline fun getInstance(index: Int) = ComponentSystem[Entity, index][ETransform]
-        private inline fun getPos(index: Int) = getInstance(index).position
-        private inline fun getScale(index: Int) = getInstance(index).scale
+        private inline fun getPos(index: Int) = ETransform[index].position
+        private inline fun getScale(index: Int) = ETransform[index].scale
         private inline fun getPosXAccessor(index: Int) = getPos(index).v0PropertyAccessor
         private inline fun getPosYAccessor(index: Int) = getPos(index).v1PropertyAccessor
         private inline fun getScaleXAccessor(index: Int) = getScale(index).v0PropertyAccessor
         private inline fun getScaleYAccessor(index: Int) = getScale(index).v1PropertyAccessor
-        private inline fun getRotationAccessor(index: Int) = getInstance(index).rotationPropertyAccessor
+        private inline fun getRotationAccessor(index: Int) = ETransform[index].rotationPropertyAccessor
         @JvmField val POSITION_X: (Int) -> FloatPropertyAccessor = this::getPosXAccessor
         @JvmField val POSITION_Y: (Int) -> FloatPropertyAccessor = this::getPosYAccessor
         @JvmField val SCALE_X: (Int) -> FloatPropertyAccessor = this::getScaleXAccessor

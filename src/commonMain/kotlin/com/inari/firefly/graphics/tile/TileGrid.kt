@@ -140,10 +140,10 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
         )
 
     val tileGridIterator: TileGridIterator
-        get() = TileGrid.getTileGridIterator(this)
+        get() = getTileGridIterator(this)
 
     fun tileGridIterator(worldClip: Vector4i): TileGridIterator =
-        TileGrid.getTileGridIterator(worldClip, this)
+        getTileGridIterator(worldClip, this)
 
     companion object : ComponentSystem<TileGrid>("TileGrid") {
 
@@ -197,54 +197,55 @@ class TileGrid private constructor(): Component(TileGrid), ViewLayerAware {
             }
 
         private fun addEntity(index: EntityIndex) {
-            val entity = Entity[index]
-            if (ETile !in entity.aspects)
+            if (index !in ETile)
                 return
-            val tile = entity[ETile]
+
+            val tile = ETile[index]
             val tileGrid = if (tile.tileGridRef.exists)
                 this[tile.tileGridRef.targetKey]
             else
-                this[this[entity[ETransform]].nextSetBit(0)]
+                this[this[ETransform[index]].nextSetBit(0)]
 
-            if (EMultiplier in entity.aspects) {
-                val multiplier = entity[EMultiplier]
+            if (index in EMultiplier) {
+                val multiplier = EMultiplier[index]
                 val pi = multiplier.positions.iterator()
                 while (pi.hasNext()) {
                     val x: Int = pi.next().toInt()
                     val y: Int = pi.next().toInt()
-                    tileGrid[x, y] = entity.index
+                    tileGrid[x, y] = index
                 }
             } else {
-                tileGrid[tile.position] = entity.index
+                tileGrid[tile.position] = index
             }
         }
 
         private fun removeEntity(index: EntityIndex) {
-            val entity = Entity[index]
-            if (ETile !in entity.aspects)
+            //val entity = Entity[index]
+            if (index !in ETile)
                 return
-            val tile = entity[ETile]
+
+            val tile = ETile[index]
             val tileGrid = if (tile.tileGridRef.exists)
                 if (this.exists(tile.tileGridRef.refIndex))
                     this[tile.tileGridRef.targetKey]
                 else return
             else {
-                val tileGridIndex = this[entity[ETransform]].nextSetBit(0)
+                val tileGridIndex = this[ETransform[index]].nextSetBit(0)
                 if (tileGridIndex >= 0)
                     this[tileGridIndex]
                 else return
             }
 
-            if (EMultiplier.components.contains(entity.index)) {
-                val multiplier = entity[EMultiplier]
+            if (index in EMultiplier) {
+                val multiplier = EMultiplier[index]
                 val pi = multiplier.positions.iterator()
                 while (pi.hasNext()) {
                     val x: Int = pi.next().toInt()
                     val y: Int = pi.next().toInt()
-                    tileGrid.resetIfMatch(entity.index, x, y)
+                    tileGrid.resetIfMatch(index, x, y)
                 }
             } else {
-                tileGrid.resetIfMatch(entity.index, tile.position)
+                tileGrid.resetIfMatch(index, tile.position)
             }
         }
 

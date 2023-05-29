@@ -84,11 +84,11 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
         if (parentId < 0)
             return
 
-        val parent = Entity[parentId]
-        val parentTransform = parent[ETransform]
+        //val parent = Entity[parentId]
+        val parentTransform = ETransform[parentId]
         transformCollector + parentTransform.renderData
-        if (EChild in parent.aspects)
-            collectTransformData(parent[EChild].parent.targetKey.componentIndex, transformCollector)
+        if (parentId in EChild)
+            collectTransformData(EChild[parentId].parent.targetKey.componentIndex, transformCollector)
     }
 
     override fun dispose() {

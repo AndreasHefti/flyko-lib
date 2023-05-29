@@ -108,12 +108,13 @@ class Player private constructor() : Composite(Player), Controlled {
 
     override fun load() {
         super.load()
+        val i = playerEntityKey.componentIndex
         playerEntity = Entity[playerEntityKey]
         playerEntity!!.groups + this.groups
-        playerPosition = playerEntity!![ETransform].position
-        playerPivot(playerEntity!![ETransform].pivot)
+        playerPosition = ETransform[i].position
+        playerPivot(ETransform[i].pivot)
         if (EMovement in playerEntity!!.aspects)
-            playerMovement = playerEntity!![EMovement]
+            playerMovement = EMovement[i]
 
         send(index, PLAYER_LOADED)
     }

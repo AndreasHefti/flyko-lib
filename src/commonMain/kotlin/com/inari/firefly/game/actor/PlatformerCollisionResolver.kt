@@ -2,8 +2,8 @@ package com.inari.firefly.game.actor
 
 import com.inari.firefly.core.CReference
 import com.inari.firefly.core.ComponentKey
-import com.inari.firefly.core.Entity
 import com.inari.firefly.core.SubComponentBuilder
+import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.contact.*
 import com.inari.firefly.physics.movement.EMovement
@@ -69,30 +69,30 @@ class PlatformerCollisionResolver : CollisionResolver() {
         return ContactConstraint.getKey(result.index)
     }
 
-    override fun resolve(entity: Entity, contact: EContact, contactScan: ContactScans) {
+    override fun resolve(index: EntityIndex, contact: EContact, contactScan: ContactScans) {
         if (terrainContactConstraintRef.exists) {
             val terrainContact = contactScan.getFullScan(terrainContactConstraintRef.targetKey.componentIndex)!!
             if (terrainContact.hasAnyContact()) {
-                val movement = entity[EMovement]
+                val movement = EMovement[index]
                 val prefGround = movement.onGround
                 movement.onGround = false
-                resolveTerrainContact(terrainContact, entity, movement, prefGround)
+                resolveTerrainContact(terrainContact, index, movement, prefGround)
             }
         }
 
     }
 
-    private fun resolveTerrainContact(contacts: FullContactScan, entity: Entity, movement: EMovement, prefGround: Boolean) {
-        val transform = entity[ETransform]
+    private fun resolveTerrainContact(contacts: FullContactScan, index: EntityIndex, movement: EMovement, prefGround: Boolean) {
+        val transform = ETransform[index]
         takeFullLedgeScans(contacts)
-        resolveVertically(contacts, entity, transform, movement)
-        resolveHorizontally(contacts, entity, transform, movement)
+        resolveVertically(contacts, index, transform, movement)
+        resolveHorizontally(contacts, index, transform, movement)
 
         movement.aspects[GROUND_TOUCHED] = (!prefGround && movement.onGround)
         movement.aspects[GROUND_LOOSE] = (prefGround && !movement.onGround)
     }
 
-    private fun resolveVertically(contacts: FullContactScan, entity: Entity, transform: ETransform, movement: EMovement) {
+    private fun resolveVertically(contacts: FullContactScan, index: EntityIndex, transform: ETransform, movement: EMovement) {
 
         var refresh = false
         var setOnGround = false
@@ -155,7 +155,7 @@ class PlatformerCollisionResolver : CollisionResolver() {
         }
 
         if (refresh) {
-            updateContacts(entity)
+            updateContacts(index)
             takeFullLedgeScans(contacts)
         }
 
@@ -168,7 +168,7 @@ class PlatformerCollisionResolver : CollisionResolver() {
         //println("onGround ${movement.onGround}")
     }
 
-    private fun resolveHorizontally(contacts: FullContactScan, entity: Entity, transform: ETransform, movement: EMovement) {
+    private fun resolveHorizontally(contacts: FullContactScan, index: EntityIndex, transform: ETransform, movement: EMovement) {
         var refresh = false
 
         movement.aspects[SLIP_LEFT] = false
@@ -198,7 +198,7 @@ class PlatformerCollisionResolver : CollisionResolver() {
         }
 
         if (refresh) {
-            updateContacts(entity)
+            updateContacts(index)
             takeFullLedgeScans(contacts)
         }
     }

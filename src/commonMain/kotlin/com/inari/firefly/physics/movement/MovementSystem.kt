@@ -2,8 +2,8 @@ package com.inari.firefly.physics.movement
 
 import com.inari.firefly.core.Control
 import com.inari.firefly.core.Engine
-import com.inari.firefly.core.Entity
 import com.inari.firefly.core.EntityControl
+import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.aspect.Aspect
@@ -51,9 +51,7 @@ object MovementSystem : EntityControl() {
         Control.activate(this.index)
     }
 
-    override fun matchForControl(entity: Entity) =
-        EMovement in entity.aspects
-
+    override fun matchForControl(index: EntityIndex) = index in EMovement
 
     override fun update() {
 
@@ -66,18 +64,18 @@ object MovementSystem : EntityControl() {
             Engine.notify(moveEvent)
     }
 
-    override fun update(entity: Entity) {
-        val movement = entity[EMovement]
+    override fun update(index: EntityIndex) {
+        val movement = EMovement[index]
         if (!movement.active || !movement.scheduler.needsUpdate())
             return
 
         val dtEntity = deltaTimeInSeconds * (60f / min(60f, movement.scheduler.resolution))
 
-        val transform = entity[ETransform]
+        val transform = ETransform[index]
         movement.integrator.integrate(movement, transform, dtEntity)
         if (movement.velocity.v0 != ZERO_FLOAT || movement.velocity.v1 != ZERO_FLOAT) {
             movement.integrator.step(movement, transform, dtEntity)
-            moveEvent.entities.set(entity.index)
+            moveEvent.entities.set(index)
         }
     }
 

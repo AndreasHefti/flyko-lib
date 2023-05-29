@@ -2,6 +2,7 @@ package com.inari.firefly.game.world
 
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.ActionResult
+import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.game.actor.Player
 import com.inari.firefly.game.actor.PlayerCamera
 import com.inari.firefly.graphics.view.ETransform
@@ -104,21 +105,21 @@ class Area private constructor() : Composite(Area) {
         @JvmField var roomTransitionCallback: ContactCallback = ::applyRoomTransition
 
         fun applyRoomTransition(playerEntityKey: ComponentKey, scan: FullContactScan): Boolean {
-            val entity = Entity[scan.getFirstContact(Room.ROOM_TRANSITION_CONTACT_TYPE).entityId]
-            val transition = entity[ERoomTransition]
+            val index = scan.getFirstContact(Room.ROOM_TRANSITION_CONTACT_TYPE).entityId
+            val transition = ERoomTransition[index]
             if (ConditionalComponent[transition.condition](playerEntityKey)) {
                 val room = Room.getActiveForPlayer(playerEntityKey.name)
                     ?: return false
 
                 if (room.deactivationScene.exists) {
                     Scene[room.deactivationScene].callback = { _, _ ->
-                        activateNextRoom(playerEntityKey.name, entity, transition)
+                        activateNextRoom(playerEntityKey.name, index, transition)
                         Room.dispose(room)
                     }
                     Room.deactivate(room)
                 } else {
                     Room.deactivate(room)
-                    activateNextRoom(playerEntityKey.name, entity, transition)
+                    activateNextRoom(playerEntityKey.name, index, transition)
                     Room.dispose(room)
                 }
                 return true
@@ -146,7 +147,7 @@ class Area private constructor() : Composite(Area) {
 
         private val playerToTransition = Vector2f()
         private val playerTargetPos = Vector2f()
-        private fun activateNextRoom(playerName: String, entity: Entity, transition: ERoomTransition) {
+        private fun activateNextRoom(playerName: String, index: EntityIndex, transition: ERoomTransition) {
 
             val newRoom = Room[transition.targetRoom]
             val player = Player[playerName]
@@ -154,9 +155,9 @@ class Area private constructor() : Composite(Area) {
             newRoom.playerRef(player)
             Room.activate(newRoom)
 
-            val targetEntity = Entity[transition.targetTransition]
-            val targetTransform = targetEntity[ETransform]
-            val sourceTransform = entity[ETransform]
+            //val targetEntity = Entity[transition.targetTransition]
+            val targetTransform = ETransform[transition.targetTransition.refIndex]
+            val sourceTransform = ETransform[index]
             playerToTransition(player.playerPosition) - sourceTransform.position
             playerTargetPos(targetTransform.position) + playerToTransition
             player.playerPosition(playerTargetPos )

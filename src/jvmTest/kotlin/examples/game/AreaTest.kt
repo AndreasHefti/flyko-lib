@@ -134,7 +134,7 @@ object AreaTest {
             val entity = Entity[fadeId]
             initAction = object : Action {
                 override fun invoke(index: EntityIndex): ActionResult {
-                    val color = entity[EShape].color1
+                    val color = EShape["fadeInOut"].color1
                     color.a = 1f
                     Entity.activate(fadeId)
                     return ActionResult.SUCCESS
@@ -142,7 +142,7 @@ object AreaTest {
             }
             updateAction = object : Action {
                 override fun invoke(index: EntityIndex): ActionResult {
-                    val color = entity[EShape].color1
+                    val color = EShape["fadeInOut"].color1
                     color.a = color.a - .05f
                     return if (color.a <= 0f) {
                         Entity.deactivate(fadeId)
@@ -158,7 +158,7 @@ object AreaTest {
             val entity = Entity[fadeId]
             initAction = object : Action {
                 override fun invoke(index: EntityIndex): ActionResult {
-                    val color = entity[EShape].color1
+                    val color =  EShape["fadeInOut"].color1
                     color.a = 0f
                     Entity.activate(fadeId)
                     return ActionResult.SUCCESS
@@ -166,7 +166,7 @@ object AreaTest {
             }
             updateAction = object : Action {
                 override fun invoke(index: EntityIndex): ActionResult {
-                    val color = entity[EShape].color1
+                    val color =  EShape["fadeInOut"].color1
                     color.a = color.a + .05f
                     return if (color.a >= 1f) {
                         Entity.deactivate(fadeId)

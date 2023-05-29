@@ -22,12 +22,12 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
 
     protected val entities: BitSet = BitSet()
 
-    internal fun notifyEntityActivation (entity: Entity) {
-        val transform = entity[ETransform]
+    internal fun notifyEntityActivation (index: EntityIndex) {
+        val transform = ETransform[index]
         if (viewIndex != transform.viewIndex || layerIndex != transform.layerIndex)
             return
 
-        entities[entity.index] = true
+        entities[index] = true
     }
 
     internal fun notifyEntityDeactivation(index: EntityIndex) {
@@ -42,21 +42,8 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
 
         var index = tempBitset.nextSetBit(0)
         while (index >= 0) {
-            val entity = Entity[index]
-            update(entity.index, entity[ETransform], entity[EContact])
+            update(index)
             index = tempBitset.nextSetBit(index + 1)
-        }
-    }
-
-    /** This is usually called by CollisionSystem in an entity move event and must update the entity in the pool
-     * if the entity id has some orientation related store attributes within the specified ContactPool implementation.
-     *
-     * @param index the index of an entity that has just moved and changed its position in the world
-     */
-    open fun update(index: EntityIndex) {
-        if (entities[index]) {
-            val entity = Entity[index]
-            update(entity.index, entity[ETransform], entity[EContact])
         }
     }
 
@@ -65,16 +52,16 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
      *
      * @param entityIndex the index of an entity that has just moved and changed its position in the world
      */
-    abstract fun update(entityIndex: EntityIndex, transform: ETransform, collision: EContact)
+    abstract fun update(entityIndex: EntityIndex)
 
     /** Use this to get an IntIterator of all entity id's that most possibly has a collision within the given region.
      * The efficiency of this depends on an specified implementation and can be different for different needs.
      *
      * @param region The contact or collision region to check collision entity collisions against.
-     * @param entity Entity to exclude from the search
+     * @param entityIndex Entity index of the Entity to exclude from the search
      * @return IndexIterator of all entity id's that most possibly has a collision within the given region
      */
-    abstract operator fun get(region: Vector4i, entity: Entity): IndexIterator
+    abstract operator fun get(region: Vector4i, entityIndex: EntityIndex): IndexIterator
 
     companion object : ComponentSystem<ContactMap>("ContactMap") {
 
@@ -93,12 +80,12 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
         }
 
         private val entityListener: ComponentEventListener = { key, type ->
-            val entity =  Entity[key.componentIndex]
-            if (EContact in entity.aspects && ETile !in entity.aspects) {
+            val index = key.componentIndex
+            if (index in EContact && index !in ETile) {
                 if (type == ComponentEventType.ACTIVATED) {
                     val iter = iterator()
                     while (iter.hasNext())
-                        iter.next().notifyEntityActivation(entity)
+                        iter.next().notifyEntityActivation(index)
                 } else if (type == ComponentEventType.DEACTIVATED) {
                     val iter = iterator()
                     while (iter.hasNext())
@@ -130,13 +117,13 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
             Engine.registerListener(MovementSystem.moveEvent, moveListener)
         }
 
-        fun update(entity: Entity) {
-            val maps = VIEW_LAYER_MAPPING[entity[ETransform]]
+        fun update(entityIndex: EntityIndex) {
+            val maps = VIEW_LAYER_MAPPING[ETransform[entityIndex]]
             if (maps.isEmpty) return
 
             var index = maps.nextSetBit(0)
             while (index >= 0) {
-                ContactMap[index].update(entity.index, entity[ETransform], entity[EContact])
+                ContactMap[index].update(index)
                 index = maps.nextSetBit(index + 1)
             }
         }
@@ -149,15 +136,15 @@ abstract class ContactMap protected constructor() : Component(ContactMap), ViewL
 
 class SimpleContactMap private constructor(): ContactMap() {
 
-    override fun update(entityIndex: EntityIndex, transform: ETransform, collision: EContact) {
+    override fun update(entityIndex: EntityIndex) {
         // not needed here since this is just an ordinary list
     }
 
     private val selfExcluded = BitSet()
-    override fun get(region: Vector4i, entity: Entity): IndexIterator {
+    override fun get(region: Vector4i, entityIndex: EntityIndex): IndexIterator {
         selfExcluded.clear()
         selfExcluded.or(entities)
-        selfExcluded[entity.index] = false
+        selfExcluded[entityIndex] = false
         return IndexIterator(selfExcluded)
     }
 

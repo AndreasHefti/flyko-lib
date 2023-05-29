@@ -129,10 +129,12 @@ class SequenceNode private constructor() : BranchNode() {
     }
 }
 
+
+
 class ActionNode private constructor() : BehaviorNode() {
 
-    @JvmField var condition: (Int) -> Boolean = { true }
-    @JvmField var actionOperation: (Int) -> ActionResult = { SUCCESS }
+    @JvmField var condition: Condition = TRUE_CONDITION
+    @JvmField var actionOperation: Action = VOID_ACTION
 
     override fun tick(index: EntityIndex): ActionResult =
         if (condition(index))

@@ -17,7 +17,7 @@ import kotlin.math.floor
 
 abstract class CollisionResolver protected constructor(): Component(CollisionResolver) {
 
-    abstract fun resolve(entity: Entity, contact: EContact, contactScan: ContactScans)
+    abstract fun resolve(index: EntityIndex, contact: EContact, contactScan: ContactScans)
 
     companion object : AbstractComponentSystem<CollisionResolver>("ContactResolver") {
         override fun allocateArray(size: Int): Array<CollisionResolver?> = arrayOfNulls(size)
@@ -28,18 +28,18 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
 
         private fun entityListener(key: ComponentKey, type: ComponentEventType) {
             if (!entityMatch(key.componentIndex)) return
-            if (type == ComponentEventType.ACTIVATED )
+            if (type == ComponentEventType.ACTIVATED)
                 entitiesWithScan[key.componentIndex] = true
             else if (type == ComponentEventType.DEACTIVATED)
                 entitiesWithScan[key.componentIndex] = false
         }
 
-        private fun entityMatch(index: EntityIndex) : Boolean {
+        private fun entityMatch(index: EntityIndex): Boolean {
             val entity = Entity[index]
             return (EContact in entity.aspects &&
-                ETransform in entity.aspects &&
-                ETile !in entity.aspects &&
-                    entity[EContact].contactScans.hasAnyScan)
+                    ETransform in entity.aspects &&
+                    ETile !in entity.aspects &&
+                    EContact[index].contactScans.hasAnyScan)
         }
 
         init {
@@ -48,43 +48,44 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
             Engine.registerListener(UPDATE_EVENT_TYPE, ::update)
         }
 
-        fun updateContacts(entityIndex: EntityIndex) = updateContacts(Entity[entityIndex])
-        fun updateContacts(entity: Entity) {
-            val contacts = entity[EContact]
+        fun updateContacts(entityIndex: EntityIndex) {
+            val contacts = EContact[entityIndex]
             if (!contacts.contactScans.hasAnyScan)
                 return
 
-            scanContacts(entity, contacts)
+            scanContacts(entityIndex, contacts)
         }
 
         private fun update() {
             var i = entitiesWithScan.nextSetBit(0)
             while (i >= 0) {
-
-                val entity = Entity[i]
-                i = entitiesWithScan.nextSetBit(i + 1)
-
-                if (Pausing.isPaused(entity.groups))
+                if (Pausing.isPaused(Entity[i].groups)) {
+                    i = entitiesWithScan.nextSetBit(i + 1)
                     continue
+                }
 
-                val contacts = entity[EContact]
-                if (!contacts.contactScans.hasAnyScan)
+                val contacts = EContact[i]
+                if (!contacts.contactScans.hasAnyScan) {
+                    i = entitiesWithScan.nextSetBit(i + 1)
                     continue
+                }
 
-                scanContacts(entity, contacts)
+                scanContacts(i, contacts)
 
                 if (contacts.collisionResolverRef.exists) {
                     CollisionResolver[contacts.collisionResolverRef.targetKey]
-                        .resolve(entity, contacts, contacts.contactScans)
-                    ContactMap.update(entity)
+                        .resolve(i, contacts, contacts.contactScans)
+                    ContactMap.update(i)
                 }
 
                 if (contacts.contactConstraintRef.exists)
-                    processContactCallbacks(entity, contacts)
+                    processContactCallbacks(i, contacts)
+
+                i = entitiesWithScan.nextSetBit(i + 1)
             }
         }
 
-        private fun processContactCallbacks(entity: Entity, contacts: EContact) {
+        private fun processContactCallbacks(index: EntityIndex, contacts: EContact) {
             val fullContact = contacts.contactScans.getFullScan(contacts.contactConstraintRef.targetKey.componentIndex)
             if (fullContact == null || !fullContact.hasAnyContact())
                 return
@@ -97,30 +98,34 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                     ?: continue
 
                 val callback =
-                    ((contactCallback.materialType == EContact.UNDEFINED_MATERIAL || fullContact.hasMaterialContact(contactCallback.materialType)) ||
-                            (contactCallback.contactType == EContact.UNDEFINED_CONTACT_TYPE || fullContact.hasContactOfType(contactCallback.contactType)))
+                    ((contactCallback.materialType == EContact.UNDEFINED_MATERIAL || fullContact.hasMaterialContact(
+                        contactCallback.materialType
+                    )) ||
+                            (contactCallback.contactType == EContact.UNDEFINED_CONTACT_TYPE || fullContact.hasContactOfType(
+                                contactCallback.contactType
+                            )))
 
-                if (callback && contactCallback.callback(entity.key, fullContact))
+                if (callback && contactCallback.callback(Entity.getKey(index), fullContact))
                     return
 
                 i = contacts.contactCallbacks.nextIndex(i + 1)
             }
         }
 
-        private fun scanContacts(entity: Entity, contactsComp: EContact) {
+        private fun scanContacts(index: EntityIndex, contactsComp: EContact) {
             var i = 0
             while (i < contactsComp.contactScans.scans.capacity) {
                 val c = contactsComp.contactScans.scans[i++] ?: continue
-                updateContacts(entity, c)
+                updateContacts(index, c)
             }
         }
 
         private val originWorldBounds = SystemContactBounds(circle = Vector3i())
         private val otherWorldBounds = SystemContactBounds(circle = Vector3i())
-        private fun updateContacts(entity: Entity, contactScan: ContactScan) {
+        private fun updateContacts(index: EntityIndex, contactScan: ContactScan) {
             val constraint = contactScan.constraint
-            val transform = entity[ETransform]
-            val movement = entity[EMovement]
+            val transform = ETransform[index]
+            val movement = EMovement[index]
 
             var layerRef = constraint.layerIndex
             if (layerRef < 0)
@@ -129,7 +134,7 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
             contactScan.clear()
 
             // apply bounds of the contact shape within world coordinate system
-            val position = getWorldPos(entity, transform)
+            val position = getWorldPos(index)
             originWorldBounds.bounds(
                 (if (movement.velocity.v0 > 0) ceil(position.x.toDouble()).toInt() else floor(position.x.toDouble()).toInt()) + constraint.bounds.x,
                 (if (movement.velocity.v1 > 0) ceil(position.y.toDouble()).toInt() else floor(position.y.toDouble()).toInt()) + constraint.bounds.y,
@@ -145,16 +150,17 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                 originWorldBounds.bounds.height = constraint.bounds.height
             }
 
-            scanTileContacts(entity, transform.viewIndex, layerRef, contactScan)
-            scanSpriteContacts(entity, transform.viewIndex, layerRef, contactScan)
+            scanTileContacts(index, transform.viewIndex, layerRef, contactScan)
+            scanSpriteContacts(index, transform.viewIndex, layerRef, contactScan)
         }
 
         private val tempPos = Vector2f()
         private fun scanTileContacts(
-            entity: Entity,
+            index: EntityIndex,
             viewRef: ComponentIndex,
             layerRef: ComponentIndex,
-            contactScan: ContactScan) {
+            contactScan: ContactScan
+        ) {
 
             val tileGrids = TileGrid[viewRef, layerRef]
             var gridIndex = tileGrids.nextSetBit(0)
@@ -162,23 +168,23 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                 val tileGrid = TileGrid[gridIndex]
                 val iterator = tileGrid.tileGridIterator(originWorldBounds.bounds)
                 while (iterator.hasNext()) {
-                    val otherEntityRef = iterator.next()
-                    if (entity.index == otherEntityRef)
+                    val otherEntityIndex = iterator.next()
+                    if (index == otherEntityIndex)
                         continue
 
-                    val otherEntity = Entity[otherEntityRef]
-                    if (EContact !in otherEntity.aspects)
+                    //val otherEntity = Entity[otherEntityRef]
+                    if (otherEntityIndex !in EContact)
                         continue
 
-                    val otherTransform = otherEntity[ETransform]
-                    val otherContact = otherEntity[EContact]
+                    val otherTransform = ETransform[otherEntityIndex]
+                    val otherContact = EContact[otherEntityIndex]
                     //apply bounds of the other contact shape within world coordinate system
                     tempPos(
                         iterator.worldPosition.x + otherTransform.position.x,
                         iterator.worldPosition.y + otherTransform.position.y
                     )
                     applyContactBounds(otherWorldBounds, otherContact, tempPos.x, tempPos.y)
-                    contactScan.scanFullContact(originWorldBounds, otherWorldBounds, otherContact, otherEntity.index)
+                    contactScan.scanFullContact(originWorldBounds, otherWorldBounds, otherContact, index)
                 }
 
                 gridIndex = tileGrids.nextSetBit(gridIndex + 1)
@@ -186,36 +192,40 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
         }
 
         private fun scanSpriteContacts(
-            entity: Entity,
+            index: EntityIndex,
             viewRef: ComponentIndex,
             layerRef: ComponentIndex,
-            contactScan: ContactScan) {
+            contactScan: ContactScan
+        ) {
 
             val contactMaps = ContactMap.VIEW_LAYER_MAPPING[viewRef, layerRef]
             var mapIndex = contactMaps.nextSetBit(0)
             while (mapIndex >= 0) {
                 val contactMap = ContactMap[mapIndex]
-                val iterator = contactMap[originWorldBounds.bounds, entity]
+                val iterator = contactMap[originWorldBounds.bounds, index]
                 mapIndex = contactMaps.nextSetBit(mapIndex + 1)
-                while (iterator.hasNext()) {
-                    val otherEntity = Entity[iterator.nextInt()]
-                    val otherContact = otherEntity[EContact]
-                    val otherWorldPos = getWorldPos(otherEntity, otherEntity[ETransform])
 
-                    if (EMultiplier in otherEntity.aspects) {
-                        val multiplier = otherEntity[EMultiplier]
+                while (iterator.hasNext()) {
+                    //val otherEntity = Entity[iterator.nextInt()]
+                    val otherEntityIndex = iterator.nextInt()
+                    val otherContact = EContact[otherEntityIndex]
+                    val otherWorldPos = getWorldPos(otherEntityIndex)
+
+                    if (otherEntityIndex in EMultiplier) {
+                        val multiplier = EMultiplier[otherEntityIndex]
                         val iterator2 = multiplier.positions.iterator()
                         while (iterator2.hasNext()) {
                             applyContactBounds(
                                 otherWorldBounds,
                                 otherContact,
                                 otherWorldPos.x + iterator2.next(),
-                                otherWorldPos.y + iterator2.next())
-                            contactScan.scanFullContact(originWorldBounds, otherWorldBounds, otherContact, otherEntity.index)
+                                otherWorldPos.y + iterator2.next()
+                            )
+                            contactScan.scanFullContact(originWorldBounds, otherWorldBounds, otherContact, index)
                         }
                     } else {
                         applyContactBounds(otherWorldBounds, otherContact, otherWorldPos.x, otherWorldPos.y)
-                        contactScan.scanFullContact(originWorldBounds, otherWorldBounds, otherContact, otherEntity.index)
+                        contactScan.scanFullContact(originWorldBounds, otherWorldBounds, otherContact, otherEntityIndex)
                     }
                 }
             }
@@ -246,28 +256,18 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                 contactBounds.resetBitmask()
         }
 
-        private fun getWorldPos(entity: Entity, transform: ETransform): Vector2f {
-            return if (EChild in entity.aspects) {
-                addTransformPos(entity[EChild].parentIndex)
+        private fun getWorldPos(index: EntityIndex): Vector2f {
+            return if (index in EChild) {
+                addTransformPos(EChild[index].parentIndex)
                 tempPos
             } else
-                transform.position
+                ETransform[index].position
         }
 
         private fun addTransformPos(parent: EntityIndex) {
-            val parentEntity = Entity[parent]
-            tempPos + parentEntity[ETransform].position
-            if (EChild in parentEntity.aspects)
-                addTransformPos(parentEntity[EChild].parentIndex)
+            tempPos + ETransform[parent].position
+            if (parent in EChild)
+                addTransformPos(EChild[parent].parentIndex)
         }
-
-//        private val contactEventType = Event.EventType("ContactEvent")
-//        private val contactEvent = ContactEvent(contactEventType)
     }
-
-//    class ContactEvent(override val eventType: EventType) : Event<(Int) -> Unit>() {
-//        var entityId: EntityIndex = NULL_COMPONENT_INDEX
-//            internal set
-//        override fun notify(listener: (Int) -> Unit) { listener(entityId) }
-//    }
 }

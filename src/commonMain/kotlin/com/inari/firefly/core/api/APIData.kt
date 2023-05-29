@@ -1,6 +1,5 @@
 package com.inari.firefly.core.api
 
-import com.inari.firefly.core.Component.Companion.NO_COMPONENT_KEY
 import com.inari.firefly.core.ComponentKey
 import com.inari.util.*
 import com.inari.util.collection.AttributesRO

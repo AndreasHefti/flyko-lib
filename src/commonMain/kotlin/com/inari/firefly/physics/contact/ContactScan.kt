@@ -66,7 +66,7 @@ class ContactScans internal constructor() {
 
     fun registerScan(fullScan: FullContactScan) {
         if (scans == DynArray.NULL_ARRAY)
-            scans = DynArray.of()
+            scans = DynArray.of(5)
         scans[fullScan.constraint.index] = fullScan
     }
 

@@ -57,12 +57,10 @@ class EShape private constructor() : EntityComponent(EShape) {
     }
 
     object PropertyAccessor {
-        fun getInstance(index: EntityIndex) = ComponentSystem[Entity, index][EShape]
-        fun getColor(index: EntityIndex) = getInstance(index).color1
-        fun getColorRed(index: EntityIndex) = getColor(index).v0PropertyAccessor
-        fun getColorGreen(index: EntityIndex) = getColor(index).v1PropertyAccessor
-        fun getColorBlue(index: EntityIndex) = getColor(index).v2PropertyAccessor
-        fun getColorAlpha(index: EntityIndex) = getColor(index).v3PropertyAccessor
+        private inline fun getColorRed(index: EntityIndex) = EShape[index].color1.v0PropertyAccessor
+        private inline fun getColorGreen(index: EntityIndex) = EShape[index].color1.v1PropertyAccessor
+        private inline fun getColorBlue(index: EntityIndex) = EShape[index].color1.v2PropertyAccessor
+        private inline fun getColorAlpha(index: EntityIndex) = EShape[index].color1.v3PropertyAccessor
         @JvmField val COLOR_RED: (EntityIndex) -> FloatPropertyAccessor = this::getColorRed
         @JvmField val COLOR_GREEN: (EntityIndex) -> FloatPropertyAccessor = this::getColorGreen
         @JvmField val COLOR_BLUE: (EntityIndex) -> FloatPropertyAccessor = this::getColorBlue

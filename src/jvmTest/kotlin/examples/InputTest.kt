@@ -18,7 +18,7 @@ fun main() {
     var text = StringBuilder("")
     var textId = Component.NO_COMPONENT_KEY
     val updateCall: () -> Unit = {
-        val textEntity = Entity[textId][EText]
+        val textEntity = EText[textId.componentIndex]
         val keyInput = Engine.input.getDevice("AllInput")
         when {
             keyInput.buttonPressed(ButtonType.UP) -> textEntity.text.clear().append("UP")

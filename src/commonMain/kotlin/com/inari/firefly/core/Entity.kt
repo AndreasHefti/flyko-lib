@@ -66,9 +66,9 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    operator fun <C : EntityComponent> get(type: EntityComponentType<C>): C =
-        ENTITY_COMPONENT_BUILDER[type.aspectIndex]?.components?.get(index)!! as C
+//    @Suppress("UNCHECKED_CAST")
+//    operator fun <C : EntityComponent> get(type: EntityComponentType<C>): C =
+//        ENTITY_COMPONENT_BUILDER[type.aspectIndex]?.components?.get(index)!! as C
 
     fun <C : EntityComponent> withComponent(cBuilder: EntityComponentBuilder<C>, configure: (C.() -> Unit)): C =
         cBuilder.builder(this)(configure)
@@ -151,6 +151,7 @@ abstract class EntityComponentBuilder<C : EntityComponent>(typeName: String) : E
     @Suppress("LeakingThis")
     @JvmField val components = allocateArray()
     inline operator fun get(index: EntityIndex): C = components.array[index]!!
+    inline operator fun get(entityName: String): C = components.array[Entity[entityName].index]!!
     inline operator fun get(entity: Entity): C = components.array[entity.index]!!
     inline operator fun contains(index: Int): Boolean = index < components.array.size && components.array[index] != null
     inline fun getIfExists(index: Int): C? =  if (index in this) this[index] else null

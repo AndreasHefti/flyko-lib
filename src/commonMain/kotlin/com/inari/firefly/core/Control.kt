@@ -2,6 +2,7 @@ package com.inari.firefly.core
 
 import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.Engine.Companion.UPDATE_EVENT_TYPE
+import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.core.api.FFTimer
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.firefly.core.api.SimpleTask
@@ -187,7 +188,7 @@ abstract class EntityControl protected constructor() : Control() {
 
     protected val entityIndexes = BitSet()
     private val componentListener: ComponentEventListener = { key, type ->
-        if (type == ComponentEventType.ACTIVATED && matchForControl(Entity[key])) {
+        if (type == ComponentEventType.ACTIVATED && matchForControl(key.componentIndex)) {
             entityIndexes[key.componentIndex] = true
             if (!this.active)
                 Control.activate(this)
@@ -212,15 +213,15 @@ abstract class EntityControl protected constructor() : Control() {
             while (it.hasNext()) {
                 val entity = Entity[it.nextInt()]
                 if (!Pausing.isPaused(entity.groups))
-                    update(entity)
+                    update(entity.index)
             }
         else
             while (it.hasNext())
-                update(Entity[it.nextInt()])
+                update(it.nextInt())
     }
 
-    abstract fun matchForControl(entity: Entity): Boolean
-    protected abstract fun update(entity: Entity)
+    abstract fun matchForControl(index: EntityIndex): Boolean
+    protected abstract fun update(index: EntityIndex)
 }
 
 interface Controlled {

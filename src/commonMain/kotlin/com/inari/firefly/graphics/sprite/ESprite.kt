@@ -45,13 +45,12 @@ class ESprite private constructor() : EntityComponent(ESprite) {
     }
 
     object PropertyAccessor {
-        private inline fun getInstance(index: ComponentIndex) = ComponentSystem[Entity, index][ESprite]
-        private inline fun getTintColor(index: ComponentIndex) = getInstance(index).renderData.tintColor
+        private inline fun getTintColor(index: ComponentIndex) = ESprite[index].renderData.tintColor
         private inline fun getTintColorRed(index: ComponentIndex) = getTintColor(index).v0PropertyAccessor
         private inline fun getTintColorGreen(index: ComponentIndex) = getTintColor(index).v1PropertyAccessor
         private inline fun getTintColorBlue(index: ComponentIndex) = getTintColor(index).v2PropertyAccessor
         private inline fun getTintColorAlpha(index: ComponentIndex) = getTintColor(index).v3PropertyAccessor
-        private inline fun getSpriteIndex(index: ComponentIndex) = getInstance(index).spriteRefPropertyAccessor
+        private inline fun getSpriteIndex(index: ComponentIndex) = ESprite[index].spriteRefPropertyAccessor
         @JvmField val SPRITE_INDEX = this::getSpriteIndex
         @JvmField val TINT_COLOR_RED: (ComponentIndex) -> FloatPropertyAccessor = this::getTintColorRed
         @JvmField val TINT_COLOR_GREEN: (ComponentIndex) -> FloatPropertyAccessor = this::getTintColorGreen
