@@ -17,13 +17,17 @@ abstract class AnimationIntegrator<A : Animation> {
 abstract class Animation protected constructor(subtype: ComponentType<out Animation>) : Component(subtype) {
 
     @JvmField var duration = 0L
-    @JvmField var normalizedTime = 0f
     @JvmField var suspend = false
     @JvmField var looping = false
     @JvmField var inverseOnLoop = false
     @JvmField var inverse = false
     @JvmField var resetOnFinish = true
     @JvmField var disposeWhenNoRefs = true
+
+    var normalizedTime = 0f
+        internal set
+    var loopCount = 0
+        internal set
 
     init {
         autoActivation = true
@@ -33,11 +37,16 @@ abstract class Animation protected constructor(subtype: ComponentType<out Animat
     protected abstract fun doDispose(index: ComponentIndex)
     protected abstract val hasReferences: Boolean
     protected abstract fun integrate()
-    abstract fun reset()
+
     fun finish() {
         Animation.deactivate(this)
         if (resetOnFinish)
             reset()
+    }
+
+    open fun reset() {
+        loopCount = 0
+        normalizedTime = 0.0f
     }
 
     fun dispose(index: ComponentIndex) {
@@ -54,8 +63,12 @@ abstract class Animation protected constructor(subtype: ComponentType<out Animat
             if (suspend || !looping) {
                 finish()
                 return
-            } else if (inverseOnLoop)
-                inverse = !inverse
+            } else {
+                if (inverseOnLoop)
+                    inverse = !inverse
+                if (!inverse)
+                    loopCount++
+            }
         }
 
         integrate()
@@ -124,7 +137,10 @@ class EasedValueAnimation private constructor() : Animation(EasedValueAnimation)
     }
 
     override fun integrate() = integrator.integrateStep(this)
-    override fun reset() = accessor(startValue)
+    override fun reset() {
+        super.reset()
+        accessor(startValue)
+    }
 
     companion object : ComponentSubTypeBuilder<Animation, EasedValueAnimation>(Animation,"EasedValue") {
         override fun create() = EasedValueAnimation()
@@ -176,7 +192,10 @@ class SpriteFrameAnimation private constructor() : Animation(SpriteFrameAnimatio
     }
 
     override fun integrate() = integrator.integrateStep(this)
-    override fun reset() = accessor(timeline[0].sprite.spriteIndex)
+    override fun reset() {
+        super.reset()
+        accessor(timeline[0].sprite.spriteIndex)
+    }
 
     companion object : ComponentSubTypeBuilder<Animation, SpriteFrameAnimation>(Animation,"SpriteFrameAnimation") {
         override fun create() = SpriteFrameAnimation()
@@ -346,5 +365,13 @@ class IntPropertyAccessorMultiplexer(
             accessorRefs[i]?.invoke(value)
             i = accessorRefs.nextIndex(i)
         }
+    }
+}
+
+class AnimationTransition private constructor(): Component(AnimationTransition) {
+
+    companion object : ComponentSystem<AnimationTransition>("AnimationTransition") {
+        override fun allocateArray(size: Int): Array<AnimationTransition?> = arrayOfNulls(size)
+        override fun create() = AnimationTransition()
     }
 }

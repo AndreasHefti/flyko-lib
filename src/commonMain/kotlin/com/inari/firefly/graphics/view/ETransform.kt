@@ -90,7 +90,7 @@ class ETransform private constructor() : EntityComponent(ETransform), ViewLayerA
     }
 
     override val componentType = Companion
-    companion object : EntityComponentBuilder<ETransform>("ETransform") {
+    companion object : EntityComponentSystem<ETransform>("ETransform") {
         override fun allocateArray() = DynArray.of<ETransform>()
         override fun create() = ETransform()
     }

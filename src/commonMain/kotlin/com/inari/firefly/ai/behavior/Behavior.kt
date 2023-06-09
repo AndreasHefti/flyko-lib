@@ -14,18 +14,8 @@ abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
     companion object : AbstractComponentSystem<BehaviorNode>("BehaviorNode") {
         override fun allocateArray(size: Int): Array<BehaviorNode?> = arrayOfNulls(size)
 
-        private val entityIds = BitSet()
-        private val entityListener: ComponentEventListener = { key, type ->
-            if (key.componentIndex in EBehavior) {
-                if (type == ComponentEventType.ACTIVATED)
-                    entityIds[key.componentIndex] = true
-                else if (type == ComponentEventType.DEACTIVATED)
-                    entityIds[key.componentIndex] = false
-            }
-        }
-
         private fun update() {
-            var i = entityIds.nextSetBit(0)
+            var i = EBehavior.activeComponents.nextSetBit(0)
             while (i >= 0) {
                 val behavior = EBehavior[i]
                 if (!behavior.active || behavior.behaviorTreeRef.targetKey.componentIndex < 0 || !behavior.scheduler.needsUpdate())
@@ -38,7 +28,7 @@ abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
                         reset(i)
 
                 behavior.treeState = BehaviorNode[behavior.treeIndex].tick(i)
-                i = entityIds.nextSetBit(i + 1)
+                i = EBehavior.activeComponents.nextSetBit(i + 1)
             }
         }
 
@@ -48,7 +38,6 @@ abstract class BehaviorNode protected constructor() : Component(BehaviorNode) {
 
         init {
             Engine.registerListener(UPDATE_EVENT_TYPE, this::update)
-            Entity.registerComponentListener(entityListener)
         }
     }
 }

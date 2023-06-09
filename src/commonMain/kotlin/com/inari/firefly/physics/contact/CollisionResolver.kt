@@ -9,7 +9,6 @@ import com.inari.firefly.graphics.tile.TileGrid
 import com.inari.firefly.graphics.view.ETransform
 import com.inari.firefly.physics.movement.EMovement
 import com.inari.firefly.physics.movement.MovementSystem
-import com.inari.util.collection.BitSet
 import com.inari.util.geom.Vector2f
 import com.inari.util.geom.Vector3i
 import kotlin.math.ceil
@@ -22,18 +21,6 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
     companion object : AbstractComponentSystem<CollisionResolver>("ContactResolver") {
         override fun allocateArray(size: Int): Array<CollisionResolver?> = arrayOfNulls(size)
 
-        // Contains all entity ids that has contact scans defined and are active
-        // They are all processed during one contact scan cycle. A contact scan is triggered by a move event
-        private val entitiesWithScan = BitSet()
-
-        private fun entityListener(key: ComponentKey, type: ComponentEventType) {
-            if (!entityMatch(key.componentIndex)) return
-            if (type == ComponentEventType.ACTIVATED)
-                entitiesWithScan[key.componentIndex] = true
-            else if (type == ComponentEventType.DEACTIVATED)
-                entitiesWithScan[key.componentIndex] = false
-        }
-
         private fun entityMatch(index: EntityIndex): Boolean {
             val entity = Entity[index]
             return (EContact in entity.aspects &&
@@ -44,7 +31,6 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
 
         init {
             MovementSystem // load movement first to ensure Contact MapUpdate first
-            Entity.registerComponentListener(::entityListener)
             Engine.registerListener(UPDATE_EVENT_TYPE, ::update)
         }
 
@@ -57,16 +43,16 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
         }
 
         private fun update() {
-            var i = entitiesWithScan.nextSetBit(0)
+            var i = EContact.activeComponents.nextSetBit(0)
             while (i >= 0) {
                 if (Pausing.isPaused(Entity[i].groups)) {
-                    i = entitiesWithScan.nextSetBit(i + 1)
+                    i = EContact.activeComponents.nextSetBit(i + 1)
                     continue
                 }
 
                 val contacts = EContact[i]
                 if (!contacts.contactScans.hasAnyScan) {
-                    i = entitiesWithScan.nextSetBit(i + 1)
+                    i = EContact.activeComponents.nextSetBit(i + 1)
                     continue
                 }
 
@@ -81,7 +67,7 @@ abstract class CollisionResolver protected constructor(): Component(CollisionRes
                 if (contacts.contactConstraintRef.exists)
                     processContactCallbacks(i, contacts)
 
-                i = entitiesWithScan.nextSetBit(i + 1)
+                i = EContact.activeComponents.nextSetBit(i + 1)
             }
         }
 

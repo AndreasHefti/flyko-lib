@@ -74,7 +74,7 @@ class ETile private constructor(): EntityComponent(ETile) {
     }
 
     override val componentType = Companion
-    companion object : EntityComponentBuilder<ETile>("ETile") {
+    companion object : EntityComponentSystem<ETile>("ETile") {
         override fun allocateArray() = DynArray.of<ETile>()
         override fun create() = ETile()
     }

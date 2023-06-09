@@ -114,7 +114,7 @@ fun main(args: Array<String>) {
 
         Entity.setMinCapacity(100000)
         val vert = floatArrayOf(0f, 0f, 10f, 20f)
-        for (i in 1..50000) {
+        for (i in 1..10000) {
             Entity {
                 autoActivation = true
                 withComponent(ETransform) {

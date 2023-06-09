@@ -3,7 +3,6 @@ package com.inari.firefly.ai.utility
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.*
 import com.inari.firefly.core.api.ActionResult.RUNNING
-import com.inari.util.VOID_CALL
 import com.inari.util.collection.BitSet
 import com.inari.util.geom.Easing
 import com.inari.util.geom.EasingFunction
@@ -18,24 +17,12 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
         override fun create() =
             throw UnsupportedOperationException("UtilityAI is abstract use a concrete implementation instead")
 
-        private val entityIds = BitSet()
-        private val entityListener: ComponentEventListener = { key, type ->
-            val entity = Entity[key.componentIndex]
-            if (EUtility in entity.aspects) {
-                when (type) {
-                    ComponentEventType.ACTIVATED -> entityIds[key.componentIndex] = true
-                    ComponentEventType.DEACTIVATED -> entityIds[key.componentIndex] = false
-                    else -> VOID_CALL
-                }
-            }
-        }
-
         private fun update() {
-            var i = entityIds.nextSetBit(0)
+            var i = EUtility.activeComponents.nextSetBit(0)
             while (i >= 0) {
                 val utility = EUtility[i]
                 if (!utility.scheduler.needsUpdate()) {
-                    i = entityIds.nextSetBit(i + 1)
+                    i = EUtility.activeComponents.nextSetBit(i + 1)
                     continue
                 }
 
@@ -76,13 +63,12 @@ abstract class UtilityAI protected constructor() : Component(UtilityAI) {
                             utility.runningActionIndex = id
                     }
                 }
-                i = entityIds.nextSetBit(i + 1)
+                i = EUtility.activeComponents.nextSetBit(i + 1)
             }
         }
 
         init {
             Engine.registerListener(Engine.UPDATE_EVENT_TYPE, this::update)
-            Entity.registerComponentListener(entityListener)
         }
     }
 }

@@ -4,7 +4,7 @@ import com.inari.firefly.core.ComponentKey
 import com.inari.firefly.core.Engine
 import com.inari.firefly.core.Engine.Companion.INFINITE_SCHEDULER
 import com.inari.firefly.core.EntityComponent
-import com.inari.firefly.core.EntityComponentBuilder
+import com.inari.firefly.core.EntityComponentSystem
 import com.inari.firefly.core.api.FFTimer
 import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.collection.BitSet
@@ -58,7 +58,7 @@ class EUtility  private constructor() : EntityComponent(EUtility) {
     }
 
     override val componentType = EUtility
-    companion object : EntityComponentBuilder<EUtility>("EUtility") {
+    companion object : EntityComponentSystem<EUtility>("EUtility") {
         override fun allocateArray() = DynArray.of<EUtility>()
         override fun create() = EUtility()
     }

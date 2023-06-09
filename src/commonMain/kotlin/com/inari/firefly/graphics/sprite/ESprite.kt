@@ -66,7 +66,7 @@ class ESprite private constructor() : EntityComponent(ESprite) {
     }
 
     override val componentType = Companion
-    companion object : EntityComponentBuilder<ESprite>("ESprite") {
+    companion object : EntityComponentSystem<ESprite>("ESprite") {
         override fun allocateArray() = DynArray.of<ESprite>()
         override fun create() = ESprite()
     }

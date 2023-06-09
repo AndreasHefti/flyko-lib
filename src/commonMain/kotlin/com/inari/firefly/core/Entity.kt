@@ -6,6 +6,7 @@ import com.inari.firefly.core.api.NULL_COMPONENT_INDEX
 import com.inari.util.ZERO_INT
 import com.inari.util.aspect.*
 import com.inari.util.collection.AttributesRO.Companion.EMPTY_ATTRIBUTES
+import com.inari.util.collection.BitSet
 import com.inari.util.collection.DynArray
 import com.inari.util.collection.DynFloatArray
 import com.inari.util.indexed.AbstractIndexed
@@ -26,16 +27,28 @@ abstract class EntityComponent protected constructor(
     entityComponentType: EntityComponentType<*>
 ) : AbstractIndexed(entityComponentType.typeName) {
 
+    var groups: Aspects? = null
+        internal set
     var entityIndex: EntityIndex = NULL_COMPONENT_INDEX
         internal set
 
-    internal fun iActivate() = activate()
-    internal fun iDeactivate() = deactivate()
+    val system: EntityComponentSystem<*>
+        get() { return ENTITY_COMPONENT_BUILDER[this.componentType.aspectIndex]!! }
+
+    internal fun iActivate() {
+        system.activeComponents[entityIndex] = true
+        groups = Entity[entityIndex].groups
+        activate()
+    }
+    internal fun iDeactivate() {
+        system.activeComponents[entityIndex] = false
+        deactivate()
+    }
     internal fun iDispose()  {
         reset()
-        ENTITY_COMPONENT_BUILDER[this.componentType.aspectIndex]
-            ?.components?.remove(this.entityIndex)
+        system.components.remove(this.entityIndex)
         this.entityIndex = NULL_COMPONENT_INDEX
+        groups = null
     }
     protected open fun activate() {}
     protected open fun deactivate() {}
@@ -66,9 +79,9 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
         }
     }
 
-    fun <C : EntityComponent> withComponent(cBuilder: EntityComponentBuilder<C>, configure: (C.() -> Unit)): C =
+    fun <C : EntityComponent> withComponent(cBuilder: EntityComponentSystem<C>, configure: (C.() -> Unit)): C =
         cBuilder.builder(this)(configure)
-    fun <C : EntityComponent> withComponent(cBuilder: EntityComponentBuilderAdapter<C>, configure: (C.() -> Unit)): C =
+    fun <C : EntityComponent> withComponent(cBuilder: EntityComponentSystemAdapter<C>, configure: (C.() -> Unit)): C =
         cBuilder.type.builder(this)(configure)
 
     override fun toString(): String = "${super.toString()} | $aspects"
@@ -91,7 +104,7 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
             }
         }
 
-        @JvmField internal val ENTITY_COMPONENT_BUILDER = DynArray.of<EntityComponentBuilder<*>>()
+        @JvmField internal val ENTITY_COMPONENT_BUILDER = DynArray.of<EntityComponentSystem<*>>()
         @JvmField val ENTITY_COMPONENT_ASPECTS = IndexedAspectType("ENTITY_COMPONENT_ASPECTS")
         private val entityListener: ComponentEventListener = { index, eType ->
             if (eType == ComponentEventType.DISPOSED)
@@ -115,14 +128,14 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
                 disposedEntities.add(create())
         }
 
-        fun createComponentForLaterUse(number: Int, builder: EntityComponentBuilder<*>) {
+        fun createComponentForLaterUse(number: Int, builder: EntityComponentSystem<*>) {
             val cache = getOrCreate(builder.aspectIndex)
             for (i in 0 until number)
                 cache.add(builder.create())
         }
 
         @Suppress("UNCHECKED_CAST")
-        internal fun <C : EntityComponent> getComponent(builder: EntityComponentBuilder<C>): C {
+        internal fun <C : EntityComponent> getComponent(builder: EntityComponentSystem<C>): C {
             val cache = getOrCreate(builder.aspectIndex)
             return if (cache.isEmpty())
                 builder.create()
@@ -151,7 +164,7 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
     }
 }
 
-abstract class EntityComponentBuilder<C : EntityComponent>(typeName: String) : EntityComponentType<C>(typeName) {
+abstract class EntityComponentSystem<C : EntityComponent>(typeName: String) : EntityComponentType<C>(typeName) {
 
     init {
         @Suppress("LeakingThis")
@@ -160,6 +173,7 @@ abstract class EntityComponentBuilder<C : EntityComponent>(typeName: String) : E
 
     @Suppress("LeakingThis")
     @JvmField val components = allocateArray()
+    @JvmField val activeComponents = BitSet()
     inline operator fun get(index: EntityIndex): C = components.array[index]!!
     inline operator fun get(entityName: String): C = components.array[Entity[entityName].index]!!
     inline operator fun get(entity: Entity): C = components.array[entity.index]!!
@@ -184,8 +198,8 @@ abstract class EntityComponentBuilder<C : EntityComponent>(typeName: String) : E
 
 }
 
-interface EntityComponentBuilderAdapter<C : EntityComponent> {
-    val type: EntityComponentBuilder<C>
+interface EntityComponentSystemAdapter<C : EntityComponent> {
+    val type: EntityComponentSystem<C>
 }
 
 class EChild private constructor() : EntityComponent(EChild) {
@@ -201,7 +215,7 @@ class EChild private constructor() : EntityComponent(EChild) {
     }
 
     override val componentType = Companion
-    companion object : EntityComponentBuilder<EChild>("EChild") {
+    companion object : EntityComponentSystem<EChild>("EChild") {
         override fun allocateArray() = DynArray.of<EChild>()
         override fun create() = EChild()
     }
@@ -216,7 +230,7 @@ class EMultiplier private constructor() : EntityComponent(EMultiplier) {
     }
 
     override val componentType = Companion
-    companion object : EntityComponentBuilder<EMultiplier>("EMultiplier") {
+    companion object : EntityComponentSystem<EMultiplier>("EMultiplier") {
         override fun allocateArray() = DynArray.of<EMultiplier>()
         override fun create() = EMultiplier()
     }
@@ -231,7 +245,7 @@ class EAttribute private constructor() : EntityComponent(EAttribute) {
     }
 
     override val componentType = Companion
-    companion object : EntityComponentBuilder<EAttribute>("EAttribute") {
+    companion object : EntityComponentSystem<EAttribute>("EAttribute") {
         override fun allocateArray() = DynArray.of<EAttribute>()
         override fun create() = EAttribute()
     }

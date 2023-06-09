@@ -1,9 +1,7 @@
 package com.inari.firefly.graphics.shape
 
-import com.inari.firefly.core.ComponentSystem
-import com.inari.firefly.core.Entity
 import com.inari.firefly.core.EntityComponent
-import com.inari.firefly.core.EntityComponentBuilder
+import com.inari.firefly.core.EntityComponentSystem
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.EntityIndex
 import com.inari.firefly.core.api.ShapeData
@@ -68,7 +66,7 @@ class EShape private constructor() : EntityComponent(EShape) {
     }
 
     override val componentType = Companion
-    companion object : EntityComponentBuilder<EShape>("EShape") {
+    companion object : EntityComponentSystem<EShape>("EShape") {
         override fun allocateArray() = DynArray.of<EShape>()
         override fun create() = EShape()
     }

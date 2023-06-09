@@ -1,7 +1,7 @@
 package com.inari.firefly.graphics.particle
 
 import com.inari.firefly.core.EntityComponent
-import com.inari.firefly.core.EntityComponentBuilder
+import com.inari.firefly.core.EntityComponentSystem
 import com.inari.firefly.graphics.view.EntityRenderer
 import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
@@ -24,7 +24,7 @@ class EParticle private constructor() : EntityComponent(EParticle) {
     }
 
     override val componentType = Companion
-    companion object : EntityComponentBuilder<EParticle>("EParticle") {
+    companion object : EntityComponentSystem<EParticle>("EParticle") {
         override fun allocateArray() = DynArray.of<EParticle>()
         override fun create() = EParticle()
     }

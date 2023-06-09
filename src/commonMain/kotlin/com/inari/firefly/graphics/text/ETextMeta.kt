@@ -2,7 +2,7 @@ package com.inari.firefly.graphics.text
 
 import com.inari.firefly.core.ComponentDSL
 import com.inari.firefly.core.EntityComponent
-import com.inari.firefly.core.EntityComponentBuilder
+import com.inari.firefly.core.EntityComponentSystem
 import com.inari.firefly.core.api.BlendMode
 import com.inari.firefly.core.api.TransformData
 import com.inari.util.collection.DynArray
@@ -52,7 +52,7 @@ class ETextMeta private constructor() : EntityComponent(ETextMeta) {
     }
 
     override val componentType = Companion
-    companion object : EntityComponentBuilder<ETextMeta>("ETextMeta") {
+    companion object : EntityComponentSystem<ETextMeta>("ETextMeta") {
         override fun allocateArray() = DynArray.of<ETextMeta>()
         override fun create() = ETextMeta()
     }

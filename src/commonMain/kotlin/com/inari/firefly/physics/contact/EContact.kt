@@ -74,7 +74,7 @@ class EContact private constructor() : EntityComponent(EContact) {
     }
 
     override val componentType = Companion
-    companion object : EntityComponentBuilder<EContact>("EContact") {
+    companion object : EntityComponentSystem<EContact>("EContact") {
         override fun allocateArray() = DynArray.of<EContact>()
         override fun create() = EContact()
 

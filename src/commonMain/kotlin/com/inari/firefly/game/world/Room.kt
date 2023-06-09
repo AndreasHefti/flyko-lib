@@ -35,7 +35,7 @@ class ERoomTransition private constructor() : EntityComponent(ERoomTransition) {
     }
 
     override val componentType = Companion
-    companion object : EntityComponentBuilder<ERoomTransition>("ERoomTransition") {
+    companion object : EntityComponentSystem<ERoomTransition>("ERoomTransition") {
         override fun allocateArray() = DynArray.of<ERoomTransition>()
         override fun create() = ERoomTransition()
     }

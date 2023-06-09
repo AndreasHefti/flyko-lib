@@ -184,46 +184,6 @@ abstract class ComponentsControl<C : Component> protected constructor(
 
 }
 
-abstract class EntityControl protected constructor() : Control() {
-
-    protected val entityIndexes = BitSet()
-    private val componentListener: ComponentEventListener = { key, type ->
-        if (type == ComponentEventType.ACTIVATED && matchForControl(key.componentIndex)) {
-            entityIndexes[key.componentIndex] = true
-            if (!this.active)
-                Control.activate(this)
-        }
-        else if (type == ComponentEventType.DEACTIVATED && key.componentIndex < entityIndexes.size)
-            entityIndexes[key.componentIndex] = false
-    }
-
-    override fun load() {
-        super.load()
-        Entity.registerComponentListener(componentListener)
-    }
-
-    override fun dispose() {
-        super.dispose()
-        Entity.disposeComponentListener(componentListener)
-    }
-
-    override fun update() {
-        val it = IndexIterator(entityIndexes)
-        if (Pausing.paused)
-            while (it.hasNext()) {
-                val entity = Entity[it.nextInt()]
-                if (!Pausing.isPaused(entity.groups))
-                    update(entity.index)
-            }
-        else
-            while (it.hasNext())
-                update(it.nextInt())
-    }
-
-    abstract fun matchForControl(index: EntityIndex): Boolean
-    protected abstract fun update(index: EntityIndex)
-}
-
 interface Controlled {
 
     fun earlyKeyAccess(): ComponentKey
