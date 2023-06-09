@@ -66,10 +66,6 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
         }
     }
 
-//    @Suppress("UNCHECKED_CAST")
-//    operator fun <C : EntityComponent> get(type: EntityComponentType<C>): C =
-//        ENTITY_COMPONENT_BUILDER[type.aspectIndex]?.components?.get(index)!! as C
-
     fun <C : EntityComponent> withComponent(cBuilder: EntityComponentBuilder<C>, configure: (C.() -> Unit)): C =
         cBuilder.builder(this)(configure)
     fun <C : EntityComponent> withComponent(cBuilder: EntityComponentBuilderAdapter<C>, configure: (C.() -> Unit)): C =
@@ -80,6 +76,20 @@ class Entity internal constructor(): Component(Entity), Controlled, AspectAware 
     companion object : ComponentSystem<Entity>("Entity")  {
         override fun allocateArray(size: Int): Array<Entity?> = arrayOfNulls(size)
         override fun create() = Entity()
+
+        override fun setMinCapacity(c: Int) {
+            super.setMinCapacity(c)
+            ENTITY_COMPONENT_BUILDER.forEach {
+                it.components.ensureCapacity(c)
+            }
+        }
+
+        override fun optimize() {
+            super.optimize()
+            ENTITY_COMPONENT_BUILDER.forEach {
+                it.components.trim()
+            }
+        }
 
         @JvmField internal val ENTITY_COMPONENT_BUILDER = DynArray.of<EntityComponentBuilder<*>>()
         @JvmField val ENTITY_COMPONENT_ASPECTS = IndexedAspectType("ENTITY_COMPONENT_ASPECTS")

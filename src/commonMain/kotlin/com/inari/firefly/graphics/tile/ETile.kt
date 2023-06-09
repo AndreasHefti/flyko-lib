@@ -6,6 +6,7 @@ import com.inari.firefly.graphics.sprite.Sprite
 import com.inari.firefly.graphics.sprite.SpriteSet
 import com.inari.util.FloatPropertyAccessor
 import com.inari.util.IntPropertyAccessor
+import com.inari.util.VOID_INT_PROPERTY_ACCESSOR
 import com.inari.util.collection.DynArray
 import com.inari.util.geom.Vector2i
 import kotlin.jvm.JvmField
@@ -27,9 +28,15 @@ class ETile private constructor(): EntityComponent(ETile) {
     @JvmField val spriteRef = CReference(Sprite)
     @JvmField val spriteSetRef = CReference(SpriteSet)
 
-    @JvmField val spriteRefPropertyAccessor: IntPropertyAccessor = object : IntPropertyAccessor {
-        override fun invoke(value: Int) { spriteIndex = value }
-    }
+    var spriteRefPropertyAccessor: IntPropertyAccessor = VOID_INT_PROPERTY_ACCESSOR
+        private set
+        get() {
+            if (field == VOID_INT_PROPERTY_ACCESSOR)
+                field = object : IntPropertyAccessor {
+                    override fun invoke(value: Int) { spriteIndex = value }
+                }
+            return field
+        }
 
     override fun activate() {
         if (tileGridRef.exists)

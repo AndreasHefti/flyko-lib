@@ -395,7 +395,7 @@ class DynArray<T> constructor(
         inline fun <reified T> nullArray() : DynArray<T> = NULL_ARRAY as DynArray<T>
 
         inline fun <reified T> of(): DynArray<T> {
-            return DynArray(50, 20) { size -> arrayOfNulls<T?>(size) }
+            return DynArray(50, 200) { size -> arrayOfNulls<T?>(size) }
         }
 
         inline fun <reified T> of(initialCapacity: Int): DynArray<T> {

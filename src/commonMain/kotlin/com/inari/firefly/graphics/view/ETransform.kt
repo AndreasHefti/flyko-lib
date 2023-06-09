@@ -3,6 +3,7 @@ package com.inari.firefly.graphics.view
 import com.inari.firefly.core.*
 import com.inari.firefly.core.api.TransformData
 import com.inari.util.FloatPropertyAccessor
+import com.inari.util.VOID_FLOAT_PROPERTY_ACCESSOR
 import com.inari.util.ZERO_FLOAT
 import com.inari.util.ZERO_INT
 import com.inari.util.collection.DynArray
@@ -30,9 +31,15 @@ class ETransform private constructor() : EntityComponent(ETransform), ViewLayerA
     override val layerIndex: Int
         get() = if (layerRef.exists) layerRef.targetKey.componentIndex else 0
 
-    @JvmField val rotationPropertyAccessor: FloatPropertyAccessor = object : FloatPropertyAccessor {
-        override fun invoke(value: Float) { rotation = value }
-    }
+    var rotationPropertyAccessor: FloatPropertyAccessor = VOID_FLOAT_PROPERTY_ACCESSOR
+        private set
+        get() {
+            if (field == VOID_FLOAT_PROPERTY_ACCESSOR)
+                field = object : FloatPropertyAccessor {
+                    override fun invoke(value: Float) { rotation = value }
+                }
+            return field
+        }
 
     override fun activate() {
         super.activate()

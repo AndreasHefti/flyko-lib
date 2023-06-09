@@ -20,6 +20,9 @@ import kotlin.random.Random
 fun main(args: Array<String>) {
 
     DesktopApp( "CoverCodeTest", 800, 600, debug = true) {
+
+        val now = System.currentTimeMillis()
+
         FFInfoSystem
             .addInfo(FrameRateInfo)
             .activate()
@@ -108,6 +111,7 @@ fun main(args: Array<String>) {
             }
         }
 
+
         Entity.setMinCapacity(100000)
         val vert = floatArrayOf(0f, 0f, 10f, 20f)
         for (i in 1..50000) {
@@ -139,5 +143,9 @@ fun main(args: Array<String>) {
                 }
             }
         }
+
+        Entity.optimize()
+
+        println("************** tuck: ${ System.currentTimeMillis() - now}")
     }
 }

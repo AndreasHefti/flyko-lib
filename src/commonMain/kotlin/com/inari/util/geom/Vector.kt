@@ -1,8 +1,6 @@
 package com.inari.util.geom
 
-import com.inari.util.FloatPropertyAccessor
-import com.inari.util.IntPropertyAccessor
-import com.inari.util.VALUE_SEPARATOR
+import com.inari.util.*
 import kotlin.jvm.JvmField
 import kotlin.math.absoluteValue
 import kotlin.math.sqrt
@@ -36,13 +34,25 @@ open class Vector2i constructor(
     constructor(v0: Float, v1: Float) : this(v0.toInt(), v1.toInt())
     constructor(other: Vector2i) : this(other.v0, other.v1)
 
-    @JvmField val v0PropertyAccessor: IntPropertyAccessor = object : IntPropertyAccessor {
-        override fun invoke(value: Int) { v0 = value }
-    }
+    var v0PropertyAccessor: IntPropertyAccessor = VOID_INT_PROPERTY_ACCESSOR
+        private set
+        get() {
+            if (field == VOID_INT_PROPERTY_ACCESSOR)
+                field = object : IntPropertyAccessor {
+                    override fun invoke(value: Int) { v0 = value }
+                }
+            return field
+        }
 
-    @JvmField val v1PropertyAccessor: IntPropertyAccessor = object : IntPropertyAccessor {
-        override fun invoke(value: Int) { v1 = value }
-    }
+    var v1PropertyAccessor: IntPropertyAccessor = VOID_INT_PROPERTY_ACCESSOR
+        private set
+        get() {
+            if (field == VOID_INT_PROPERTY_ACCESSOR)
+                field = object : IntPropertyAccessor {
+                    override fun invoke(value: Int) { v1 = value }
+                }
+            return field
+        }
 
     open val length: Int
         get() = v0.absoluteValue + v1.absoluteValue
@@ -169,9 +179,15 @@ open class Vector3i constructor(
 
     constructor(other: Vector3i) : this(other.v0, other.v1, other.v2)
 
-    @JvmField val v2PropertyAccessor: IntPropertyAccessor = object : IntPropertyAccessor {
-        override fun invoke(value: Int) { v2 = value }
-    }
+    var v2PropertyAccessor: IntPropertyAccessor = VOID_INT_PROPERTY_ACCESSOR
+        private set
+        get() {
+            if (field == VOID_INT_PROPERTY_ACCESSOR)
+                field = object : IntPropertyAccessor {
+                    override fun invoke(value: Int) { v2 = value }
+                }
+            return field
+        }
 
     inline var radius: Int
         get() = v2
@@ -316,9 +332,15 @@ class Vector4i constructor(
     constructor(other: Vector4i) : this(other.v0, other.v1, other.v2, other.v3)
     constructor(other: Vector2i) : this(other.v0, other.v1)
 
-    @JvmField val v3PropertyAccessor: IntPropertyAccessor = object : IntPropertyAccessor {
-        override fun invoke(value: Int) { v3 = value }
-    }
+    var v3PropertyAccessor: IntPropertyAccessor = VOID_INT_PROPERTY_ACCESSOR
+        private set
+        get() {
+            if (field == VOID_INT_PROPERTY_ACCESSOR)
+                field = object : IntPropertyAccessor {
+                    override fun invoke(value: Int) { v3 = value }
+                }
+            return field
+        }
 
     override val length: Int
         get() = super.length + v3.absoluteValue
@@ -477,12 +499,24 @@ open class Vector2f constructor(
     constructor(v0: Int, v1: Int) : this(v0.toFloat(), v1.toFloat())
     constructor(other: Vector2f) : this(other.v0, other.v1)
 
-    @JvmField val v0PropertyAccessor: FloatPropertyAccessor = object : FloatPropertyAccessor {
-        override fun invoke(value: Float) { v0 = value }
-    }
-    @JvmField val v1PropertyAccessor: FloatPropertyAccessor = object : FloatPropertyAccessor {
-        override fun invoke(value: Float) { v1 = value }
-    }
+    var v0PropertyAccessor: FloatPropertyAccessor = VOID_FLOAT_PROPERTY_ACCESSOR
+        private set
+        get() {
+            if (field == VOID_FLOAT_PROPERTY_ACCESSOR)
+                field = object : FloatPropertyAccessor {
+                    override fun invoke(value: Float) { v0 = value }
+                }
+            return field
+        }
+    var v1PropertyAccessor: FloatPropertyAccessor = VOID_FLOAT_PROPERTY_ACCESSOR
+        private set
+        get() {
+            if (field == VOID_FLOAT_PROPERTY_ACCESSOR)
+                field = object : FloatPropertyAccessor {
+                    override fun invoke(value: Float) { v1 = value }
+                }
+            return field
+        }
 
     inline var x: Float
         get() = v0
@@ -644,9 +678,15 @@ open class Vector3f constructor(
     constructor(v0: Int = 1, v1: Int = 1, v2: Int = 1) : this(v0.toFloat(), v1.toFloat(), v2.toFloat())
     constructor(other: Vector3f) : this(other.v0, other.v1, other.v2)
 
-    @JvmField val v2PropertyAccessor: FloatPropertyAccessor = object : FloatPropertyAccessor {
-        override fun invoke(value: Float) { v2 = value }
-    }
+    var v2PropertyAccessor: FloatPropertyAccessor  = VOID_FLOAT_PROPERTY_ACCESSOR
+        private set
+        get() {
+            if (field == VOID_FLOAT_PROPERTY_ACCESSOR)
+                field = object : FloatPropertyAccessor {
+                    override fun invoke(value: Float) { v2 = value }
+                }
+            return field
+        }
 
     inline var z: Float
         get() = v2
@@ -804,9 +844,15 @@ class Vector4f constructor(
     constructor(other: Vector4f) : this(other.v0, other.v1, other.v2, other.v3)
     constructor(other: ImmutableVector4f) : this(other.v0, other.v1, other.v2, other.v3)
 
-    @JvmField val  v3PropertyAccessor: FloatPropertyAccessor = object : FloatPropertyAccessor {
-        override fun invoke(value: Float) { v3 = value }
-    }
+    var v3PropertyAccessor: FloatPropertyAccessor  = VOID_FLOAT_PROPERTY_ACCESSOR
+        private set
+        get() {
+            if (field == VOID_FLOAT_PROPERTY_ACCESSOR)
+                field = object : FloatPropertyAccessor {
+                    override fun invoke(value: Float) { v3 = value }
+                }
+            return field
+        }
 
     inline var a: Float
         get() = v3

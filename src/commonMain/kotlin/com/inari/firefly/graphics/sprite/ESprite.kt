@@ -4,6 +4,7 @@ import com.inari.firefly.core.*
 import com.inari.firefly.core.api.*
 import com.inari.util.FloatPropertyAccessor
 import com.inari.util.IntPropertyAccessor
+import com.inari.util.VOID_INT_PROPERTY_ACCESSOR
 import com.inari.util.collection.DynArray
 import kotlin.jvm.JvmField
 
@@ -21,9 +22,15 @@ class ESprite private constructor() : EntityComponent(ESprite) {
         set(value) { renderData.blendMode = value }
     @JvmField val spriteRef = CReference(Sprite)
     @JvmField val spriteSetRef = CReference(SpriteSet)
-    @JvmField val spriteRefPropertyAccessor: IntPropertyAccessor = object : IntPropertyAccessor {
-        override fun invoke(value: Int) { renderData.spriteIndex = value }
-    }
+    var spriteRefPropertyAccessor: IntPropertyAccessor = VOID_INT_PROPERTY_ACCESSOR
+        private set
+        get() {
+            if (field == VOID_INT_PROPERTY_ACCESSOR)
+                field = object : IntPropertyAccessor {
+                    override fun invoke(value: Int) { renderData.spriteIndex = value }
+                }
+            return field
+        }
 
     override fun activate() {
         if (spriteRef.exists)

@@ -51,7 +51,7 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
             entities[transform.viewIndex] = DynArray.of(10, 2)
         val views = entities[transform.viewIndex]!!
         if (transform.layerIndex !in views)
-            views[transform.layerIndex] = DynIntArray(50, -1, 100)
+            views[transform.layerIndex] = DynIntArray(50, -1, 200)
         val layer = views[transform.layerIndex]!!
         layer.add(index)
         sort(layer)
@@ -84,7 +84,6 @@ abstract class EntityRenderer(override val name: String) : ViewRenderer {
         if (parentId < 0)
             return
 
-        //val parent = Entity[parentId]
         val parentTransform = ETransform[parentId]
         transformCollector + parentTransform.renderData
         if (parentId in EChild)
