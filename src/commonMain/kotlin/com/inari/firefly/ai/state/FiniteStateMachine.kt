@@ -20,7 +20,7 @@ class StateChange internal constructor() {
 
     @JvmField var fromState: String = NO_NAME
     @JvmField var toState: String = NO_NAME
-    @JvmField var condition: () -> Boolean = FALSE_SUPPLIER
+    @JvmField var condition = CReference(ConditionalComponent)
 
     @JvmField
     val disposeStateTaskRef = CReference(Task)
@@ -122,28 +122,28 @@ class FiniteStateMachine : Control() {
         var i = 0
         while (i < currentStateChanges.capacity) {
             val stateChange = currentStateChanges[i++] ?: continue
-            if (stateChange.condition()) {
-                if (stateChange.disposeStateTaskRef.exists)
-                    Task[stateChange.disposeStateTaskRef.targetKey](this.key)
+            if (!ConditionalComponent[stateChange.condition]()) continue
 
-                currentState = stateChange.toState
+            if (stateChange.disposeStateTaskRef.exists)
+                Task[stateChange.disposeStateTaskRef.targetKey](this.key)
 
-                if (stateChange.initStateTaskRef.exists)
-                    Task[stateChange.initStateTaskRef.targetKey](this.key)
+            currentState = stateChange.toState
 
-                if (stateChange.toState !== NO_STATE)
-                    sendEvent(
-                        StateChangeEvent.Type.STATE_CHANGED,
-                        Control.getKey(this.index),
-                        stateChange
-                    )
-                else
-                    sendEvent(
-                        StateChangeEvent.Type.STATE_MACHINE_FINISHED,
-                        Control.getKey(this.index),
-                        stateChange
-                    )
-            }
+            if (stateChange.initStateTaskRef.exists)
+                Task[stateChange.initStateTaskRef.targetKey](this.key)
+
+            if (stateChange.toState !== NO_STATE)
+                sendEvent(
+                    StateChangeEvent.Type.STATE_CHANGED,
+                    Control.getKey(this.index),
+                    stateChange
+                )
+            else
+                sendEvent(
+                    StateChangeEvent.Type.STATE_MACHINE_FINISHED,
+                    Control.getKey(this.index),
+                    stateChange
+                )
         }
     }
 
